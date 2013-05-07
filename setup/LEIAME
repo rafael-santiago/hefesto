@@ -1,0 +1,6 @@
+Desinstale o Hefesto utilizando o script "hfst-inst.hls" contido nesse diretorio
+
+Estando fora do diretorio de instalacao, rode o seguinte comando para desinstalar:
+
+hefesto --forgefiles=<install dir>/setup/hfst-inst.hls --hfst-inst-projects=hefesto-install --uninstall
+

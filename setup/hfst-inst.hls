@@ -1,0 +1,1040 @@
+#
+# "hfst-inst.hls"
+#
+# Description: Hefesto self installer.
+#
+#              Don't touch unless you know what you're
+#                                                doing.
+#
+
+toolset "hefesto-self-installer" # Dummie toolset
+ forge function "hfst_install" :
+$
+
+function is_dir(path type string) : result type int {
+    var old_cwd type string;
+    var is_dir type int;
+    $old_cwd = hefesto.sys.pwd();
+    hefesto.sys.cd($path);
+    $is_dir = 0;
+    if (hefesto.sys.pwd() == $path ||
+        hefesto.sys.pwd() == ($path + "\\")) {
+        $is_dir = 1;
+        hefesto.sys.cd($old_cwd);
+    }
+    result $is_dir;
+}
+
+function path_exists(path type string) : result type int {
+    var old_cwd type string;
+    var exists type int;
+    $exists = 0;
+    $old_cwd = hefesto.sys.pwd();
+    hefesto.sys.cd($path);
+    if (hefesto.sys.os_name() != "windows") {
+        if (hefesto.sys.pwd() == $path) {
+            $exists = 1;
+        }
+    } else {
+        if (hefesto.sys.pwd() == $path ||
+            hefesto.sys.pwd() == ($path + "\\")) {
+            $exists = 1;
+        }
+    }
+    hefesto.sys.cd($old_cwd);
+    result $exists;
+}
+
+function create_dir_tree(path type string) : result type int {
+    var path_elements type list;
+    var p type int;
+    var p_sz type int;
+    var temp type string;
+    var path_sep type string;
+    var res type int;
+    var cwd type string;
+    var fullpath type string;
+
+    $temp = hefesto.sys.os_name();
+    if ($temp == "linux" || $temp == "freebsd") {
+        $path_sep = "/";
+    } else {
+        $path_sep = "\\";
+    }
+    $temp = "";
+
+    $p = 1;
+    $p_sz = $path.len();
+
+    $temp = $temp + $path.at(0);
+
+    while ($p < $p_sz) {
+        if ($path.at($p) != $path_sep) {
+            $temp = $temp + $path.at($p);
+        } else {
+            $path_elements.add_item($temp);
+            $temp = "";
+        }
+        $p = $p + 1;
+    }
+
+    if ($temp != "") $path_elements.add_item($temp);
+
+    $p_sz = $path_elements.count();
+    $p = 0;
+    $temp = "";
+    $fullpath = "";
+    $res = 1;
+
+    $cwd = hefesto.sys.pwd();
+
+    while ($p < $p_sz && $res == 1) {
+        $temp = $path_elements.item($p);
+        if (path_exists($temp) == 0) {
+            if (hefesto.sys.mkdir($path_elements.item($p)) != 0) $res = 0;
+        }
+        if ($fullpath.len() > 0) {
+            $fullpath = $fullpath + $path_sep + $temp;
+        } else {
+            $fullpath = $temp;
+        }
+        $res = hefesto.sys.cd($temp);
+        $p = $p + 1;
+    }
+
+    hefesto.sys.cd($cwd);
+
+    result $res;
+}
+
+function _path_exists(path type string) : result type int {
+    var old_cwd type string;
+    var exists type int;
+    $exists = 0;
+    $old_cwd = hefesto.sys.pwd();
+    hefesto.sys.cd($path);
+    if (hefesto.sys.os_name() != "windows") {
+        if (hefesto.sys.pwd() == $path) {
+            hefesto.sys.cd($old_cwd);
+            $exists = 1;
+        }
+    } else {
+        if (hefesto.sys.pwd() == $path ||
+            hefesto.sys.pwd() == ($path + "\\")) {
+            hefesto.sys.cd($old_cwd);
+            $exists = 1;
+        }
+    }
+    result $exists;
+}
+
+function _create_dir_tree(path type string) : result type int {
+    var path_elements type list;
+    var p type int;
+    var p_sz type int;
+    var temp type string;
+    var path_sep type string;
+    var res type int;
+    var cwd type string;
+    var fullpath type string;
+
+    $temp = hefesto.sys.os_name();
+    if ($temp == "linux" || $temp == "freebsd") {
+        $path_sep = "/";
+    } else {
+        $path_sep = "\\";
+    }
+    $temp = "";
+
+    $p = 1;
+    $p_sz = $path.len();
+
+    $temp = $temp + $path.at(0);
+
+    while ($p < $p_sz) {
+        if ($path.at($p) != $path_sep) {
+            $temp = $temp + $path.at($p);
+        } else {
+            $path_elements.add_item($temp);
+            $temp = "";
+        }
+        $p = $p + 1;
+    }
+
+    if ($temp != "") $path_elements.add_item($temp);
+
+    $p_sz = $path_elements.count();
+    $p = 0;
+    $temp = "";
+    $fullpath = "";
+    $res = 1;
+
+    $cwd = hefesto.sys.pwd();
+
+    while ($p < $p_sz && $res == 1) {
+        $fullpath = $temp;
+        $temp = hefesto.sys.make_path($temp, $path_elements.item($p));
+        if (path_exists($temp) == 0) {
+            if ($fullpath.len() == 0) 
+                hefesto.sys.cd($temp);
+            else
+                hefesto.sys.cd($fullpath);
+            if (hefesto.sys.mkdir($path_elements.item($p)) != 0) $res = 0;
+        }
+        $path_sep = $temp;
+        $p = $p + 1;
+    }
+
+    hefesto.sys.cd($cwd);
+
+    result $res;
+}
+
+function get_path_from_filepath(filepath type string) : result type string {
+
+    var filepath_sz type int;
+    var f type int;
+    var os_name type string;
+    var path_sep type string;
+
+    $os_name = hefesto.sys.os_name();
+
+    if ($os_name == "linux" || $os_name == "freebsd") {
+        $path_sep = "/";
+    } else {
+        $path_sep = "\\";
+    }
+
+    $filepath_sz = $filepath.len() - 1;
+    while ($filepath.at($filepath_sz) != $path_sep && $filepath_sz > 1) {
+        $filepath_sz = $filepath_sz - 1;
+    }
+
+    if ($filepath_sz == 1) result "";
+
+    var path type string;
+    $f = 0;
+    while ($f < $filepath_sz) {
+        $path = $path + $filepath.at($f);
+        $f = $f + 1;
+    }
+
+    result $path;
+
+}
+
+function tolwrcase(str type string) : result type string {
+    var lwr_str type string;
+    var s type int;
+    $s = 0;
+    while ($s < $str.len()) {
+        if ($str.at($s) == "A") {
+            $lwr_str = $lwr_str + "a";
+        } else if ($str.at($s) == "B") {
+            $lwr_str = $lwr_str + "b";
+        } else if ($str.at($s) == "C") {
+            $lwr_str = $lwr_str + "c";
+        } else if ($str.at($s) == "D") {
+            $lwr_str = $lwr_str + "d";
+        } else if ($str.at($s) == "E") {
+            $lwr_str = $lwr_str + "e";
+        } else if ($str.at($s) == "F") {
+            $lwr_str = $lwr_str + "f";
+        } else if ($str.at($s) == "G") {
+            $lwr_str = $lwr_str + "g";
+        } else if ($str.at($s) == "H") {
+            $lwr_str = $lwr_str + "h";
+        } else if ($str.at($s) == "I") {
+            $lwr_str = $lwr_str + "i";
+        } else if ($str.at($s) == "J") {
+            $lwr_str = $lwr_str + "j";
+        } else if ($str.at($s) == "K") {
+            $lwr_str = $lwr_str + "k";
+        } else if ($str.at($s) == "L") {
+            $lwr_str = $lwr_str + "l";
+        } else if ($str.at($s) == "M") {
+            $lwr_str = $lwr_str + "m";
+        } else if ($str.at($s) == "N") {
+            $lwr_str = $lwr_str + "n";
+        } else if ($str.at($s) == "O") {
+            $lwr_str = $lwr_str + "o";
+        } else if ($str.at($s) == "P") {
+            $lwr_str = $lwr_str + "p";
+        } else if ($str.at($s) == "Q") {
+            $lwr_str = $lwr_str + "q";
+        } else if ($str.at($s) == "R") {
+            $lwr_str = $lwr_str + "r";
+        } else if ($str.at($s) == "S") {
+            $lwr_str = $lwr_str + "s";
+        } else if ($str.at($s) == "T") {
+            $lwr_str = $lwr_str + "t";
+        } else if ($str.at($s) == "U") {
+            $lwr_str = $lwr_str + "u";
+        } else if ($str.at($s) == "V") {
+            $lwr_str = $lwr_str + "v";
+        } else if ($str.at($s) == "W") {
+            $lwr_str = $lwr_str + "w";
+        } else if ($str.at($s) == "X") {
+            $lwr_str = $lwr_str + "x";
+        } else if ($str.at($s) == "Y") {
+            $lwr_str = $lwr_str + "y";
+        } else if ($str.at($s) == "Z") {
+            $lwr_str = $lwr_str + "z";
+        } else {
+            $lwr_str = $lwr_str + $str.at($s);
+        }
+        $s = $s + 1;
+    }
+    result $lwr_str;
+}
+
+function export_env_hefesto_var(install_dir type string) : result type int {
+
+    var os_name type string;
+    var exported type int;
+
+    $exported = 0;
+
+    $os_name = hefesto.sys.os_name();
+
+    if ($os_name == "linux") {
+        var hefesto_sh_fd type file;
+        $hefesto_sh_fd = hefesto.sys.fopen("/etc/profile.d/hefesto.sh", "w");
+        if ($hefesto_sh_fd != 0) {
+            var data_buf type string;
+            $data_buf = "#!/bin/sh\n\nexport HEFESTO_INCLUDES_HOME=" + hefesto.sys.make_path($install_dir, "include") + "\n\n";
+            $exported = hefesto.sys.fwrite($data_buf, $data_buf.len(), $hefesto_sh_fd);
+            if ($exported == $data_buf.len()) {
+                $exported = (hefesto.sys.run("chmod +x /etc/profile.d/hefesto.sh") == 0);
+            } else {
+                $exported = 0;
+            }
+            hefesto.sys.fclose($hefesto_sh_fd);
+        }
+    } else if ($os_name == "freebsd") {
+        var profile type list;
+        $profile = serialize_profile_file();
+        $profile.add_item("HEFESTO_INCLUDES_HOME=\"" + hefesto.sys.make_path($install_dir, "include") + "\"; export HEFESTO_INCLUDES_HOME\n");
+        $exported = flush_profile_file($profile);
+    } else if ($os_name == "windows") {
+        var reg_cmd type string;
+        var escaped_dir type string;
+        var t type int;
+        var temp type string;
+        $temp = hefesto.sys.make_path($install_dir, "include");
+        $t = 0;
+        while ($t < $temp.len()) {
+            if ($temp.at($t) == "\\") {
+                $escaped_dir = $escaped_dir + "\\";
+            }
+            $escaped_dir = $escaped_dir + $temp.at($t);
+            $t = $t + 1;
+        }
+        $reg_cmd = "REG ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v HEFESTO_INCLUDES_HOME /t REG_SZ /d " + $escaped_dir;
+        $exported = (hefesto.sys.run($reg_cmd) == 0);
+
+        if ($exported == 1) {
+            var path_env type string;
+
+            $path_env = get_windows_path_env_var_content();
+            if ($path_env.at($path_env.len()-1) != ";") {
+                $path_env = $path_env + ";";
+            }
+            $path_env = $path_env + $install_dir + "\\bin";
+
+            $reg_cmd = "REG ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v PATH /t REG_SZ /d \"" + $path_env + "\"";
+            $exported = (hefesto.sys.run($reg_cmd) == 0);
+        }
+    }
+
+    result $exported;
+
+}
+
+function get_windows_path_env_var_content() : result type string {
+    var reg_cmd type string;
+    var content type string;
+    var key type string;
+    $key = "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+    $reg_cmd = "REG QUERY \"" + $key + "\" /v PATH > winreg.out";
+    if (hefesto.sys.run($reg_cmd) == 0) {
+        var winregout_fp type file;
+        var buf type string;
+        var bytes_read type int;
+        var state type int;
+        $winregout_fp = hefesto.sys.fopen("winreg.out", "r");
+        $bytes_read = hefesto.sys.fread($buf, 2, $winregout_fp);
+        while ($buf != "\n" && hefesto.sys.feof($winregout_fp) == 0) {
+            $bytes_read = hefesto.sys.fread($buf, 1, $winregout_fp);
+        }
+        $state = 0;
+        while ($state < 3 && hefesto.sys.feof($winregout_fp) == 0) {
+            $bytes_read = hefesto.sys.fread($buf, 1, $winregout_fp);
+            while ($bytes_read > 0 && ($buf == " " || $buf == "\n" || $buf == "\t" || $buf == "\r")) {
+                $bytes_read = hefesto.sys.fread($buf, 1, $winregout_fp);
+            }
+            if ($state < 2) {
+                $bytes_read = hefesto.sys.fread($buf, 1, $winregout_fp);
+                while ($bytes_read > 0 && ($buf != " " && $buf != "\n" && $buf != "\t" && $buf != "\r")) {
+                    $bytes_read = hefesto.sys.fread($buf, 1, $winregout_fp);
+                }
+            }
+            $state = $state + 1;
+        }
+        $content = $buf;
+        while (hefesto.sys.feof($winregout_fp) == 0) {
+            hefesto.sys.fread($buf, 1, $winregout_fp);
+            $content = $content + $buf;
+        }
+        $buf = $content;
+        $content = "";
+        var b type int;
+        var s type int;
+        $s = $buf.len() - 1;
+        while ($buf.at($s) == "\n" || $buf.at($s) == "\r" || $buf.at($s) == "\t" ||
+               $buf.at($s) == " ") $s = $s - 1;
+        $b = 0;
+        while ($b <= $s) {
+            $content = $content + $buf.at($b);
+            $b = $b + 1;
+        }
+        hefesto.sys.fclose($winregout_fp);
+    }
+    hefesto.sys.rm("winreg.out");
+    result $content;
+}
+
+function serialize_env_path(path type string) : result type list {
+    var item type string;
+    var p type int;
+    var path_lst type list;
+    $p = 0;
+    while ($p < $path.len()) {
+        if ($path.at($p) == ";" && $item.len() > 0) {
+            $path_lst.add_item($item);
+            $item = "";
+        } else {
+            if ($path.at($p) != ";") $item = $item + $path.at($p);
+        }
+        $p = $p + 1;
+    }
+    if ($item.len() > 0) {
+        $path_lst.item($item);
+    }
+    result $path_lst;
+}
+
+function serialize_profile_file() : result type list {
+    var profd type file;
+    var line type string;
+    var byte type string;
+    var lst type list;
+    $profd = hefesto.sys.fopen("/etc/profile", "r");
+    if ($profd != 0) {
+        hefesto.sys.fread($byte, 1, $profd);
+        while (hefesto.sys.feof($profd) != 1) {
+            if ($byte == "\n") {
+                if ($line.len() == 0) $line = $byte;
+                $lst.add_item($line);
+                $line = "";
+            } else {
+                $line = $line + $byte;
+            }
+            hefesto.sys.fread($byte, 1, $profd);
+        }
+        if ($line.len() > 0) {
+            if ($line != "\r") $lst.add_item($line);
+        }
+        hefesto.sys.fclose($profd);
+    }
+    result $lst;
+}
+
+function flush_profile_file(content type list) : result type int {
+    var ret type int;
+    var c type int;
+    var profd type file;
+    var line type string;
+    $ret = 0;
+    $c = 0;
+    $profd = hefesto.sys.fopen("/etc/profile", "w");
+    if ($profd != 0) {
+        while ($c < $content.count()) {
+            $line = $content.item($c);
+            hefesto.sys.fwrite($line, $line.len(), $profd);
+            if ($content.item($c) != "\n" && $c + 1 < $content.count() ) {
+                hefesto.sys.fwrite("\n", 1, $profd);
+            }
+            $c = $c + 1;
+        }
+        hefesto.sys.fclose($profd);
+        $ret = 1;
+    }
+    result $ret;
+}
+
+function unexport_env_hefesto_var() : result type int {
+    var os_name type string;
+    var unexported type int;
+    $unexported = 0;
+    $os_name = hefesto.sys.os_name();
+    if ($os_name == "linux") {
+        $unexported = (hefesto.sys.rm("/etc/profile.d/hefesto.sh") == 0);
+    } else if ($os_name == "freebsd") {
+        var profile type list;
+        var p type int;
+        var item type string;
+        $profile = serialize_profile_file();
+        $p = 0;
+        while ($p < $profile.count()) {
+            $item = $profile.item($p);
+            if ($item.match("^HEFESTO_INCLUDES_HOME=") == 1) {
+                $profile.del_index($p);
+                $p = $p - 1;
+            }
+            $p = $p + 1;
+        }
+        $unexported = flush_profile_file($profile);
+    } else if ($os_name == "windows") {
+        var reg_cmd type string ;
+        $reg_cmd = "REG ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v HEFESTO_INCLUDES_HOME /t REG_SZ /d \"\"";
+        $unexported = (hefesto.sys.run($reg_cmd) == 0);
+        if ($unexported == 1) {
+            var l type int;
+            var path_lst type list;
+            $path_lst = serialize_env_path(get_windows_path_env_var_content());
+            $l = 0;
+            while ($path_lst.index_of($install_dir + "\\bin") > -1) {
+                $path_lst.del_item($install_dir + "\\bin");
+            }
+            var env_path type string;
+            while ($l < $path_lst.count()) {
+                $env_path = $env_path + $path_lst.item($l);
+                $l = $l + 1;
+                if ($l < $path_lst.count()) $env_path = $env_path + ";";
+            }
+            $reg_cmd = "REG ADD \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v PATH /t REG_SZ /d \"" + $env_path + "\"";
+            $unexported = (hefesto.sys.run($reg_cmd) == 0);
+        }
+    }
+    result $unexported;
+}
+
+function brk_test() : result type int {
+    var i type int;
+    $i = 0;
+    while ($i < 100) {
+        hefesto.sys.echo("i = " + $i + "\n");
+        if ($i == 4) {
+            if ($i == 3) {
+                break;
+            }
+        } else {
+            if ($i == 3)
+                if ($i == 3)
+                    break;
+                else
+                    hefesto.sys.echo("nao eh...\n");
+        }
+        $i = $i + 1;
+    }
+    result 0;
+}
+
+function hfst_install(install_dir type string, source_files type list, dest_files type list) : result type int {
+
+    var paths_to_create type list;
+    var temp type string;
+    var sz type int;
+    var i type int;
+    var res type int;
+    var platform type string;
+
+    $sz = $dest_files.count();
+    $i = 0;
+    while ($i < $sz) {
+        $temp = $dest_files.item($i);
+        $temp = get_path_from_filepath($temp);
+        if ($temp.len() > 0 && $paths_to_create.index_of($temp) == -1)
+            $paths_to_create.add_item($temp);
+        $i = $i + 1;
+    }
+
+    hefesto.sys.echo("-- Scanning destination paths...\n");
+
+    $sz = $paths_to_create.count();
+    $i = 0;
+    while ($i < $sz) {
+        $temp = $paths_to_create.item($i);
+        if (path_exists($temp) == 0) {
+            hefesto.sys.echo("-- Need to create path \"" + $temp + "\"... ");
+            if (create_dir_tree($temp)) {
+                hefesto.sys.echo("created.\n");
+            } else {
+                hefesto.sys.echo("not created... aborting...\n");
+                result 1;
+            }
+        } else {
+            hefesto.sys.echo("-- Path \"" + $temp + "\" already exists.\n");
+        }
+        $i = $i + 1;
+    }
+
+    hefesto.sys.echo("-- All destination paths are ok. Now copying files...\n");
+
+    $sz = $source_files.count();
+    $i = 0;
+    $res = 1;
+    while (($res == 1) && ($i < $sz)) {
+        hefesto.sys.echo("\tcopying " + $source_files.item($i)  + " to " + $dest_files.item($i) + "... ");
+        $res = hefesto.sys.cp($source_files.item($i), $dest_files.item($i));
+        if ($res == 1) {
+            hefesto.sys.echo("ok!\n");
+        } else {
+            hefesto.sys.echo("error...\n");
+        }
+        $i = $i + 1;
+    }
+
+    if ($res == 1) {
+        hefesto.sys.echo("-- Done ;)\n");
+        if (hefesto.sys.os_name() != "windows") {
+            hefesto.sys.echo("-- Exporting HEFESTO_INCLUDES_HOME environment var...\n");
+        } else {
+            hefesto.sys.echo("-- Exporting HEFESTO_INCLUDES_HOME environment var, adding hefesto export to PATH environment var...\n");
+        }
+        $res = export_env_hefesto_var($install_dir);
+    }
+
+    if ($res == 1) {
+        if (hefesto.sys.os_name() == "linux" ||
+            hefesto.sys.os_name() == "freebsd") {
+            hefesto.sys.echo("-- Setting instalation directory permissions... ");
+            if (hefesto.sys.run("chmod -R 754 " + $install_dir) == 0) {
+                hefesto.sys.echo("ok!\n");
+            } else {
+                hefesto.sys.echo("fail, please do it later :(\n");
+            }
+        }
+        hefesto.sys.echo("-- Done ;)\n");
+    } else {
+        hefesto.sys.echo("-- Tsc!......\n-- Wait... rolling back the partial install...\n");
+        hfst_uninstall($install_dir, $dest_files);
+        hefesto.sys.echo("-- Done.\n");
+        result 1;
+    }
+
+    result 0;
+
+}
+
+function windows_rm_paths_on_reboot(paths type list) : result type none {
+    var p type int;
+    var reg_cmd type string;
+    var rm_cmd type string;
+    var str type string;
+    $p = 0;
+    $rm_cmd = "cmd /c ";
+    while ($p < $paths.count()) {
+        $str = $paths.item($p);
+        if (is_dir($str) == 0) {
+           $rm_cmd = $rm_cmd + " del \"" + $paths.item($p) + "\"";
+        } else {
+            $rm_cmd = $rm_cmd + " rmdir \"" + $paths.item($p) + "\"";
+        }
+        
+        $p = $p + 1;
+        
+        if ($p != $paths.count()) $rm_cmd = $rm_cmd + " &";
+    }
+    $reg_cmd = "REG ADD \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v hfstbootrm /t REG_SZ /d \"" + $rm_cmd + "\"";     
+    hefesto.sys.run($reg_cmd);
+}
+
+function hfst_uninstall(install_dir type string, source_files type list) : result type int {
+    var subdirs type list;
+    var hhh type list;
+    var sz type int;
+    var i type int;
+    var temp type string;
+    var s_len type int;
+    var t_len type int;
+    var s type int;
+    var path_sep type string;
+    var subdir type string;
+    var regex type string;
+    var removed_paths type list;
+    var remove_later type list;
+
+    $sz = $source_files.count();
+    $i = 0;
+    while ($i < $sz) {
+        hefesto.sys.echo("\tRemoving file " + $source_files.item($i) + "... ");
+        if (hefesto.sys.rm($source_files.item($i)) == 0) {
+            hefesto.sys.echo("ok!\n");
+        } else {
+            if (hefesto.sys.os_name() == "windows" &&
+                ($source_files.item($i) == hefesto.sys.make_path($install_dir, "bin\\hefesto.exe") ||
+                 $source_files.item($i) == hefesto.sys.make_path($install_dir, "setup\\hfst-inst.hls"))) {
+                $remove_later.add_item($source_files.item($i));
+            } else {
+                hefesto.sys.echo("error...\n");
+            }
+        }
+        $i = $i + 1;
+    }
+
+    $temp = hefesto.sys.os_name();
+    if ($temp == "linux" || $temp == "freebsd") {
+        $path_sep = "/";
+    } else {
+        $path_sep = "\\";
+    }
+
+    $regex = "^" + $install_dir;
+    if (hefesto.sys.os_name() == "windows") {
+        $temp = "";
+        $i = 0;
+        $s_len = $regex.len();
+        while ($i < $s_len) {
+            $temp = $temp + $regex.at($i);
+            if ($regex.at($i) == "\\") $temp = $temp + "\\";
+            $i = $i + 1;
+        }
+        $regex = $temp;
+    }
+    $i = 0;
+    $s_len = $install_dir.len();
+    while ($i < $sz) {
+        $temp = $source_files.item($i);
+        if ($temp.match($regex) == 1) {
+            $subdirs.clear();
+            $s = $s_len;
+            $t_len = $temp.len();
+            $subdir = "";
+            while ($temp.at($s) == $path_sep) $s = $s + 1;
+            while ($s < $t_len) {
+                if ($temp.at($s) == $path_sep) {
+                    if ($subdir.len() > 0) {
+                        $subdirs.add_item($subdir);
+                        $subdir = "";
+                    }
+                } else {
+                    $subdir = $subdir + $temp.at($s);
+                }
+                $s = $s + 1;
+            }
+            $t_len = $subdirs.count();
+            while ($t_len > 0) {
+                $s = 0;
+                $temp = $install_dir;
+                while ($s < $t_len) {
+                    $temp = hefesto.sys.make_path($temp, $subdirs.item($s));
+                    $s = $s + 1;
+                }
+                if ($removed_paths.index_of($temp) == -1) {
+                    hefesto.sys.echo("\tRemoving directory " + $temp + "... ");
+                    if (hefesto.sys.rmdir($temp) == 0) {
+                        hefesto.sys.echo("ok!\n");
+                        $removed_paths.add_item($temp);
+                    } else {
+                        hefesto.sys.echo("error...\n");
+                    }
+                }
+                $t_len = $t_len - 1;
+            }
+        }
+        $i = $i + 1;
+    }
+
+    hefesto.sys.echo("\tRemoving directory " + $install_dir + "... ");
+    if (hefesto.sys.rmdir($install_dir) == 0) {
+        hefesto.sys.echo("ok!\n");
+    } else {
+        if (hefesto.sys.os_name() == "windows") {
+            $remove_later.add_item(hefesto.sys.make_path($install_dir, "setup"));
+            $remove_later.add_item(hefesto.sys.make_path($install_dir, "bin"));
+            $remove_later.add_item($install_dir);
+        } else {
+            hefesto.sys.echo("error...\n");
+        }
+    }
+
+    if (hefesto.sys.os_name() != "windows") {
+        hefesto.sys.echo("\tUnexporting HEFESTO_INCLUDES_HOME environment var... ");
+    } else {
+        hefesto.sys.echo("\tUnexporting HEFESTO_INCLUDES_HOME environment var and hefesto export in PATH environment var... ");
+    }
+    if (unexport_env_hefesto_var()) {
+        hefesto.sys.echo("ok!\n");
+    } else {
+        hefesto.sys.echo("error...\n");
+    }
+
+    if (hefesto.sys.os_name() == "windows") {
+        if ($remove_later.count() > 0) {
+            windows_rm_paths_on_reboot($remove_later);
+            hefesto.sys.echo("*** Now you need to reboot your system to finish uninstall process. ***\n");
+        }
+    }
+
+    result 0;
+}
+
+function is_already_installed(install_dir type string) : result type int {
+    var filename type string;
+    var old_cwd type string;
+    var is_installed type int;
+    $is_installed = 0;
+    $old_cwd = hefesto.sys.pwd();
+    $filename = hefesto.sys.make_path($install_dir, "setup");
+    if (hefesto.sys.cd($filename) == 1) {    
+        $is_installed = (hefesto.sys.ls("hfst\\-inst.hls") == 1);
+        hefesto.sys.cd($old_cwd);
+    }
+    result $is_installed;
+}
+
+var install_dir type string;
+var source_files type list;
+var dest_files type list;
+
+var uninst_opt type list;
+var cancel type int;
+
+project hefesto-install :
+        toolset "hefesto-self-installer" :
+                    $install_dir, $source_files, $dest_files ;
+
+hefesto-install.prologue() {
+
+    var os_name type string;
+    var prompt_str type string;
+    var install_dir_opt type list;
+    #$r = serialize_profile_file();
+    #$rr = 0;
+    #while ($rr < $r.count()) {
+    #    hefesto.sys.echo($r.item($rr) + "\n");
+    #    $rr = $rr + 1;
+    #}
+    #$rr = $r.count() - 1;
+    #$r.del_index($r.count() - 1);
+    #hefesto.sys.echo("RESULT: " + flush_profile_file($r) + "\n");
+    #hefesto.sys.exit(1);
+    #hefesto.sys.echo("lwr = " + tolwrcase("ABCDEFGHIJKLMNOPQRSTUVWXYZ.") + "\n");
+    #hefesto.sys.exit(1);
+    #hefesto.project.name(AAAAAAAA"); # gpf
+    #brk_test();
+    #hefesto.sys.exit(1);
+    $cancel = 0;
+    #hefesto.sys.echo("PATH = " + get_windows_path_env_var_content());
+    #hefesto.sys.exit(1);
+    $uninst_opt = hefesto.sys.get_option("uninstall");
+
+    $os_name = hefesto.sys.os_name();
+
+    if ($uninst_opt.count() == 0) {
+        $prompt_str = "=====================\n== Hefesto install ==\n=====================\n\n";
+        $prompt_str = $prompt_str + "Type the directory where you want to install Hefesto or ";
+        $prompt_str = $prompt_str + "just type ENTER to use the default or \"cancel\" ";
+    } else {
+        $prompt_str = "=======================\n== Hefesto uninstall ==\n=======================\n\n";
+        $prompt_str = $prompt_str + "Type the directory where was installed Hefesto or ";
+        $prompt_str = $prompt_str + "just type ENTER to use the default or \"cancel\" ";
+    }
+
+    if ($os_name == "linux") {
+        $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
+    } else if ($os_name == "freebsd") {
+        $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
+    } else if ($os_name == "windows") {
+        $prompt_str = $prompt_str +"[C:\\hefesto]: ";
+    }
+
+    $install_dir_opt = hefesto.sys.get_option("install-dir");
+
+    if ($install_dir_opt.count() == 0) {
+        $install_dir = hefesto.sys.prompt($prompt_str);
+    } else {
+        $install_dir = $install_dir_opt.item(0);
+    }
+
+    if ($install_dir.match("[Cc][aA][nN][cC][eE][lL]") == 1) {
+        $cancel = 1;
+        hefesto.sys.exit(1);
+    } else if ($install_dir == "") {
+        if ($os_name == "linux") {
+            $install_dir = "/usr/local/share/hefesto";
+        } else if ($os_name == "freebsd") {
+            $install_dir = "/usr/local/share/hefesto";
+        } else if ($os_name == "windows") {
+            $install_dir = "C:\\hefesto";
+        }
+    }
+
+    #
+    # Sources
+    #
+
+    # Doc files
+    if ($os_name == "linux" || $os_name == "freebsd") {
+        $source_files.add_item("../doc/man/hefesto.1");
+    }
+    $source_files.add_item("../doc/html/imgs/200712080908-3531.jpg");
+    $source_files.add_item("../doc/html/imgs/freebsd_icon.jpg");
+    $source_files.add_item("../doc/html/imgs/linux_icon.jpg");
+    $source_files.add_item("../doc/html/imgs/windows_icon.jpg");
+    $source_files.add_item("../doc/html/index_pt.html");
+    $source_files.add_item("../doc/html/index_en.html");
+
+    # The binaries
+    if ($os_name == "linux" || $os_name == "freebsd") {
+        $source_files.add_item("../bin/hefesto");
+    } else {
+        $source_files.add_item("../bin/hefesto.exe");
+    }
+
+    # The standard hls scripts
+
+    $source_files.add_item("../include/toolsets/common/utils/lang/c/dependency_scanner.hls");
+    $source_files.add_item("../include/toolsets/gcc/forges/common.hls");
+    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_app_forge.hls");
+    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_lib_forge.hls");
+    $source_files.add_item("../include/toolsets/gcc/gcc-app.hls");
+    $source_files.add_item("../include/toolsets/gcc/gcc-lib.hls");
+    $source_files.add_item("../include/toolsets/gcc/README");
+    $source_files.add_item("../include/toolsets/latex/forges/latex_forge_stuff.hls");
+    $source_files.add_item("../include/toolsets/latex/latex.hls");
+    $source_files.add_item("../include/toolsets/latex/README");
+    $source_files.add_item("../include/toolsets/null/null.hls");
+    $source_files.add_item("../include/toolsets/java/forges/java_forge.hls");
+    $source_files.add_item("../include/toolsets/java/java.hls");
+    $source_files.add_item("../include/toolsets/java/README");
+    $source_files.add_item("../include/conv.hls");
+    $source_files.add_item("../include/fsutil.hls");
+    $source_files.add_item("../include/optutil.hls");
+    $source_files.add_item("../include/string.hls");
+
+    # The setup files
+
+    $source_files.add_item("../setup/README");
+    $source_files.add_item("../setup/LEIAME");
+    $source_files.add_item("../setup/hfst-inst.hls");
+
+    #
+    # Destinations
+    #
+
+    if ($os_name == "linux" || $os_name == "freebsd") {
+        # Doc files
+        $dest_files.add_item("/usr/local/man/man1/hefesto.1");
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/200712080908-3531.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/freebsd_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/linux_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/windows_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/index_pt.html"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/index_en.html"));
+        # Binaries
+        $dest_files.add_item("/usr/local/bin/hefesto");
+        # The standard hls scripts
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_app_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_lib_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-app.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/forges/latex_forge_stuff.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/latex.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/null/null.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/forges/java_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/java.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/conv.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/fsutil.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/optutil.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/string.hls"));
+        # The setup files
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/LEIAME"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls"));
+    } else if ($os_name == "windows") {
+        # Doc files
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\200712080908-3531.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\freebsd_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\linux_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\windows_icon.jpg"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\index_pt.html"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\index_en.html"));
+        # Binaries
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "bin\\hefesto.exe"));
+        # The standard hls scripts
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_app_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_lib_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-app.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\forges\\latex_forge_stuff.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\latex.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\null\\null.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\forges\\java_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\java.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\conv.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\fsutil.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\optutil.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\string.hls"));
+        # The setup files
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\README"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\LEIAME"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\hfst-inst.hls"));
+    }
+
+    if ($uninst_opt.count() == 0) {
+        if (is_already_installed($install_dir)) {
+            hefesto.sys.echo("\n====================");
+            hefesto.sys.echo("\n==================== Hefesto is already installed, uninstalling the older version to install the newest...");
+            hefesto.sys.echo("\n====================\n\n");
+            var uninstall_cmd type string;
+            $uninstall_cmd = "hefesto --forgefiles=" + hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls");
+            if (hefesto.sys.os_name() == "windows") {
+                var u type int;
+                var temp type string;
+                $temp = "";
+                $u = 0;
+                while ($u < $uninstall_cmd.len()) {
+                    if ($uninstall_cmd.at($u) == "\\") $temp = $temp + "\\";
+                    $temp = $temp + $uninstall_cmd.at($u);
+                    $u = $u + 1;
+                }
+                $uninstall_cmd = $temp;
+            }
+            $uninstall_cmd = $uninstall_cmd + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;            
+            if (hefesto.sys.run($uninstall_cmd) != 0) {
+                hefesto.sys.exit(1);
+            }
+        }
+        hefesto.sys.echo("\n-- Installing Hefesto...\n\n");
+    } else {
+        hefesto.sys.echo("\n-- Uninstalling Hefesto...\n\n");
+        hefesto.sys.exit(hfst_uninstall($install_dir, $dest_files));
+    }
+
+}
+
+hefesto-install.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        if ($uninst_opt.count() == 0)
+            hefesto.sys.echo("\n-- Installed.\n\n");
+        else
+            hefesto.sys.echo("\n-- Uninstalled.\n\n");
+    } else {
+        if ($cancel == 0) {
+            hefesto.sys.echo("\n-- Not installed, please check your permissions.\n\n");
+        }
+    }
+}

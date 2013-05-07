@@ -1,0 +1,75 @@
+.TH hefesto 1 "Febuary 15, 2013" "version 0.1.0" "USER COMMANDS"
+.SH NAME
+hefesto \- a multi platform build tool
+.SH SYNOPSIS
+.B hefesto [\fIOPTIONS\fR]
+.SH DESCRIPTION
+Hefesto is a build system. The main objective in design of
+this application is to be generic. With Hefesto you can easily
+build toolsets for widely used compilers or for a new compiler
+for a new language that you created in your last weekend.
+
+Under Hefesto's context a "toolset" can be understood as a set
+of commands that can be used to create something, for example,
+a toolset for Hefesto C language calls the command "compile" to
+create the object files and then calls the command "link" to
+create the binary.
+
+The toolsets are expressed in a particular language.
+
+With a toolset chosen not only can you build your
+app/widget/"whateverthing" but you can use the hls ([H]efesto's
+[s]cripting [l]anguage) to assist in the pre and post-compilation.
+.PP
+This means:
+.TP
+.PP
+\- You can set your code: 
+  editing some headers to fit version, etc.
+
+\- You can forge the project.
+
+\- You can run your unit / system tests.
+
+\- You can generate your application packages, etc.
+.PP
+In the Hefesto's jargon, "forge" something means to create something
+anywhere.
+.SH OPTIONS
+.TP
+\-\-forgefiles=\fIfoo.hls,bar.hls\fR
+Indicates the Forgefiles paths which contains the projects.
+
+Note that to build fooproject defined inside "foo.hls" you must
+use the dynamic option "\-\-foo\-projects=fooproject" in this case.
+.TP
+\-\-compile\-only
+Performs the basic compilation of files supplied by "\-\-forgefiles" option.
+.TP
+\-\-forge-anyway
+Compiles all project source files ignoring the change status.
+.TP
+\-\-qsize=\fIn\fR
+Configures the size of work queue.
+.TP
+\-\-user\-includes\-home=\fI"~/myincs","/etc/incs"\fR
+Defines additional includes search paths.
+.TP
+\-\-version
+Displays the application version.
+.PP
+.SH EXIT STATUS
+If all build task succeeds hefesto returns zero, otherwise
+non zero value will be returned.
+.PP
+.SH
+SEE ALSO
+.TP
+\fI/usr/local/share/hefesto/doc\fR (or equivalent in your system)
+.PP
+.SH
+HOMEPAGE
+.TP
+http://hefesto.sf.org/
+.SH AUTHOR
+Rafael Santiago <voidbrainvoid@gmail.com>

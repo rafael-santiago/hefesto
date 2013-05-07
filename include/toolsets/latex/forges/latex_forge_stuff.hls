@@ -1,0 +1,102 @@
+#                                                 Wed 10 Apr 2013 08:56:30 PM BRT
+#
+# "latex_forge_stuff.hls"
+#   by Rafael Santiago
+#
+# Description: forge function to latex toolset.
+#
+# Relevant toolset options: --mkpdf: requests the pdf generation.
+#                           --pdfout=<filepath>: indicates the name of pdf that
+#                                                will be generated.
+#                           --latex-options=<option0,..,optionN>: the options that
+#                                                                must be passed to
+#                                                                latex.
+#                           --keepclean: removes ".log" and ".aux" generated
+#                                        files.
+#
+# WARNING: Don't call any function here directly,
+#          always use the the toolset. ;)
+#
+
+function get_src_file_without_ext(main_src_file type string) :
+            result type string {
+    var m type int;
+    var no_ext type string;
+    $m = $main_src_file.len();
+    if ($m > 0) {
+        $m = $m - 1;
+        while ($m > 0 && $main_src_file.at($m) != ".") {
+            $m = $m - 1;
+        }
+        var mm type int;
+        $mm = 0;
+        while ($mm < $m) {
+            $no_ext = $no_ext + $main_src_file.at($mm);
+            $mm = $mm + 1;
+        }
+    }
+    result $no_ext;
+}
+
+function get_ltx_options() : result type string {
+    var ltx_options type string;
+    var ltx_options_lst type list;
+    var o type int;
+    $ltx_options_lst = hefesto.sys.get_option("latex-options");
+    if ($ltx_options_lst.count() > 0) {
+        $o = 0;
+        while ($o < $ltx_options_lst.count()) {
+            $ltx_options = $ltx_options + " " + $ltx_options_lst.item($o);
+            $o = $o + 1;
+        }
+    }
+    result $ltx_options;
+}
+
+function latex_src_forge(main_src_file type string) :
+                        result type int {
+
+    var res_code type int;
+    var mkpdf_opt type list;
+    var usr_ltx_options type string;
+    var keepclean_opt type list;
+    $res_code = 0;
+    hefesto.sys.echo("== " + hefesto.project.toolset() + " INFO: compile and generating the DVI.\n==\n\n");
+    $usr_ltx_options = get_ltx_options();
+    $res_code = hefesto.sys.run(hefesto.toolset.compile_and_mkdvi($main_src_file,
+                                                                  $usr_ltx_options));
+    $mkpdf_opt = hefesto.sys.get_option("mkpdf");
+    if ($res_code == 0) {
+        hefesto.sys.echo("\n\n== " + hefesto.project.toolset() + " INFO: syntax ok, DVI generated");
+        if ($mkpdf_opt.count() == 1) {
+            hefesto.sys.echo("... now generating the PDF.\n==\n\n");
+            var dvi type string;
+            var pdfout_opt type list;
+            var pdfout type string;
+            $dvi = get_src_file_without_ext($main_src_file) + ".dvi";
+            $pdfout_opt = hefesto.sys.get_option("pdfout");
+            if ($pdfout_opt.count() == 0) {
+                $pdfout = get_src_file_without_ext($main_src_file) + ".pdf";
+            } else {
+                $pdfout = $pdfout_opt.item(0);
+            }
+            $res_code = hefesto.sys.run(hefesto.toolset.dvi2pdf($dvi, $pdfout));
+            if ($res_code == 0) {
+                hefesto.sys.echo("== " + hefesto.project.toolset() + " INFO: PDF generated!\n==\n\n");
+            } else {
+                hefesto.sys.echo("== " + hefesto.project.toolset() + " INFO: error(s)... unable to generate the PDF.\n==\n\n");
+            }
+        } else {
+            hefesto.sys.echo(".\n==\n\n");
+        }
+    } else {
+        hefesto.sys.echo("\n\n== " + hefesto.project.toolset() + " INFO: error(s)... unable to generate the DVI.\n==\n\n");
+    }
+    $keepclean_opt = hefesto.sys.get_option("keepclean");
+    if ($keepclean_opt.count() > 0) {
+        $usr_ltx_options = get_src_file_without_ext($main_src_file);
+        hefesto.sys.rm($usr_ltx_options + ".aux");
+        hefesto.sys.rm($usr_ltx_options + ".log");
+    }
+    result $res_code;
+}

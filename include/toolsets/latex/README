@@ -1,0 +1,70 @@
+===============================
+= The Hefesto's LaTeX toolset =
+===============================
+
+The Hefesto's LaTeX toolset assist you and basic .dvi generation
+and also genarates the pdf for you.
+
+To start to use it you need to include the main toolset hls:
+
+include ~/toolsets/latex/latex.hls
+
+After you must to declare your project, telling that it uses the
+latex-htool, look:
+
+project my_next_pulitzer : toolset "latex-htool" : "mybook.tex" ;
+
+You only too pass the name of your main .tex file to forge function.
+
+To compile your tex:
+
+    hefesto --forgefiles=example.hls --example-projects=my_next_pulitzer
+    
+If you need to pass some option to latex, use:
+
+    hefesto --forgefiles=example.hls --example-projects=my_next_pulitzer --latex-options=youropt
+
+It's very simple, you could create a template to be use in any latex project, look:
+
+include ~/toolsets/latex/latex.hls
+
+var main_tex_filename type string;
+
+project carbonEx : toolset "latex-htool" : $main_tex_filename ;
+
+cabonEx.prologue()
+{
+    var maintex type list;
+    $maintex = hefesto.sys.get_option("main-tex");
+    if ($maintex.count() == 0) {
+        hefesto.sys.echo("ERROR: you must to indicate the main .tex file with --main-tex option.\n");
+        hefesto.sys.exit(1);
+    }
+    $main_text_filename = $maintex.item(0);
+    hefesto.sys.echo("*** You are using CarbonEx template v0.1 ***\n");
+}
+
+carbonEx.epilogue()
+{
+    hefesto.sys.echo("***\n");
+}
+
+To compile you tex, with this template:
+
+    hefesto --forgefiles=cabonEx.hls --carbonEx-projects=carbonEx --main-tex=mybook.tex
+    
+But it's only a sugestion.
+
+To generate the pdf from .dvi you must to pass the command option --mkpdf:
+
+    hefesto --forgefiles=example.hls --example-projects=my_next_pulitzer --mkpdf
+    
+To specifies the pdf file name:
+
+    hefesto --forgefiles=example.hls --example-projects=my_next_pulitzer --mkpdf --pdfout=T-hooooooowl.pdf
+    
+The latex creates some files that you maybe want to delete them keeping your directory always clean:
+
+    hefesto --forgefiles=example.hls --example-projects=my_next_pulitzer --keepclean
+
+The command option "--keepclean" will removes all ".log" and ".aux" from the current directory.

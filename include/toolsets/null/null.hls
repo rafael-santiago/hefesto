@@ -1,0 +1,14 @@
+#
+# "null.hls"
+#
+# Description: a null toolset to be used to test
+#              some functions, etc. ;)
+#
+
+toolset "no-tool-any-set"
+ forge function "null_forge" :
+$
+
+function null_forge(res type int) : result type int {
+    result $res;
+}

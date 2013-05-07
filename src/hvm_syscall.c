@@ -1,0 +1,1660 @@
+/*
+ *                              Copyright (C) 2013 by Rafael Santiago
+ *
+ * This is free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
+#include "hvm_syscall.h"
+#include "vfs.h"
+#include "mem.h"
+#include "exprchk.h"
+#include "hvm_alu.h"
+#include "hvm_str.h"
+#include "parser.h"
+#include "synchk.h"
+#include "lang_defs.h"
+#include "structs_io.h"
+#include "regex.h"
+#include "os_detect.h"
+#include "hlsc_msg.h"
+#include "hvm.h"
+#include "hvm_rqueue.h"
+#include "htask.h"
+#include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
+#include <time.h>
+
+static void *hefesto_sys_replace_in_file(const char *syscall,
+                                         hefesto_var_list_ctx **lo_vars,
+                                         hefesto_var_list_ctx **gl_vars,
+                                         hefesto_func_list_ctx *functions,
+                                         hefesto_type_t **otype);
+
+static void *hefesto_sys_ls(const char *syscall,
+                            hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype);
+
+static void *hefesto_sys_pwd(const char *syscall,
+                             hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx  *functions,
+                             hefesto_type_t **otype);
+
+static void *hefesto_sys_cd(const char *syscall,
+                            hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype);
+
+static void *hefesto_sys_rm(const char *syscall,
+                            hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype);
+
+static void *hefesto_sys_fopen(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_sys_fwrite(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype);
+
+static void *hefesto_sys_fread(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_sys_fclose(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype);
+
+static void *hefesto_sys_cp(const char *syscall,
+                            hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype);
+
+static void *hefesto_sys_run(const char *syscall,
+                             hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx *functions,
+                             hefesto_type_t **otype);
+
+static void *hefesto_sys_mkdir(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_sys_rmdir(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_sys_echo(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype);
+
+static void *hefesto_sys_env(const char *syscall,
+                             hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx *functions,
+                             hefesto_type_t **otype);
+
+static void *hefesto_sys_feof(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype);
+
+static void *hefesto_sys_prompt(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype);
+
+static void *hefesto_sys_fseek(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe);
+
+static void *hefesto_sys_fseek_to_begin(const char *syscall,
+                                        hefesto_var_list_ctx **lo_vars,
+                                        hefesto_var_list_ctx **gl_vars,
+                                        hefesto_func_list_ctx *functions,
+                                        hefesto_type_t **otyoe);
+
+static void *hefesto_sys_fseek_to_end(const char *syscall,
+                                      hefesto_var_list_ctx **lo_vars,
+                                      hefesto_var_list_ctx **gl_vars,
+                                      hefesto_func_list_ctx *functions,
+                                      hefesto_type_t **otyoe);
+
+static void *hefesto_sys_fsize(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe);
+
+static void *hefesto_sys_ftell(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe);
+
+static void *hefesto_sys_exit(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype);
+
+static void *hefesto_sys_os_name(const char *syscall,
+                                 hefesto_var_list_ctx **lo_vars,
+                                 hefesto_var_list_ctx **gl_vars,
+                                 hefesto_func_list_ctx *functions,
+                                 hefesto_type_t **otype);
+
+static void *hefesto_sys_get_option(const char *syscall,
+                                    hefesto_var_list_ctx **lo_vars,
+                                    hefesto_var_list_ctx **gl_vars,
+                                    hefesto_func_list_ctx *functions,
+                                    hefesto_type_t **otype);
+
+static void *hefesto_sys_make_path(const char *syscall,
+                                   hefesto_var_list_ctx **lo_vars,
+                                   hefesto_var_list_ctx **gl_vars,
+                                   hefesto_func_list_ctx *functions,
+                                   hefesto_type_t **otype);
+
+static void *hefesto_sys_last_forge_result(const char *syscall,
+                                           hefesto_var_list_ctx **lo_vars,
+                                           hefesto_var_list_ctx **gl_vars,
+                                           hefesto_func_list_ctx *functions,
+                                           hefesto_type_t **otype);
+
+static void *hefesto_sys_forge(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_sys_byref(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype);
+
+static void *hefesto_nrun(const char *syscall,
+                          hefesto_var_list_ctx **lo_vars,
+                          hefesto_var_list_ctx **gl_vars,
+                          hefesto_func_list_ctx *functions,
+                          hefesto_type_t **otype);
+
+static void *hefesto_sys_time(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype);
+
+struct hefesto_hvm_syscall {
+    void *(*syscall)(const char *syscall,
+                     hefesto_var_list_ctx **lo_vars,
+                     hefesto_var_list_ctx **gl_vars,
+                     hefesto_func_list_ctx *functions, hefesto_type_t **otype);
+};
+
+#define set_method(m) { m }
+
+static struct hefesto_hvm_syscall
+    HEFESTO_HVM_SYSCALL[HEFESTO_SYS_CALLS_NR] = {
+
+    set_method(hefesto_sys_replace_in_file),
+    set_method(hefesto_sys_ls),
+    set_method(hefesto_sys_pwd),
+    set_method(hefesto_sys_cd),
+    set_method(hefesto_sys_rm),
+    set_method(hefesto_sys_fopen),
+    set_method(hefesto_sys_fwrite),
+    set_method(hefesto_sys_fread),
+    set_method(hefesto_sys_fclose),
+    set_method(hefesto_sys_cp),
+    set_method(hefesto_sys_run),
+    set_method(hefesto_sys_mkdir),
+    set_method(hefesto_sys_rmdir),
+    set_method(hefesto_sys_echo),
+    set_method(hefesto_sys_env),
+    set_method(hefesto_sys_feof),
+    set_method(hefesto_sys_prompt),
+    set_method(hefesto_sys_fseek),
+    set_method(hefesto_sys_fseek_to_begin),
+    set_method(hefesto_sys_fseek_to_end),
+    set_method(hefesto_sys_fsize),
+    set_method(hefesto_sys_ftell),
+    set_method(hefesto_sys_exit),
+    set_method(hefesto_sys_os_name),
+    set_method(hefesto_sys_get_option),
+    set_method(hefesto_sys_make_path),
+    set_method(hefesto_sys_last_forge_result),
+    set_method(hefesto_sys_forge),
+    set_method(hefesto_sys_byref),
+    set_method(hefesto_sys_time)
+
+};
+
+#undef set_method
+
+char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
+
+    char *syscall = hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    hefesto_common_list_ctx *p;
+    char *label = "";
+    memset(syscall, 0, HEFESTO_MAX_BUFFER_SIZE);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/id = %x\n", 
+                *(unsigned long *)code->params->data);
+    switch (*(hefesto_instruction_code_t *)code->params->data) {
+
+        case HEFESTO_SYS_CALL_REPLACE_IN_FILE: 
+            label = "hefesto.sys.replace_in_file(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_LS:
+            label = "hefesto.sys.ls(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_CWD:
+            label = "hefesto.sys.cwd(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_CD:
+            label = "hefesto.sys.cd(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_RM:
+            label = "hefesto.sys.rm(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_FD:
+            label = "hefesto.sys.fopen(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_WRITE:
+            label = "hefesto.sys.fwrite(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_READ:
+            label = "hefesto.sys.fread(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_CLOSEFD:
+            label = "hefesto.sys.fclose(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_CP:
+            label = "hefesto.sys.cp(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_RUN:
+            label = "hefesto.sys.run(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_MKDIR:
+            label = "hefesto.sys.mkdir(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_RMDIR:
+            label = "hefesto.sys.rmdir(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_ECHO:
+            label = "hefesto.sys.echo(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_ENV:
+            label = "hefesto.sys.env(\0";
+            break;
+
+        case HEFESTO_SYS_CALL_FDEND:
+            label = "hefesto.sys.feof(\0";
+            break;
+
+        case HEFESTO_SYS_PROMPT:
+            label = "hefesto.sys.prompt(";
+            break;
+
+        case HEFESTO_SYS_FSEEK:
+            label = "hefesto.sys.fseek(";
+            break;
+
+        case HEFESTO_SYS_FSEEK_TO_BEGIN:
+            label = "hefesto.sys.fseek_to_begin(";
+            break;
+
+        case HEFESTO_SYS_FSEEK_TO_END:
+            label = "hefesto.sys.fseek_to_end(";
+            break;
+
+        case HEFESTO_SYS_FSIZE:
+            label = "hefesto.sys.fsize(";
+            break;
+
+        case HEFESTO_SYS_FTELL:
+            label = "hefesto.sys.ftell(";
+            break;
+
+        case HEFESTO_SYS_EXIT:
+            label = "hefesto.sys.exit(";
+            break;
+
+        case HEFESTO_SYS_OS_NAME:
+            label = "hefesto.sys.os_name(";
+            break;
+
+        case HEFESTO_SYS_GET_OPTION:
+            label = "hefesto.sys.get_option(";
+            break;
+
+        case HEFESTO_SYS_MAKE_PATH:
+            label = "hefesto.sys.make_path(";
+            break;
+
+        case HEFESTO_SYS_LAST_FORGE_RESULT:
+            label = "hefesto.sys.last_forge_result(";
+            break;
+
+        case HEFESTO_SYS_FORGE:
+            label = "hefesto.sys.forge(";
+            break;
+
+        case HEFESTO_SYS_BYREF:
+            label = "hefesto.sys.byref(";
+            break;
+
+        case HEFESTO_SYS_TIME:
+            label = "hefesto.sys.time(";
+            break;
+
+        default:
+            label = NULL;
+            break;
+
+    }
+
+    strncpy(syscall, label, HEFESTO_MAX_BUFFER_SIZE - 1);
+
+    for (p = code->params->next; p; p = p->next) {
+        strcat(syscall, p->data);
+        if (p->next) strcat(syscall, ",");
+        else strcat(syscall,")");
+    }
+
+    return syscall;
+
+}
+
+void *hefesto_sys_call(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                       hefesto_var_list_ctx **gl_vars,
+                       hefesto_func_list_ctx *functions, hefesto_type_t *otype) {
+
+    char *syscall_label = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *s;
+    const char *sp;
+    ssize_t sys_call_idx;
+    void *result = NULL;
+
+    for (sp = syscall; *sp != 0 && is_hefesto_blank(*sp); sp++);
+
+    for (s = syscall_label; *sp != '(' && *sp != 0; sp++, s++) *s = *sp;
+
+    *s = 0;
+
+    sys_call_idx = get_hefesto_sys_call_index(syscall_label);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscal/syscall idx: %d %s\n", sys_call_idx,
+                                                             syscall);
+    free(syscall_label);
+
+    if (sys_call_idx > -1) {
+        result = HEFESTO_HVM_SYSCALL[sys_call_idx].syscall(syscall, lo_vars,
+                                                           gl_vars, functions,
+                                                           &otype);
+    }
+
+    return result;
+
+}
+
+static void *hefesto_sys_replace_in_file(const char *syscall,
+                                         hefesto_var_list_ctx **lo_vars,
+                                         hefesto_var_list_ctx **gl_vars,
+                                         hefesto_func_list_ctx *functions,
+                                         hefesto_type_t **otype) {
+
+    FILE *fp;
+    const char *s;
+    char *arg_file_path, *arg_file_path_pfix;
+    char *arg_regex, *arg_regex_pfix;
+    char *arg_replace_text, *arg_replace_text_pfix;
+    void *regex;
+    void *file_path;
+    void *replace_text;
+    char processed_regex[HEFESTO_MAX_BUFFER_SIZE];
+    size_t offset, osz;
+    hefesto_type_t etype;
+    long file_size;
+    size_t replace_text_size;
+    char *buffer, *replaced_buffer;
+
+    void *result = (void *) hefesto_mloc(sizeof(int));
+
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/replace_in_file\n");
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_file_path = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_file_path_pfix = infix2postfix(arg_file_path, strlen(arg_file_path), 1);
+    file_path = expr_eval(arg_file_path_pfix, lo_vars, gl_vars,
+                          functions, &etype, &osz);
+    arg_regex = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_regex_pfix = infix2postfix(arg_regex, strlen(arg_regex), 1);
+    regex = expr_eval(arg_regex_pfix, lo_vars, gl_vars, functions, &etype, &osz);
+    preprocess_usr_regex((unsigned char *)processed_regex,
+                         (unsigned char *)regex,
+                         sizeof(processed_regex)-1, strlen(regex));
+    arg_replace_text = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_replace_text_pfix = infix2postfix(arg_replace_text,
+                                          strlen(arg_replace_text), 1);
+    replace_text = expr_eval(arg_replace_text_pfix, lo_vars, gl_vars,
+                             functions, &etype, &osz);
+    replace_text_size = strlen((char *)replace_text);
+
+    if (!(fp = fopen((char *)file_path, "rb"))) {
+        *(int *)result = -1;
+        free(arg_file_path);
+        free(arg_file_path_pfix);
+        free(arg_regex);
+        free(arg_regex_pfix);
+        free(regex);
+        free(arg_replace_text);
+        free(arg_replace_text_pfix);
+        free(replace_text);
+        free(file_path);
+        return result;
+    }
+
+    fseek(fp, 0L, SEEK_END);
+    file_size = ftell(fp);
+    buffer = (char *) hefesto_mloc(file_size+1);
+    memset(buffer, 0, file_size+1);
+    fseek(fp, 0L, SEEK_SET);
+    fread(buffer, 1, file_size, fp);
+
+    *(int *)result = 0;
+
+    replaced_buffer = (char *) regex_replace((unsigned char *)processed_regex,
+                                             (unsigned char *)buffer,
+                                             file_size,
+                                             (unsigned char *)replace_text,
+                                             replace_text_size, &osz);
+
+    fclose(fp);
+
+    if (osz > 0) {
+        if ((fp = fopen((char *)file_path, "wb"))) {
+            fwrite(replaced_buffer, 1, osz, fp);
+            fclose(fp);
+            *(int *)result = 1;
+        }
+    } else {
+        *(int *)result = 1;
+    }
+
+    free(arg_file_path);
+    free(arg_file_path_pfix);
+    free(arg_regex);
+    free(arg_regex_pfix);
+    free(arg_replace_text);
+    free(arg_replace_text_pfix);
+    free(file_path);
+    free(regex);
+    free(replace_text);
+    free(replaced_buffer);
+    free(buffer);
+
+    return result;
+
+}
+
+static void *hefesto_sys_ls(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_regex_mask;
+    char *str_regex_mask_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_regex_mask = get_arg_from_call(syscall, &sz);
+    str_regex_mask_fmt = hvm_str_format(str_regex_mask,
+                                        lo_vars, gl_vars, functions);
+    free(str_regex_mask);
+
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_ls(str_regex_mask_fmt);
+    free(str_regex_mask_fmt);
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_pwd(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx  *functions,
+                             hefesto_type_t **otype) {
+
+    **otype = HEFESTO_VAR_TYPE_STRING;
+
+    return hefesto_pwd();
+
+}
+
+static void *hefesto_sys_cd(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_dir;
+    char *str_dir_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_dir = get_arg_from_call(syscall, &sz);
+    str_dir_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
+    free(str_dir);
+
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_fs_cd(str_dir_fmt);
+    free(str_dir_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_rm(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_file;
+    char *str_file_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_file = get_arg_from_call(syscall, &sz);
+    str_file_fmt = hvm_str_format(str_file, lo_vars, gl_vars, functions);
+    free(str_file);
+
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_rm(str_file_fmt);
+    free(str_file_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_fopen(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    void *file_path;
+    void *mode;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_FILE_DESCRIPTOR;
+    size_t osz;
+    size_t offset;
+    char *arg_file_path, *arg_file_path_pfix, *arg_mode, *arg_mode_pfix;
+    const char *s;
+    void *result;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_file_path = get_arg_from_call(syscall, &offset);
+    arg_mode = get_arg_from_call(syscall, &offset);
+    arg_file_path_pfix = infix2postfix(arg_file_path, strlen(arg_file_path), 1);
+    file_path = expr_eval(arg_file_path_pfix, lo_vars, gl_vars,
+                          functions, &etype, &osz);
+    arg_mode_pfix = infix2postfix(arg_mode, strlen(arg_mode), 1);
+    mode = expr_eval(arg_mode_pfix, lo_vars, gl_vars, functions, &etype, &osz);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fopen(%s,%s)\n", file_path, mode);
+    result = hefesto_fopen(file_path, mode);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fopen(%s, %s): %x\n", file_path,
+                                                                     mode,
+                                                                     result);
+    free(arg_file_path);
+    free(arg_file_path_pfix);
+    free(file_path);
+    free(arg_mode);
+    free(arg_mode_pfix);
+    free(mode);
+
+    **otype = HEFESTO_VAR_TYPE_FILE_DESCRIPTOR;
+
+    return result;
+
+}
+
+static void *hefesto_sys_fwrite(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype) {
+    const char *s;
+    size_t offset;
+    char *arg_fd, *arg_size, *arg_size_pfix, *arg_buf, *arg_buf_pfix;
+    hefesto_file_handle *fd;
+    void *size;
+    void *buf;
+    void *result;
+    hefesto_type_t etype;
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_buf = get_arg_from_call(syscall, &offset);
+    arg_size = get_arg_from_call(syscall, &offset);
+    arg_fd = get_arg_from_call(syscall, &offset);
+    HEFESTO_DEBUG_INFO(0, 
+        "hvm_syscall/arg_buf: %s / arg_size: %s / arg_fd: %s\n", arg_buf,
+                                                                 arg_size,
+                                                                 arg_fd);
+    fd = get_file_descriptor_by_var_name(arg_fd + 1, *lo_vars, *gl_vars,
+                                         functions);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/fd: %x\n", fd);
+    etype = HEFESTO_VAR_TYPE_INT;
+    arg_size_pfix = infix2postfix(arg_size, strlen(arg_size), 1);
+    size = expr_eval(arg_size_pfix, lo_vars, gl_vars, functions, &etype,
+                     &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_buf_pfix = infix2postfix(arg_buf, strlen(arg_buf), 1);
+    buf = expr_eval(arg_buf_pfix, lo_vars, gl_vars, functions, &etype,
+                    &offset);
+    result = (void *) hefesto_mloc(sizeof(int));
+    *(int *)result = hefesto_fwrite((char *)buf, *((size_t *) size), fd);
+    HEFESTO_DEBUG_INFO(0, 
+        "hvm_syscall/hefesto_fwrite result: %d\n", *(int *)result);
+
+    free(arg_fd);
+    free(arg_size);
+    free(arg_size_pfix);
+    free(arg_buf);
+    free(arg_buf_pfix);
+    free(size);
+    free(buf);
+
+    return result;
+
+}
+
+static void *hefesto_sys_fread(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    const char *s;
+    size_t offset;
+    char *arg_fd, *arg_size, *arg_size_pfix, *arg_buf;
+    hefesto_file_handle *fd;
+    void *size;
+    char *tmp;
+    void *result;
+    hefesto_type_t etype;
+    hefesto_var_list_ctx *buf;
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_buf = get_arg_from_call(syscall, &offset);
+    arg_size = get_arg_from_call(syscall, &offset);
+    arg_fd = get_arg_from_call(syscall, &offset);
+    fd = get_file_descriptor_by_var_name(arg_fd + 1, *lo_vars,
+                                         *gl_vars, functions);
+    etype = HEFESTO_VAR_TYPE_INT;
+    arg_size_pfix = infix2postfix(arg_size, strlen(arg_size), 1);
+    size = expr_eval(arg_size_pfix, lo_vars, gl_vars, functions,
+                     &etype, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    result = (void *) hefesto_mloc(sizeof(int));
+    buf = get_hefesto_var_list_ctx_name(arg_buf+1, *lo_vars);
+    if (buf == NULL) {
+        buf = get_hefesto_var_list_ctx_name(arg_buf+1, *gl_vars);
+    }
+    if (buf != NULL) {
+        tmp = (char *) hefesto_mloc(*((size_t *)size)+1);
+        *(int *)result = hefesto_fread(tmp, *((size_t *) size), fd);
+        if (*(int *)result > -1)
+            assign_data_to_hefesto_var(buf, tmp, *((size_t *)result));
+        free(tmp);
+    } else {
+        *(int *)result = -1;
+    }
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/fread result: %d %d\n", *(int *)result,
+                                                               buf->type);
+    free(arg_fd);
+    free(arg_size);
+    free(arg_size_pfix);
+    free(arg_buf);
+    free(size);
+
+    return result;
+
+}
+
+static void *hefesto_sys_fclose(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype) {
+
+    size_t offset = 0;
+    char *arg;
+    const char *s;
+    void *result = (int *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg = get_arg_from_call(syscall, &offset);
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fclose: %s\n", arg);
+    fp_handle = get_file_descriptor_by_var_name(arg+1, *lo_vars,
+                                                *gl_vars, functions);
+    hefesto_fclose(&fp_handle);
+    free(arg);
+
+    *(int *)result = 1;
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fclose done.\n");
+
+    return result;
+}
+
+static void *hefesto_sys_cp(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                            hefesto_var_list_ctx **gl_vars,
+                            hefesto_func_list_ctx *functions,
+                            hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_src, *str_dest;
+    char *str_src_fmt, *str_dest_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_src = get_arg_from_call(syscall, &sz);
+    str_dest = get_arg_from_call(syscall, &sz);
+
+    str_src_fmt = hvm_str_format(str_src, lo_vars, gl_vars, functions);
+    free(str_src);
+    str_dest_fmt = hvm_str_format(str_dest, lo_vars, gl_vars, functions);
+    free(str_dest);
+
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_cp(str_src_fmt, str_dest_fmt);
+    free(str_src_fmt);
+    free(str_dest_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_run(const char *syscall,
+                             hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx *functions,
+                             hefesto_type_t **otype) {
+
+    const char *s;
+    char *str_run, *sr, *srp;
+    char *str_fmt;
+    int *ret;
+    hefesto_var_list_ctx *vp;
+    hefesto_func_list_ctx *fp;
+
+    for (s = &syscall[strlen(syscall)-1]; *s != ')'; s--);
+    str_fmt = (char *) s;
+    s = get_arg_list_start_from_call(syscall);
+    s = s + 1;
+
+    str_run = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    for (sr = str_run; s != str_fmt; s++, sr++) *sr = *s;    
+    *sr = 0;
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/run: %s\n", str_run);
+    vp = get_hefesto_var_list_ctx_name(str_run+1, *lo_vars);
+    if (vp == NULL) vp = get_hefesto_var_list_ctx_name(str_run+1, *gl_vars);
+
+    if (vp == NULL || vp->type != HEFESTO_VAR_TYPE_LIST) {
+        str_fmt = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+        for (sr = str_run, srp = str_fmt; *sr != '(' && *sr != 0; sr++, srp++) {
+            *srp = *sr;
+        }
+        *srp = 0;
+        fp = get_hefesto_func_list_ctx_name(str_fmt, functions);
+        free(str_fmt);
+    }
+
+    if ((vp && vp->type == HEFESTO_VAR_TYPE_LIST) || 
+        (fp && fp->result_type == HEFESTO_VAR_TYPE_LIST)) {
+        ret = hefesto_nrun(syscall, lo_vars, gl_vars, functions, otype);
+    } else {
+        str_fmt = hvm_str_format(str_run, lo_vars, gl_vars, functions);
+        ret = (int *) hefesto_mloc(sizeof(int));
+        HEFESTO_DEBUG_INFO(0, "hvm_syscall/run: %s\n", str_fmt);
+        *ret = system(str_fmt);
+        free(str_fmt);
+    }
+
+    free(str_run);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+    return ret;
+
+}
+
+static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
+                          hefesto_var_list_ctx **gl_vars,
+                          hefesto_func_list_ctx *functions,
+                          hefesto_type_t **otype) {
+
+    hefesto_type_t etype;
+    void *plist, *ret = NULL;
+    const char *s, *se;
+    char *sr;
+    char *str_run, *str_run_pf;
+    size_t osize;
+
+    for (s = &syscall[strlen(syscall)-1]; *s != ')'; s--);
+    se = s;
+    s = get_arg_list_start_from_call(syscall);
+    s = s + 1;
+
+    str_run = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    for (sr = str_run; s != se; s++, sr++) *sr = *s;
+    *sr = 0;
+
+    str_run_pf = infix2postfix(str_run, strlen(str_run), 1);
+
+    free(str_run);
+
+    etype = HEFESTO_VAR_TYPE_LIST;
+    plist = expr_eval(str_run_pf, lo_vars, gl_vars, functions, &etype, &osize);
+
+    free(str_run_pf);
+
+    if (plist != NULL) {
+        if (etype == HEFESTO_VAR_TYPE_LIST) {
+            ret = (int *) hefesto_mloc(sizeof(int));
+            *(int *)ret = hvm_rqueue_run(plist);
+        }
+        del_hefesto_common_list_ctx((hefesto_common_list_ctx *)plist);
+    }
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_mkdir(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_dir;
+    char *str_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_dir = get_arg_from_call(syscall, &sz);
+
+    str_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
+
+    free(str_dir);
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_mkdir(str_fmt);
+    free(str_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_rmdir(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_dir;
+    char *str_fmt;
+    int *ret;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    str_dir = get_arg_from_call(syscall, &sz);
+
+    str_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
+
+    free(str_dir);
+    ret = (int *) hefesto_mloc(sizeof(int));
+    *ret = hefesto_rmdir(str_fmt);
+    free(str_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    return ret;
+
+}
+
+static void *hefesto_sys_echo(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype) {
+
+    size_t sz = 0;
+    const char *s;
+    char *str_echo;
+    char *str_fmt;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+    str_echo = get_arg_from_call(syscall, &sz);
+    str_fmt = hvm_str_format(str_echo, lo_vars, gl_vars, functions);
+    free(str_echo);
+    fprintf(stdout, "%s", str_fmt);
+    fflush(stdout);
+    free(str_fmt);
+
+    **otype = HEFESTO_VAR_TYPE_UNTYPED;
+
+    return NULL;
+
+}
+
+static void *hefesto_sys_env(const char *syscall,
+                             hefesto_var_list_ctx **lo_vars,
+                             hefesto_var_list_ctx **gl_vars,
+                             hefesto_func_list_ctx *functions,
+                             hefesto_type_t **otype) {
+
+    const char *s;
+    char *arg;
+    char *arg_fmt;
+    char *result;
+    size_t sz;
+
+    **otype = HEFESTO_VAR_TYPE_STRING;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    arg = get_arg_from_call(syscall, &sz);
+
+    arg_fmt = hvm_str_format(arg, lo_vars, gl_vars, functions);
+    free(arg);
+
+    s = getenv(arg_fmt);
+
+    free(arg_fmt);
+
+    if (s == NULL) {
+        result = (char *) hefesto_mloc(HEFESTO_NULL_EVAL_SZ);
+        strncpy(result, HEFESTO_NULL_EVAL, HEFESTO_NULL_EVAL_SZ-1);
+    } else {
+        sz = strlen(s);
+        result = (char *) hefesto_mloc(sz + 1);
+        memset(result, 0, sz + 1);
+        strncpy(result, s, sz);
+    }
+
+    return result;
+
+}
+
+static void *hefesto_sys_feof(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype) {
+
+    size_t offset = 0;
+    char  *arg;
+    const char *s;
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg = get_next_call_args(syscall, &offset);
+    void *result = (int *) hefesto_mloc(sizeof(int));
+    *(int *)result = hefesto_feof(get_file_descriptor_by_var_name(arg+1, 
+                                                                  *lo_vars,
+                                                                  *gl_vars,
+                                                                  functions));
+    **otype = HEFESTO_VAR_TYPE_INT;
+    free(arg);
+
+    return result;
+
+}
+
+static void *hefesto_sys_prompt(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype) {
+
+    char *buf = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *b;
+    char *prompt_message, *arg;
+    const char *s;
+    size_t sz;
+
+    s = get_arg_list_start_from_call(syscall);
+    sz = s - syscall + 1;
+
+    arg = get_arg_from_call(syscall, &sz);
+    prompt_message = hvm_str_format(arg, lo_vars, gl_vars, functions);
+    free(arg);
+
+    fprintf(stdout, "%s", prompt_message);
+    free(prompt_message);
+
+    memset(buf, 0, HEFESTO_MAX_BUFFER_SIZE);
+    fgets(buf, HEFESTO_MAX_BUFFER_SIZE, stdin);
+    buf[strlen(buf)-1] = 0;
+    for (b = buf; *b != '\n' && *b != 0; b++);
+    *b = 0;
+
+    **otype = (hefesto_type_t) HEFESTO_VAR_TYPE_STRING;
+
+    return buf;
+
+}
+
+static void *hefesto_sys_fseek(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe) {
+
+    const char *s;
+    size_t offset;
+    char *arg_fd_name;
+    char *arg_pos, *arg_pos_pfix;
+    void *result = (void *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+    hefesto_type_t etype;
+    void *pos;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_fd_name = get_arg_from_call(syscall, &offset);
+    arg_pos = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_INT;
+    arg_pos_pfix = infix2postfix(arg_pos, strlen(arg_pos), 1);
+    pos = expr_eval(arg_pos_pfix, lo_vars, gl_vars, functions, &etype, &offset);
+    fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1, *lo_vars,
+                                                *gl_vars, functions);
+    *(int *)result = hefesto_fseek(fp_handle, *(long *)pos);
+
+    free(pos);
+    free(arg_pos);
+    free(arg_pos_pfix);
+    free(arg_fd_name);
+
+    return result;
+
+}
+
+static void *hefesto_sys_fseek_to_begin(const char *syscall,
+                                        hefesto_var_list_ctx **lo_vars,
+                                        hefesto_var_list_ctx **gl_vars,
+                                        hefesto_func_list_ctx *functions,
+                                        hefesto_type_t **otyoe) {
+
+    const char *s;
+    size_t offset;
+    char *arg_fd_name;
+    void *result = (void *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_fd_name = get_arg_from_call(syscall, &offset);
+    fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
+                                                *lo_vars,
+                                                *gl_vars, functions);
+
+    *(int *)result = hefesto_fseek_to_begin(fp_handle);
+
+    free(arg_fd_name);
+
+    return result;
+
+}
+
+static void *hefesto_sys_fseek_to_end(const char *syscall,
+                                      hefesto_var_list_ctx **lo_vars,
+                                      hefesto_var_list_ctx **gl_vars,
+                                      hefesto_func_list_ctx *functions,
+                                      hefesto_type_t **otyoe) {
+
+    const char *s;
+    size_t offset;
+    char *arg_fd_name;
+    void *result = (void *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_fd_name = get_arg_from_call(syscall, &offset);
+    fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
+                                                *lo_vars, *gl_vars,
+                                                functions);
+    *(int *)result = hefesto_fseek_to_end(fp_handle);
+
+    free(arg_fd_name);
+
+    return result;
+
+}
+
+static void *hefesto_sys_fsize(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe) {
+
+    const char *s;
+    size_t offset;
+    char *arg_fd_name;
+    void *result = (void *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_fd_name = get_arg_from_call(syscall, &offset);
+    fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
+                                                *lo_vars, *gl_vars,
+                                                functions);
+    *(int *)result = hefesto_fsize(fp_handle);
+
+    free(arg_fd_name);
+
+    return result;
+
+}
+
+static void *hefesto_sys_ftell(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otyoe) {
+    const char *s;
+    size_t offset;
+    char *arg_fd_name;
+    void *result = (void *) hefesto_mloc(sizeof(int));
+    hefesto_file_handle *fp_handle;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_fd_name = get_arg_from_call(syscall, &offset);
+    fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
+                                                *lo_vars, *gl_vars, functions);
+    *(int *)result = hefesto_ftell(fp_handle);
+
+    free(arg_fd_name);
+
+    return result;
+
+}
+
+static void *hefesto_sys_exit(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype) {
+
+    const char *s;
+    char *arg_code, *arg_code_pfix;
+    void *code;
+    size_t offset;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_code = get_arg_from_call(syscall, &offset);
+    arg_code_pfix = infix2postfix(arg_code, strlen(arg_code), 1);
+    code = expr_eval(arg_code_pfix, lo_vars, gl_vars, functions,
+                     &etype, &offset);
+    HEFESTO_EXIT_CODE = *(int *)code;
+    HEFESTO_LAST_FORGE_RESULT = HEFESTO_EXIT_CODE;
+
+    free(arg_code);
+    free(arg_code_pfix);
+    free(code);
+    HEFESTO_EXIT = 1;
+
+    return NULL;
+
+}
+
+static void *hefesto_sys_os_name(const char *syscall,
+                                 hefesto_var_list_ctx **lo_vars,
+                                 hefesto_var_list_ctx **gl_vars,
+                                 hefesto_func_list_ctx *functions,
+                                 hefesto_type_t **otype) {
+
+    void *result = get_os_name();
+
+    **otype = HEFESTO_VAR_TYPE_STRING;
+
+    return result;
+
+}
+
+static void *hefesto_sys_get_option(const char *syscall,
+                                    hefesto_var_list_ctx **lo_vars,
+                                    hefesto_var_list_ctx **gl_vars,
+                                    hefesto_func_list_ctx *functions,
+                                    hefesto_type_t **otype) {
+
+    const char *s;
+    void *result = NULL;
+    char *arg_option, *arg_option_pfix;
+    void *option;
+    size_t offset;
+    hefesto_type_t etype;
+    hefesto_options_ctx *op;
+    hefesto_common_list_ctx *cp;
+
+    **otype = HEFESTO_VAR_TYPE_LIST;
+
+    if (HEFESTO_OPTIONS != NULL) {
+        s = get_arg_list_start_from_call(syscall);
+        offset = s - syscall + 1;
+        arg_option = get_arg_from_call(syscall, &offset);
+        arg_option_pfix = infix2postfix(arg_option, strlen(arg_option), 1);
+        etype = HEFESTO_VAR_TYPE_STRING;
+        option = expr_eval(arg_option_pfix, lo_vars, gl_vars, functions,
+                           &etype, &offset);
+        if (option != NULL) {
+            free(arg_option);
+            arg_option = (char *) hefesto_mloc(offset + 3);
+            strncpy(arg_option, "--", 3);
+            strcat(arg_option, option);
+        }
+        op = get_hefesto_options_ctx_option(arg_option, HEFESTO_OPTIONS);
+        if (op != NULL) {
+            result = (void *) cp_hefesto_common_list_ctx(op->data);
+        } else {
+            new_hefesto_common_list_ctx(cp);
+            cp->is_dummy_item = 1;
+            result = (void *) cp;
+        }
+        free(arg_option);
+        free(arg_option_pfix);
+        free(option);
+    }
+
+    return result;
+
+}
+
+static void *hefesto_sys_make_path(const char *syscall,
+                                   hefesto_var_list_ctx **lo_vars,
+                                   hefesto_var_list_ctx **gl_vars,
+                                   hefesto_func_list_ctx *functions,
+                                   hefesto_type_t **otype) {
+
+    const char *s;
+    char *arg1, *arg2;
+    char *arg1_pfixd, *arg2_pfixd;
+    void *expd_arg1, *expd_arg2;
+    size_t offset;
+    hefesto_type_t etype;
+    void *result;
+
+    **otype = HEFESTO_VAR_TYPE_STRING;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg1 = get_arg_from_call(syscall, &offset);
+    arg1_pfixd = infix2postfix(arg1, strlen(arg1), 1);
+
+    arg2 = get_arg_from_call(syscall, &offset);
+    arg2_pfixd = infix2postfix(arg2, strlen(arg2), 1);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    expd_arg1 = expr_eval(arg1_pfixd,
+                          lo_vars, gl_vars,
+                          functions, &etype, &offset);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    expd_arg2 = expr_eval(arg2_pfixd,
+                          lo_vars, gl_vars,
+                          functions, &etype, &offset);
+
+    result = (void *) hefesto_make_path(expd_arg1,
+                                        expd_arg2,
+                                        strlen(expd_arg1) +
+                                             strlen(expd_arg2) + 2);
+
+    free(arg1);
+    free(arg1_pfixd);
+    free(expd_arg1);
+
+    free(arg2);
+    free(arg2_pfixd);
+    free(expd_arg2);
+
+    return result;
+
+}
+
+static void *hefesto_sys_last_forge_result(const char *syscall,
+                                           hefesto_var_list_ctx **lo_vars,
+                                           hefesto_var_list_ctx **gl_vars,
+                                           hefesto_func_list_ctx *functions,
+                                           hefesto_type_t **otype) {
+
+    void *result = (void *) hefesto_mloc(sizeof(HEFESTO_LAST_FORGE_RESULT));
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    *(int *)result = HEFESTO_LAST_FORGE_RESULT;
+
+    return result;
+
+}
+
+static void *hefesto_sys_forge(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    const char *s;
+    char *prj, *hls, *opt;
+    char *prj_pfixd, *hls_pfixd, *opt_pfixd;
+    void *expd_prj, *expd_hls, *expd_opt;
+    size_t offset;
+    hefesto_type_t etype;
+    void *result;
+    hefesto_options_ctx *prjs = NULL;
+    char prj_opt[1024];
+    int r;
+    hefesto_options_ctx *curr_opts = NULL, *swp_opts = NULL;
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    prj = get_arg_from_call(syscall, &offset);
+    prj_pfixd = infix2postfix(prj, strlen(prj), 1);
+
+    hls = get_arg_from_call(syscall, &offset);
+    hls_pfixd = infix2postfix(hls, strlen(hls), 1);
+
+    opt = get_arg_from_call(syscall, &offset);
+    opt_pfixd = infix2postfix(opt, strlen(opt), 1);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    expd_prj = expr_eval(prj_pfixd,
+                         lo_vars, gl_vars,
+                         functions, &etype, &offset);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    expd_hls = expr_eval(hls_pfixd,
+                         lo_vars, gl_vars,
+                         functions, &etype, &offset);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    expd_opt = expr_eval(opt_pfixd,
+                         lo_vars, gl_vars,
+                         functions, &etype, &offset);
+
+    curr_opts = add_option_buf_to_hefesto_options_ctx(curr_opts,
+                                                      expd_opt);
+
+    result = (void *) hefesto_mloc(sizeof(int));
+    sprintf(prj_opt, "--foo=%s", (char *)expd_prj);
+    prjs = add_option_to_hefesto_options_ctx(prjs, prj_opt);
+
+    swp_opts = HEFESTO_OPTIONS;
+    HEFESTO_OPTIONS = NULL;
+
+    r = boot_forge(prjs, expd_hls, curr_opts);
+    del_hefesto_options_ctx(prjs);
+
+    HEFESTO_OPTIONS = swp_opts;
+
+    del_hefesto_options_ctx(curr_opts);
+
+    *(int *)result = r;
+
+    free(prj);
+    free(prj_pfixd);
+    free(hls);
+    free(hls_pfixd);
+    free(expd_prj);
+    free(expd_hls);
+    free(opt);
+    free(opt_pfixd);
+    free(expd_opt);
+
+    return result;
+
+}
+
+static void *hefesto_sys_byref(const char *syscall,
+                               hefesto_var_list_ctx **lo_vars,
+                               hefesto_var_list_ctx **gl_vars,
+                               hefesto_func_list_ctx *functions,
+                               hefesto_type_t **otype) {
+
+    char *var_src;
+    const char *s;
+    size_t offset;
+    hefesto_var_list_ctx *vp_d = NULL, *vp_s;
+    hefesto_func_list_ctx *l_fp, *c_fp;
+
+    c_fp = hvm_get_current_executed_function();
+
+    if (c_fp == NULL) {
+        hlsc_info(HLSCM_MTYPE_RUNTIME, 
+                  HLSCM_RUNTIME_ERROR_BYREF_NULL_FN_IN_EXECUTION);
+        return NULL;
+    }
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    var_src = get_arg_from_call(syscall, &offset);
+
+    vp_s = get_hefesto_var_list_ctx_name(var_src + 1, c_fp->args);
+
+    if (vp_s == NULL) {
+        hlsc_info(HLSCM_MTYPE_F_CKD_BUG,
+                  HLSCM_RUNTIME_ERROR_BYREF_UNK_SRC_VAR,
+                  var_src);
+    } else {
+        if (vp_s->contents != NULL && vp_s->contents->data &&
+            (*((char *)vp_s->contents->data)) == '$') {
+            if ((l_fp = hvm_get_last_executed_function()) != NULL) {
+                vp_d = get_hefesto_var_list_ctx_name(vp_s->contents->data + 1,
+                                                     l_fp->vars);
+            }
+            if (vp_d == NULL) {
+                vp_d = get_hefesto_var_list_ctx_name(vp_s->contents->data + 1,
+                                                     *gl_vars);
+            }
+            vp_s = get_hefesto_var_list_ctx_name(var_src + 1, *lo_vars);
+            if (vp_d != NULL && vp_s != NULL) {
+                if (vp_d->type == vp_s->type) {
+
+                    switch (vp_d->type) {
+
+                        case HEFESTO_VAR_TYPE_INT:
+                        case HEFESTO_VAR_TYPE_STRING:
+                            if (vp_s->contents && vp_s->contents->data) {
+                                del_hefesto_common_list_ctx(vp_d->contents);
+                                vp_d->contents = NULL;
+                                vp_d->contents =
+                                    add_data_to_hefesto_common_list_ctx(
+                                            vp_d->contents, vp_s->contents->data,
+                                                          vp_s->contents->dsize);
+                            } else {
+                                 hlsc_info(HLSCM_MTYPE_RUNTIME,
+                                    HLSCM_RUNTIME_ERROR_BYREF_UNINITZD_SRC_VAR,
+                                    var_src);
+                            }
+                            break;
+
+                        case HEFESTO_VAR_TYPE_LIST:
+                            if (vp_d->contents) {
+                                vp_d->contents =
+                                    cp_hefesto_common_list_ctx(vp_s->contents);
+                            } else {
+                                hlsc_info(HLSCM_MTYPE_RUNTIME,
+                                    HLSCM_RUNTIME_ERROR_BYREF_UNINITZD_SRC_VAR,
+                                    var_src);
+                            }
+                            break;
+
+                        default:
+                            hlsc_info(HLSCM_MTYPE_RUNTIME,
+                                      HLSCM_RUNTIME_ERROR_BYREF_UNK_TYPE,
+                                      var_src);
+                            break;
+                    }
+
+                } else {
+                    hlsc_info(HLSCM_MTYPE_RUNTIME,
+                              HLSCM_RUNTIME_ERROR_BYREF_TYPE_MISMATCH,
+                              vp_d->name, var_src);
+                }
+            } else {
+                hlsc_info(HLSCM_MTYPE_RUNTIME,
+                          HLSCM_RUNTIME_ERROR_BYREF_GLVAR_OUT_OF_SCOPE,
+                          vp_s->contents->data);
+            }
+        } else {
+            hlsc_info(HLSCM_MTYPE_RUNTIME,
+                      HLSCM_RUNTIME_ERROR_BYREF_UNACCESS_VAR,
+                      var_src + 1);
+        }
+    }
+
+    free(var_src);
+
+    return NULL;
+
+}
+
+static void *hefesto_sys_time(const char *syscall,
+                              hefesto_var_list_ctx **lo_vars,
+                              hefesto_var_list_ctx **gl_vars,
+                              hefesto_func_list_ctx *functions,
+                              hefesto_type_t **otype) {
+    char *arg, *pfixd_arg;
+    const char *s;
+    void *expd_arg;
+    size_t offset;
+    hefesto_type_t etype;
+    void *result;
+    time_t t;
+    struct tm *tmp;
+
+    **otype = HEFESTO_VAR_TYPE_STRING;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    pfixd_arg = infix2postfix(arg, strlen(arg), 1);
+    expd_arg = expr_eval(pfixd_arg, lo_vars,
+                         gl_vars, functions, &etype, &offset);
+    if (expd_arg != NULL) {
+        t = time(NULL);
+        tmp = localtime(&t);
+        if (tmp == NULL) {
+            result = hefesto_mloc(2);
+            memset(result, 0, 2);
+        } else {
+            result = hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+            if (strftime(result, HEFESTO_MAX_BUFFER_SIZE, expd_arg, tmp) == 0) {
+                memset(result, 0, HEFESTO_MAX_BUFFER_SIZE);
+            }
+        }
+    } else {
+        result = hefesto_mloc(2);
+        memset(result, 0, 2);
+    }
+
+    free(expd_arg);
+    free(pfixd_arg);
+    free(arg);
+
+    return result;
+
+}

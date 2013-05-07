@@ -1,0 +1,76 @@
+
+function gcc_mk_gcc_incl_str_opt(includes type list) : result type string {
+    var include_list type string;
+    var size type int;
+    var i type int;
+    $size = $includes.count();
+    $i = 0;
+    $include_list = " ";
+    while ($i < $size) {
+        $include_list = $include_list + "-I" + $includes.item($i) + " ";
+        $i = $i + 1;
+    }
+    result $include_list;
+}
+
+function gcc_mk_gcc_lib_str_opt(libraries type list) : result type string {
+    var libraries_list type string;
+    var size type int;
+    var i type int;
+    $size = $libraries.count();
+    $i = 0;
+    $libraries_list = " ";
+    while ($i < $size) {
+        $libraries_list = $libraries_list + "-L" + $libraries.item($i) + " ";
+        $i = $i + 1;
+    }
+    result $libraries_list;
+}
+
+function gcc_mk_ofile_name(source type string) : result type string {
+    var ofile type string;
+    var i type int;
+    var size type int;
+    $ofile = "";
+    $size = $source.len();
+    $i = 0;
+    while ($size > 0 && $source.at($size) != ".") {
+        $size = $size - 1;
+    }
+    while ($i < $size) {
+        $ofile = $ofile + $source.at($i);
+        $i = $i + 1;
+    }
+    result $ofile + ".o";
+}
+
+function gcc_mk_ofiles_str_opt(sources type list) : result type string {
+    var size type int;
+    var s type int;
+    var src type string;
+    var ofiles type string;
+    $ofiles = "";
+    $s = 0;
+    $size = $sources.count();
+    while ($s < $size) {
+        $src = $sources.item($s);
+        $ofiles = $ofiles + " " + gcc_mk_ofile_name($src);
+        $s = $s + 1;
+    }
+    result $ofiles;
+}
+
+function gcc_mk_raw_str_opt(options type list) : result type string {
+    var options_list type string;
+    var size type int;
+    var i type int;
+    $size = $options.count();
+    $i = 0;
+    $options_list = " ";
+    while ($i < $size) {
+        $options_list = $options_list + " " + $options.item($i) + " ";
+        $i = $i + 1;
+    }
+    result $options_list;
+}
+

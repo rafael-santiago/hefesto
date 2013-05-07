@@ -1,0 +1,1020 @@
+<HTML>
+	
+	<STYLE TYPE = "text/css">
+		.code li { color: black; font-size: 14; font:8px arial; background: rgb(255,249,213);}
+		.code code { color: blue; font-size: 15; font-weight: bolder; font: 15px courier;}		
+		a:link {color: black;}
+		a:visited {color: black;}
+		a:hover {background: black; color: white; text-decoration: none;}
+		h1 { background: black; color: white; font-variant: small-caps;}
+		h3 {font-variant: small-caps; background: black; color: white;}
+		h5 {font-variant: small-caps; text-decoration: underline}
+		table tr {background: rgb(255,249,213); color: blue}
+	</STYLE>
+	
+    <TITLE>Hefesto build tool</TITLE>
+
+    <FONT FACE = "Arial" SIZE = 2>
+    
+    <HEAD>
+		<SMALL><P ALIGN = "RIGHT"><A HREF="index_en.html">English manual</A></P></SMALL>
+        <CENTER><H1>A build tool Hefesto</H1></CENTER>
+    </HEAD>
+	
+	<CENTER>
+		<IMG SRC = "imgs/200712080908-3531.jpg" with=320 height=200>
+	</CENTER>
+    
+	<A NAME = "topics"></A>
+    <H3>Tópicos</H3>
+    
+    <A HREF="#overview">Visão geral</A><BR>
+    <A HREF="#firststeps">Primeiros passos na hls<A><BR>
+	<A HREF="#strlistfacilities">Facilitadores built-in de string e lista<A><BR>
+	<A HREF="#syscallsguide">Guia de syscalls do Hefesto<A><BR>
+	<A HREF="#toolsetcomposing">Compondo um toolset hefesto<A><BR>
+	<A HREF="#forgingprojectswithhefesto">Forjando projetos com Hefesto<A><BR>
+	<A HREF="#deps">Dependências de projeto e scanners de dependência<A><BR>
+	<A HREF="#suitableforges">Tornando seu Forgefile mais compatível entre diferentes ambientes<A><BR>
+	<A HREF="#theapp">O aplicativo Hefesto<A><BR>
+    <A HREF="#contribute">Como contribuir com este projeto</A><BR>
+	<A HREF="#download">Downloads</A><BR>
+	
+	<BODY>
+
+        <P ALIGN = "JUSTIFY">
+        
+        <!-- Overview section -->
+        <A NAME = "overview"></A>
+        <H3>Visão geral</H3>
+        Hefesto é um build system. O principal objetivo em seu design é ser genérico.
+		Com Hefesto você pode facilmente construir toolsets para compiladores amplamente
+		utilizados ou para um novo compilador para uma nova linguagem que você criou no
+		seu último final de semana. ;)<BR><BR>
+
+		Sob o contexto do Hefesto um "toolset" pode ser entendido como um conjunto
+		de comandos que podem ser usados para criar algo, por exemplo, um
+		toolset Hefesto para Linguagem C chama o comando "compile" para criar os
+		arquivos objeto e então chama o comando "link" para criar o binário.<BR><BR>
+		
+		Os toolsets são expressos em uma linguagem particular.<BR><BR>
+
+		Com um toolset escolhido você pode não somente construir seu aplicativo/widget/"whateverthing",
+		mas você pode usar a hls (<B>h</B>efesto's <B>l</B>anguage <B>s</B>cript) para auxiliar
+		nas fases de pré e pós-compilação.<BR><BR>
+        
+		Isso significa:<BR><BR>
+		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   - você pode configurar seu código: editando alguns headers para ajustar versão, etc.<BR>        
+		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   - você pode forjar* o projeto.<BR>        
+		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   - você pode rodar os seus unit/system tests.<BR>        
+		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   - você pode gerar pacotes da sua aplicação, etc.<BR>                
+		<BR>
+        *: no jargão do Hefesto, "forjar" algo significa criar alguma coisa em qualquer lugar.
+        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+        <!-- First steps -->
+        <A NAME = "firststeps"></A>
+        <H3>Primeiros passos na hls</H3>
+        
+		A hls é uma linguagem procedural projetada com dois principais objetivos: ser simples e tornar as coisas mais claras.
+		Às vezes ser simples e claro irá requerer de você mais código, mas na minha opinião, é melhor escrever mais código
+		claro e menos documentação sobre o que aquele pequeno <FONT FACE = "ARIAL BLACK" COLOR="MAGENTA"><B>bonitinho</B></FONT> código intenta fazer. É um fato que documentação frequentemente
+		não é uma constante na maioria dos builds de projetos que você trabalha, correto?<BR><BR>
+		
+        
+		Existem algumas linguagens script de build muito minimalistas e bastante confusas. Em contraste, a Hls é uma linguagem simples mas não primitiva.<BR><BR>
+    
+		Basicamente você pode escrever funções, com cláusulas "if/[else]", loops via "while".<BR><BR>
+
+		Sim, <B><U>Hls é uma linguagem tipada</U></B>. Variáveis têm a necessidade de declaração, a regra é: "se você irá usar uma variável, por favor,
+		anuncie isso primeiro". Se você anunciar isso mais de uma vez, o compilador Hls do Hefesto vai reclamar do fato.<BR><BR>
+        
+		Hls conta com uma série de funcionalidades comumente necessárias em tarefas de build. As funcionalidades "built-in" são chamadas "syscalls". Syscalls
+		são responsáveis por criar uma camada de abstração entre o build e a plataforma onde essa tarefa corre. Então, por exemplo, para copiar um arquivo
+		de um lugar para outro é a mesma coisa tanto no Linux quanto no Windows.<BR><BR>
+        
+		Agora vamos ver algum código em Hls:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function hello_world() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("Hello World!\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		A função apresentada, não retorna valor devido a isso é tipada com <B>none</B> na sua <B>seção result type</B>,
+		para imprimir a criativa mensagem, a <B>syscall</B> "echo" foi chamada. Todas as syscalls estão acessíveis via
+		<B>hefesto.sys.*</B>. Segue uma lista com todas as syscalls implementadas:<BR><BR>
+		
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Syscall</B></TD><TD><B>Descrição</B></TD></TR>
+                <TR><TD>replace_in_file()</TD><TD>substitui um texto encontrado via uma expressão regular</TD></TR>
+                <TR><TD>ls()</TD><TD>retorna a contagem de arquivos encontrados no diretório corrente que casam seus nomes com a regex fornecida</TD></TR>
+                <TR><TD>pwd()</TD><TD>retorna o fullpath do diretório corrente</TD></TR>
+                <TR><TD>cd()</TD><TD>muda o diretório corrente para o caminho passado</TD></TR>
+                <TR><TD>rm()</TD><TD>remove o filepath fornecido</TD></TR>
+                <TR><TD>cp()</TD><TD>copia um arquivo/diretório de um path existente para outro</TD></TR>
+                <TR><TD>mkdir()</TD><TD>cria um diretório</TD></TR>
+                <TR><TD>rmdir()</TD><TD>remove um diretório vazio</TD></TR>
+                <TR><TD>fopen()</TD><TD>abre um arquivo retornando seu descritor que deve ser atribuído a uma variável do tipo file</TD></TR>
+                <TR><TD>fwrite()</TD><TD>escreve dados para o arquivo referenciado pelo descritor de arquivo fornecido</TD></TR>
+                <TR><TD>fread()</TD><TD>lê dados do arquivo referenciado pelo descritor de arquivo fornecido</TD></TR>
+                <TR><TD>fclose()</TD><TD>limpa todos os recursos alocados por um descritor de arquivo</TD></TR>
+                <TR><TD>feof()</TD><TD>verifica se é o final do arquivo</TD></TR>
+                <TR><TD>fseek()</TD><TD>pula para um determinado offset do arquivo</TD></TR>
+                <TR><TD>fseek_to_begin()</TD><TD>pula para o início do arquivo</TD></TR>
+                <TR><TD>fseek_to_end()</TD><TD>pula para o final do arquivo</TD></TR>
+                <TR><TD>fsize()</TD><TD>retorna o tamanho do arquivo em bytes</TD></TR>
+                <TR><TD>ftell()</TD><TD>retorna o offset corrente do arquivo</TD></TR>
+                <TR><TD>run()</TD><TD>roda um processo externo, retornando seu exit code</TD></TR>
+                <TR><TD>echo()</TD><TD>escreve texto na tela</TD></TR>
+                <TR><TD>env()</TD><TD>retorna o conteúdo de uma variável de ambiente</TD></TR>
+                <TR><TD>prompt()</TD><TD>lê dados do teclado, esperando a confirmação via "ENTER"</TD></TR>
+                <TR><TD>exit()</TD><TD>aborta a máquina virtual do hefesto, alterando o error level para o valor fornecido</TD></TR>
+                <TR><TD>os_name()</TD><TD>retorna o nome da plataforma corrente</TD></TR>
+                <TR><TD>get_option()</TD><TD>retorna dados de uma opção fornecida via linha de comando</TD></TR>
+                <TR><TD>make_path()</TD><TD>cria uma string que corresponde a um caminho no sistema de arquivos</TD></TR>
+                <TR><TD>last_forge_result()</TD><TD>obtém o exit code do último processo de forja executado</TD></TR>
+                <TR><TD>forge()</TD><TD>invoca um outro projeto de forja</TD></TR>
+                <TR><TD>byref()</TD><TD>atualiza os valores de um argumento de função para a variável externa que foi passada como esse argumento local</TD></TR>
+				<TR><TD>time()</TD><TD>retorna uma string representando o tempo do sistema de acordo com o formato passado</TD></TR>
+            </TABLE>
+        </CENTER><BR>
+        
+		Mais à frente, maiores detalhes sobre cada syscall serão exibidos.<BR><BR>
+        
+		Agora vamos ver a implementação de uma função que retorna um valor:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function fatorial(value type int, useless_var type string) : result type int {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;if ($value == 0) result 1;</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;result ($value) * fatorial($value - 1, "");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		Argumentos de função devem ser declarados sob o esquema <B><I>var_name</I> type <I>type_name</I></B>. Todas as variáveis devem ser acessadas com o símbolo dólar prefixando-as.
+		A palavra reservada <B>result</B> é usada para abortar a execução da função, retornando o valor passado para o chamador.<BR><BR>
+
+        Loops em Hls são muito simples, dê uma olhada:<BR><BR>
+		        
+        <OL CLASS="code">
+			<LI><CODE>function print_sequence(limit type int) : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;var i type int;</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;$i = 0;</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;while ($i < $limit) {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;&nbsp;hefesto.sys.echo($i + "\n");</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;&nbsp;$i = $i + 1;</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;}</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		No corpo da função você deve declarar variáveis via o esquema: <B>var <I>var_name</I> type <I>type_name</I></B>.<BR><BR>
+		
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Tipos de variáveis suportados</B></TD><TD><B>Armazena</B></TD></TR>
+                <TR><TD>int</TD><TD>Inteiro</TD></TR>
+                <TR><TD>string</TD><TD>Texto</TD></TR>
+                <TR><TD>file</TD><TD>Uma referência para um arquivo, ela será manipulada via syscalls de i/o de arquivos</TD></TR>
+                <TR><TD>list</TD><TD>Pode armazenar inteiro ou string (o que é incialmente adicionado a lista, define o tipo da lista)</TD></TR>
+            </TABLE>
+        </CENTER>
+    
+		<BR><BR><A HREF = "#topics">Voltar</A>
+	
+		<A NAME = "strlistfacilities"></A>
+        <H3>Facilitadores built-in de string e lista</H3>
+		
+        Os tipos <B>string</B> e <B>list</B> talvez serão os tipos mais usados. Pensando nisso,
+		decidi implementar dentro do Hefesto algumas operações comuns de serem feitas com esses tipos.<BR><BR>
+        
+		Os facilitadores implementados para string são:<BR><BR>
+        
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Facilitador</B></TD><TD><B>Faz</B></TD><TD><B>Exemplo de chamada</B></TD></TR>
+                <TR><TD>len()</TD><TD>Retorna o tamanho da string</TD><TD>$str_length = str.len();</TD></TR>
+                <TR><TD>at()</TD><TD>Retorna o caracter presente no índice passado</TD><TD>while ($str.at($i) == ' ') $i = $i + 1;</TD></TR>
+				<TR><TD>match()</TD><TD>Busca um padrão regex no conteúdo da string, retorna 1 caso encontrar, de outra forma 0</TD><TD>$str.match("^#include.*")</TD></TR>
+				<TR><TD>replace()</TD><TD>Substitui na string sequências encontradas via regex pelo padrão fornecido</TD><TD>$str.replace("^#include", "include")</TD></TR>
+            </TABLE>
+        </CENTER>
+        
+        <BR>
+        
+		Os facilitadores de lista implementados são:<BR><BR>
+        
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Facilitador</B></TD><TD><B>Faz</B></TD><TD><B>Exemplo de chamada</B></TD></TR>
+                <TR><TD>item()</TD><TD>Retorna o item presente no índice passado</TD><TD>$lst.item(2);</TD></TR>
+                <TR><TD>count()</TD><TD>Retorna o total de items da lista</TD><TD>$items_total = lst.count();</TR>
+                <TR><TD>add_item()</TD><TD>Adiciona um novo item na lista</TD><TD>$lst.add_item("sample");</TR></TR>
+                <TR><TD>del_item()</TD><TD>Remove o conteúdo passado por argumento (o primeiro encontrado)</TD><TD>$lst.del_item("foo");</TD></TR>
+                <TR><TD>del_index()</TD><TD>Remove o item contido no índice passado</TD><TD>$lst.del_index(0);</TD></TR>
+                <TR><TD>set_from_fs_by_regex()</TD><TD>Popula a lista com os nomes de arquivos de um cwd que casa seus nomes com a regex passada</TD><TD>$lst.set_from_fs_by_regex(".*\\.txt$");</TD></TR>
+                <TR><TD>clear()</TD><TD>Limpa a lista</TD><TD>$lst.clear()</TD></TR>
+                <TR><TD>index_of()</TD><TD>Retorna o índice de um conteúdo passado</TD><TD>$sample_index = $lst.index_of("example");</TD></TR>
+            </TABLE>
+        </CENTER>
+                
+		<BR><BR><A HREF = "#topics">Voltar</A>
+				
+        <!-- Syscalls guide -->
+        <A NAME = "syscallsguide"></A>
+        <H3>Guia de syscalls do Hefesto</H3>
+        
+		Nesse curto guia você encontrará descrições e exemplos sobre cada syscall hefesto.
+                
+        <H5><B><U>replace_in_file()</U></B></H5>
+        
+		Substitui dados em um arquivo. O primeiro argumento deve ser o filepath, o segundo é o padrão de busca expresso por uma regex, o terceiro é o texto de substituição desejado.<BR><BR>
+		           
+        <OL CLASS="code">
+			<LI><CODE>function replace_in_file_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>ls()</U></B></H5>
+        
+		Lista arquivos no diretório corrente. Recebe somente um argumento que deve ser o padrão de listagem em regex.<BR><BR>
+		    
+        <OL CLASS="code">
+			<LI><CODE>function ls_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;if (hefesto.sys.ls(".*(c|cpp|s|asm)$") > 0) {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("Hey Beavis, Huh cool files to delete here!! Yeah yeah! Butt-head remove them! remove them!\n");</CODE></LI>
+			<LI><CODE>&nbsp;} else {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("ohh, nothing to do here.\n");</CODE></LI>
+			<LI><CODE>&nbsp;}</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>pwd()</U></B></H5>
+        
+		Retorna o diretório corrente. É muito DIFÍCIL de usar essa função built-in, dê uma olhada:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function pwd_only_to_PHDs() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The current work directory is: " + hefesto.sys.pwd() + "\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>cd()</U></B></H5>
+        
+		Muda o cwd para o diretório fornecido via argumento.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function cd_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.cd("/home/rs");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
+        <H5><B><U>rm()</U></B></H5>
+        
+        Remove um arquivo.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function rm_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.rm("some.lint~");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>cp()</U></B></H5>
+        
+		Copia arquivo/diretórios para o diretório especificado. O primeiro argumento é o padrão regex correspondente ao source, o segundo é o destino.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function cp_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.cp(".*.(exe|dll|msi)", "wpkg");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>mkdir()</U></B></H5>
+        
+		Cria o diretório sob o diretório de trabalho.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function mkdir_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.mkdir("wpkg");</CODE></LI>
+			<LI><CODE>}</LI></CODE>
+        </OL>
+        
+        <H5><B><U>rmdir()</U></B></H5>
+        
+        Remove um diretório vazio.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function rmdir_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.rmdir("stage");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fopen()</U></B></H5>
+        
+		Abre um arquivo retornando o descritor que pode ser manipulado. O primeiro argumento é o filepath, o segundo é o modo de abertura.
+		Os modos seguem o fopen clássico da libc ("r" = somente leitura, "w" = somente escrita, "a" = modo append).<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function fopen_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "a");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fwrite()</U></B></H5>
+        
+		Escreve dados em um descritor de arquivo aberto com modo de escrita ou append. O primeiro argumento é o buffer de dados, o segundo é o quanto escrever desse buffer, o terceiro é o descritor de arquivo.<BR><BR>
+        
+		Retorna a quantidade de dados escritos no arquivo.<BR><BR>
+                
+        <OL CLASS="code">
+			<LI><CODE>function fwrite_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "a");</CODE></LI>
+			<LI><CODE>&nbsp;var buf type string;</CODE></LI>
+			<LI><CODE>&nbsp;$buf = "that's all folks for fwrite!\n";</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fwrite($buf, $buf.len(), $fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fread()</U></B></H5>
+        
+		Lê dados de um descritor de arquivo (óbvio: aberto em modo de leitura) avançando o ponteiro de arquivo por n bytes lidos. O primeiro argumento é o buffer de dados, o segundo é a quantidade
+		que deve ser lida à partir do arquivo, o terceiro é o descritor.<BR><BR>
+		
+		Retorna a quantidade de dados lidos do arquivo.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function fread_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;var byte type string</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fread($byte, 1, $fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fclose()</U></B></H5>
+        
+		Fecha/limpa os recursos internos associados com o descritor de arquivo. Recebe o descritor que deve ser fechado. É importante sempre chamar esta função
+		depois de uma manipulação de arquivo. Seja higiêncio(a)! :)<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function fclose_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "w");</CODE></LI>
+			<LI><CODE>&nbsp;#  do some manipulation here...</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>feof()</U></B></H5>
+        
+		Retorna 1 se o final do arquivo foi alcançado de outra forma 0. Recebe o descritor de arquivo que deve ser verificado.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function feof_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;if (hefesto.sys.feof($fp) == 1) {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("file end.\n");</CODE></LI>
+			<LI><CODE>&nbsp;} else hefesto.sys.echo("NOT file end.\n");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+                
+        <H5><B><U>fseek()</U></B></H5>
+        
+		Pula para um offset específico do arquivo do início ao fim. O primeiro argumento é o descritor de arquivo, o segundo é o offset desejado.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function fseek_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fseek($fp, 10);</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fseek_to_begin()</U></B></H5>
+        
+		Pula para o início do arquivo. Recebe o descritor associado como argumento.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function fseek_to_begin_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fseek_to_begin($fp); #  yes this is a very useless dummy sample...</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fseek_to_end()</U></B></H5>
+        
+		Pula para o final do arquivo. Recebe o descritor associado como argumento.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function fseek_to_end_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fseek_to_end($fp);</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>fsize()</U></B></H5>
+		
+		Retorna os bytes totais de um arquivo associado com o descritor de arquivo passado.<BR><BR>
+  
+        <OL CLASS="code">
+			<LI><CODE>function fsize_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The has " + hefesto.sys.fsize($fp) + "byte(s).\n");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>        
+        
+        <H5><B><U>ftell()</U></B></H5>
+        
+		Retorna o offset corrente do descritor de arquivo.<BR><BR>
+		        
+        <OL CLASS="code">
+			<LI><CODE>function ftell_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var fp type file;</CODE></LI>
+			<LI><CODE>&nbsp;$fp = hefesto.sys.fopen("test.dat", "r");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The current offset should be 0 and is " + hefesto.sys.ftell($fp) + ".\n");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.fclose($fp);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>run()</U></B></H5>
+        
+		Roda um processo externo retornando o exit code. A chamada run é sempre bloqueante.<BR><BR>
+		  
+        <OL CLASS="code">
+			<LI><CODE>function sync_run_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("ls /dev exits with " + hefesto.sys.run("ls /dev") + " exit code.\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		Você pode também rodar n processos se você passar para essa syscall uma lista contendo as linhas de execução. O número de processos concorrentes é
+		controlado pela opção de linha de comando "--qsize=n". Nesse modo, a syscall run retorna a soma dos exit codes.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function async_run_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var wqueue type list;</CODE></LI>
+			<LI><CODE>&nbsp;$wqueue.add_item("ls /dev");</CODE></LI>
+			<LI><CODE>&nbsp;$wqueue.add_item("ls /home/rs");</CODE></LI>
+			<LI><CODE>&nbsp;$wqueue.add_item("echo \"duh!\"");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The work queue exit code is " + hefesto.sys.run($wqueue) + ".\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>echo()</U></B></H5>
+        
+		Exibe uma string na tela. De fato é uma Hefesto syscall muito complicada.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function echo_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("Hello world.\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>env()</U></B></H5>
+        
+		Obtém o conteúdo de uma variável de ambiente.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function env_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>prompt()</U></B></H5>
+        
+		Lê um valor do teclado. Retornando os dados lidos.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function prompt_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var usr_data type string;</CODE></LI>
+			<LI><CODE>&nbsp;$usr_data = hefesto.sys.prompt("Type about an idea and then press enter to confirm this: \n");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("Hey I had an idea: " + $usr_data + "\nWhat do you think?");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>        
+        
+        <H5><B><U>exit()</U></B></H5>
+        
+		Aborta a execução da hvm saindo com o código passado.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function exit_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.exit(1);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>os_name()</U></B></H5>
+        
+		Retorna o nome do sistema operacional onde seu hls está correndo. O retorno é sempre o nome em lower-case e sem qualquer informação de versão.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function env_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;if (hefesto.sys.os_name() == "windows") {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");</CODE></LI>
+			<LI><CODE>&nbsp;}</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>get_option()</U></B></H5>
+
+		Obtém um argumento da linha de comando. Retorna uma lista contendo um ou mais valores ou uma lista vazia.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function get_option_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var cups_of_tea type list;</CODE></LI>
+			<LI><CODE>&nbsp;$cups_of_tea = hefesto.sys.get_option("cups-of-tea");</CODE></LI>
+			<LI><CODE>&nbsp;if ($cups_of_tea.size() == 0)</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("--cups-of-tea option not supplied.\n");</CODE></LI>
+			<LI><CODE>&nbsp;else</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("--cups-of-tea option supplied.\n");</CODE></LI>
+			<LI><CODE>}</LI></CODE>
+		</OL>
+        
+        <H5><B><U>make_path()</U></B></H5>
+        
+		Cria uma string path. O primeiro argumento é o root path, o segundo é o "addendum" do path. Retorna a combinação correta.<BR><BR>
+		       
+        <OL CLASS="code">
+			<LI><CODE>function make_path_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("STRING PATH must be /home/rs \"" + hefesto.sys.make_path("/home", "/rs") + "\"\n.");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        
+        <H5><B><U>last_forge_result()</U></B></H5>
+        
+        Obtém o último resultado de forja (este resultado pode ser alterado pela syscall exit).<BR><BR>
+		        
+        <OL CLASS="code">
+			<LI><CODE>function last_forge_result_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("The last forge result was " + hefesto.sys.last_forge_result() + ".\n");</CODE></LI>
+			<LI><CODE>}</LI></CODE>
+        </OL>
+        
+        <H5><B><U>forge()</U></B></H5>
+        
+		Invoca um projeto de forja. O primeiro argumento é o hls contendo a declaração do projeto, o segundo é o nome do projeto dentro do hls.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function forge_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.forge("local_deps.hls", "foolib");</CODE></LI>
+			<LI><CODE>&nbsp;if (hefesto.sys.last_forge_result() == 0) {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("foolib built with success.\n");</CODE></LI>
+			<LI><CODE>&nbsp;} else {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("unable to build foolib.\n");</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;hefesto.sys.exit(1);</CODE></LI>
+			<LI><CODE>&nbsp;}</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5><B><U>byref()</U></B></H5>
+        
+		Atualiza os valores de um argumento local de função para uma variável externa que foi passada como esse argumento. Deve ser passada a variável local exata que deve ser atualizada
+		para a variável externa.<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function caller() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var return type string;</CODE></LI>
+			<LI><CODE>&nbsp;$return = "foo";</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo($return);</CODE></LI>
+			<LI><CODE>&nbsp;byref_sample($return);</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo($return + "\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>function byref_sample(io_var type string) : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;$io_var = "bar";</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.byref($io_var);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+		<H5><B><U>time()</U></B></H5>
+		
+		Retorna uma string representando o tempo do sistema de acordo com o formato passado. Os formatos aceitos são os mesmos aceitos pela função
+		"strftime()" contida na libc de seu SO.<BR><BR>
+		
+		<OL CLASS="code">
+			<LI><CODE>function time_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+		
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+        <!-- hls toolset dialect -->
+        <A NAME = "toolsetcomposing"></A>
+        <H3>Compondo um toolset hefesto</H3>
+        
+		Criar um toolset hefesto significa indicar como formatar comandos para construir algo.
+		O subconjunto da hls utilizado nesta tarefa é mais uma linguagem de configuração que uma linguagem de programação.<BR><BR>
+        
+		Todo comando de toolset é uma string, uma string formatada. Esses comandos podem ser chamados via <B>hefesto.toolset.*</B>.<BR>
+		
+        <H5>O "dialeto" hls para toolsets</H5>
+        
+		Abaixo você pode ver como exemplo um toolset reduzido:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>toolset "tiny-GCC-app" forge function "c_gcc_forge_base":</CODE></LI>
+			<LI><CODE>&nbsp;command "compile": SOURCE, INCLUDES, FLAGS <</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;gcc -c $SOURCE $INCLUDES $FLAGS</CODE></LI>
+			<LI><CODE>&nbsp;></CODE></LI>
+			<LI><CODE>&nbsp;command "link": APP_NAME, OBJECTS, LIBRARIES <</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;gcc -o$APP_NAME $OBJECTS $LIBRARIES</CODE></LI>
+			<LI><CODE>&nbsp;></CODE></LI>
+			<LI><CODE>$</CODE></LI>
+        </OL>       
+        
+        <BR>
+        
+		Após a palavra reservada "toolset" você define o nome do toolset (uma string), esse nome será usado para associar seus projetos com esse toolset.
+		Então, você precisa indicar uma função especial, essa função será usada para formatar e executar os comandos de toolset. Essa função executará o build.
+		No Hefesto, funções desse tipo são chamadas "funções de forja".<BR><BR>
+        
+		A configuração dentro das seções iniciadas pela palavra reservada "command" são templates para comandos de string. Onde você define o nome do comando,
+		as strings que serão passadas e como esse comando será retornado/formatado para o chamador. <B><U>Importante:</U></B> todo comando de toolset sempre recebe
+		argumentos string, nunca outro tipo.<BR><BR>
+		
+		Funções de forja têm a propriedade de chamar funções da coleção <B>hefesto.toolset.*</B>.<BR><BR>
+        
+		Quando você carrega um determinado toolset, todos os comandos configurados nele estarão acessíveis via a coleção de funções de toolset.<BR><BR>
+        
+		Nós podemos invocar dentro de uma função de forja algo como isso:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;&nbsp;hefesto.toolset.command("main.c", "-I/usr/home/rs/cincs", "-Wall");</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		Se você precisa usar funções da coleção de toolset em outra função, você precisa informar essa função como sendo "forge helper" na
+		declaração do toolset, veja:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>toolset "tiny-GCC-app" forge function "c_gcc_forge_base": forge helpers: "compile_helper", "link_helper":</CODE></LI>
+			<LI><CODE>&nbsp;command "compile": SOURCE, INCLUDES, FLAGS <</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;gcc -c $SOURCE $INCLUDES $FLAGS</CODE></LI>
+			<LI><CODE>&nbsp;></CODE></LI>
+			<LI><CODE>&nbsp;command "link": APP_NAME, OBJECTS, LIBRARIES <</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;gcc -o$APP_NAME $OBJECTS $LIBRARIES</CODE></LI>
+			<LI><CODE>&nbsp;></CODE></LI>
+			<LI><CODE>$</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		Ajudantes de forja são úteis porque toda tarefa de build codificada em somente uma função pode produzir uma código longo e feio. É melhor quebrá-lo em partes. Dessa forma você pode debugar e expandir isso facilmente.<BR><BR>
+        
+		Por hora é tudo o que você precisa saber sobre declaração de toolsets. Ah...<BR><BR>
+        
+		Sim, toda declaração de toolset finaliza com o símbolo dólar, final de fita! :)
+                
+		<H5>A função de forja</H5>
+        
+		A função de forja é expressa em hls padrão. Os argumentos recebidos por essa função dependem de como essa foi projetada, não há um padrão fixo para isso.<BR><BR>
+		
+		Os argumentos definem como o usuário do toolset irá configurar o Forgefile, o script usado pelo hefesto para forjar o "someware" dele.<BR><BR>
+        
+		Segue uma idéia geral sobre o que essa função precisa fazer:<BR><BR>
+        
+		- Receber uma lista com os caminhos dos fontes.<BR>
+        - Verificar se cada arquivo fonte mudou.<BR>
+		- Se um arquivo foi alterado, ele precisa ser compilado:<BR>
+        &nbsp;&nbsp;- Formatar o comando de compilação para o arquivo alterado.<BR>
+        &nbsp;&nbsp;- Rodar o comando de compilação.<BR>
+        &nbsp;&nbsp;- Se não ok, abortar a forja.<BR> 
+		- Ir para o próximo arquivo na lista.<BR>
+        - Depois do processo de compilação, se tudo compilado, formatar o comando de link e rodá-lo.<BR>
+        - Checar o resultado e informar isso.
+        
+        <BR><BR>
+        
+		Você pode ver mais lendo o código das funções de forja presentes na biblioteca Hefesto que foi instalada com esse pacote.<BR><BR>
+        
+		Mas é importante apresentar para você duas úteis funções built-in de toolset: <B><U>hefesto.toolset.file_has_change()</U></B> e <B><U>hefesto.toolset.base_refresh()</U></B>.<BR><BR>
+                
+        <I>file_has_change()</I> é usada para saber se um arquivo mudou, você passa o path para o arquivo, retorna 1 se estiver "sujo" de outra forma 0.<BR><BR>
+        
+        <I>base_refresh()</I> atualiza os checksums na sumbase (um arquivo com informação que é usada para saber se o arquivo possui mudanças ou não desde a última chamada a base_refresh).
+        Essa função recebe uma lista contendo todos os arquivos compilados no processo.
+        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+        <A NAME = "forgingprojectswithhefesto"></A>
+        <H3>Forjando projetos com Hefesto</H3>
+        
+		Ok, você já sabe tudo sobre a hls... configuração de toolset, como integrar um função hls para executar a build task, etc... mas você ainda não sabe como usar todas essas coisas para
+		forjar alguma coisa.<BR>
+                
+        <H5>O "dialeto" de forja</H5>
+
+		Aqui está um "Forgefile" de exemplo:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls<BR></CODE>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
+			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
+			<LI><CODE>&nbsp;var cflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var libraries type list;</CODE></LI>
+			<LI><CODE>&nbsp;var ldflags type list;</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;project aquiles-armor : toolset "tiny-GCC-app" : $sources, $includes, $cflags, $libraries, $ldflags, "aquiles-armor";<BR></CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		A hls permite você incluir o conteúdo de um arquivo dentro de outro via a palavra reservada "include". O símbolo "~" indica que o arquivo incluso
+		está localizado em um lugar conhecido configurado na variável de ambiente "HEFESTO_INCLUDES_HOME". Se o arquivo está relativo/local você precisa
+		somente indicar o caminho relativo sem a abstração para HEFESTO_INCLUDES_HOME, a.k.a "~".<BR><BR>
+		
+		Variáveis precisam ser declaradas, você se lembra?<BR><BR>
+        
+		A palavra reservada "project" declara o projeto de build, "aquiles-armor" é o projeto de build no exemplo. Então, depois que o projeto de build foi nomeado você precisa
+		indicar qual toolset usar. As variáveis fornecidas são passadas para a função de forja definida no toolset escolhido. Note que o usuário chama a função de forja aqui, mas de modo indireto.<BR><BR>
+
+		Talvez você esteja se perguntando como essas listas passadas para a forja são populadas. Aqui Hefesto começa ser diferente de outros build systems.<BR>
+        
+        <H5>As linhas de execução da forja</H5>
+        
+		Uma forja tem quatro estágios de execução: <B><U>pré-carregamento</U></B>, <B><U>prólogo</U></B>, <B><U>forja</U></B> e <B><U>epílogo</U></B>. Somente a
+		<B><U>forja</U></B> é sempre executada.<BR><BR>
+		
+		Os outros estágios são executados somente se eles tiverem algo codificados neles. Sim, você precisa codificar isso.<BR><BR>
+        
+		Automaticamente todo projeto quando é declarado possui três funções pré-definidas: <B><U>preloading()</U></B>, <B><U>prologue()</U></B> e <B><U>epilogue()</U></B>. 
+		Você pode ter acesso a essas funções da seguinte forma:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>aquiles-armor.preloading() {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("this is the preloading stage.\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>aquiles-armor.prologue() {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("this is the prologue stage.\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>arquilles-armor.epilogue() {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.echo("this is the epilogue stage.\n");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+    
+        <BR>
+		
+		Se você define algum código dentro dessas funções, o código será executado no momento determinado da build task.<BR><BR>
+        
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Linhas de execução</B></TD><TD><B>Quando</B></TD></TR>
+                <TR><TD>preloading</TD><TD>toolset está sendo carregado</TD></TR>
+                <TR><TD>prologue</TD><TD>depois do toolset carregado antes do build</TD></TR>
+                <TR><TD>epilogue</TD><TD>após build bem/mal sucedido</TD></TR>
+            </TABLE>
+        </CENTER>
+        
+        <BR>
+		Para o projeto "aquiles-armor" nós podemos popular nossas listas dentro da função de prólogo, veja:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
+			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
+			<LI><CODE>&nbsp;var cflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var libraries type list;</CODE></LI>
+			<LI><CODE>&nbsp;var ldflags type list;</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;project aquiles-armor : toolset "tiny-GCC-app" : $sources, $includes, $cflags, $libraries, $ldflags, "aquiles-armor";</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>aquiles-armor.prologue() {</CODE></LI>
+			<LI><CODE>&nbsp;$sources.set_from_fs_by_regex(".*c$");</CODE></LI>
+			<LI><CODE>&nbsp;$includes = hefesto.sys.get_option("includes");</CODE></LI>
+			<LI><CODE>&nbsp;$ldflags = hefesto.sys.get_option("ldflags");</CODE></LI>
+			<LI><CODE>&nbsp;$cflags = hefesto.sys.get_option("cflags");</CODE></LI>
+			<LI><CODE>&nbsp;$libraries = hefesto.sys.get_option("libraries");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+        
+        <H5>Resgatando certas informações sobre o projeto via facilitadores built-in</H5>
+        
+        É possível obter informações sobre o projeto que está em processo de forja via <B><U>hefesto.project.*</U></B>, segue uma listagem com todos
+        os facilitadores disponíveis.<BR><BR>
+        
+        <CENTER>
+            <TABLE BORDER = 0>
+                <TR><TD><B>Facilitador</B></TD><TD><B>Retorna</B></TD></TR>
+                <TR><TD>hefesto.project.name()</TD><TD>O nome do projeto em execução</TD></TR>
+                <TR><TD>hefesto.project.dep_chain()</TD><TD>A dep chain configurada para esse projeto</TD></TR>
+                <TR><TD>hefesto.project.toolset()</TD><TD>O toolset que está sendo usado para forjar o projeto</TD></TR>
+            </TABLE>
+        </CENTER>
+        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+		<A NAME = "deps"></A>
+        <H3>Dependências de projeto e scanners de dependência</H3>
+        
+		Como muitos build systems, Hefesto pode processar somente arquivos que possuem mudanças desde a última forja. Você já sabe sobre as funções built-in "base_refresh()" e "file_has_change()", mas
+		essas funções somente irão funcionar com projetos que tem uma <B><U>dep chain</U></B> definida.<BR><BR>
+		
+		Uma <I>dep chain</I> ou cadeia de dependência é uma string usada para expressar o relacionamento entre seus arquivos de projeto. Alguns tipos de linguagens criam dependências entre módulos, então a manipulação correta disso é importante.<BR><BR>
+        
+		Por exemplo, se o arquivo "foo.c" depende de "foo.h" e "bar.c", já o arquivo "bar.c" depende de "bar.h", a dep chain poderia ser:<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;foo.c: foo.h & bar.c ;</CODE></LI>
+			<LI><CODE>&nbsp;bar.c: bar.h ;</CODE></LI>
+        </OL>
+        
+        <BR>
+        
+		Na declaração do projeto você deve pôr essa dep chain na forma de uma string, depois da declaração de toolset e prefixada pela palavra reservada "dependencies":<BR><BR>
+        
+		<OL CLASS="code">
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
+			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
+			<LI><CODE>&nbsp;var cflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var libraries type list;</CODE></LI>
+			<LI><CODE>&nbsp;var ldflags type list;</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;project aquiles-armor : toolset "tiny-GCC-app" : dependencies "foo.c: foo.h & bar.c;bar.c: bar.h" :</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$sources, $includes, $cflags, $libraries, $ldflags, "aquiles-armor";</CODE></LI>
+			<LI><CODE></CODE></LI>
+        </OL>
+        
+		Agora se a função de forja grava checksums do arquivos de projeto chamando base_refresh(), isso pode melhorar o build na próxima vez, tornando o processo mais rápido, processando somente as coisas que mudaram.<BR><BR>
+		
+        Não existe função built-in que detecta dependência de módulo, isso não foi implementado porque Hefesto não é projetada somente para poucos tipos de linguagem de programação, você pode expandir Hefesto
+		para auxiliá-lo no build de qualquer coisa. Essa é a principal ideia do Hefesto.<BR><BR>
+        
+		Os scanners de dependência podem ser codificados em hls. Uma função que retorna uma string, a cadeia de dependências.<BR><BR>
+		
+		Na declaração do projeto na seção dependências você pode usar uma variável string no lugar de uma string literal. Usando isso você pode setar a variável com o retorno de um scanner de dependências.
+		Você deve atribuir isso na função preloading, porque o projeto é carregado e configurado nesse estágio. Veja um exemplo:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
+			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
+			<LI><CODE>&nbsp;var cflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var libraries type list;</CODE></LI>
+			<LI><CODE>&nbsp;var ldflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var dep_chain type string;</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;project aquiles-armor : toolset "tiny-GCC-app" : dependencies $dep_chain : </CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$sources, $includes, $cflags, $libraries, $ldflags, "aquiles-armor";<BR>        </CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;aquiles-armor.preloading() {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;$dep_chain = get_c_project_dependencies();</CODE></LI>
+			<LI><CODE>&nbsp;}</CODE></LI>
+        </OL>
+        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+		<A NAME = "suitableforges"></A>
+        <H3>Tornando seu Forgefile mais compatível entre diferentes ambientes</H3>
+        
+		É desejável escrever builds portáveis, dessa maneira se a plataforma muda e/ou o compilador também, seu projeto ainda pode ser construído sem alterações no "Forgefile".<BR><BR>
+		
+		Como a declaração das dependências, a declaração de toolset aceita uma variável string também. Você pode detectar a plataforma e o compilador instalado no estágio "preloading".
+        Você pode tentar usar os toolsets em alguma ordem de precedência. Alguma coisa feito isso: "Hmm se estiver no Windows e o vs está instalado uso o vs-toolset, senão tento usar o "Gcc-toolset", e assim vai.".
+        Veja um projeto de build que deve usar msvc quando executado no Windows.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/vs.hls</CODE></LI>
+			<LI><CODE></CODE></CODE></LI>
+			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
+			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
+			<LI><CODE>&nbsp;var cflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var libraries type list;</CODE></LI>
+			<LI><CODE>&nbsp;var ldflags type list;</CODE></LI>
+			<LI><CODE>&nbsp;var dep_chain type string;</CODE></LI>
+			<LI><CODE>&nbsp;var platform_toolset type string;</CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;project aquiles-armor : toolset $platform_toolset : dependencies $dep_chain : </CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$sources, $includes, $cflags, $libraries, $ldflags, "aquiles-armor";<BR>        </CODE></LI>
+			<LI><CODE></CODE></LI>
+			<LI><CODE>&nbsp;aquiles-armor.preloading() {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;$dep_chain = get_c_project_dependencies();</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;if (hefesto.sys.os_name() == "windows") {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;$plarform_toolset = "tiny-VS-app";</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;} else {</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;&nbsp;$platform_toolset = "tiny-GCC-app";</CODE></LI>
+			<LI><CODE>&nbsp;&nbsp;}</CODE></LI>
+			<LI><CODE>&nbsp;}</CODE></LI>
+        </OL>
+        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+		<A NAME = "theapp"></A>
+        <H3>O aplicativo Hefesto</H3>
+        
+		A aplicação Hefesto concentra o compilador hls e o interpretador. Ela é controlada via opções de linha de comando.<BR><BR>
+        
+		
+		Opções podem ser fornecidas para o Hefesto nas seguintes formas:<BR><BR>
+        
+        <CENTER>
+            <I>--single_option_name=algum_valor</I><BR>
+            <I>--multi_option_name=valor_a,valor_b,valor_c</I><BR>
+			<I>--flag_option</I><BR>
+        </CENTER>
+		
+		<BR>
+		
+		Um toolset específico pode ler diversas opções devido a isso é importante saber sobre o toolset usado.
+		Você deveria sempre ler a documentação do toolset antes de começar usar isso.<BR><BR>
+		
+		A maioria das opções são relevantes no contexto de execução do hls, isso irá depender do desenvolvedor do toolset e/ou do criador do projeto de forja, mas algumas opções
+		são internas. São elas:<BR><BR>
+				
+		<CENTER>
+			<TABLE BORDER=0>
+				<TR><TD><B>Opção</B></TD><TD><B>Utilidade</B></TD><TD><B>Tipo</B></TD></TR>
+				<TR><TD>--forgefiles</TD><TD>indica o caminho dos Forgefiles contendo os projetos</TD><TD>multi option</TD></TR>
+				<TR><TD>--compile-only</TD><TD>faz apenas a compilação básica dos arquivos hls fornecidos via opção "--forgefiles"</TD><TD>flag option</TD></TR>
+				<TR><TD>--forge-anyway</TD><TD>compila todos os fontes do projeto ignorando o status de mudança deles</TD><TD>flag option</TD></TR>
+				<TR><TD>--qsize</TD><TD>configura o tamanho da work queue</TD><TD>single option</TD></TR>
+				<TR><TD>--user-includes-home</TD><TD>define paths adicionais para busca de includes hls</TD><TD>multi option</TD></TR>
+			</TABLE>
+		</CENTER>
+        
+		<BR>
+	
+		Quando você indica o Forgefile via a opção "--forgefiles" você precisa indicar os projetos para forja via opção --seu-hls-sem-extensão-projects="projeto", veja:<BR><BR>
+	
+		<CENTER>
+			<I>hefesto --forgefiles="/usr/bin/hefesto/samples/hefesto-sample.hls" --<B>hefesto-sample-</B>projects="aquiles-armor"</I>
+		</CENTER>
+		
+		<BR>
+
+		O comando acima forjará o projeto "aquiles-armor" definido em "hefesto-sample.hls".
+		
+		        
+		<BR><BR><A HREF = "#topics">Voltar</A>
+		
+        <!-- How to contribute with this project -->
+        <A NAME = "contribute"></A>
+        <H3>Como contribuir com este projeto</H3>
+		
+			Você pode notar que eu não falo bem inglês :) ... Se você não fala português, minhas desculpas he-he. Eu acho que o manual em inglês deveria ser melhorado.<BR><BR>
+ 
+			Hoje você pode forjar projetos C/C++ (usando GCC) e LaTeX, porém mais toolsets deveriam ser implementados para diversos tipos de ferramentas e linguagens.<BR><BR>
+ 
+			Para o toolset C/C++ deveria ser implementado o toolset VS. Uma função que cria o ".sln" seria muito interesante para quem usa VS.<BR><BR>
+  
+			Eu odeio HTML, você ama? Melhore esse lugar preto-e-branco...<BR><BR>
+
+			Eu acho que o projeto deveria ter  um mascote, mas eu só sei desenhar bonecos de palito.<BR><BR>
+			
+			E finalmente, você pode me ajudar com o core do Hefesto também. Precisa somente amar liguagem C pura e compiladores/interpretadores. Em minha opinião, os unit e system tests deveriam ser melhorados... tem sempre algum refactory por fazer :)
+			
+		<BR><BR><A HREF = "#topics">Voltar</A><BR>
+			
+		<A NAME = "hefestopeople"></A>
+		<H3>A equipe Hefesto</H3>
+			
+			<A HREF = "mailto:voidbrainvoid@gmail.com">Rafael Santiago</A> - Criador do Hefesto (mas não Zeus, somente o desenvolvedor principal, the main code monkey).
+			
+			<BR><BR><A HREF = "#topics">Voltar</A><BR>
+			
+			<A NAME = "download"></A>
+			<H3>Downloads</H3>
+		
+			<IMG SRC="imgs/linux_icon.jpg" WIDTH=50 HEIGHT=50><A HREF="pkgs/hfst_lin.zip" target=_vblank>Pacote pré-compilado Linux</A><BR><BR>
+			<IMG SRC="imgs/freebsd_icon.jpg" WIDTH=50 HEIGHT=50><A HREF="pkgs/hfst_fbsd.zip" target=_vblank>Pacote pré-compilado FreeBSD</A><BR><BR>
+			<IMG SRC="imgs/windows_icon.jpg" WIDTH=50 HEIGHT=50><A HREF="pkgs/hfst_win.zip" target=_vblank>Pacote pré-compilado Windows</A>
+				
+			<BR><BR><A HREF = "#topics">Voltar</A><BR><BR>
+						
+			<SMALL>Se você tem grandes ideias sobre isso, você precisa estar aqui também. <A HREF = "mailto:voidbrainvoid@gmail.com">Fale comigo</A>.</SMALL>
+        </P>
+		
+    </BODY>
+    </FONT>
+	
+	<CENTER><SMALL>Rafael Santiago, (c) Copyrigth 2012</SMALL></CENTER>
+</HTML>
