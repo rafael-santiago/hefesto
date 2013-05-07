@@ -1,4 +1,10 @@
 #                                                 Sun 31 Mar 2013 01:54:28 PM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
 # "fsutil.hls"
 #
 # Description: filesystem common utilities.

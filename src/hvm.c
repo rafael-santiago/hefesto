@@ -92,7 +92,6 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
     hefesto_type_t out_type;
     size_t out_size;
     int ret;
-    hefesto_command_list_ctx *lcmd;
 
     while (cmd && hvm_continue_loop == 0 && !HEFESTO_EXIT) {
 
@@ -140,6 +139,8 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                                     case HEFESTO_WHILE:
                                         if (cmd->sub == NULL) cmd = cmd->next;
                                         break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
@@ -176,6 +177,8 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                                     case HEFESTO_IF:
                                     case HEFESTO_WHILE:
                                         if (cmd->sub == NULL) cmd = cmd->next;
+                                        break;
+                                    default:
                                         break;
                                 }
                             }
@@ -265,7 +268,6 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
             case HEFESTO_BREAK:
                 if (hvm_is_inside_a_loop > 0) {
                     hvm_break_loop = 1;
-                    //if (should_return != NULL) *should_return = 1;
                     return NULL;
                 }
                 break;
@@ -361,7 +363,6 @@ static void *hvm_if(hefesto_command_list_ctx *cmd,
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
     size_t osize;
     hefesto_command_list_ctx *cmd_p = NULL, *tmp_cmd_p = NULL, *lst_cmd_p = NULL;
-    hefesto_command_list_ctx *else_cmd_p = NULL;
 
     if (cmd->sub != NULL) {
         cmd_p = cmd->sub;
@@ -408,9 +409,7 @@ static void *hvm_if(hefesto_command_list_ctx *cmd,
     }*/
 
     free(test);
-//printf("IF EXPR: %s [%d]\n", cmd->expr, *if_test);
     if (tmp_cmd_p != NULL) {
-        //cmd_p->next = tmp_cmd_p;
         lst_cmd_p->next = tmp_cmd_p;
     }
 
@@ -426,16 +425,13 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
     void *test;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
     size_t osize;
-    //hefesto_command_list_ctx *cmd_p = NULL, *tmp_cmd_p;
-    hefesto_command_list_ctx *cmd_p = NULL, *tmp_cmd_p = NULL, *lst_cmd_p = NULL, *x;
+    hefesto_command_list_ctx *cmd_p = NULL, *tmp_cmd_p = NULL, *lst_cmd_p = NULL;
     void *result = NULL;
 
     if (cmd->sub != NULL) {
         cmd_p = cmd->sub;
     } else {
         cmd_p = cmd->next;
-        //tmp_cmd_p = cmd_p->next;
-        //cmd_p->next = NULL;
         lst_cmd_p = get_last_cmd_to_exec(cmd_p);
         tmp_cmd_p = lst_cmd_p->next;
         lst_cmd_p->next = NULL;

@@ -13,6 +13,7 @@
 #include "synchk.h"
 #include "regex.h"
 #include "vfs.h"
+#include "hvm.h"
 #include "hvm_str.h"
 #include <string.h>
 #include <dirent.h>

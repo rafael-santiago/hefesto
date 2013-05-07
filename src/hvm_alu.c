@@ -258,7 +258,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
     void *index = NULL;
     int *integer_result, foo;
     size_t offset, osize;
-    hefesto_common_list_ctx *cp;
     hefesto_type_t etype;
 
     HEFESTO_DEBUG_INFO(0, "hvm_alu/operand: %s\n", operand);

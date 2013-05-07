@@ -3,7 +3,7 @@
 #
 
 COMPILER="gcc" # Adjust for your system compiler
-COMPILER_OPTS="-c " # Options too
+COMPILER_OPTS="-c -Wall " # Options too
 LINKER="gcc" # Linker too
 LINKER_OPTS="-o../bin/hefesto dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\

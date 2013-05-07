@@ -12,35 +12,6 @@
 #include <dirent.h>
 #include <ctype.h>
 
-static int is_windows();
-
-static int is_windows() {
-
-    DIR *dir;
-    char drive[10], letter;
-    int state;
-
-    for (letter = 'b'; letter != 'z'; letter++) {
-        for (state = 0; state < 2; state++) {
-            switch (state) {
-                case 0:
-                    sprintf(drive, "%c:\\", letter);
-                    break;
-                case 1:
-                    sprintf(drive, "%c%c:\\", letter, letter);
-                    break;
-            }
-        }
-        if ((dir = opendir(drive))) {
-            closedir(dir);
-            return 1;
-        }
-    }
-
-    return 0;
-
-}
-
 char *get_os_name() {
 
     char *result;

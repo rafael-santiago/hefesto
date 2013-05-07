@@ -1,4 +1,10 @@
 #                                                 Fri 29 Mar 2013 11:41:11 AM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
 # "conv.hls"
 #
 # Description: Some commons conversion routines.

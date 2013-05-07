@@ -12,6 +12,7 @@
 #include "hvm_alu.h"
 #include "regex.h"
 #include "synchk.h"
+#include "hvm.h"
 #include <string.h>
 
 static void *hvm_str_len(const char *method,
