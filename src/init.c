@@ -10,7 +10,7 @@
 #include "vfs.h"
 #include "mem.h"
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
 #include <unistd.h>
 
