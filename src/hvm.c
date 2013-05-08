@@ -68,19 +68,24 @@ void hvm_set_current_executed_function(hefesto_func_list_ctx *function) {
     hvm_last_executed_function = hvm_current_executed_function;
     hvm_current_executed_function = function;
 }
+
 hefesto_func_list_ctx *hvm_get_current_executed_function() {
     return hvm_current_executed_function;
 }
+
 hefesto_func_list_ctx *hvm_get_last_executed_function() {
     return hvm_last_executed_function;
 }
+
 static void hvm_set_current_executed_instruction(
                         hefesto_instruction_code_t instruction) {
     hvm_current_executed_instruction = instruction;
 }
+
 hefesto_instruction_code_t hvm_get_current_executed_instruction() {
     return hvm_current_executed_instruction;
 }
+
 void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                             hefesto_var_list_ctx **lo_vars,
                             hefesto_var_list_ctx **gl_vars,
@@ -126,7 +131,6 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                     //cmd = cmd->next;
                     cmd = get_last_cmd_to_exec(cmd);
                 }
-
                 if (hvm_last_if_test == 1) {
                     while (cmd != NULL && cmd->next != NULL &&
                            cmd->next->instruction == HEFESTO_ELSE) {
@@ -296,7 +300,7 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
 
 static hefesto_command_list_ctx *get_last_cmd_to_exec(hefesto_command_list_ctx *cmd) {
     hefesto_command_list_ctx *p = cmd;
-    while ((p->instruction == HEFESTO_WHILE ||
+    while (p && (p->instruction == HEFESTO_WHILE ||
             p->instruction == HEFESTO_IF) && p->sub == NULL) {
         p = p->next;
     }
@@ -328,8 +332,10 @@ static void *hvm_else(hefesto_command_list_ctx *cmd,
 */
     if (cmd->sub == NULL) {
         lst_cmd_p = get_last_cmd_to_exec(cmd_p);
-        tmp_cmd_p = lst_cmd_p->next;
-        lst_cmd_p->next = NULL;
+        if (lst_cmd_p != NULL) {
+            tmp_cmd_p = lst_cmd_p->next;
+            lst_cmd_p->next = NULL;
+        }
     }
 
     result = hvm_exec_command_list(cmd_p, lo_vars, gl_vars, functions,
@@ -374,20 +380,17 @@ static void *hvm_if(hefesto_command_list_ctx *cmd,
         cmd_p->next = NULL;
         */
         lst_cmd_p = get_last_cmd_to_exec(cmd_p);
-        tmp_cmd_p = lst_cmd_p->next;
-        lst_cmd_p->next = NULL;
+        if (lst_cmd_p != NULL) {
+            tmp_cmd_p = lst_cmd_p->next;
+            lst_cmd_p->next = NULL;
+        }
     }
 
     test = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype, &osize);
 
     if (test && *(int *)test) {
-        if (cmd->sub != NULL) {
-            result = hvm_exec_command_list(cmd_p, lo_vars, gl_vars, functions,
-                                           should_return);
-        } else {
-            result = hvm_exec_command_list(cmd_p, lo_vars, gl_vars, functions,
-                                           should_return);
-        }
+        result = hvm_exec_command_list(cmd_p, lo_vars, gl_vars, functions,
+                                       should_return);
         hvm_last_if_test = *(int *)test;
     } else {
         hvm_last_if_test = 0;
@@ -433,8 +436,10 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
     } else {
         cmd_p = cmd->next;
         lst_cmd_p = get_last_cmd_to_exec(cmd_p);
-        tmp_cmd_p = lst_cmd_p->next;
-        lst_cmd_p->next = NULL;
+        if (lst_cmd_p != NULL) {
+            tmp_cmd_p = lst_cmd_p->next;
+            lst_cmd_p->next = NULL;
+        }
     }
 
     test = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype, &osize);

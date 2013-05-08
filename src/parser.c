@@ -1008,6 +1008,8 @@ static long get_section_end_offset(FILE *fp, const long stop_at) {
 
     }
 
+    if (is_hefesto_section_end(c)) bracket--;
+
     return (bracket == 0 && is_really_section_end(fp, stop_at)) ? ftell(fp) : -1;
 
 }
