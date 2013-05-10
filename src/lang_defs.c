@@ -73,6 +73,7 @@ static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.forge",
   "hefesto.sys.byref",
   "hefesto.sys.time",
+  "hefesto.sys.setenv",
   "\0"
 };
 

@@ -212,6 +212,12 @@ static void *hefesto_sys_time(const char *syscall,
                               hefesto_func_list_ctx *functions,
                               hefesto_type_t **otype);
 
+static void *hefesto_sys_setenv(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype);
+
 struct hefesto_hvm_syscall {
     void *(*syscall)(const char *syscall,
                      hefesto_var_list_ctx **lo_vars,
@@ -253,7 +259,8 @@ static struct hefesto_hvm_syscall
     set_method(hefesto_sys_last_forge_result),
     set_method(hefesto_sys_forge),
     set_method(hefesto_sys_byref),
-    set_method(hefesto_sys_time)
+    set_method(hefesto_sys_time),
+    set_method(hefesto_sys_setenv)
 
 };
 
@@ -387,6 +394,10 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
 
         case HEFESTO_SYS_TIME:
             label = "hefesto.sys.time(";
+            break;
+
+        case HEFESTO_SYS_SETENV:
+            label = "hefesto.sys.setenv(";
             break;
 
         default:
@@ -1657,4 +1668,54 @@ static void *hefesto_sys_time(const char *syscall,
 
     return result;
 
+}
+
+static void *hefesto_sys_setenv(const char *syscall,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions,
+                                hefesto_type_t **otype) {
+    void *result = NULL;
+    char *arg_var, *arg_var_pfixd;
+    char *arg_val, *arg_val_pfixd;
+    void *var, *val;
+    const char *s;
+    size_t offset;
+    hefesto_type_t etype;
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg_var = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_var_pfixd = infix2postfix(arg_var, strlen(arg_var), 1);
+
+    arg_val = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_val_pfixd = infix2postfix(arg_val, strlen(arg_val), 1);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    var = expr_eval(arg_var_pfixd,
+                    lo_vars, gl_vars, functions, &etype, &offset);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    val = expr_eval(arg_val_pfixd,
+                    lo_vars, gl_vars, functions, &etype, &offset);
+
+    result = (int *) hefesto_mloc(sizeof(int));
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    *(int *)result = setenv(var, val, 1);
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+#endif
+
+    free(arg_var);
+    free(arg_var_pfixd);
+    free(arg_val);
+    free(arg_val_pfixd);
+    free(var);
+    free(val);
+
+    return result;
 }
