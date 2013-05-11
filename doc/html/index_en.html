@@ -124,6 +124,8 @@
                 <TR><TD>forge()</TD><TD>invokes another forge project</TD></TR>
                 <TR><TD>byref()</TD><TD>updates the value of a function argument to the external variable that was passed as this local variable (the function's argument)</TD></TR>                                
 				<TR><TD>time()</TD><TD>returns a string representing the system time based on provided format</TD></TR>
+                <TR><TD>setenv()</TD><TD>creates an environment variable</TD></TR>
+                <TR><TD>unsetenv()</TD><TD>removes an environment variable</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -592,6 +594,48 @@
 			<LI><CODE>&nbsp;hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 		</OL>
+        
+        <H5><B><U>setenv()</U></B></H5>
+        
+		Creates an environment variable. After application exit the created variables for this syscall are lost.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function setenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.setenv("mytempvar", "mytempval");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
+        <BR><BR>
+        
+        On Windows you can use this syscall to access the registry too, for it you need to inform the fullpath
+        of the value. This information must be prefixed with "WINREG:" marker.<BR><BR>
+               
+        <OL CLASS="code">
+			<LI><CODE>function setenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.setenv("WINREG:HKCU\\Software\\Abc\\mytempvar:REG_SZ", "mytempval");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>        
+        
+        <H5><B><U>unsetenv()</U></B></H5>
+        
+		Removes an environment variable. This remove operation is performed only for the application process.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function unsetenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.unsetenv("VSCOMPILERPATH");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
+        <BR><BR>
+        
+        On Windows you can use this syscall to remove values from registry too (this type of removing will be permanent).
+        In the following way:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function unsetenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>        
 		
 		<BR><BR><A HREF = "#topics">Back</A>
 		

@@ -118,6 +118,7 @@ typedef enum _hefesto_instruction_code_t {
 #define HEFESTO_SYS_BYREF                                       0x1d000000
 #define HEFESTO_SYS_TIME                                        0x1e000000
 #define HEFESTO_SYS_SETENV                                      0x1f000000
+#define HEFESTO_SYS_UNSETENV                                    0x20000000
 
 typedef struct _hefesto_command_list_ctx {
   hefesto_instruction_code_t instruction;

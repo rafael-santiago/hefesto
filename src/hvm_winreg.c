@@ -7,11 +7,11 @@
 #include <winreg.h>
 #endif
 
+#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
 static unsigned int get_key_handle_from_wreg_path(const char *path);
 
 static char *get_value_from_wreg_path(const char *path);
-
-#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static DWORD get_value_type_from_wreg_path(const char *path);
 
@@ -21,8 +21,11 @@ static char *get_subkey_from_winreg_path(const char *value_fullpath);
 
 #endif
 
-static unsigned int get_key_handle_from_wreg_path(const char *path) {
+
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
+static unsigned int get_key_handle_from_wreg_path(const char *path) {
+
     const char *p, *pe;
     char handle[HEFESTO_MAX_BUFFER_SIZE], *h;
     for (p = path; *p != '\\' && *p != '/' && *p != 0; p++);
@@ -46,7 +49,7 @@ static unsigned int get_key_handle_from_wreg_path(const char *path) {
     if (strcmp(handle, "HKCC") == 0) {
         return ((unsigned int)HKEY_CURRENT_CONFIG);
     }
-#endif
+
     return ((unsigned int)-1);
 }
 
@@ -61,12 +64,10 @@ static char *get_value_from_wreg_path(const char *path) {
     for (r = result;
          r != (result + HEFESTO_MAX_BUFFER_SIZE-1) &&
          *p != 0 && *p != ':'; p++, r++) {
-        *r = *p;         
+        *r = *p;
     }
     return result;
 }
-
-#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static DWORD get_value_type_from_wreg_path(const char *path) {
     const char *p;
@@ -95,7 +96,7 @@ static LONG open_winreg_key(const char *value_fullpath, PHKEY key) {
     ve = v;
     for (v = value_fullpath; *v != 0 &&
                              *v != '/' && *v != '\\'; v++);
-    
+
     if (*v != 0) {
         for (v++, s = 0; s < HEFESTO_MAX_BUFFER_SIZE && v != ve; v++, s++) {
             subpath[s] = *v;
@@ -103,9 +104,8 @@ static LONG open_winreg_key(const char *value_fullpath, PHKEY key) {
         subpath[s] = 0;
         return RegOpenKeyEx(hk, subpath, 0, KEY_ALL_ACCESS, key);
     }
-    
+
     return 1;
-    
 }
 
 static char *get_subkey_from_winreg_path(const char *value_fullpath) {
@@ -117,17 +117,17 @@ static char *get_subkey_from_winreg_path(const char *value_fullpath) {
     ve = v;
     for (v = value_fullpath; *v != 0 &&
                              *v != '/' && *v != '\\'; v++);
-    
+
     memset(subpath, 0, HEFESTO_MAX_BUFFER_SIZE);
-    
+
     if (*v != 0) {
         for (v++, s = 0; s < HEFESTO_MAX_BUFFER_SIZE && v != ve; v++, s++) {
             subpath[s] = *v;
         }
         subpath[s] = 0;
     }
-    
-    return subpath;    
+
+    return subpath;
 }
 
 #endif
@@ -142,7 +142,7 @@ char *get_value_from_winreg(const char *value_fullpath) {
     result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     memset(result, 0, HEFESTO_MAX_BUFFER_SIZE);
     if (open_winreg_key(value_fullpath, &hk) == ERROR_SUCCESS) {
-        if (RegQueryValueEx(hk, 
+        if (RegQueryValueEx(hk,
                             value_name,
                             NULL, &vtype, result,
                             &rsize) == 0) {

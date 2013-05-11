@@ -6,3 +6,4 @@ int set_value_from_winreg(const char *value_fullpath, const char *value);
 int del_value_from_winreg(const char *value_fullpath);
 
 #endif
+

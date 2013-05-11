@@ -199,6 +199,11 @@ static int synchk_hefesto_sys_setenv(const char *usr_calling,
                                      hefesto_var_list_ctx *lo_vars,
                                      hefesto_var_list_ctx *gl_vars,
                                      hefesto_func_list_ctx *functions);
+                                     
+static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
+                                       hefesto_var_list_ctx *lo_vars,
+                                       hefesto_var_list_ctx *gl_vars,
+                                       hefesto_func_list_ctx *functions);
 
 hefesto_type_t get_hefesto_var_type_by_usr_code(const char *var,
                                                 hefesto_var_list_ctx *lo_vars,
@@ -264,8 +269,8 @@ static struct hefesto_syscall_syntax_checker_ctx
     set_hefesto_synchk_slot(synchk_hefesto_sys_forge),
     set_hefesto_synchk_slot(synchk_hefesto_sys_byref),
     set_hefesto_synchk_slot(synchk_hefesto_sys_time),
-    set_hefesto_synchk_slot(synchk_hefesto_sys_setenv)
-
+    set_hefesto_synchk_slot(synchk_hefesto_sys_setenv),
+    set_hefesto_synchk_slot(synchk_hefesto_sys_unsetenv)
 };
 
 static struct hefesto_syscall_syntax_checker_ctx
@@ -2533,6 +2538,16 @@ static int synchk_hefesto_sys_setenv(const char *usr_calling,
                                         gl_vars,
                                         functions);
 
+}
+
+static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
+                                       hefesto_var_list_ctx *lo_vars,
+                                       hefesto_var_list_ctx *gl_vars,
+                                       hefesto_func_list_ctx *functions) {
+    return synchk_hefesto_sys_env(usr_calling,
+                                  lo_vars,
+                                  gl_vars,
+                                  functions);
 }
 
 static int synchk_hefesto_project_name(const char *usr_calling,

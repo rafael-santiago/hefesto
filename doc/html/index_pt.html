@@ -141,6 +141,8 @@
                 <TR><TD>forge()</TD><TD>invoca um outro projeto de forja</TD></TR>
                 <TR><TD>byref()</TD><TD>atualiza os valores de um argumento de função para a variável externa que foi passada como esse argumento local</TD></TR>
 				<TR><TD>time()</TD><TD>retorna uma string representando o tempo do sistema de acordo com o formato passado</TD></TR>
+                <TR><TD>setenv()</TD><TD>cria uma variável de ambiente</TD></TR>
+                <TR><TD>unsetenv()</TD><TD>remove uma variável de ambiente</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -616,6 +618,48 @@
 			<LI><CODE>&nbsp;hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 		</OL>
+        
+        <H5><B><U>setenv()</U></B></H5>
+		
+		Cria uma variável de ambiente. Após o término do processo a variável é perdida.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function setenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.setenv("mytempvar", "mytempval");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
+        <BR><BR>
+        
+        No Windows você pode utilizar essa syscall para acessar o registro também, bastando informar o caminho completo onde
+        deseja salvar o valor, precedendo essa informação pelo marcador "WINREG:".<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function setenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.setenv("WINREG:HKCU\\Software\\Abc\\mytempvar:REG_SZ", "mytempval");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>        
+		
+        <H5><B><U>unsetenv()</U></B></H5>
+		
+		Remove uma variável de ambiente. O processo de remoção somente afeta o processo referente a aplicação.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function unsetenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.unsetenv("VSCOMPILERPATH");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
+        <BR><BR>
+        
+        No Windows você pode utilizar essa syscall para remover valores do registro também (essa remoção é permanente).
+        Da seguinte forma:<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function unsetenv_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>        
 		
 		<BR><BR><A HREF = "#topics">Voltar</A>
 		

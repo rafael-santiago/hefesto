@@ -9,6 +9,7 @@
 #include "options.h"
 #include "htask.h"
 #include "init.h"
+#include "hvm_winreg.h"
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
     hefesto_common_list_ctx *fp;
     int o_idx, exit_code = 1;
     char *temp;
-
+    
     for (o_idx = 1; o_idx < argc; o_idx++) {
         o = add_option_to_hefesto_options_ctx(o, argv[o_idx]);
     }

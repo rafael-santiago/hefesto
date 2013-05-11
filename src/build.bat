@@ -4,9 +4,11 @@
 
 @SET LINKER=gcc
 
-@SET LINKER_OPTS=-o../bin/hefesto.exe dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o regex.o src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o
+@SET ADVAPI32LIB=-ladvapi32
 
-@SET UNIT_TEST=-omain.exe ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o ../../parser.o ../../regex.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o
+@SET LINKER_OPTS=-o../bin/hefesto.exe dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o regex.o src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o %ADVAPI32LIB%
+
+@SET UNIT_TEST=-omain.exe ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o ../../parser.o ../../regex.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o %ADVAPI32LIB%
 
 @echo ### Compiling
 
@@ -95,6 +97,9 @@
 @IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
 
 @%COMPILER% %COMPILER_OPTS% vfs.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
+
+@%COMPILER% %COMPILER_OPTS% hvm_winreg.c
 @IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
 
 @echo ### Compiled.

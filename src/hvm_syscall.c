@@ -21,6 +21,7 @@
 #include "hvm.h"
 #include "hvm_rqueue.h"
 #include "htask.h"
+#include "hvm_winreg.h"
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
@@ -217,6 +218,12 @@ static void *hefesto_sys_setenv(const char *syscall,
                                 hefesto_var_list_ctx **gl_vars,
                                 hefesto_func_list_ctx *functions,
                                 hefesto_type_t **otype);
+                                
+static void *hefesto_sys_unsetenv(const char *syscall,
+                                  hefesto_var_list_ctx **lo_vars,
+                                  hefesto_var_list_ctx **gl_vars,
+                                  hefesto_func_list_ctx *functions,
+                                  hefesto_type_t **otype);
 
 struct hefesto_hvm_syscall {
     void *(*syscall)(const char *syscall,
@@ -260,8 +267,8 @@ static struct hefesto_hvm_syscall
     set_method(hefesto_sys_forge),
     set_method(hefesto_sys_byref),
     set_method(hefesto_sys_time),
-    set_method(hefesto_sys_setenv)
-
+    set_method(hefesto_sys_setenv),
+    set_method(hefesto_sys_unsetenv)
 };
 
 #undef set_method
@@ -398,6 +405,10 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
 
         case HEFESTO_SYS_SETENV:
             label = "hefesto.sys.setenv(";
+            break;
+            
+        case HEFESTO_SYS_UNSETENV:
+            label = "hefesto.sys.unsetenv(";
             break;
 
         default:
@@ -1051,6 +1062,7 @@ static void *hefesto_sys_env(const char *syscall,
     char *arg;
     char *arg_fmt;
     char *result;
+    char *value;
     size_t sz;
 
     **otype = HEFESTO_VAR_TYPE_STRING;
@@ -1063,18 +1075,35 @@ static void *hefesto_sys_env(const char *syscall,
     arg_fmt = hvm_str_format(arg, lo_vars, gl_vars, functions);
     free(arg);
 
-    s = getenv(arg_fmt);
+    if (strstr(arg_fmt, "WINREG:") != arg_fmt) {
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+        value = getenv(arg_fmt);
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+        value = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+        if (GetEnvironmentVariable(arg_fmt,
+                                   value,
+                                   HEFESTO_MAX_BUFFER_SIZE) == 0) {
+            free(value);
+            value = NULL;
+        }
+#endif
+    } else {
+        value = get_value_from_winreg(arg_fmt + 7);
+    }
 
     free(arg_fmt);
 
-    if (s == NULL) {
+    if (value == NULL) {
         result = (char *) hefesto_mloc(HEFESTO_NULL_EVAL_SZ);
         strncpy(result, HEFESTO_NULL_EVAL, HEFESTO_NULL_EVAL_SZ-1);
     } else {
-        sz = strlen(s);
+        sz = strlen(value);
         result = (char *) hefesto_mloc(sz + 1);
         memset(result, 0, sz + 1);
-        strncpy(result, s, sz);
+        strncpy(result, value, sz);
+#if HEFESTO_TGT_OS != HEFESTO_LINUX
+        free(value);
+#endif
     }
 
     return result;
@@ -1708,6 +1737,11 @@ static void *hefesto_sys_setenv(const char *syscall,
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     *(int *)result = setenv(var, val, 1);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    if (strstr(var, "WINREG:") != var) {
+        *(int *)result = (SetEnvironmentVariable(var, val) != 1);
+    } else {
+        *(int *)result = set_value_from_winreg(var + 7, val);
+    }
 #endif
 
     free(arg_var);
@@ -1716,6 +1750,50 @@ static void *hefesto_sys_setenv(const char *syscall,
     free(arg_val_pfixd);
     free(var);
     free(val);
+
+    return result;
+}
+
+static void *hefesto_sys_unsetenv(const char *syscall,
+                                  hefesto_var_list_ctx **lo_vars,
+                                  hefesto_var_list_ctx **gl_vars,
+                                  hefesto_func_list_ctx *functions,
+                                  hefesto_type_t **otype) {
+    void *result = NULL;
+    char *arg_var, *arg_var_pfixd;
+    const char *s;
+    void *var;
+    size_t offset;
+    hefesto_type_t etype;
+
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg_var = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    arg_var_pfixd = infix2postfix(arg_var, strlen(arg_var), 1);
+
+    etype = HEFESTO_VAR_TYPE_STRING;
+    var = expr_eval(arg_var_pfixd,
+                    lo_vars, gl_vars, functions, &etype, &offset);
+
+    result = (int *) hefesto_mloc(sizeof(int));
+
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    *(int *)result = unsetenv(var);
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    if (strstr(var, "WINREG:") != var) {
+        *(int *)result = (SetEnvironmentVariable(var, NULL) != 1);
+    } else {
+        *(int *)result = del_value_from_winreg(var + 7);
+    }
+#endif
+
+    free(arg_var);
+    free(arg_var_pfixd);
+    free(var);
 
     return result;
 }
