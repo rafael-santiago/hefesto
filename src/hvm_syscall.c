@@ -1094,8 +1094,10 @@ static void *hefesto_sys_env(const char *syscall,
     free(arg_fmt);
 
     if (value == NULL) {
-        result = (char *) hefesto_mloc(HEFESTO_NULL_EVAL_SZ);
-        strncpy(result, HEFESTO_NULL_EVAL, HEFESTO_NULL_EVAL_SZ-1);
+//        result = (char *) hefesto_mloc(HEFESTO_NULL_EVAL_SZ);
+//        strncpy(result, HEFESTO_NULL_EVAL, HEFESTO_NULL_EVAL_SZ-1);
+        result = (char *) hefesto_mloc(2);
+        memset(result, 0, 2);
     } else {
         sz = strlen(value);
         result = (char *) hefesto_mloc(sz + 1);
