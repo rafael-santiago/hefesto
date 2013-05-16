@@ -1944,6 +1944,11 @@ static int synchk_hefesto_sys_env(const char *usr_calling,
                 fp->result_type == HEFESTO_VAR_TYPE_STRING) {
                 free(args);
                 return 1;
+            } else {
+                if (is_valid_expression(args, lo_vars, gl_vars, functions)) {
+                    free(args);
+                    return 1;
+                }
             }
         }
 

@@ -2424,7 +2424,8 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
             *t = fgetc(fp);
             while (is_hefesto_blank(*t)) *t = fgetc(fp);
             t++;
-            while (*(t-1) != '\n' && *(t-1) != '#' && !feof(fp) &&
+            while (*(t-1) != '\n' && *(t-1) != '\r' &&
+                   *(t-1) != '#' && !feof(fp) &&
                    t < (tok + HEFESTO_MAX_BUFFER_SIZE)) {
                 *t = fgetc(fp);
                 t++;

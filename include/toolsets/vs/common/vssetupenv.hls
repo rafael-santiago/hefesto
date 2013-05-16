@@ -5,6 +5,8 @@ project vslab : toolset "no-tool-any-set" : 1 ;
 vslab.prologue() {
     hefesto.sys.echo("be aware it can explode...\n");
     hefesto.sys.echo("vs110_vcvarsall result = " + vs110_vcvarsall("x86") + "\n");
+    hefesto.sys.run("\"C:\\Program Files\\Microsoft Visual Studio 11.0\\VC\\bin\\cl.exe\"");
+    hefesto.sys.run("\"C:\\Program Files\\Microsoft Visual Studio 11.0\\VC\\bin\\cl.exe\"");
     hefesto.sys.echo("what's up? :( :)\n");
 }
 
@@ -819,12 +821,12 @@ function vspath_exists(path type string) : result type string
 function vcvars_query_registry(mtype type list) : result type int {
     var exit_code type int;
     $exit_code = get_windows_sdk_dir();
-    if ($exit_code != 0) result $exit_code;
+    if ($exit_code != 0) result $exit_code;    
     $exit_code = get_windows_sdk_dir_old();
     if ($exit_code != 0) result $exit_code;
-    $exit_code = get_windows_sdk_dir_35();
+    $exit_code = get_windows_sdk_dir_35();    
     if ($exit_code != 0) result $exit_code;
-    $exit_code = get_extension_sdk_dir();
+    $exit_code = get_extension_sdk_dir();    
     if ($exit_code != 0) result $exit_code;
     $exit_code = get_vs_install_dir();
     if ($exit_code != 0) result $exit_code;
@@ -854,12 +856,12 @@ function get_windows_sdk_dir() : result type string {
     if ($exit_code == 1) {
         $exit_code = get_windows_sdk_dir_helper32("HKCU");
     }
-#    if ($exit_code == 1) {
-#        $exit_code = get_windows_sdk_dir_helper64("HKLM");
-#    }
-#    if ($exit_code == 1) {
-#        $exit_code = get_windows_sdk_dir_helper64("HKLM");
-#    }
+    if ($exit_code == 1) {
+        $exit_code = get_windows_sdk_dir_helper64("HKLM");
+    }
+    if ($exit_code == 1) {
+        $exit_code = get_windows_sdk_dir_helper64("HKLM");
+    }
     result $exit_code;
 }
 
@@ -930,7 +932,7 @@ function get_windows_sdk_dir_helper64_35(root_key type string) : result type int
     var sdk_dir_35 type string;
     $sdk_dir_35 = hefesto.sys.env("WINREG:" + $root_key + "\\SOFTWARE\\Wow6432Node\\Microsoft SDKs\\Windows\\v8.0A\\WinSDK-NetFx35Tools\\InstallationFolder");
     if ($sdk_dir_35.len() > 0) {
-        result hefesto.sys.setenv("WindowsSdkDir_35", $sdk_dir);
+        result hefesto.sys.setenv("WindowsSdkDir_35", $sdk_dir_35);
     }
     result 1;
 }
@@ -979,7 +981,7 @@ function get_vs_install_dir() : result type int
     if ($exit_code == 1) {
         $exit_code = get_vs_install_dir_helper64("HKCU");
     }
-    result 1;
+    result $exit_code;
 }
 
 function get_vs_install_dir_helper32(root_key type string) : result type int
@@ -1083,7 +1085,7 @@ function get_windows_sdk_dir_helper32(root_key type string) : result type string
     result 1;
 }
 
-function get_windows_sdk_dir_helper32(root_key type string) : result type string {
+function get_windows_sdk_dir_helper64(root_key type string) : result type string {
     var sdk_dir type string;
     $sdk_dir = hefesto.sys.env("WINREG:" + $root_key + "\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v8.0\\InstallationFolder");
     if ($sdk_dir.len() > 0) {
@@ -1123,7 +1125,7 @@ function get_framework_dir32_helper64(root_key type string) : result type int
     var framework_dir type string;
     $framework_dir = hefesto.sys.env("WINREG:" + $root_key + "\\SOFTWARE\\Wow6432Node\\Microsoft\\VisualStudio\\SxS\\VC7\\FrameworkDir32");
     if ($framework_dir.len() > 0) {
-        result hefesto.sys.setenv("FrameworkDir32", $framwork_dir);
+        result hefesto.sys.setenv("FrameworkDir32", $framework_dir);
     }
     result 1;
 }
