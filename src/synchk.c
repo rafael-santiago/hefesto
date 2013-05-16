@@ -1907,8 +1907,55 @@ static int synchk_hefesto_sys_env(const char *usr_calling,
                                   hefesto_var_list_ctx *gl_vars,
                                   hefesto_func_list_ctx *functions) {
 
-    return synchk_hefesto_sys_ls(usr_calling, lo_vars,
-                                 gl_vars, functions);
+    char *args, *a;
+    size_t offset = 0;
+    hefesto_var_list_ctx *vp;
+    hefesto_func_list_ctx *fp;
+
+    args = get_arg_from_call(usr_calling, &offset);
+
+    if (!is_expected_args_total(usr_calling, 1)) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                 usr_calling);
+        free(args);
+        return 0;
+    }
+
+    if (args) {
+        if (is_hefesto_string(args)) {
+            free(args);
+            return 1;
+        } else if (*args == '$') {
+            vp = get_hefesto_var_list_ctx_name(args+1, lo_vars);
+            if (!vp) vp = get_hefesto_var_list_ctx_name(args+1, gl_vars);
+            if (vp && vp->type == HEFESTO_VAR_TYPE_STRING) {
+                free(args);
+                return 1;
+            } else {
+                if (is_valid_expression(args, lo_vars, gl_vars, functions)) {
+                    free(args);
+                    return 1;
+                }
+            }
+        } else {
+            for (a = args; *a != 0 && *a != '('; a++);
+            *a = 0;
+            if ((fp = get_hefesto_func_list_ctx_name(args, functions)) &&
+                fp->result_type == HEFESTO_VAR_TYPE_STRING) {
+                free(args);
+                return 1;
+            }
+        }
+
+        free(args);
+
+    }
+
+    hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_STR_OR_REGEX,
+              usr_calling);
+
+
+    return 0;
 
 }
 
@@ -2082,7 +2129,8 @@ char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
 
     *offset = (c - calling_buffer);
     if (arg && *arg != 0 && *arg != '(' && strlen(arg) > 1) {
-        if (arg[strlen(arg)-2] == ')') {
+        if (arg[strlen(arg)-2] == ')' &&
+            !is_hefesto_string_tok(arg[strlen(arg)-1])) {
             arg[strlen(arg)-2] = 0;
             *offset -= 2;
         }
