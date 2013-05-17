@@ -1079,10 +1079,10 @@ static void *hefesto_sys_env(const char *syscall,
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
         value = getenv(arg_fmt);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
-        value = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+        value = (char *) hefesto_mloc(0x100000);
         if (GetEnvironmentVariable(arg_fmt,
                                    value,
-                                   HEFESTO_MAX_BUFFER_SIZE) == 0) {
+                                   0x100000) == 0) {
             free(value);
             value = NULL;
         }
