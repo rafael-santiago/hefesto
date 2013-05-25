@@ -205,7 +205,7 @@ ___free_buffers:
         } else {
             free(buffer);
         }
-        c = skip_blank(fp);
+        //c = skip_blank(fp);
     }
 
     return vars;

@@ -107,6 +107,7 @@ static char *hvm_toolset_command_fmt(hefesto_toolset_command_ctx *command) {
         } else if (*c == '\\') {
             c++;
             *r = *c;
+            r++;
         } else {
             *r = *c;
             r++;
