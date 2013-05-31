@@ -574,11 +574,11 @@
         
         <H5><B><U>forge()</U></B></H5>
         
-		Invoca um projeto de forja. O primeiro argumento é o hls contendo a declaração do projeto, o segundo é o nome do projeto dentro do hls.<BR><BR>
+		Invoca um projeto de forja. O primeiro argumento é o nome do projeto contido no hls informado via primeiro argumento. O terceiro argumento são as opções de usuário<BR><BR>
 		
         <OL CLASS="code">
 			<LI><CODE>function forge_sample() : result type none {</CODE></LI>
-			<LI><CODE>&nbsp;hefesto.sys.forge("local_deps.hls", "foolib");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.forge("foolib", "local_deps.hls", "--user-includes-home=../alt_incs --pre-submit-me");</CODE></LI>
 			<LI><CODE>&nbsp;if (hefesto.sys.last_forge_result() == 0) {</CODE></LI>
 			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("foolib built with success.\n");</CODE></LI>
 			<LI><CODE>&nbsp;} else {</CODE></LI>

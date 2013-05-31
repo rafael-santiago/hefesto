@@ -68,6 +68,10 @@ int balanced_parentesis(const char *expression) {
 
         switch(*e) {
 
+            case '#':
+                    while (*e != 0 && *e != '\n') e++;
+                break;
+
             case ')':
                 if (sp && 
                     *((char *)hefesto_common_stack_ctx_data_on_top(sp)) == '(') {

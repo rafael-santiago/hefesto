@@ -199,7 +199,7 @@ static int synchk_hefesto_sys_setenv(const char *usr_calling,
                                      hefesto_var_list_ctx *lo_vars,
                                      hefesto_var_list_ctx *gl_vars,
                                      hefesto_func_list_ctx *functions);
-                                     
+
 static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
                                        hefesto_var_list_ctx *lo_vars,
                                        hefesto_var_list_ctx *gl_vars,
