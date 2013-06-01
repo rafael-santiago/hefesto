@@ -1103,7 +1103,7 @@ static void *hefesto_sys_env(const char *syscall,
         result = (char *) hefesto_mloc(sz + 1);
         memset(result, 0, sz + 1);
         strncpy(result, value, sz);
-#if HEFESTO_TGT_OS != HEFESTO_LINUX
+#if HEFESTO_TGT_OS != HEFESTO_LINUX && HEFESTO_TGT_OS != HEFESTO_FREEBSD
         free(value);
 #endif
     }
