@@ -1,0 +1,96 @@
+#
+# "Forgefile.hls"
+#       by Rafael Santiago
+#
+# Description: Project main forgefile.
+#
+
+# Including the gcc-c-app toolset because it'll used to compile our app...
+include ~/toolsets/gcc/gcc-app.hls
+
+# Declaring variables that will be used in project declaration...
+
+var prj_chain_dep type string; # This holds the project chain dep...
+
+var sources type list; # This holds the implementation files (.c)...
+var includes_extra_dir type list; # This holds the extra includes dir passed via user option "--extra-incs"...
+var cflags type list; # This holds the compiler options passed via user option "--cflags"...
+var libraries_extra_dir type list; # This holds the extra libraries dir passed via user option "--extra-libs"...
+var ldflags type list; # This holds the linker flags passed via user option "--ldflags"...
+
+###########################
+# The Project declaration #
+###########################
+
+# Internally the forge file receives 5 lists and 1 string, where:
+#
+#       List one     => The implementation files;
+#       List two     => The extra includes directory;
+#       List three   => The compiler flags;
+#       List four    => The extra libraries directory;
+#       List five    => The linker flags;
+#       Final string => The binary name;
+#
+
+project huffman-example : toolset "gcc-c-app" : dependencies $prj_chain_dep :
+    $sources,
+    $includes_extra_dir,
+    $cflags,
+    $libraries_extra_dir,
+    $ldflags,
+    "huffman" ;
+
+function get_prj_chain_dep() : result type string {
+    # Here in this function we hardcode the chain dep...
+    var chain type string;
+    $chain = "main.c: huffman.h; huffman.h: btree.h & huffman.c; huffman.c: huffman.h; btree.c: btree.h; btree.h: btree.c;";
+    result $chain;
+}
+
+function read_user_custom_options() : result type none {
+    # Here we're reading all user command line options...
+    var temp type list;
+    $temp = hefesto.sys.get_option("clean");
+    if ($temp.count() > 0) {
+        $temp.clear();
+        $temp.set_from_fs_by_regex(".*\.o$");
+        var t type int;
+        $t = 0;
+        while ($t < $temp.count()) {
+            hefesto.sys.echo("\tRemoving \"" + $temp.item($t) + "\"... ");
+            if (hefesto.sys.rm($temp.item($t)) == 0)hefesto.sys.echo("removed.\n");
+            else hefesto.sys.echo("unable to remove...\n");
+            $t = $t + 1;
+        }
+        hefesto.sys.echo("*** clean!\n");
+        hefesto.sys.exit(1);
+    }
+    $temp = hefesto.sys.get_option("help");
+    if ($temp.count() == 0) {
+        $includes_extra_dir = hefesto.sys.get_option("extra-incs");
+        $cflags = hefesto.sys.get_option("cflags");
+        $libraries_extra_dir = hefesto.sys.get_option("extra-libs");
+        $ldflags = hefesto.sys.get_option("ldflags");
+    } else { # if --help was supplied via command line option, displays the help and exit with code 1
+        hefesto.sys.echo("*** Huffman build quick help\n\n");
+        hefesto.sys.echo("BASIC FORGE: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example\n");
+        hefesto.sys.echo("DEBUG FORGE: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --compile-model=debug\n");
+        hefesto.sys.echo("RELEASE FORGE: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --compile-model=release\n");
+        hefesto.sys.echo("STATIC COMPILATION: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --link-model=static\n");
+        hefesto.sys.echo("SHARED COMPILATION: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --link-model=shared\n");
+        hefesto.sys.echo("FORCING RECOMPILATION AND LINKAGE: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --forge-anyway\n");
+        hefesto.sys.echo("DELETING OBJECT FILES: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --clean\n");
+        hefesto.sys.echo("AND TO DISPLAY IT: hefesto --forgefiles=Forgefile.hls --Forgefile-projects=huffman-example --help\n");
+        hefesto.sys.echo("\n***\n");
+        hefesto.sys.exit(1);
+    }
+}
+
+huffman-example.prologue() {
+    read_user_custom_options();
+    # Getting all implementation files in current directory, a.k.a
+    # "The Project Directory"...
+    $sources.set_from_fs_by_regex(".*\.c$");
+    # Acquiring the dependency chain, indeed to compile only changed sources...
+    $prj_chain_dep = get_prj_chain_dep();
+}
