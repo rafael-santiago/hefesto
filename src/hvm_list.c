@@ -11,10 +11,11 @@
 #include "mem.h"
 #include "structs_io.h"
 #include "synchk.h"
-#include "regex.h"
+#include "here/here.h"
 #include "vfs.h"
 #include "hvm.h"
 #include "hvm_str.h"
+#include "hlsc_msg.h"
 #include <string.h>
 #include <dirent.h>
 
@@ -45,12 +46,12 @@ static void *hvm_list_del_item(const char *method,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions);
 
-static void *hvm_list_set_from_fs_by_regex(const char *method,
-                                           hefesto_common_list_ctx **list_var,
-                                           hefesto_type_t *otype,
-                                           hefesto_var_list_ctx **lo_vars,
-                                           hefesto_var_list_ctx **gl_vars,
-                                           hefesto_func_list_ctx *functions);
+static void *hvm_list_ls(const char *method,
+                         hefesto_common_list_ctx **list_var,
+                         hefesto_type_t *otype,
+                         hefesto_var_list_ctx **lo_vars,
+                         hefesto_var_list_ctx **gl_vars,
+                         hefesto_func_list_ctx *functions);
 
 static void *hvm_list_clear(const char *method,
                             hefesto_common_list_ctx **list_var,
@@ -89,7 +90,7 @@ static struct hvm_list_method_call_vector
     set_method(hvm_list_count),
     set_method(hvm_list_add_item),
     set_method(hvm_list_del_item),
-    set_method(hvm_list_set_from_fs_by_regex),
+    set_method(hvm_list_ls),
     set_method(hvm_list_clear),
     set_method(hvm_list_index_of),
     set_method(hvm_del_index)
@@ -367,29 +368,28 @@ static void *hvm_list_del_item(const char *method,
 
 }
 
-static void *hvm_list_set_from_fs_by_regex(const char *method,
-                                           hefesto_common_list_ctx **list_var,
-                                           hefesto_type_t *otype,
-                                           hefesto_var_list_ctx **lo_vars,
-                                           hefesto_var_list_ctx **gl_vars,
-                                           hefesto_func_list_ctx *functions) {
+static void *hvm_list_ls(const char *method,
+                         hefesto_common_list_ctx **list_var,
+                         hefesto_type_t *otype,
+                         hefesto_var_list_ctx **lo_vars,
+                         hefesto_var_list_ctx **gl_vars,
+                         hefesto_func_list_ctx *functions) {
 
-    char *arg, *data, regex[HEFESTO_MAX_BUFFER_SIZE];
+    char *arg, *data;
     size_t offset = 0;
     DIR *dir;
     struct dirent *de;
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
     hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
+    here_search_program_ctx *search_program;
+    here_search_result_ctx *search_result;
 
     arg = get_arg_from_call(method, &offset);
     data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &offset);
     free(arg);
 
-    if (check_regex((unsigned char *)data)) {
+    if ((search_program = here_compile(data, errors)) != NULL) {
 
-        memset(regex, 0, sizeof(regex));
-        preprocess_usr_regex((unsigned char *)regex,
-                             (unsigned char *)data, sizeof(regex),
-                             strlen(data) + 1);
         free(data);
 
         data = hefesto_pwd();
@@ -402,17 +402,12 @@ static void *hvm_list_set_from_fs_by_regex(const char *method,
             while ((de = readdir(dir))) {
                 if ((strcmp(de->d_name, ".") == 0) ||
                     (strcmp(de->d_name, "..") == 0)) continue;
-                if (bool_match_regex((unsigned char *)de->d_name,
-                                     (unsigned char *)de->d_name,
-                                     (unsigned char *)de->d_name +
-                                               strlen(de->d_name),
-                                     (unsigned char *)regex,
-                                     (unsigned char *)regex,
-                                     (unsigned char *)regex +
-                                               strlen(regex), 1)) {
+
+                search_result = here_match_string(de->d_name, search_program);
+
+                if (here_matches(search_result)) {
                     HEFESTO_DEBUG_INFO(0,
-                        "hvm_list/set_from_fs_by_regex %s %s\n", de->d_name,
-                                                                      regex);
+                        "hvm_list/set_from_fs_by_regex %s\n", de->d_name);
                     arg = hefesto_make_path(data, de->d_name,
                                             HEFESTO_MAX_BUFFER_SIZE * 2);
                     if (get_hefesto_common_list_ctx_content(arg,
@@ -425,12 +420,19 @@ static void *hvm_list_set_from_fs_by_regex(const char *method,
                     }
                     free(arg);
                 }
+
+                del_here_search_result_ctx(search_result);
+
             }
             free(data);
         }
 
         closedir(dir);
 
+        del_here_search_program_ctx(search_program);
+
+    } else {
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
     }
 
     return NULL;

@@ -75,6 +75,7 @@ static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.time",
   "hefesto.sys.setenv",
   "hefesto.sys.unsetenv",
+  "hefesto.sys.lines_from_file",
   "\0"
 };
 
@@ -83,7 +84,7 @@ static char *HEFESTO_LIST_METHODS[] = {
   ".count",
   ".add_item",
   ".del_item",
-  ".set_from_fs_by_regex",
+  ".ls",
   ".clear",
   ".index_of",
   ".del_index",
@@ -102,6 +103,7 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     ".name",
     ".toolset",
     ".dep_chain",
+    ".abort",
     "\0"
 };
 

@@ -378,7 +378,7 @@ function unexport_env_hefesto_var() : result type int {
                 $env_path = $env_path + $path_lst.item($l);
                 $l = $l + 1;
                 if ($l < $path_lst.count()) $env_path = $env_path + ";";
-            }            
+            }
             $unexported = (hefesto.sys.setenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\PATH", $env_path) == 0);
         }
     }
@@ -507,9 +507,9 @@ function windows_rm_paths_on_reboot(paths type list) : result type none {
         } else {
             $rm_cmd = $rm_cmd + " rmdir \"" + $paths.item($p) + "\"";
         }
-        
+
         $p = $p + 1;
-        
+
         if ($p != $paths.count()) $rm_cmd = $rm_cmd + " &";
     }
     hefesto.sys.setenv("WINREG:HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\hfstbootrm", $rm_cmd);

@@ -38,7 +38,7 @@ toolset "gcc-c-lib" forge function "gcc_c_lib_forge" : forge helpers "gcc_compil
     >
 $
 
-toolset "gcc-cc-lib" forge function "gcc_cc_lib_forge" : forge helpers "gcc_compile_source_list", "gcc_ar_ofiles", "gcc_so_ofiles", "gcc_mk_lib_compilation_command":
+toolset "gcc-cc-lib" forge function "gcc_c_lib_forge" : forge helpers "gcc_compile_source_list", "gcc_ar_ofiles", "gcc_so_ofiles", "gcc_mk_lib_compilation_command":
     command "compile_static_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
         g++ -c $SOURCE $INCLUDES, $CFLAGS -o $OUTFILE
     >

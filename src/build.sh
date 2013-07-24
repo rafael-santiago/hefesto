@@ -5,17 +5,23 @@
 COMPILER="gcc" # Adjust for your system compiler
 COMPILER_OPTS="-c -Wall " # Options too
 LINKER="gcc" # Linker too
+LIB="ar"
 LINKER_OPTS="-o../bin/hefesto dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
-                         regex.o src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o -lpthread"
+                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o here/libhere.a -lpthread"
 
 UNIT_TEST="-omain ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../regex.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o -lpthread"
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../here/libhere.a -lpthread"
 
 ALL_OK=1
+
+HERE_UNIT_TEST="-ohere_unittest main.o htest.o ../libhere.a"
+
+LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
+
 
 # I know... this is ugly... boo!
 
@@ -131,11 +137,6 @@ if test $? -gt 0
 then
     ALL_OK=0
 fi
-$COMPILER $COMPILER_OPTS regex.c
-if test $? -gt 0
-then
-    ALL_OK=0
-fi
 $COMPILER $COMPILER_OPTS src_chsum.c
 if test $? -gt 0
 then
@@ -167,6 +168,53 @@ then
     ALL_OK=0
 fi
 $COMPILER $COMPILER_OPTS hvm_winreg.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+
+cd here
+$COMPILER $COMPILER_OPTS here.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+$COMPILER $COMPILER_OPTS here_ctx.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+$COMPILER $COMPILER_OPTS here_mem.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+$COMPILER $COMPILER_OPTS here_mmachine.c
+if test $? -gt 0
+then
+    ALL_OK=0
+else
+    $LIB -r "libhere.a" $LIBHERE_OBJS
+fi
+cd testing
+$COMPILER $COMPILER_OPTS htest.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+$COMPILER $COMPILER_OPTS main.c
+if test $? -gt 0
+then
+    ALL_OK=0
+else
+    $LINKER $HERE_UNIT_TEST
+    ./here_unittest
+fi
+
+cd ..
+
+cd ..
+
 if test $? -gt 0
 then
     ALL_OK=0
@@ -206,7 +254,7 @@ then
 
         # If tests are ok, use the hefesto to install hefesto ;)
 
-        ../bin/hefesto --forgefiles=../setup/hfst-inst.hls --hfst-inst-projects=hefesto-install
+#        ../bin/hefesto --forgefiles=../setup/hfst-inst.hls --hfst-inst-projects=hefesto-install
 
     fi
     # Done!

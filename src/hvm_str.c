@@ -10,9 +10,10 @@
 #include "structs_io.h"
 #include "hvm_alu.h"
 #include "hvm_alu.h"
-#include "regex.h"
+#include "here/here.h"
 #include "synchk.h"
 #include "hvm.h"
+#include "hlsc_msg.h"
 #include <string.h>
 
 static void *hvm_str_len(const char *method,
@@ -233,8 +234,10 @@ static void *hvm_str_match(const char *method,
     size_t offset = 0, outsz;
     char *arg, *pfixd_regex;
     const char *m;
-    unsigned char regex[HEFESTO_MAX_BUFFER_SIZE];
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
     void *usr_regex, *result;
+    here_search_program_ctx *search_program;
+    here_search_result_ctx *search_result;
 
     hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
     *otype = HEFESTO_VAR_TYPE_INT;
@@ -255,15 +258,15 @@ static void *hvm_str_match(const char *method,
     }
     usr_regex = expr_eval(pfixd_regex, lo_vars, gl_vars, functions,
                           &etype, &outsz);
-    preprocess_usr_regex(regex, usr_regex, HEFESTO_MAX_BUFFER_SIZE,
-                         strlen(usr_regex));
-    *(int *)result = bool_match_regex((unsigned char *)(*string_var)->data,
-                                      (unsigned char *)(*string_var)->data,
-                                      (unsigned char *)(*string_var)->data +
-                                            strlen((*string_var)->data) - 1,
-                                      regex,
-                                      regex, regex + strlen((char *)regex),
-                                      1);
+    if ((search_program = here_compile(usr_regex, errors)) != NULL) {
+        search_result = here_match_string((*string_var)->data,
+                                          search_program);
+        *(int *)result = here_matches(search_result);
+        del_here_search_program_ctx(search_program);
+        del_here_search_result_ctx(search_result);
+    } else {
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
+    }
     free(pfixd_regex);
     free(usr_regex);
 
@@ -280,11 +283,12 @@ static void *hvm_str_replace(const char *method,
 
     size_t offset = 0, outsz;
     char *regex_arg, *pattern_arg, *pfixd_regex, *pfixd_pattern;
-    char *replaced_buffer;
+    char *replaced_buffer = NULL;
     const char *m;
-    char regex[HEFESTO_MAX_BUFFER_SIZE];
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
     void *usr_regex, *usr_pattern, *result;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
+    here_search_program_ctx *search_program;
 
     *otype = HEFESTO_VAR_TYPE_INT;
     result = hefesto_mloc(sizeof(int));
@@ -312,29 +316,31 @@ static void *hvm_str_replace(const char *method,
 
     usr_regex = expr_eval(pfixd_regex, lo_vars, gl_vars, functions,
                           &etype, &outsz);
-    preprocess_usr_regex((unsigned char *)regex,
-                         (unsigned char *)usr_regex,
-                         HEFESTO_MAX_BUFFER_SIZE, outsz);
-    usr_pattern = expr_eval(pfixd_pattern, lo_vars, gl_vars, functions,
-                            &etype, &outsz);
 
-    replaced_buffer = (char *)regex_replace((unsigned char *)regex,
-                                            (unsigned char *)(*string_var)->data,
-                                            strlen((*string_var)->data),
-                                            (unsigned char *)usr_pattern,
-                                            strlen(usr_pattern), &outsz);
+    if ((search_program = here_compile(usr_regex, errors)) != NULL) {
+        usr_pattern = expr_eval(pfixd_pattern, lo_vars, gl_vars, functions,
+                                &etype, &outsz);
 
-    *(int *)result = 1;
-    free((*string_var)->data);
-    (*string_var)->data = (char *) hefesto_mloc(outsz+1);
-    (*string_var)->dsize = outsz;
-    memset((*string_var)->data, 0, outsz+1);
-    strncpy((*string_var)->data, replaced_buffer, outsz+1);
+        *(int *)result = here_replace_string((*string_var)->data,
+                                             search_program,
+                                             usr_pattern,
+                                             &replaced_buffer,
+                                             &outsz);
+        free((*string_var)->data);
+        (*string_var)->data = (char *) hefesto_mloc(outsz+1);
+        (*string_var)->dsize = outsz;
+        memset((*string_var)->data, 0, outsz+1);
+        strncpy((*string_var)->data, replaced_buffer, outsz+1);
+        free(replaced_buffer);
+        free(usr_pattern);
+        del_here_search_program_ctx(search_program);
+    } else {
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
+    }
 
     free(pfixd_regex);
     free(usr_regex);
     free(pfixd_pattern);
-    free(usr_pattern);
 
     return result;
 

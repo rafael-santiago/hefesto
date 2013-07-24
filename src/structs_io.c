@@ -708,7 +708,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 p = p->next;
             }
         }
-
         if (strcmp(tok, "if") == 0) {
             HEFESTO_DEBUG_INFO(0, "structs_io/IF --\n");
             p->instruction = HEFESTO_IF;
@@ -802,6 +801,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                                                             &m_idx,
                                                             sizeof(m_idx));
             while (is_hefesto_blank(*b)) b++;
+            sz = 0;
             b++;
             buf_p = get_arg_from_call(b, &sz);
             while (*buf_p) {

@@ -855,7 +855,7 @@ static int compile_code(hefesto_func_list_ctx *function,
                                                                 functions);
                 HEFESTO_DEBUG_INFO(1,
                     "parser/syntax_is_ok = %d line number: %d\n", syntax_is_ok,
-                        get_current_line_number()); 
+                        get_current_line_number());
             }
             free(command);
         }

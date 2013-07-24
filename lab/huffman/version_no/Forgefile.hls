@@ -1,0 +1,58 @@
+#
+# "Forgefile.hls"
+#       by Rafael Santiago
+#
+# Description: An example where the application's version is
+#              manipulated... The application is versionated under the scheme: "no.no.no.buildno"
+#              The buildno is automatically incremented by set_version_number() function.
+#              It is always called on project prologue().
+#
+#              The user can supply the desired application version with --version-no=no.no.no cmdline option
+#              or be asked about it by a prompt.
+#
+
+# Including the toolset definition
+include ~/toolsets/gcc/gcc-app.hls
+# Version handling stuff
+include version_utils.hls
+
+# Our forge data
+
+var deps type string;
+var sources type list;
+var includes type list;
+var cflags type list;
+var libraries type list;
+var ldflags type list;
+
+####################################################################################################################################
+#                                               The Project Definition                                                             #
+####################################################################################################################################
+
+project huffman-example : toolset "gcc-c-app" : dependencies $deps : $sources, $includes, $cflags, $libraries, $ldflags, "huffman" ;
+
+function read_user_cmdline_opts() : result type none {
+    $includes = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    $libraries = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+}
+
+huffman-example.prologue() {
+    # Defining our dep chain
+    $deps = "main.c: version_no.h & huffman.h; huffman.h: btree.h; huffman.c: huffman.h; btree.h: btree.c;";
+    read_user_cmdline_opts();
+    # Refreshing version info
+    if (set_version_number() == 0) hefesto.sys.exit(1);
+    # Selecting all implementation files in current directory
+    $sources.ls(".*\.c$");
+    # and so the forge can be started
+}
+
+huffman-example.epilogue() {
+    # If your forge was successfully completed maybe you want to commit the new "version_no.h" for example...
+    # The epilogue() is the right place to do it.
+    if (hefesto.sys.last_forge_result() == 0) {
+        # Here you do something that depends of a forge success: commit something, deploy, etc...
+    }
+}

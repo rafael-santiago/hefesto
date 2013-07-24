@@ -1,0 +1,84 @@
+#
+# "Forgefile.hls"
+#
+#  Description: Hefesto's Main Forgefile.
+#
+#       by Rafael Santiago
+#
+
+#
+# Relevant user options:
+#
+#       --includes=<list>       # defines extra includes' directories;
+#       --libraries=<list>      # defines extra libraries' directories;
+#       --ldflags=<list>        # defines extra linking options;
+#       --cflags=<list>         # defines extra compiler options;
+#       --install               # requests the compiled package installing;
+
+include ~/toolsets/gcc/gcc-app.hls
+
+var sources type list;
+var includes type list;
+var libraries type list;
+var ldflags type list;
+var cflags type list;
+
+project hefesto : toolset "gcc-c-app" :
+                            $sources,
+                            $includes,
+                            $cflags,
+                            $libraries,
+                            $ldflags,
+                            "../bin/hefesto";
+
+function config_basic_ld_deps() : result type none {
+    $ldflags.add_item("here/libhere.a");
+    var os type string;
+    $os = hefesto.sys.os_name();
+    if ($os == "linux" || $os == "freebsd") {
+        $ldflags.add_item("-lpthread");
+    }
+}
+
+hefesto.prologue() {
+    hefesto.sys.echo("-- building...\n");
+    # Getting user options if it exists
+    $includes = hefesto.sys.get_option("includes");
+    $libraries = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+    $cflags = hefesto.sys.get_option("cflags");
+    # Setting some basic dependencies needed for a successful linking
+    config_basic_ld_deps();
+    # Now we'll invoke the libhere's forge
+    hefesto.sys.cd("here");
+    hefesto.sys.forge("here", "Forgefile.hls", "");
+    hefesto.sys.cd("..");
+    # If all ok, now we forge the Hefesto app...
+    if (hefesto.sys.last_forge_result() == 0) {
+        hefesto.sys.echo("--\n");
+        $sources.ls(".*\.c$");
+    }
+}
+
+hefesto.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        # Now forging & running the unit tests
+        hefesto.sys.cd("tests/unit");
+        hefesto.sys.forge("hfst-unit", "Forgefile.hls", "");
+        hefesto.sys.cd("../../");
+        if (hefesto.sys.last_forge_result() == 0) {
+            hefesto.sys.echo("-- build succeded.\n");
+            var install type list;
+            $install = hefesto.sys.get_option("install");
+            if ($install.count() > 0) {
+                hefesto.sys.cd("../setup");
+                hefesto.sys.forge("hefesto-install", "hfst-inst.hls", "");
+                hefesto.sys.cd("../src");
+            }
+        } else {
+            hefesto.sys.echo("-- build failed, please check and try again...\n");
+        }
+    } else {
+        hefesto.sys.echo("-- build failed, please check and try again...\n");
+    }
+}

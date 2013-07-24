@@ -1,6 +1,7 @@
 #include "hvm_project.h"
 #include "lang_defs.h"
 #include "mem.h"
+#include "hvm_syscall.h"
 #include <string.h>
 
 struct hefesto_project_method_callvector {
@@ -28,12 +29,19 @@ static void *hefesto_project_dep_chain(const char *method,
                                        hefesto_func_list_ctx *functions,
                                        hefesto_type_t *otype);
 
+static void *hefesto_project_abort(const char *method,
+                                   hefesto_var_list_ctx **lo_vars,
+                                   hefesto_var_list_ctx **gl_vars,
+                                   hefesto_func_list_ctx *functions,
+                                   hefesto_type_t *otype);
+
 
 static struct hefesto_project_method_callvector
         HEFESTO_PROJECT_METHOD_EXEC_TABLE[HEFESTO_PROJECT_METHODS_NR] = {
     {hefesto_project_name},
     {hefesto_project_toolset},
-    {hefesto_project_dep_chain}
+    {hefesto_project_dep_chain},
+    {hefesto_project_abort}
 };
 
 char
@@ -128,3 +136,37 @@ static void *hefesto_project_dep_chain(const char *method,
     return result;
 
 }
+
+static void *hefesto_project_abort(const char *method,
+                                   hefesto_var_list_ctx **lo_vars,
+                                   hefesto_var_list_ctx **gl_vars,
+                                   hefesto_func_list_ctx *functions,
+                                   hefesto_type_t *otype) {
+    char exit_call[HEFESTO_MAX_BUFFER_SIZE], *ep, *ep_end;
+    const char *mp;
+    hefesto_type_t ext_otype;
+    void *retval;
+    *otype = HEFESTO_VAR_TYPE_INT;
+    strncpy(exit_call, "hefesto.sys.exit(", sizeof(exit_call)-1);
+    for (mp = method; *mp != '(' && *mp != 0; mp++);
+    if (*mp == '(') {
+        mp++;
+        ep_end = &exit_call[0] + HEFESTO_MAX_BUFFER_SIZE - 1;
+        for (ep = &exit_call[0] + strlen(exit_call); *mp != 0 &&
+                                                     ep != ep_end;
+                                                     ep++, mp++) {
+            *ep = *mp;
+        }
+        *ep = 0;
+        retval = hefesto_sys_call(exit_call, lo_vars, gl_vars, functions, &ext_otype);
+        if (retval != NULL) {
+            free(retval);
+        }
+        HEFESTO_EXIT_FORGE = 1;
+    }
+    retval = (int *) hefesto_mloc(sizeof(int));
+    *(int *)retval = HEFESTO_EXIT_CODE;
+    return retval;
+}
+
+

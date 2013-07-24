@@ -81,3 +81,42 @@ function gcc_mk_raw_str_opt(options type list) : result type string {
     result $options_list;
 }
 
+function gcc_file_exists(filepath type string) : result type string {
+    var old_cwd type string;
+    var exists type int;
+    var filecwd type string;
+    var f type int;
+    var fs type int;
+    $exists = 0;
+    $old_cwd = hefesto.sys.pwd();
+    $fs = $filepath.len() - 1;
+    while ($fs > 0) {
+        if (hefesto.sys.os_name() == "windows") {
+            if ($filepath.at($fs) == "\\" || $filepath.at($fs) == "/") break;
+        } else if (hefesto.sys.os_name() == "linux" || hefesto.sys.os_name() == "freebsd") {
+            if ($filepath.at($fs) == "/") break;
+        }
+        $fs = $fs - 1;
+    }
+    $f = 0;
+    while ($f < $fs) {
+        $filecwd = $filecwd + $filepath.at($f);
+        $f = $f + 1;
+    }
+    if (hefesto.sys.cd($filecwd) == 0) {
+        $fs = $fs + 1;
+        $filecwd = "";
+        while ($fs < $filepath.len()) {
+            if ($filepath.at($f) != ".") {
+                $filecwd = $filecwd + $filepath.at($f);
+            } else {
+                $filecwd = $filecwd + "\\" + $filepath.at($f);
+            }
+            $fs = $fs + 1;
+        }
+        $filecwd = $filecwd + "$";
+        $exists = hefesto.sys.ls($filecwd);
+    }
+    hefesto.sys.cd($old_cwd);
+    result $exists;
+}

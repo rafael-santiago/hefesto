@@ -1,0 +1,204 @@
+#
+# "version_utils.hls"
+#       by Rafael Santiago
+#
+
+# Needed due to isdigit() and str2int() calls
+include ~/conv.hls
+
+# Here goes our stuff to handle versioning
+
+function is_valid_version_number(version_no type string) : result type int {
+    var valid type int;
+    var temp type string;
+    var v type int;
+    var t type int;
+    var dots_nr type int;
+
+    $valid = 1;
+    $v = 0;
+    $dots_nr = 0;
+
+    while ($v < $version_no.len() && $valid == 1) {
+        if ($version_no.at($v) == ".") {
+            $dots_nr = $dots_nr + 1;
+            $t = 0;
+            while ($t < $temp.len() && $valid == 1) {
+                $valid = isdigit($temp.at($t));
+                $t = $t + 1;
+            }
+            $temp = "";
+        } else {
+            $temp = $temp + $version_no.at($v);
+        }
+        $v = $v + 1;
+    }
+
+    if ($temp.len() > 0) {
+        $t = 0;
+        while ($t < $temp.len() && $valid == 1) {
+            $valid = isdigit($temp.at($t));
+            $t = $t + 1;
+        }
+        $valid = ($valid == 1) && ($dots_nr == 2);
+    }
+
+    result $valid;
+}
+
+function set_version_number() : result type int {
+
+    var configurated type int;
+    var version_no type list;
+    var chosen_version type string;
+
+    $configurated = 0;
+
+    $version_no = hefesto.sys.get_option("version-no");
+    if ($version_no.count() == 0) {
+        $chosen_version = hefesto.sys.prompt("Please type a version number (d.d.d): ");
+    } else {
+        $chosen_version = $version_no.item(0);
+    }
+
+    if (is_valid_version_number($chosen_version) == 0) {
+        hefesto.sys.echo("\nAn invalid version number was supplied!\n");
+        result 0;
+    }
+
+    hefesto.sys.echo("Adjusting version number to " + $chosen_version + "\n");
+
+    $configurated = refresh_version_no_h($chosen_version);
+
+    if ($configurated == 1) {
+        hefesto.sys.echo("ok!\n\n");
+    }
+
+    result $configurated;
+
+}
+
+function refresh_version_no_h(version_no type string) : result type int {
+    var refreshed type int;
+    var version_no_h type file;
+    var buffer type string;
+    var byte type string;
+    $refreshed = 1;
+    $version_no_h = hefesto.sys.fopen("version_no.h", "r");
+    if ($version_no_h == 0) {
+        result 0;
+    }
+    hefesto.sys.fread($byte, 1, $version_no_h);
+    while (hefesto.sys.feof($version_no_h) == 0) {
+        if ($byte == "#") {
+            hefesto.sys.fread($byte, 6, $version_no_h);
+            if ($byte == "define") {
+                hefesto.sys.fread($byte, 1, $version_no_h);
+                while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t") {
+                    hefesto.sys.fread($byte, 1, $version_no_h);
+                }
+                $buffer = $byte;
+                hefesto.sys.fread($byte, 1, $version_no_h);
+                while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t") {
+                    $buffer = $buffer + $byte;
+                    hefesto.sys.fread($byte, 1, $version_no_h);
+                }
+                if ($buffer == "VERSION") {
+                    hefesto.sys.fread($byte, 1, $version_no_h);
+                    while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t" || $byte == "\"") {
+                        hefesto.sys.fread($byte, 1, $version_no_h);
+                    }
+                    $buffer = $byte;
+                    hefesto.sys.fread($byte, 1, $version_no_h);
+                    while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t" && $byte != "\"") {
+                        $buffer = $buffer + $byte;
+                        hefesto.sys.fread($byte, 1, $version_no_h);
+                    }
+                    break;
+                }
+                $buffer = "";
+            }
+        }
+        hefesto.sys.fread($byte, 1, $version_no_h);
+    }
+    hefesto.sys.fclose($version_no_h);
+
+    var curr_major_version type string;
+    var curr_minor_version type string;
+    var curr_sub_version type string;
+    var curr_build_version type string;
+
+    var new_major_version type string;
+    var new_minor_version type string;
+    var new_sub_version type string;
+    var new_build_version type int;
+
+    $curr_major_version = get_major_version($buffer);
+    $new_major_version = get_major_version($version_no);
+
+    $curr_minor_version = get_minor_version($buffer);
+    $new_minor_version = get_minor_version($version_no);
+
+    $curr_sub_version = get_sub_version($buffer);
+    $new_sub_version = get_sub_version($version_no);
+
+    $curr_build_version = get_build_version($buffer);
+
+    if ($curr_major_version == $new_major_version &&
+        $curr_minor_version == $new_minor_version &&
+        $curr_sub_version == $new_sub_version) {
+        $new_build_version = str2int($curr_build_version) + 1;
+    } else {
+        $new_build_version = 1;
+    }
+
+    var final_version type string;
+
+    $final_version = $new_major_version + "." + $new_minor_version + "." + $new_sub_version + "." + $new_build_version;
+
+    $refreshed = hefesto.sys.replace_in_file("version_no.h", "#define VERSION.*[0123456789]+\.[0123456789]\.[0123456789]\.[0123456789].*\n", "#define VERSION \"" + $final_version + "\"\n");
+
+    result ($refreshed > 0);
+}
+
+function get_major_version(version_no type string) : result type string {
+    result get_version_data($version_no, 1);
+}
+
+function get_minor_version(version_no type string) : result type string {
+    result get_version_data($version_no, 2);
+}
+
+function get_sub_version(version_no type string) : result type string {
+    result get_version_data($version_no, 3);
+}
+
+function get_build_version(version_no type string) : result type string {
+    result get_version_data($version_no, 4);
+}
+
+function get_version_data(version_no type string, skip_ndots type int) : result type string {
+    var dots type int;
+    var end_at type int;
+    var start_at type int;
+    var version_data type string;
+    $dots = 0;
+    $start_at = 0;
+    $end_at = 0;
+    while ($end_at <= $version_no.len()) {
+        if ($version_no.at($end_at) == "." || $end_at == $version_no.len()) {
+            $dots = $dots + 1;
+            if ($dots == $skip_ndots) {
+                while ($start_at < $end_at) {
+                    $version_data = $version_data + $version_no.at($start_at);
+                    $start_at = $start_at + 1;
+                }
+                break;
+            } else {
+                $start_at = $end_at + 1;
+            }
+        }
+        $end_at = $end_at + 1;
+    }
+    result $version_data;
+}

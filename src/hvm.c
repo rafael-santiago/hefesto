@@ -292,6 +292,7 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
 
         }
         if (cmd != NULL) cmd = cmd->next;
+        if (hvm_break_loop) break;
     }
 
     return NULL;
@@ -681,10 +682,11 @@ int hvm_forge_project(hefesto_project_ctx *project,
         }
     }
 
-    HEFESTO_EXIT = 0; // because the epilogue needs to be executed anyway
+    HEFESTO_EXIT = 0; // because the epilogue needs to be executed anyway,
+                      // except when exit_forge() syscall was called.
 
     // executes the epilogue
-    if (project) {
+    if (project && !HEFESTO_EXIT_FORGE) {
         if (project->epilogue && project->epilogue->code) {
             result = hvm_exec_function(project->epilogue,
                                        &project->epilogue->vars,

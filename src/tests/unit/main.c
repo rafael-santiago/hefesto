@@ -9,10 +9,10 @@
 #include "../../parser.h"
 #include "../../hvm_func.h"
 #include "../../hvm_syscall.h"
-#include "../../regex.h"
 #include "../../dep_chain.h"
 #include "../../vfs.h"
 #include "../../hvm_toolset.h"
+#include "../../here/here.h"
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
@@ -1022,79 +1022,83 @@ char *hvm_syscalls_tests() {
 char *regex_tests() {
 
     char user_regex[HEFESTO_MAX_BUFFER_SIZE];
-    char prep_regex[HEFESTO_MAX_BUFFER_SIZE];
     char text[HEFESTO_MAX_BUFFER_SIZE];
+    here_search_program_ctx *search_program;
+    here_search_result_ctx *search_result;
     printf("-- regex_tests\n");
     strncpy(user_regex, "^Wild thing", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex,
-                         sizeof(prep_regex), strlen(user_regex) + 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
     strncpy(text, "Wild thing you make me everything", sizeof(text)-1);
-    HTEST_CHECK("\"Wild thing\" not found",
-                bool_match_regex(text, text, text + strlen(text),
-                                 prep_regex, prep_regex, prep_regex +
-                                                    strlen(prep_regex), 1) == 1);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Wild thing\" not found", here_matches(search_result) == 1);
+    del_here_search_result_ctx(search_result);
+
     text[0] = 'w';
-    HTEST_CHECK("\"Wild thing\" found",
-                bool_match_regex(text, text, text + strlen(text),
-                          prep_regex, prep_regex, prep_regex +
-                                        strlen(prep_regex), 1) == 0);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    del_here_search_result_ctx(search_result);
     strncpy(text, " Wild thing you make me everything", sizeof(text)-1);
-    HTEST_CHECK("\"Wild thing\" found",
-                 bool_match_regex(text, text, text + strlen(text),
-                                  prep_regex, prep_regex, prep_regex +
-                                                strlen(prep_regex), 1) == 0);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    del_here_search_result_ctx(search_result);
+
+    del_here_search_program_ctx(search_program);
+
     strncpy(user_regex, "^Wild thing$", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex,
-                         sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("\"Wild thing\" found",
-                  bool_match_regex(text, text, text + strlen(text),
-                               prep_regex, prep_regex, prep_regex +
-                                             strlen(prep_regex), 1) == 0);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    del_here_search_result_ctx(search_result);
+    del_here_search_program_ctx(search_program);
     strncpy(user_regex, ".*you make me.*", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex,
-                         sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("\"you make me\" not found",
-                     bool_match_regex(text, text, text + strlen(text),
-                                      prep_regex, prep_regex,
-                                      prep_regex + strlen(prep_regex), 1) == 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"you make me\" not found", here_matches(search_result) == 1);
+    del_here_search_program_ctx(search_program);
+    del_here_search_result_ctx(search_result);
     strncpy(text, "Theres a red house over younder", sizeof(text)-1);
     strncpy(user_regex, "Theres a (green|blue) house", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex,
-                         sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("Some pattern found",
-                bool_match_regex(text, text, text + strlen(text),
-                                 prep_regex, prep_regex,
-                                 prep_regex + strlen(prep_regex), 1) == 0);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("Some pattern found", here_matches(search_result) == 0);
+    del_here_search_program_ctx(search_program);
+    del_here_search_result_ctx(search_result);
     strncpy(user_regex, "Theres a (red|blue|green) house", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex,
-                         sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("\"Theres a red house\" not found",
-                 bool_match_regex(text, text, text + strlen(text),
-                                  prep_regex, prep_regex,
-                                  prep_regex + strlen(prep_regex), 1) == 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
+    del_here_search_result_ctx(search_result);
+    del_here_search_program_ctx(search_program);
     strncpy(user_regex, "Theres a (blue|green|red) house", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex, sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("\"Theres a red house\" not found",
-                   bool_match_regex(text, text, text + strlen(text),
-                                    prep_regex, prep_regex,
-                                    prep_regex + strlen(prep_regex), 1) == 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
+    del_here_search_result_ctx(search_result);
+    del_here_search_program_ctx(search_program);
     strncpy(text, "Theres a ReD house over younder", sizeof(text)-1);
     strncpy(user_regex,
             "Theres a ([rR]e[Dd]|blue|green) house", sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex, sizeof(prep_regex), strlen(user_regex) + 1);
-    HTEST_CHECK("\"Theres a ReD house\" not found",
-                bool_match_regex(text, text, text + strlen(text),
-                                 prep_regex, prep_regex, prep_regex +
-                                                 strlen(prep_regex), 1) == 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Theres a ReD house\" not found", here_matches(search_result) == 1);
+    del_here_search_program_ctx(search_program);
+    del_here_search_result_ctx(search_result);
     strncpy(text, "Are you experienced?$", sizeof(text)-1);
-    strncpy(user_regex, "[aA]re.*y(O|[AaEeIiuUOo])u experi[Ee]nced\\?$",
+    strncpy(user_regex, "[aA]re.*y(O|[AaEeIiuUOo])u experi[Ee]nced\\?.*$",
             sizeof(user_regex)-1);
-    preprocess_usr_regex(prep_regex, user_regex, sizeof(prep_regex),
-                         strlen(user_regex) + 1);
-    HTEST_CHECK("\"Are you experienced?\" not found",
-                bool_match_regex(text, text, text + strlen(text), prep_regex,
-                                 prep_regex, prep_regex +
-                                        strlen(prep_regex), 1) == 1);
+    search_program = here_compile(user_regex, NULL);
+    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    search_result = here_match_string(text, search_program);
+    HTEST_CHECK("\"Are you experienced?\" not found", here_matches(search_result) == 1);
+    del_here_search_result_ctx(search_result);
+    del_here_search_program_ctx(search_program);
     printf("-- passed.\n");
 
     return NULL;
@@ -1502,10 +1506,10 @@ char *run_tests() {
 int main(int argc, char **argv) {
     char *result = run_tests();
     if (result != NULL) {
-        printf("%s [%d test(s) runned]\n", result, htest_runned_tests);
+        printf("%s [%d test(s) ran]\n", result, htest_runned_tests);
         return 1;
     } else {
-        printf("* all tests passed :-) [%d test(s) runned]\n", htest_runned_tests);
+        printf("* all tests passed :-) [%d test(s) ran]\n", htest_runned_tests);
     }
     return 0;
 }

@@ -53,7 +53,7 @@ function read_user_custom_options() : result type none {
     $temp = hefesto.sys.get_option("clean");
     if ($temp.count() > 0) {
         $temp.clear();
-        $temp.set_from_fs_by_regex(".*\.o$");
+        $temp.ls(".*\.o$");
         var t type int;
         $t = 0;
         while ($t < $temp.count()) {
@@ -90,7 +90,7 @@ huffman-example.prologue() {
     read_user_custom_options();
     # Getting all implementation files in current directory, a.k.a
     # "The Project Directory"...
-    $sources.set_from_fs_by_regex(".*\.c$");
+    $sources.ls(".*\.c$");
     # Acquiring the dependency chain, indeed to compile only changed sources...
     $prj_chain_dep = get_prj_chain_dep();
 }

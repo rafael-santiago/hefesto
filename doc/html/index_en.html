@@ -95,8 +95,9 @@
             <TABLE BORDER = 0>
                 <TR><TD><B>Syscall</B></TD><TD><B>Description</B></TD></TR>
                 <TR><TD>replace_in_file()</TD><TD>replaces a text found via a regular expression</TD></TR>
+		<TR><TD>lines_from_file()</TD><TD>gets the lines from file which matches with the supplied regular expression</TD></TR>
                 <TR><TD>ls()</TD><TD>returns the count of found files in the current directory with names that matches the provided regex</TD></TR>
-                <TR><TD>pwd()</TD><TD>returns the current directory's fullpath</TD></TR>
+		<TR><TD>pwd()</TD><TD>returns the current directory's fullpath</TD></TR>
                 <TR><TD>cd()</TD><TD>changes the current directory to the supplied path</TD></TR>
                 <TR><TD>rm()</TD><TD>removes the supplied filepath</TD></TR>
                 <TR><TD>cp()</TD><TD>copies a file/directory on an existing path to another</TD></TR>
@@ -123,7 +124,7 @@
                 <TR><TD>last_forge_result()</TD><TD>gets the exit code of the last executed forging process</TD></TR>
                 <TR><TD>forge()</TD><TD>invokes another forge project</TD></TR>
                 <TR><TD>byref()</TD><TD>updates the value of a function argument to the external variable that was passed as this local variable (the function's argument)</TD></TR>                                
-				<TR><TD>time()</TD><TD>returns a string representing the system time based on provided format</TD></TR>
+		<TR><TD>time()</TD><TD>returns a string representing the system time based on provided format</TD></TR>
                 <TR><TD>setenv()</TD><TD>creates an environment variable</TD></TR>
                 <TR><TD>unsetenv()</TD><TD>removes an environment variable</TD></TR>
             </TABLE>
@@ -204,7 +205,7 @@
                 <TR><TD>add_item()</TD><TD>Adds a new item to the list</TD><TD>$lst.add_item("sample");</TR></TR>
                 <TR><TD>del_item()</TD><TD>Removes the passed content (the first found)</TD><TD>$lst.del_item("foo");</TD></TR>
                 <TR><TD>del_index()</TD><TD>Removes the item contained at the provided index</TD><TD>$lst.del_index(0);</TD></TR>
-                <TR><TD>set_from_fs_by_regex()</TD><TD>Populates the list with the filenames from cwd that matches the provided regex</TD><TD>$lst.set_from_fs_by_regex(".*\\.txt$");</TD></TR>
+                <TR><TD>ls()</TD><TD>Populates the list with the filenames from cwd that matches the provided regex</TD><TD>$lst.ls(".*\\.txt$");</TD></TR>
                 <TR><TD>clear()</TD><TD>Clears the list</TD><TD>$lst.clear()</TD></TR>
                 <TR><TD>index_of()</TD><TD>Returns the index of provided data</TD><TD>$sample_index = $lst.index_of("example");</TD></TR>
             </TABLE>
@@ -226,6 +227,19 @@
         <OL CLASS="code">
 			<LI><CODE>function replace_in_file_sample() : result type none {</CODE></LI>
 			<LI><CODE>&nbsp;hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+
+	<H5><B><U>lines_from_file()</U></B></H5>
+        
+		This syscall filters the lines from file which matches with a regex. The first argument should be the filepath, the second is the search pattern expressed by a regex.
+		The return is a list containing the filtered lines from file.
+		<BR><BR>
+		
+        <OL CLASS="code">
+			<LI><CODE>function replace_in_file_sample() : result type none {</CODE></LI>
+			<LI><CODE>var retval type list;</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.lines_from_file("test.txt", "^foo.*");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
         </OL>
         
@@ -834,10 +848,11 @@
         
         <CENTER>
             <TABLE BORDER = 0>
-                <TR><TD><B>Facilitator</B></TD><TD><B>Returns</B></TD></TR>
+                <TR><TD><B>Facilitator</B></TD><TD><B>Returns/Executes</B></TD></TR>
                 <TR><TD>hefesto.project.name()</TD><TD>The executing project name</TD></TR>
                 <TR><TD>hefesto.project.dep_chain()</TD><TD>The project's configured dep chain</TD></TR>
                 <TR><TD>hefesto.project.toolset()</TD><TD>The toolset which is being used to forge the project</TD></TR>
+	        <TR><TD>hefesto.project.abort()</TD><TD>Aborts the current forge execution</TD></TR>
             </TABLE>
         </CENTER>
         

@@ -1,0 +1,7 @@
+#
+# Hefesto's invoke file
+#
+# It allows you to invoke the forge just typing "hefesto".
+#
+
+--forgefiles=Forgefile.hls --Forgefile-projects=hefesto

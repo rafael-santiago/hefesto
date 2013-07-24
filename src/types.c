@@ -13,6 +13,8 @@ int HEFESTO_EXIT_CODE = 0;
 
 int HEFESTO_EXIT = 0;
 
+int HEFESTO_EXIT_FORGE = 0;
+
 hefesto_dep_chain_ctx *HEFESTO_CURRENT_DEP_CHAIN = NULL;
 
 hefesto_options_ctx *HEFESTO_OPTIONS = NULL;

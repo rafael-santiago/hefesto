@@ -112,6 +112,7 @@
             <TABLE BORDER = 0>
                 <TR><TD><B>Syscall</B></TD><TD><B>Descrição</B></TD></TR>
                 <TR><TD>replace_in_file()</TD><TD>substitui um texto encontrado via uma expressão regular</TD></TR>
+		<TR><TD>lines_from_file()</TD><TD>filtra linhas que casam com a expressão regular passada</TD></TR>
                 <TR><TD>ls()</TD><TD>retorna a contagem de arquivos encontrados no diretório corrente que casam seus nomes com a regex fornecida</TD></TR>
                 <TR><TD>pwd()</TD><TD>retorna o fullpath do diretório corrente</TD></TR>
                 <TR><TD>cd()</TD><TD>muda o diretório corrente para o caminho passado</TD></TR>
@@ -221,7 +222,7 @@
                 <TR><TD>add_item()</TD><TD>Adiciona um novo item na lista</TD><TD>$lst.add_item("sample");</TR></TR>
                 <TR><TD>del_item()</TD><TD>Remove o conteúdo passado por argumento (o primeiro encontrado)</TD><TD>$lst.del_item("foo");</TD></TR>
                 <TR><TD>del_index()</TD><TD>Remove o item contido no índice passado</TD><TD>$lst.del_index(0);</TD></TR>
-                <TR><TD>set_from_fs_by_regex()</TD><TD>Popula a lista com os nomes de arquivos de um cwd que casa seus nomes com a regex passada</TD><TD>$lst.set_from_fs_by_regex(".*\\.txt$");</TD></TR>
+                <TR><TD>ls()</TD><TD>Popula a lista com os nomes de arquivos de um cwd que casa seus nomes com a regex passada</TD><TD>$lst.ls(".*\.txt$");</TD></TR>
                 <TR><TD>clear()</TD><TD>Limpa a lista</TD><TD>$lst.clear()</TD></TR>
                 <TR><TD>index_of()</TD><TD>Retorna o índice de um conteúdo passado</TD><TD>$sample_index = $lst.index_of("example");</TD></TR>
             </TABLE>
@@ -242,6 +243,17 @@
         <OL CLASS="code">
 			<LI><CODE>function replace_in_file_sample() : result type none {</CODE></LI>
 			<LI><CODE>&nbsp;hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+        </OL>
+
+	<H5><B><U>lines_from_file()</U></B></H5>
+        
+		Filtra linhas de um arquivo. O primeiro argumento deve ser o filepath, o segundo é o padrão de busca expresso por uma regex. A syscall retorna uma lista contendo as linhas filtradas do arquivo.<BR><BR>
+		           
+        <OL CLASS="code">
+			<LI><CODE>function lines_from_file_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;var retval type list;</CODE></LI>
+			<LI><CODE>&nbsp;$retval = hefesto.sys.lines_from_file("test.txt", "^foo.*");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
         </OL>
         
@@ -864,10 +876,11 @@
         
         <CENTER>
             <TABLE BORDER = 0>
-                <TR><TD><B>Facilitador</B></TD><TD><B>Retorna</B></TD></TR>
+                <TR><TD><B>Facilitador</B></TD><TD><B>Retorna/Executa</B></TD></TR>
                 <TR><TD>hefesto.project.name()</TD><TD>O nome do projeto em execução</TD></TR>
                 <TR><TD>hefesto.project.dep_chain()</TD><TD>A dep chain configurada para esse projeto</TD></TR>
                 <TR><TD>hefesto.project.toolset()</TD><TD>O toolset que está sendo usado para forjar o projeto</TD></TR>
+		<TR><TD>hefesto.project.abort()</TD><TD>O cancelamento da forja do projeto</TD></TR>
             </TABLE>
         </CENTER>
         

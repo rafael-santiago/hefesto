@@ -1,0 +1,206 @@
+include ~/toolsets/null/null.hls
+include ~/string.hls
+include ~/conv.hls
+include ~/optutil.hls
+include ~/fsutil.hls
+
+project mylab : toolset "no-tool-any-set" : 1 ;
+
+mylab.prologue() {
+    #test_buf_fucked_oh_no("C:\\hefesto");
+    #hefesto.sys.echo("X = " + tolwrcase("ABCDEFGHIJKLMNOPQRSTUVWXYZ.") + "\n");
+    #hefesto.sys.exit(1);
+    hefesto.sys.echo("Result = " + reverse_string("abcdefghijklmnopqrstuvwxyz") + "\n");
+    var lst  type list;
+    $lst.add_item("RAFAEL");
+    $lst.add_item("santiago");
+    $lst.add_item("DE");
+    $lst.add_item("souza");
+    $lst.add_item("NETTO");
+    $lst.add_item("$");
+    var str type string;
+    $str = make_string($lst, " ");
+    hefesto.sys.echo("Result = " + $str + "\n");
+    $lst.clear();
+    $lst = split_string($str, " ");
+    var i type int;
+    $i = 0;
+    while ($i < $lst.count()) {
+        hefesto.sys.echo("ITEM=>"+$lst.item($i) + "\n");
+        $i = $i + 1;
+    }
+    hefesto.sys.echo("LWR = " + strlwr("RAFAEL") + "\n");
+    hefesto.sys.echo("UPR = " + strupr("santiago") + "\n");
+    hefesto.sys.echo("LTRIM = \"" + ltrim("      \n\r\t\t\t  S o u z a  ") + "\"\n");
+    hefesto.sys.echo("RTRIM = \"" + rtrim("  N ett o   \n") + "\"\n");
+    hefesto.sys.echo("TRIM = \"" + trim("    from      outter  space   \n\n\r\t\t") + "\"\n");
+    hefesto.sys.echo("POS = " + strpos("RAFAEL", "AFAEL") + "\n");
+    var xd type list;
+    var x type int;
+    $x = 0;
+    $xd.add_item("a");
+    $xd.add_item("b");
+    $xd.add_item("c");
+    $xd.add_item("d");
+    $xd.add_item("e");
+    $xd.add_item("f");
+    $xd.add_item("F");
+    $xd.add_item("E");
+    $xd.add_item("D");
+    $xd.add_item("C");
+    $xd.add_item("B");
+    $xd.add_item("A");
+    $xd.add_item("0");
+    $xd.add_item("1");
+    $xd.add_item("2");
+    $xd.add_item("3");
+    $xd.add_item("4");
+    $xd.add_item("5");
+    $xd.add_item("6");
+    $xd.add_item("7");
+    $xd.add_item("8");
+    $xd.add_item("9");
+    $xd.add_item("y");
+    $xd.add_item("x");
+    $xd.add_item("z");
+    while ($x < $xd.count()) {
+        $str = $xd.item($x);
+        hefesto.sys.echo("ISXDIGIT(" + $xd.item($x) + ") = " + isxdigit($str) + "\n" );
+        $x = $x + 1;
+    }
+    hefesto.sys.echo("INT2HEX = 0x" + int2hex(32) + "\n");
+    hefesto.sys.echo("ISDECIMAL = " + isdecimal("101") + "\n");
+    hefesto.sys.echo("ISHEX = " + ishex("babacaf0da53") + "\n");
+    hefesto.sys.echo("HEX2INT = " + hex2int("7f000001") + "\n");
+    hefesto.sys.echo("GETUSRSTROPT = " + get_usr_str_opt("forgefiles") + "\n");
+    hefesto.sys.echo("ISDIR = " + isdir("lab-one") + "\n");
+    hefesto.sys.echo("ISFILE = " + isfile("hls-test.hls") + "\n");
+    hefesto.sys.echo("MKTREE = " + mktree("a/b/c/d") + "\n");
+    hefesto.sys.echo("RMTREE = " + rmtree("a/b/c/d") + "\n");
+    setenv_test();
+    var retval type list;
+    #$retval = hefesto.sys.lines_from_file("types.h", ".*[Rr]afael.*");
+    $retval = hefesto.sys.lines_from_file("types.h", "^extern.*");
+    var r type int;
+    var line type string;
+    $r = 0;
+    while ($r < $retval.count()) {
+        $line = $retval.item($r);
+        hefesto.sys.echo("LINE = \"" + $line + "\"\n");
+        $r = $r + 1;
+    }
+    hefesto.sys.echo("*** done.\n");
+}
+
+function test_buf_fucked_oh_no(install_dir type string) : result type string {
+    var l type int;
+    var lst type list;
+    var content type string;
+    #$content = "C:\\abc;C:\\abc\\def\\ghi;C:\\foo\\bar;" + $install_dir + "\\bin;" + $install_dir + "\\bin;" + $install_dir + "\\bin";
+    $content = "C:\PROGRA~1\Borland\CBUILD~1\Bin;C:\PROGRA~1\Borland\CBUILD~1\Projects\Bpl;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Dell\DW WLAN Card\Driver;c:\Program Files\WIDCOMM\Bluetooth Software\;C:\Program Files\Common Files\Roxio Shared\DLLShared\;C:\Program Files\Common Files\Roxio Shared\10.0\DLLShared\;C:\Program Files\Java\jdk1.6.0_19\bin;C:\usr\rafael\dwl\marcus\BEwT-E\ant\bin;C:\usr\rafael\bin\lame;C:\usr\rafael\prj\papers\enia;C:\Program Files\QuickTime\QTSystem\;c:\usr\rafael\bin;C:\usr\rafael\bin\crius;C:\Qt\2010.04\qt;;C:\Program Files\GnuWin32\bin;C:\usr\rafael\bin\dev-cpp\bin;c:\usr\rafael\bin\doris;C:\usr\rafael\share\libs\android_sdk\tools;C:\Program Files\Common Files\Ulead Systems\MPEG;;C:\\\\hefesto\\\\bin;C:\\\\hefesto\\\\bin;C:\\\\hefesto\\\\bin;C:\\\\hefesto\\\\bin";
+    $lst = serialize_env_path($content);
+    $l = 0;
+    while ($lst.index_of($install_dir + "\\bin") > -1) $lst.del_item($install_dir + "\\bin");
+    while ($l < $lst.count()) {
+        hefesto.sys.echo("P: " + $lst.item($l) + "\n");
+        $l = $l + 1;
+    }
+    result $content;
+}
+
+function serialize_env_path(path type string) : result type list {
+    var item type string;
+    var p type int;
+    var path_lst type list;
+    $p = 0;
+    while ($p < $path.len()) {
+        if ($path.at($p) == ";" && $item.len() > 0) {
+            $path_lst.add_item($item);
+            $item = "";
+        } else {
+            if ($path.at($p) != ";") $item = $item + $path.at($p);
+        }
+        $p = $p + 1;
+    }
+    if ($item.len() > 0) { # Oh... ;)
+        $path_lst.item($item);
+    }
+    result $path_lst;
+}
+
+function tolwrcase(str type string) : result type string {
+    var lwr_str type string;
+    var s type int;
+    $s = 0;
+    while ($s < $str.len()) {
+        if ($str.at($s) == "A") {
+            $lwr_str = $lwr_str + "a";
+        } else if ($str.at($s) == "B") {
+            $lwr_str = $lwr_str + "b";
+        } else if ($str.at($s) == "C") {
+            $lwr_str = $lwr_str + "c";
+        } else if ($str.at($s) == "D") {
+            $lwr_str = $lwr_str + "d";
+        } else if ($str.at($s) == "E") {
+            $lwr_str = $lwr_str + "e";
+        } else if ($str.at($s) == "F") {
+            $lwr_str = $lwr_str + "f";
+        } else if ($str.at($s) == "G") {
+            $lwr_str = $lwr_str + "g";
+        } else if ($str.at($s) == "H") {
+            $lwr_str = $lwr_str + "h";
+        } else if ($str.at($s) == "I") {
+            $lwr_str = $lwr_str + "i";
+        } else if ($str.at($s) == "J") {
+            $lwr_str = $lwr_str + "j";
+        } else if ($str.at($s) == "K") {
+            $lwr_str = $lwr_str + "k";
+        } else if ($str.at($s) == "L") {
+            $lwr_str = $lwr_str + "l";
+        } else if ($str.at($s) == "M") {
+            $lwr_str = $lwr_str + "m";
+        } else if ($str.at($s) == "N") {
+            $lwr_str = $lwr_str + "n";
+        } else if ($str.at($s) == "O") {
+            $lwr_str = $lwr_str + "o";
+        } else if ($str.at($s) == "P") {
+            $lwr_str = $lwr_str + "p";
+        } else if ($str.at($s) == "Q") {
+            $lwr_str = $lwr_str + "q";
+        } else if ($str.at($s) == "R") {
+            $lwr_str = $lwr_str + "r";
+        } else if ($str.at($s) == "S") {
+            $lwr_str = $lwr_str + "s";
+        } else if ($str.at($s) == "T") {
+            $lwr_str = $lwr_str + "t";
+        } else if ($str.at($s) == "U") {
+            $lwr_str = $lwr_str + "u";
+        } else if ($str.at($s) == "V") {
+            $lwr_str = $lwr_str + "v";
+        } else if ($str.at($s) == "W") {
+            $lwr_str = $lwr_str + "w";
+        } else if ($str.at($s) == "X") {
+            $lwr_str = $lwr_str + "x";
+        } else if ($str.at($s) == "Y") {
+            $lwr_str = $lwr_str + "y";
+        } else if ($str.at($s) == "Z") {
+            $lwr_str = $lwr_str + "z";
+        } else {
+            $lwr_str = $lwr_str + $str.at($s);
+        }
+        $s = $s + 1;
+    }
+    result $lwr_str;
+}
+
+function setenv_test() : result type none {
+    hefesto.sys.echo("WINREG TEST: " + hefesto.sys.env("WINREG:HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CD Burning\\CD Recorder Drive") + "\n");
+    hefesto.sys.echo("FOO = " + hefesto.sys.env("FOO") + "\n");
+    hefesto.sys.echo("SETENV RESULT = " + hefesto.sys.setenv("FOO", "bar") + "\n");
+    hefesto.sys.echo("FOO = " + hefesto.sys.env("FOO") + "\n");
+    hefesto.sys.echo("SETENV RESULT = " + hefesto.sys.setenv("FOO", "baz") + "\n");
+    hefesto.sys.echo("FOO = " + hefesto.sys.env("FOO") + "\n");
+    hefesto.sys.echo("SETENV WINREG RESULT = " + hefesto.sys.setenv("WINREG:HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\TestKey:REG_SZ", "calc.exe") + "\n");
+    hefesto.sys.echo("UNSETENV WINREG RESULT = " + hefesto.sys.unsetenv("FOO") + "\n");
+    hefesto.sys.echo("FOO = " + hefesto.sys.env("FOO") + "\n");
+}

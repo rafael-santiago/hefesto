@@ -7,7 +7,7 @@
  */
 #include "synchk.h"
 #include "mem.h"
-#include "regex.h"
+#include "here/here.h"
 #include "structs_io.h"
 #include "parser.h"
 #include "exprchk.h"
@@ -205,6 +205,11 @@ static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
                                        hefesto_var_list_ctx *gl_vars,
                                        hefesto_func_list_ctx *functions);
 
+static int synchk_hefesto_sys_lines_from_file(const char *usr_calling,
+                                              hefesto_var_list_ctx *lo_vars,
+                                              hefesto_var_list_ctx *gl_vars,
+                                              hefesto_func_list_ctx *functions);
+
 hefesto_type_t get_hefesto_var_type_by_usr_code(const char *var,
                                                 hefesto_var_list_ctx *lo_vars,
                                                 hefesto_var_list_ctx *gl_vars);
@@ -223,6 +228,11 @@ static int synchk_hefesto_project_toolset(const char *usr_calling,
                                           hefesto_var_list_ctx *lo_vars,
                                           hefesto_var_list_ctx *gl_vars,
                                           hefesto_func_list_ctx *functions);
+
+static int synchk_hefesto_project_abort(const char *usr_calling,
+                                        hefesto_var_list_ctx *lo_vars,
+                                        hefesto_var_list_ctx *gl_vars,
+                                        hefesto_func_list_ctx *functions);
 
 struct hefesto_syntax_checker_ctx {
     int (*synchk)(const char *statement, hefesto_var_list_ctx *lo_vars,
@@ -270,14 +280,17 @@ static struct hefesto_syscall_syntax_checker_ctx
     set_hefesto_synchk_slot(synchk_hefesto_sys_byref),
     set_hefesto_synchk_slot(synchk_hefesto_sys_time),
     set_hefesto_synchk_slot(synchk_hefesto_sys_setenv),
-    set_hefesto_synchk_slot(synchk_hefesto_sys_unsetenv)
+    set_hefesto_synchk_slot(synchk_hefesto_sys_unsetenv),
+    set_hefesto_synchk_slot(synchk_hefesto_sys_lines_from_file)
+
 };
 
 static struct hefesto_syscall_syntax_checker_ctx
     HEFESTO_PROJECT_METHOD_CHECKER[HEFESTO_PROJECT_METHODS_NR] = {
     set_hefesto_synchk_slot(synchk_hefesto_project_name),
     set_hefesto_synchk_slot(synchk_hefesto_project_toolset),
-    set_hefesto_synchk_slot(synchk_hefesto_project_dep_chain)
+    set_hefesto_synchk_slot(synchk_hefesto_project_dep_chain),
+    set_hefesto_synchk_slot(synchk_hefesto_project_abort)
 };
 
 #undef set_hefesto_synchk_slot
@@ -1172,6 +1185,8 @@ int synchk_list_method_statement(const char *statement,
     char *arg, *tmp_arg;
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
+    here_search_program_ctx *search_program;
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
 
     for (s = statement; *s != 0 && *s != '.'; s++);
 
@@ -1233,7 +1248,7 @@ int synchk_list_method_statement(const char *statement,
                               statement);
                 }
                 free(arg);
-            } else if (strcmp(temp, ".set_from_fs_by_regex") == 0) {
+            } else if (strcmp(temp, ".ls") == 0) {
                 arg = get_arg_from_call(s, &offset);
 
                 if (*arg == '$') {
@@ -1250,9 +1265,12 @@ int synchk_list_method_statement(const char *statement,
                     }
                 } else {
                     tmp_arg = strip_quotes_from_string(arg);
-                    if ((result = check_regex((unsigned char *)tmp_arg)) == 0) {
+                    if ((search_program = here_compile(tmp_arg, errors)) == NULL) {
                         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_REGEX,
-                                  statement, arg);
+                                  statement, errors);
+                    } else {
+                        result = 1;
+                        del_here_search_program_ctx(search_program);
                     }
                     free(tmp_arg);
                 }
@@ -1421,6 +1439,7 @@ static int synchk_hefesto_sys_ls(const char *usr_calling,
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
+    here_search_program_ctx *sp = NULL;
 
     args = get_arg_from_call(usr_calling, &offset);
 
@@ -1432,7 +1451,10 @@ static int synchk_hefesto_sys_ls(const char *usr_calling,
     }
 
     if (args) {
-        if (is_hefesto_string(args) && check_regex((unsigned char *)args)) {
+        if (is_hefesto_string(args) && (sp = here_compile(args, NULL))) {
+            if (sp != NULL) {
+                del_here_search_program_ctx(sp);
+            }
             free(args);
             return 1;
         } else if (*args == '$') {
@@ -2603,6 +2625,58 @@ static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
                                   functions);
 }
 
+static int synchk_hefesto_sys_lines_from_file(const char *usr_calling,
+                                              hefesto_var_list_ctx *lo_vars,
+                                              hefesto_var_list_ctx *gl_vars,
+                                              hefesto_func_list_ctx *functions) {
+    char *args;
+    size_t offset = 0;
+    int result = 0;
+    hefesto_var_list_ctx *vp;
+
+    if (!is_expected_args_total(usr_calling, 2)) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+
+    args = get_arg_from_call(usr_calling, &offset);
+
+    if (args) {
+        result = 1;
+        while (result && *args) {
+            if (*args != '$') {
+                result = is_hefesto_string(args) ||
+                         is_valid_expression(args, lo_vars,
+                                             gl_vars, functions);
+                if (result == 0) {
+                    hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_EXPR,
+                              usr_calling);
+                }
+            } else {
+                vp = get_hefesto_var_list_ctx_name(args+1, lo_vars);
+                if (!vp) vp = get_hefesto_var_list_ctx_name(args+1, gl_vars);
+                result = vp && (vp->type == HEFESTO_VAR_TYPE_STRING);
+                if (result == 0) {
+                    if (vp == NULL) {
+                        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_VAR,
+                                  usr_calling);
+                    } else {
+                        hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                  HLSCM_SYN_ERROR_STRING_TYPE_REQUIRED,
+                                  usr_calling);
+                    }
+                }
+            }
+            free(args);
+            args = get_arg_from_call(usr_calling, &offset);
+        }
+        free(args);
+    }
+
+    return result;
+}
+
 static int synchk_hefesto_project_name(const char *usr_calling,
                                        hefesto_var_list_ctx *lo_vars,
                                        hefesto_var_list_ctx *gl_vars,
@@ -2651,6 +2725,37 @@ static int synchk_hefesto_project_toolset(const char *usr_calling,
     return result;
 }
 
+static int synchk_hefesto_project_abort(const char *usr_calling,
+                                        hefesto_var_list_ctx *lo_vars,
+                                        hefesto_var_list_ctx *gl_vars,
+                                        hefesto_func_list_ctx *functions) {
+    int result;
+    const char *s;
+    char *arg;
+    size_t offset = 0;
+
+    for (s = usr_calling; *s != '(' && *s != 0; s++);
+    result = is_expected_args_total(s + 1, 1);
+    if (result == 0) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+
+    arg = get_arg_from_call(s + 1, &offset);
+
+    result = is_valid_expression(arg, lo_vars, gl_vars, functions);
+
+    if (result == 0) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_EXPR,
+                  usr_calling);
+    }
+
+    free(arg);
+
+    return result;
+}
+
 int synchk_project_method_statement(const char *statement,
                                     hefesto_var_list_ctx *lo_vars,
                                     hefesto_var_list_ctx *gl_vars,
@@ -2674,3 +2779,4 @@ int synchk_project_method_statement(const char *statement,
     return result;
 
 }
+

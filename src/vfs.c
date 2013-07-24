@@ -7,9 +7,10 @@
  */
 #include "vfs.h"
 #include "mem.h"
-#include "regex.h"
+#include "here/here.h"
 #include "structs_io.h"
 #include "parser.h"
+#include "hlsc_msg.h"
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -188,7 +189,10 @@ int hefesto_cp(const char *src, const char *dest) {
     DIR *dir;
     struct dirent *de;
     int result = 0;
-    char *regex;
+    //char *regex;
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
+    here_search_program_ctx *search_program;
+    here_search_result_ctx *search_result;
 
     full_src = hefesto_make_path(hefesto_is_relative_path(src) ?
                                     HEFESTO_FS_CWD : "", src,
@@ -240,11 +244,12 @@ int hefesto_cp(const char *src, const char *dest) {
 
         }
     } else if (hefesto_is_dir(full_dest)) {
-        regex = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-        preprocess_usr_regex((unsigned char *)regex, (unsigned char *) src,
-                              HEFESTO_MAX_BUFFER_SIZE, strlen(src));
+        //regex = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+        //preprocess_usr_regex((unsigned char *)regex, (unsigned char *) src,
+        //                      HEFESTO_MAX_BUFFER_SIZE, strlen(src));
+        search_program = here_compile(src, errors);
 
-        if ((dir = opendir(HEFESTO_FS_CWD))) {
+        if (search_program != NULL && (dir = opendir(HEFESTO_FS_CWD))) {
 
             result = 1;
 
@@ -253,14 +258,9 @@ int hefesto_cp(const char *src, const char *dest) {
                 file_src = hefesto_make_path(HEFESTO_FS_CWD, 
                                    de->d_name, HEFESTO_MAX_BUFFER_SIZE);
 
-                if (bool_match_regex((unsigned char *)file_src,
-                                     (unsigned char *)file_src,
-                                     (unsigned char *)file_src +
-                                        strlen(file_src),
-                                     (unsigned char *)regex,
-                                     (unsigned char *)regex,
-                                     (unsigned char *)regex +
-                                        strlen(regex), 1)) {
+                search_result = here_match_string(file_src, search_program);
+
+                if (here_matches(search_result)) {
                     if (hefesto_is_file(file_src)) {
                         file_dest = hefesto_make_path(full_dest, de->d_name,
                                                       HEFESTO_MAX_BUFFER_SIZE);
@@ -282,13 +282,19 @@ int hefesto_cp(const char *src, const char *dest) {
 
                 }
 
+                del_here_search_result_ctx(search_result);
+
                 free(file_src);
 
             }
 
         }
 
-        free(regex);
+        if (search_program != NULL) {
+            del_here_search_program_ctx(search_program);
+        }
+
+        //free(regex);
 
     }
 
@@ -396,31 +402,36 @@ int hefesto_ls(const char *mask) {
     char *cwd = hefesto_pwd();
     struct dirent *de;
     int total = 0;
-    char regex[HEFESTO_MAX_BUFFER_SIZE];
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
     char *full_path;
+    here_search_program_ctx *search_program;
+    here_search_result_ctx *search_result;
 
     if (!(dir = opendir(cwd))) {
         free(cwd);
         return 0;
     }
 
-    preprocess_usr_regex((unsigned char *)regex, (unsigned char *) mask,
-                         HEFESTO_MAX_BUFFER_SIZE, strlen(mask) + 1);
+    search_program = here_compile(mask, errors);
+
+    if (search_program == NULL) {
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
+        return 0;
+    }
 
     while ((de = readdir(dir))) {
         if (strcmp(de->d_name, ".") == 0 ||
             strcmp(de->d_name, "..") == 0) continue;
         full_path = hefesto_make_path(cwd, de->d_name, HEFESTO_MAX_BUFFER_SIZE);
-        if (bool_match_regex((unsigned char *)full_path,
-                             (unsigned char *)full_path,
-                             (unsigned char *)full_path + strlen(full_path),
-                             (unsigned char *)regex,
-                             (unsigned char *)regex,
-                             (unsigned char *)regex + strlen(regex), 1)) {
+        search_result = here_match_string(full_path, search_program);
+        if (here_matches(search_result)) {
             total++;
         }
         free(full_path);
+        del_here_search_result_ctx(search_result);
     }
+
+    del_here_search_program_ctx(search_program);
 
     free(cwd);
 

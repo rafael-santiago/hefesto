@@ -81,7 +81,7 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
         while ($i < $size && $exit_code == 0) {
             $ofile = $sources.item($i);
             $ofile = gcc_mk_ofile_name($ofile);
-            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($ofile) == 0) {
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || gcc_file_exists($ofile) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
                 $curr_src_file = $sources.item($i);
                 $exit_code = hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file, $ofile, $includes, $cflags, $is_release));

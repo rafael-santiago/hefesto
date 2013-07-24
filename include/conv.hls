@@ -160,3 +160,45 @@ function hex2int(xvalue type string) : result type int {
     }
     result $value;
 }
+
+#
+# Returns the decimal representation of a decimal string value.
+#
+# @svalue = the decimal string value;
+#
+function str2int(svalue type string) : result type int {
+    var s type int;
+    var neg type int;
+    var val type int;
+    var digit type int;
+    var digits type list;
+    $s = 0;
+    $neg = 0;
+    $val = 0;
+    while ($svalue.at($s) == " " || $svalue.at($s) == "\t") $s = $s + 1;
+    if ($svalue.at($s) == "-") {
+        $s = $s + 1;
+        $neg = 1;
+    } else if ($svalue.at($s) == "+") {
+        $s = $s + 1;
+    }
+    $digits.add_item("0");
+    $digits.add_item("1");
+    $digits.add_item("2");
+    $digits.add_item("3");
+    $digits.add_item("4");
+    $digits.add_item("5");
+    $digits.add_item("6");
+    $digits.add_item("7");
+    $digits.add_item("8");
+    $digits.add_item("9");
+    while ($s < $svalue.len()) {
+        $digit = $digits.index_of($svalue.at($s));
+        $val = ($val * 10) + $digit;
+        $s = $s + 1;
+    }
+    if ($neg == 1) {
+        $val = -1 * $val;
+    }
+    result $val;
+}

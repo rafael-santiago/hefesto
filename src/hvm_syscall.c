@@ -15,13 +15,15 @@
 #include "synchk.h"
 #include "lang_defs.h"
 #include "structs_io.h"
-#include "regex.h"
+#include "here/here.h"
 #include "os_detect.h"
 #include "hlsc_msg.h"
 #include "hvm.h"
 #include "hvm_rqueue.h"
 #include "htask.h"
 #include "hvm_winreg.h"
+#include "hlsc_msg.h"
+#include "file_io.h"
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
@@ -218,12 +220,18 @@ static void *hefesto_sys_setenv(const char *syscall,
                                 hefesto_var_list_ctx **gl_vars,
                                 hefesto_func_list_ctx *functions,
                                 hefesto_type_t **otype);
-                                
+
 static void *hefesto_sys_unsetenv(const char *syscall,
                                   hefesto_var_list_ctx **lo_vars,
                                   hefesto_var_list_ctx **gl_vars,
                                   hefesto_func_list_ctx *functions,
                                   hefesto_type_t **otype);
+
+static void *hefesto_sys_lines_from_file(const char *syscall,
+                                         hefesto_var_list_ctx **lo_vars,
+                                         hefesto_var_list_ctx **gl_vars,
+                                         hefesto_func_list_ctx *functions,
+                                         hefesto_type_t **otype);
 
 struct hefesto_hvm_syscall {
     void *(*syscall)(const char *syscall,
@@ -268,7 +276,8 @@ static struct hefesto_hvm_syscall
     set_method(hefesto_sys_byref),
     set_method(hefesto_sys_time),
     set_method(hefesto_sys_setenv),
-    set_method(hefesto_sys_unsetenv)
+    set_method(hefesto_sys_unsetenv),
+    set_method(hefesto_sys_lines_from_file)
 };
 
 #undef set_method
@@ -406,9 +415,13 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
         case HEFESTO_SYS_SETENV:
             label = "hefesto.sys.setenv(";
             break;
-            
+
         case HEFESTO_SYS_UNSETENV:
             label = "hefesto.sys.unsetenv(";
+            break;
+
+        case HEFESTO_SYS_LINES_FROM_FILE:
+            label = "hefesto.sys.lines_from_file(";
             break;
 
         default:
@@ -467,18 +480,19 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
 
     FILE *fp;
     const char *s;
-    char *arg_file_path, *arg_file_path_pfix;
-    char *arg_regex, *arg_regex_pfix;
-    char *arg_replace_text, *arg_replace_text_pfix;
-    void *regex;
-    void *file_path;
-    void *replace_text;
-    char processed_regex[HEFESTO_MAX_BUFFER_SIZE];
+    char *arg_file_path = NULL, *arg_file_path_pfix = NULL;
+    char *arg_regex = NULL, *arg_regex_pfix = NULL;
+    char *arg_replace_text = NULL, *arg_replace_text_pfix = NULL;
+    void *regex = NULL;
+    void *file_path = NULL;
+    void *replace_text = NULL;
+    char errors[HEFESTO_MAX_BUFFER_SIZE];
     size_t offset, osz;
     hefesto_type_t etype;
     long file_size;
     size_t replace_text_size;
-    char *buffer, *replaced_buffer;
+    char *buffer = NULL, *replaced_buffer = NULL;
+    here_search_program_ctx *search_program;
 
     void *result = (void *) hefesto_mloc(sizeof(int));
 
@@ -495,69 +509,68 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
     etype = HEFESTO_VAR_TYPE_STRING;
     arg_regex_pfix = infix2postfix(arg_regex, strlen(arg_regex), 1);
     regex = expr_eval(arg_regex_pfix, lo_vars, gl_vars, functions, &etype, &osz);
-    preprocess_usr_regex((unsigned char *)processed_regex,
-                         (unsigned char *)regex,
-                         sizeof(processed_regex)-1, strlen(regex));
-    arg_replace_text = get_arg_from_call(syscall, &offset);
-    etype = HEFESTO_VAR_TYPE_STRING;
-    arg_replace_text_pfix = infix2postfix(arg_replace_text,
-                                          strlen(arg_replace_text), 1);
-    replace_text = expr_eval(arg_replace_text_pfix, lo_vars, gl_vars,
-                             functions, &etype, &osz);
-    replace_text_size = strlen((char *)replace_text);
+    if ((search_program = here_compile(regex, errors)) != NULL) {
+        arg_replace_text = get_arg_from_call(syscall, &offset);
+        etype = HEFESTO_VAR_TYPE_STRING;
+        arg_replace_text_pfix = infix2postfix(arg_replace_text,
+                                              strlen(arg_replace_text), 1);
+        replace_text = expr_eval(arg_replace_text_pfix, lo_vars, gl_vars,
+                                 functions, &etype, &osz);
+        replace_text_size = strlen((char *)replace_text);
 
-    if (!(fp = fopen((char *)file_path, "rb"))) {
-        *(int *)result = -1;
-        free(arg_file_path);
-        free(arg_file_path_pfix);
-        free(arg_regex);
-        free(arg_regex_pfix);
-        free(regex);
-        free(arg_replace_text);
-        free(arg_replace_text_pfix);
-        free(replace_text);
-        free(file_path);
-        return result;
-    }
-
-    fseek(fp, 0L, SEEK_END);
-    file_size = ftell(fp);
-    buffer = (char *) hefesto_mloc(file_size+1);
-    memset(buffer, 0, file_size+1);
-    fseek(fp, 0L, SEEK_SET);
-    fread(buffer, 1, file_size, fp);
-
-    *(int *)result = 0;
-
-    replaced_buffer = (char *) regex_replace((unsigned char *)processed_regex,
-                                             (unsigned char *)buffer,
-                                             file_size,
-                                             (unsigned char *)replace_text,
-                                             replace_text_size, &osz);
-
-    fclose(fp);
-
-    if (osz > 0) {
-        if ((fp = fopen((char *)file_path, "wb"))) {
-            fwrite(replaced_buffer, 1, osz, fp);
-            fclose(fp);
-            *(int *)result = 1;
+        if (!(fp = fopen((char *)file_path, "rb"))) {
+            *(int *)result = -1;
+            free(arg_file_path);
+            free(arg_file_path_pfix);
+            free(arg_regex);
+            free(arg_regex_pfix);
+            free(regex);
+            free(arg_replace_text);
+            free(arg_replace_text_pfix);
+            free(replace_text);
+            free(file_path);
+            return result;
         }
+
+        fseek(fp, 0L, SEEK_END);
+        file_size = ftell(fp);
+        buffer = (char *) hefesto_mloc(file_size+1);
+        memset(buffer, 0, file_size+1);
+        fseek(fp, 0L, SEEK_SET);
+        fread(buffer, 1, file_size, fp);
+
+        *(int *)result = here_replace_string(buffer, search_program,
+                                             replace_text, &replaced_buffer,
+                                             &osz);
+        fclose(fp);
+
+        if (osz > 0) {
+            if ((fp = fopen((char *)file_path, "wb"))) {
+                fwrite(replaced_buffer, 1, osz, fp);
+                fclose(fp);
+                *(int *)result = 1;
+            }
+        } else {
+            *(int *)result = 0;
+        }
+
+        del_here_search_program_ctx(search_program);
+
     } else {
-        *(int *)result = 1;
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
     }
 
-    free(arg_file_path);
-    free(arg_file_path_pfix);
-    free(arg_regex);
-    free(arg_regex_pfix);
-    free(arg_replace_text);
-    free(arg_replace_text_pfix);
-    free(file_path);
-    free(regex);
-    free(replace_text);
-    free(replaced_buffer);
-    free(buffer);
+    if (arg_file_path != NULL) free(arg_file_path);
+    if (arg_file_path_pfix != NULL) free(arg_file_path_pfix);
+    if (arg_regex != NULL) free(arg_regex);
+    if (arg_regex_pfix != NULL) free(arg_regex_pfix);
+    if (arg_replace_text != NULL) free(arg_replace_text);
+    if (arg_replace_text_pfix != NULL) free(arg_replace_text_pfix);
+    if (file_path != NULL) free(file_path);
+    if (regex != NULL) free(regex);
+    if (replace_text != NULL) free(replace_text);
+    if (replaced_buffer != NULL) free(replaced_buffer);
+    if (buffer != NULL) free(buffer);
 
     return result;
 
@@ -1525,6 +1538,12 @@ static void *hefesto_sys_forge(const char *syscall,
     HEFESTO_OPTIONS = NULL;
 
     r = boot_forge(prjs, expd_hls, curr_opts);
+
+    if (HEFESTO_EXIT_FORGE) {
+        HEFESTO_EXIT_FORGE = 0;
+        HEFESTO_EXIT = 0;
+    }
+
     del_hefesto_options_ctx(prjs);
 
     HEFESTO_OPTIONS = swp_opts;
@@ -1562,7 +1581,7 @@ static void *hefesto_sys_byref(const char *syscall,
     c_fp = hvm_get_current_executed_function();
 
     if (c_fp == NULL) {
-        hlsc_info(HLSCM_MTYPE_RUNTIME, 
+        hlsc_info(HLSCM_MTYPE_RUNTIME,
                   HLSCM_RUNTIME_ERROR_BYREF_NULL_FN_IN_EXECUTION);
         return NULL;
     }
@@ -1799,3 +1818,52 @@ static void *hefesto_sys_unsetenv(const char *syscall,
 
     return result;
 }
+
+static void *hefesto_sys_lines_from_file(const char *syscall,
+                                         hefesto_var_list_ctx **lo_vars,
+                                         hefesto_var_list_ctx **gl_vars,
+                                         hefesto_func_list_ctx *functions,
+                                         hefesto_type_t **otype) {
+    hefesto_common_list_ctx *result = NULL;
+    const char *s;
+    char *arg_filepath, *arg_filepath_pfix;
+    char *arg_regex, *arg_regex_pfix;
+    void *filepath;
+    void *regex;
+    size_t offset, osz;
+    hefesto_type_t etype;
+    FILE *fp;
+
+    **otype = HEFESTO_VAR_TYPE_LIST;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg_filepath = get_arg_from_call(syscall, &offset);
+    arg_filepath_pfix = infix2postfix(arg_filepath, strlen(arg_filepath), 1);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    filepath = expr_eval(arg_filepath_pfix, lo_vars, gl_vars, functions,
+                         &etype, &osz);
+
+    arg_regex = get_arg_from_call(syscall, &offset);
+    arg_regex_pfix = infix2postfix(arg_regex, strlen(arg_filepath), 1);
+    etype = HEFESTO_VAR_TYPE_STRING;
+    regex = expr_eval(arg_regex_pfix, lo_vars, gl_vars, functions,
+                      &etype, &osz);
+
+    free(arg_filepath);
+    free(arg_filepath_pfix);
+    free(arg_regex);
+    free(arg_regex_pfix);
+
+    if ((fp = fopen(filepath, "rb")) != NULL) {
+        result = lines_from_file(fp, regex);
+        fclose(fp);
+    }
+
+    free(regex);
+    free(filepath);
+
+    return ((void *)result);
+}
+
