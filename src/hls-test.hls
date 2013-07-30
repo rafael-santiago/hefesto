@@ -89,6 +89,8 @@ mylab.prologue() {
         hefesto.sys.echo("LINE = \"" + $line + "\"\n");
         $r = $r + 1;
     }
+    var buffer type string;
+    $buffer.replace("#define .*VERSION\"", ""); # corrigir esse gpf!
     hefesto.sys.echo("*** done.\n");
 }
 

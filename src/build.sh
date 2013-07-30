@@ -9,12 +9,12 @@ LIB="ar"
 LINKER_OPTS="-o../bin/hefesto dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
-                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o here/libhere.a -lpthread"
+                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o here/libhere.a -lpthread"
 
 UNIT_TEST="-omain ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../here/libhere.a -lpthread"
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../here/libhere.a -lpthread"
 
 ALL_OK=1
 
@@ -172,6 +172,12 @@ if test $? -gt 0
 then
     ALL_OK=0
 fi
+$COMPILER $COMPILER_OPTS ivk.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
+
 
 cd here
 $COMPILER $COMPILER_OPTS here.c
@@ -196,7 +202,7 @@ then
 else
     $LIB -r "libhere.a" $LIBHERE_OBJS
 fi
-cd testing
+cd test
 $COMPILER $COMPILER_OPTS htest.c
 if test $? -gt 0
 then

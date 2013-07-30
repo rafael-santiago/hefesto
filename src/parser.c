@@ -92,7 +92,7 @@ static char *get_next_word_or_string_from_file(FILE *fp,
 static char *expand_include_file_name(const char *file_path,
                                       hefesto_options_ctx *hefesto_usr_inc_dir);
 
-static hefesto_common_list_ctx 
+static hefesto_common_list_ctx
     *get_all_includes(hefesto_common_list_ctx *includes, const char *file_path,
                       hefesto_options_ctx *hefesto_usr_inc_dir);
 
@@ -786,6 +786,10 @@ static char *get_next_command(FILE *fp, const long stop_at) {
             p++;
             c = fgetc(fp);
             if (c == '\n') inc_current_line_number();
+            //+
+            //*p = c;
+            //c = fgetc(fp);
+            //p++;
         } else if (is_hefesto_comment(c) && str == 0) {
             *p = c;
             p++;
@@ -796,7 +800,7 @@ static char *get_next_command(FILE *fp, const long stop_at) {
                 c = fgetc(fp);
             }
         } else if (is_hefesto_string_tok(c)) {
-            str = (str == 0) ? 1 : 0;  
+            str = (str == 0) ? 1 : 0;
         } else if (is_hefesto_section_beg(c) && str == 0) {
             bracket++;
         } else if (is_hefesto_section_end(c) && str == 0) {
@@ -896,11 +900,19 @@ static char *strip_comment_lines_from_command_block(const char *command) {
             *rp = *cp;
             rp++;
             cp++;
-            while (!is_hefesto_string_tok(*cp) && 
+            while (!is_hefesto_string_tok(*cp) &&
                    *cp != 0 && rp != (result + size)) {
                 *rp = *cp;
-                rp++;
-                cp++;
+                if (*rp == '\\') {
+                    rp++;
+                    cp++;
+                    *rp = *cp;
+                    rp++;
+                    cp++;
+                } else {
+                    rp++;
+                    cp++;
+                }
             }
             *rp = *cp;
         }
@@ -2255,7 +2267,8 @@ static char *get_next_word_or_string_from_file(FILE *fp, long stop_at) {
 
     if (is_hefesto_string_tok(*(s-1))) {
 
-        while (ftell(fp) < stop_at) {
+        while (ftell(fp) < stop_at &&
+               (s - string) < (size_t) HEFESTO_MAX_BUFFER_SIZE) {
             *s = fgetc(fp);
             s++;
             if (*(s-1) == '\\') continue;
@@ -2267,7 +2280,8 @@ static char *get_next_word_or_string_from_file(FILE *fp, long stop_at) {
                    (s - string) < (size_t) HEFESTO_MAX_BUFFER_SIZE) {
                 *s = fgetc(fp);
                 if (is_hefesto_string_tok(*s)) {
-                    while (ftell(fp) < stop_at) {
+                    while (ftell(fp) < stop_at &&
+                           (s - string) < (size_t) HEFESTO_MAX_BUFFER_SIZE) {
                         *s = fgetc(fp);
                         s++;
                         if (*(s-1) == '\\') continue;

@@ -1,0 +1,6 @@
+#ifndef _HEFESTO_VERSION_NO_H
+#define _HEFESTO_VERSION_NO_H 1
+
+#define HEFESTO_VERSION "0.1.1.0"
+
+#endif

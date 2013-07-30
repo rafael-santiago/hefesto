@@ -16,6 +16,7 @@
 #       --install               # requests the compiled package installing;
 
 include ~/toolsets/gcc/gcc-app.hls
+include version_handler.hls
 
 var sources type list;
 var includes type list;
@@ -42,21 +43,25 @@ function config_basic_ld_deps() : result type none {
 
 hefesto.prologue() {
     hefesto.sys.echo("-- building...\n");
-    # Getting user options if it exists
-    $includes = hefesto.sys.get_option("includes");
-    $libraries = hefesto.sys.get_option("libraries");
-    $ldflags = hefesto.sys.get_option("ldflags");
-    $cflags = hefesto.sys.get_option("cflags");
-    # Setting some basic dependencies needed for a successful linking
-    config_basic_ld_deps();
-    # Now we'll invoke the libhere's forge
-    hefesto.sys.cd("here");
-    hefesto.sys.forge("here", "Forgefile.hls", "");
-    hefesto.sys.cd("..");
-    # If all ok, now we forge the Hefesto app...
-    if (hefesto.sys.last_forge_result() == 0) {
-        hefesto.sys.echo("--\n");
-        $sources.ls(".*\.c$");
+    if (hfst_version_config() == 1) {
+        # Getting user options if it exists
+        $includes = hefesto.sys.get_option("includes");
+        $libraries = hefesto.sys.get_option("libraries");
+        $ldflags = hefesto.sys.get_option("ldflags");
+        $cflags = hefesto.sys.get_option("cflags");
+        # Setting some basic dependencies needed for a successful linking
+        config_basic_ld_deps();
+        # Now we'll invoke the libhere's forge
+        hefesto.sys.cd("here");
+        hefesto.sys.forge("here", "Forgefile.hls", "");
+        hefesto.sys.cd("..");
+        # If all ok, now we forge the Hefesto app...
+        if (hefesto.sys.last_forge_result() == 0) {
+            hefesto.sys.echo("--\n");
+            $sources.ls(".*\.c$");
+        }
+    } else {
+        hefesto.sys.exit(1);
     }
 }
 

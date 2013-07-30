@@ -685,7 +685,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
 
     while (*b != end && *b != 0) {
 
-        for (t = &tok[0]; *b != 0 && *b != '(' && !is_hefesto_blank(*b) && 
+        for (t = &tok[0]; *b != 0 && *b != '(' && !is_hefesto_blank(*b) &&
                           *b != '='; b++, t++) {
             *t = *b;
         }
@@ -905,12 +905,17 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                         b++;
                         while (!is_hefesto_string_tok(*b) && *b != 0) {
                             *t = *b;
-                            t++;
-                            b++;
                             if (*b == '\\') {
                                 *t = *b;
                                 b++;
                                 t++;
+                                *t = *b;
+                                t++;
+                                b++;
+                                *t = 0;
+                            } else {
+                                t++;
+                                b++;
                             }
                         }
                         *t = *b;

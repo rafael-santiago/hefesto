@@ -80,48 +80,59 @@ function set_version_number() : result type int {
 
 function refresh_version_no_h(version_no type string) : result type int {
     var refreshed type int;
-    var version_no_h type file;
+#    var version_no_h type file;
     var buffer type string;
+    var lines type list;
     var byte type string;
     $refreshed = 1;
-    $version_no_h = hefesto.sys.fopen("version_no.h", "r");
-    if ($version_no_h == 0) {
+#    $version_no_h = hefesto.sys.fopen("version_no.h", "r");
+#    if ($version_no_h == 0) {
+#        result 0;
+#    }
+#    hefesto.sys.fread($byte, 1, $version_no_h);
+#    while (hefesto.sys.feof($version_no_h) == 0) {
+#        if ($byte == "#") {
+#            hefesto.sys.fread($byte, 6, $version_no_h);
+#            if ($byte == "define") {
+#                hefesto.sys.fread($byte, 1, $version_no_h);
+#                while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t") {
+#                    hefesto.sys.fread($byte, 1, $version_no_h);
+#                }
+#                $buffer = $byte;
+#                hefesto.sys.fread($byte, 1, $version_no_h);
+#                while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t") {
+#                    $buffer = $buffer + $byte;
+#                    hefesto.sys.fread($byte, 1, $version_no_h);
+#                }
+#                if ($buffer == "VERSION") {
+#                    hefesto.sys.fread($byte, 1, $version_no_h);
+#                    while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t" || $byte == "\"") {
+#                        hefesto.sys.fread($byte, 1, $version_no_h);
+#                    }
+#                    $buffer = $byte;
+#                    hefesto.sys.fread($byte, 1, $version_no_h);
+#                    while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t" && $byte != "\"") {
+#                        $buffer = $buffer + $byte;
+#                        hefesto.sys.fread($byte, 1, $version_no_h);
+#                    }
+#                    break;
+#                }
+#                $buffer = "";
+#            }
+#        }
+#        hefesto.sys.fread($byte, 1, $version_no_h);
+#    }
+#    hefesto.sys.fclose($version_no_h);
+
+    $lines = hefesto.sys.lines_from_file("version_no.h", "#define .*VERSION");
+
+    if ($lines.count() > 0) {
+        $buffer = $lines.item(0);
+        $buffer.replace("#define .*VERSION \"", "");
+        $buffer.replace("\"$", "");
+    } else {
         result 0;
     }
-    hefesto.sys.fread($byte, 1, $version_no_h);
-    while (hefesto.sys.feof($version_no_h) == 0) {
-        if ($byte == "#") {
-            hefesto.sys.fread($byte, 6, $version_no_h);
-            if ($byte == "define") {
-                hefesto.sys.fread($byte, 1, $version_no_h);
-                while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t") {
-                    hefesto.sys.fread($byte, 1, $version_no_h);
-                }
-                $buffer = $byte;
-                hefesto.sys.fread($byte, 1, $version_no_h);
-                while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t") {
-                    $buffer = $buffer + $byte;
-                    hefesto.sys.fread($byte, 1, $version_no_h);
-                }
-                if ($buffer == "VERSION") {
-                    hefesto.sys.fread($byte, 1, $version_no_h);
-                    while ($byte == "\n" || $byte == "\r" || $byte == " " || $byte == "\t" || $byte == "\"") {
-                        hefesto.sys.fread($byte, 1, $version_no_h);
-                    }
-                    $buffer = $byte;
-                    hefesto.sys.fread($byte, 1, $version_no_h);
-                    while ($byte != "\n" && $byte != "\r" && $byte != " " && $byte != "\t" && $byte != "\"") {
-                        $buffer = $buffer + $byte;
-                        hefesto.sys.fread($byte, 1, $version_no_h);
-                    }
-                    break;
-                }
-                $buffer = "";
-            }
-        }
-        hefesto.sys.fread($byte, 1, $version_no_h);
-    }
-    hefesto.sys.fclose($version_no_h);
 
     var curr_major_version type string;
     var curr_minor_version type string;
