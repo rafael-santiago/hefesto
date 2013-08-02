@@ -121,12 +121,20 @@ function hfst_version_config() : result type int {
         } else {
             var version_no_h_ln type list;
             var curr_version type string;
-            $version_no_h_ln = hefesto.sys.lines_from_file("version_no.h", "#define HEFESTO_VERSION .*");
-            if ($version_no_h_ln.count() > 0) {
-                $curr_version = $version_no_h_ln.item(0);
-                $curr_version.replace("#define HEFESTO_VERSION \"", "");
-                $curr_version.replace("\"$", "");
-                $retval = (inc_hfst_version($curr_version, $version_no) > 0);
+            $retval = hefesto.sys.run("git checkout version_no.h");
+            if ($retval == 0) {
+                $version_no_h_ln = hefesto.sys.lines_from_file("version_no.h", "#define HEFESTO_VERSION .*");
+                if ($version_no_h_ln.count() > 0) {
+                    $curr_version = $version_no_h_ln.item(0);
+                    $curr_version.replace("#define HEFESTO_VERSION \"", "");
+                    $curr_version.replace("\"$", "");
+                    $retval = (inc_hfst_version($curr_version, $version_no) > 0);
+                    if ($retval == 1) {
+                        $retval = (hefesto.sys.run("git commit version_no.h -m \"Hefesto version build number increment\"") == 0);
+                    }
+                }
+            } else {
+                hefesto.sys.echo("ERROR: git checkout version_no.h\n");
             }
         }
     }
