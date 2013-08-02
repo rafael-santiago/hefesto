@@ -11,8 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dbg.h"
+#include "version_no.h"
 
-#define HEFESTO_VERSION_INFO         "hefesto-0.1.0"
+#define HEFESTO_VERSION_INFO         "hefesto-"HEFESTO_VERSION
 
 #define HEFESTO_LINUX           0
 #define HEFESTO_WINDOWS         1
