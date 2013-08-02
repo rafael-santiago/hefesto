@@ -130,7 +130,7 @@ function hfst_version_config() : result type int {
                     $curr_version.replace("\"$", "");
                     $retval = (inc_hfst_version($curr_version, $version_no) > 0);
                     if ($retval == 1) {
-                        $retval = (hefesto.sys.run("git commit version_no.h -m \"Hefesto version build number increment\"") == 0);
+                        $retval = (hefesto.sys.run("git commit version_no.h -m \"Build number increment.\"") == 0);
                     }
                 }
             } else {
