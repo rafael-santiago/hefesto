@@ -1,0 +1,90 @@
+include ~/toolsets/null/null.hls
+include ~/fsutil.hls
+
+project hfst-packman : toolset "no-tool-any-set" : 0 ;
+
+function del_temp_tree() : result type none {
+    if (hefesto.sys.os_name() == "linux" ||
+        hefesto.sys.os_name() == "freebsd") {
+        hefesto.sys.run("rm -r tmp/");
+    } else if (hefesto.sys.os_name() == "windows") {
+        hefesto.sys.run("deltree tmp/ /Y");
+    }
+}
+
+function mk_install_dir_structure() : result type int {
+    if (isdir("tmp/") == 1) {
+        del_temp_tree();
+    }
+    hefesto.sys.mkdir("tmp");
+    hefesto.sys.cd("tmp");
+    hefesto.sys.mkdir("bin");
+    hefesto.sys.mkdir("setup");
+    hefesto.sys.mkdir("install");
+    hefesto.sys.mkdir("include");
+    hefesto.sys.mkdir("doc");
+    hefesto.sys.cd("..");
+    if (hefesto.sys.os_name() == "freebsd" ||
+        hefesto.sys.os_name() == "linux") {
+        hefesto.sys.cp("../bin/hefesto", "tmp/bin/hefesto");
+    } else {
+        hefesto.sys.cp("..\\bin\\hefesto.exe", "tmp\\bin\\hefesto.exe");
+    }
+    hefesto.sys.cp("../include", "tmp/include/");
+    hefesto.sys.cp("../doc", "tmp/doc/");
+    hefesto.sys.cp("../setup", "tmp/setup");
+    var install_cmd type string;
+    if (hefesto.sys.os_name() == "linux" ||
+        hefesto.sys.os_name() == "freebsd") {
+        $install_cmd = "../bin/hefesto --forgefiles=../setup/hfst-inst.hls --hfst-inst-projects=hefesto-install";
+    } else {
+        $install_cmd = "@..\bin\hefesto --forgefiles=..\\setup\\hfst-inst.hls --hfst-inst-projects=hefesto-install";
+    }
+    var script type file;
+    if (hefesto.sys.os_name() == "linux" ||
+        hefesto.sys.os_name() == "freebsd") {
+        $script = hefesto.sys.fopen("tmp/install/install.sh", "w");
+    } else if (hefesto.sys.os_name() == "windows") {
+        $script = hefesto.sys.fopen("tmp\\install\\install.bat", "w");
+    } else {
+        $script = 0;
+    }
+    if ($script != 0) {
+        hefesto.sys.fwrite($install_cmd, $install_cmd.len(), $script);
+        hefesto.sys.fclose($script);
+    }
+    result 1;
+}
+
+function mk_pkg() : result type int {
+    var version_no type string;
+    var version_no_ln type list;
+    $version_no_ln = hefesto.sys.lines_from_file("version_no.h", "#define .*HEFESTO_VERSION.*[0123456789]\.[0123456789]\.[0123456789]\.[0123456789]");
+    $version_no = $version_no_ln.item(0);
+    $version_no.replace("#define .*HEFESTO_VERSION.*\"", "");
+    $version_no.replace("\"$", "");
+    var pkg_filename type string;
+    $pkg_filename = "hfst-" + hefesto.sys.os_name() + "-" + $version_no + ".zip";
+    hefesto.sys.cd("tmp");
+    var exit_code type int;
+    $exit_code = hefesto.sys.run("zip -qr " + $pkg_filename + " *");
+    hefesto.sys.cp($pkg_filename, "../../prebuilts/" + $pkg_filename);
+    hefesto.sys.rm($pkg_filename);
+    hefesto.sys.cd("..");
+    del_temp_tree();
+    result ($exit_code == 0);
+}
+
+hfst-packman.prologue() {
+    hefesto.sys.echo("*** Assembling directory structure...\n");
+    if (mk_install_dir_structure() == 1) {
+        hefesto.sys.echo("*** Directory structure assembled.\n");
+        if (mk_pkg() == 1) {
+            hefesto.sys.echo("*** Package generation success.\n");
+        } else {
+            hefesto.sys.echo("ERROR: on package generation.\n");
+        }
+    } else {
+        hefesto.sys.echo("ERROR: on directory structure setup.\n");
+    }
+}

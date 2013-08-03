@@ -79,6 +79,15 @@ hefesto.epilogue() {
                 hefesto.sys.cd("../setup");
                 hefesto.sys.forge("hefesto-install", "hfst-inst.hls", "");
                 hefesto.sys.cd("../src");
+            } else {
+                var releasebuild type list;
+                $releasebuild = hefesto.sys.get_option("release-build");
+                if ($releasebuild.count() > 0) {
+                    hefesto.sys.forge("hfst-packman", "Package.hls", "");
+                    if (hefesto.sys.last_forge_result() != 0) {
+                        hefesto.project.abort(1);
+                    }
+                }
             }
         } else {
             hefesto.sys.echo("-- build failed, please check and try again...\n");

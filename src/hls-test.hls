@@ -91,6 +91,8 @@ mylab.prologue() {
     }
     var buffer type string;
     $buffer.replace("#define .*VERSION\"", ""); # corrigir esse gpf!
+#    hefesto.sys.echo("CPTREE = " + cptree("../include", "include") + "\n");
+    hefesto.sys.cp("../include/", "include/");
     hefesto.sys.echo("*** done.\n");
 }
 
