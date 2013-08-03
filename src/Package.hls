@@ -85,6 +85,6 @@ hfst-packman.prologue() {
             hefesto.sys.echo("ERROR: on package generation.\n");
         }
     } else {
-        hefesto.sys.echo("ERROR: on directory structure setup.\n");
+        hefesto.sys.echo("ERROR: on directory structure creation.\n");
     }
 }
