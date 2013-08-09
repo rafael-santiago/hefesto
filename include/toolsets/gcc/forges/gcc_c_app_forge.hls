@@ -58,6 +58,7 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
     var compile_model type list;
     var is_release type int;
     var curr_src_file type string;
+    var regex type string;
     $size = $sources.count();
     if ($size == 0) result 0;
     $qsize_list = hefesto.sys.get_option("qsize");
@@ -81,7 +82,8 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
         while ($i < $size && $exit_code == 0) {
             $ofile = $sources.item($i);
             $ofile = gcc_mk_ofile_name($ofile);
-            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || gcc_file_exists($ofile) == 0) {
+            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
                 $curr_src_file = $sources.item($i);
                 $exit_code = hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file, $ofile, $includes, $cflags, $is_release));
@@ -102,8 +104,9 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
     } else {
         while ($i < $size) {
             $ofile = $sources.item($i);
-            $ofile = gcc_mk_ofile_name($ofile);
-            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($ofile) == 0) {
+            $ofile = gcc_mk_ofile_name($ofile);            
+            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
                 $curr_src_file = $sources.item($i);
                 $run_list.add_item(gcc_mk_app_compilation_command($curr_src_file, $ofile, $includes, $cflags, $is_release));
@@ -177,7 +180,8 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     hefesto.sys.echo("*** compiling...\n");
 
     $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags); # ver pq nao passa a lista com o total de conteudos correto
-    $regex = "^" + hefesto.sys.make_path(hefesto.sys.pwd(), $APPNAME) + "$";
+    $regex = hefesto.sys.make_path(hefesto.sys.pwd(), $APPNAME);
+    $regex = gcc_mk_regex_pattern_from_filepath($regex);
     if ($gcc_c_project_forge_dirty_files_nr == 0 && hefesto.sys.ls($regex) == 0) {
         $gcc_c_project_forge_dirty_files_nr = 1;
     }

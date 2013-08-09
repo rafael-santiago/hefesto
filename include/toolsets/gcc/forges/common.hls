@@ -120,3 +120,11 @@ function gcc_file_exists(filepath type string) : result type string {
     hefesto.sys.cd($old_cwd);
     result $exists;
 }
+
+function gcc_mk_regex_pattern_from_filepath(filepath type string) : result type string {
+    var retval type string;
+    $retval = "^" + $filepath + "$";
+    $retval.replace("\\\\", "\\\\");
+    $retval.replace("\\.", "\\.");
+    result $retval;
+}
