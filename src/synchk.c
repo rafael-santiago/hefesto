@@ -353,7 +353,7 @@ int synchk_check_language_production(const char *command,
     int result = 0, state;
     char ltok;
     const char *cmd_p = command, *c;
-    char var_name[HEFESTO_MAX_BUFFER_SIZE], *v;
+    char var_name[HEFESTO_MAX_BUFFER_SIZE*10], *v;
     char buf[HEFESTO_MAX_BUFFER_SIZE];
     hefesto_var_list_ctx *vp;
     hefesto_type_t vtype;
@@ -498,6 +498,11 @@ int synchk_check_language_production(const char *command,
                 if (*c == '=') {
                     for (c++; is_hefesto_blank(*c); c++);
                     for (v = &var_name[0]; *c != 0 && *c != ';'; c++, v++) {
+                        if (v > (&var_name[0] +
+                                 (HEFESTO_MAX_BUFFER_SIZE * 10))-1) {
+                            *v = 0;
+                            break;
+                        }
                         *v = *c;
                         if (is_hefesto_string_tok(*c)) {
                             c++;

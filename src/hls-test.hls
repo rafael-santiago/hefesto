@@ -92,7 +92,18 @@ mylab.prologue() {
     var buffer type string;
     $buffer.replace("#define .*VERSION\"", ""); # corrigir esse gpf!
 #    hefesto.sys.echo("CPTREE = " + cptree("../include", "include") + "\n");
-    hefesto.sys.cp("../include/", "include/");
+#    hefesto.sys.cp("../include/", "include/");
+    $buffer = "cassiopeia_statistical_logger_types.c: cassiopeia_statistical_logger.h;" +
+            "cassiopeia_statistical_logger_ctx.c: cassiopeia_statistical_logger_ctx.h;" +
+            "cassiopeia_statistical_logger.c: cassiopeia_statistical_logger.h;" +
+            "cassiopeia_statistical_logger_recall.c: cassiopeia_statistical_logger_recall.h;" +
+            "cassiopeia_statistical_logger_precision.c: cassiopeia_statistical_logger_precision.h;" +
+            "cassiopeia_statistical_logger_coesion.c: cassiopeia_statisticall_logger_coesion.h;" +
+            "cassiopeia_statistical_logger_coupling.c: cassiopeia_statistical_logger_coupling.h;" +
+            "cassiopeia_statistical_logger_fmeasure.c: cassiopeia_statistical_logger_fmeasure.h;" +
+            "cassiopeia_statistical_logger_silhouette_coeficient.c: cassiopeia_statistical_logger_silhouette_coeficient.h;" +
+            "cassiopeia_statistical_logger_metrics_evaluater.c: cassiopeia_statistical_logger_metrics_evaluater.h;" +
+            "cassiopeia_statistical_logger_csv_utils.c: cassiopeia_statistical_logger_csv_utils.h;";
     hefesto.sys.echo("*** done.\n");
 }
 

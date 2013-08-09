@@ -1028,7 +1028,7 @@ static long get_section_end_offset(FILE *fp, const long stop_at) {
 
 char *get_next_expression_from_buffer(const char *buf, size_t *next_pos) {
 
-    char *result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    char *result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE * 10);
     char *r = result;
     const char *b;
     size_t o = 0;
@@ -1207,7 +1207,6 @@ static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
         }
         fseek(fp, 0L, SEEK_SET);
     }
-
     return result;
 
 }
@@ -1284,7 +1283,6 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 fseek(fp, 0L, SEEK_END);
                 file_size = ftell(fp);
                 fseek(fp, 0L, SEEK_SET);
-
                 if (project_curr != NULL) {
                     if (get_project_functions(project_curr, fp, file_size,
                                               gl_vars, functions) == 0) {
