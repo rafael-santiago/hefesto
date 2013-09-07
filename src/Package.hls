@@ -8,7 +8,7 @@ function del_temp_tree() : result type none {
         hefesto.sys.os_name() == "freebsd") {
         hefesto.sys.run("rm -r tmp/");
     } else if (hefesto.sys.os_name() == "windows") {
-        hefesto.sys.run("deltree tmp/ /Y");
+        hefesto.sys.run("rmdir /q /s tmp");
     }
 }
 
@@ -38,7 +38,7 @@ function mk_install_dir_structure() : result type int {
         hefesto.sys.os_name() == "freebsd") {
         $install_cmd = "../bin/hefesto --forgefiles=../setup/hfst-inst.hls --hfst-inst-projects=hefesto-install";
     } else {
-        $install_cmd = "@..\bin\hefesto --forgefiles=..\\setup\\hfst-inst.hls --hfst-inst-projects=hefesto-install";
+        $install_cmd = "@..\\bin\\hefesto --forgefiles=..\\\\setup\\\\hfst-inst.hls --hfst-inst-projects=hefesto-install";
     }
     var script type file;
     if (hefesto.sys.os_name() == "linux" ||

@@ -19,15 +19,15 @@ char *get_next_line_from_file(FILE *fp) {
     if (!feof(fp)) {
         line_start = ftell(fp);
         l = fgetc(fp);
-        while (!feof(fp) && l != '\n') {
+        while (!feof(fp) && l != '\n' && l != '\r') {
             l = fgetc(fp);
-            if (l == '\n') {
+            /*if (l == '\n') {
                 l = fgetc(fp);
                 if (l != '\r') {
                     fseek(fp, ftell(fp) - 1, SEEK_SET);
                 }
                 l = '\n';
-            }
+            }*/
         }
         line_end = ftell(fp);
         if (line_end - line_start > 0) {
@@ -40,7 +40,7 @@ char *get_next_line_from_file(FILE *fp) {
                 lp++;
             }
             lp--;
-            if (*lp == '\n') *lp = 0;
+            if (*lp == '\n' || *lp == '\r') *lp = 0;
         }
     }
     return line;
