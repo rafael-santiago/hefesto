@@ -498,6 +498,8 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
 
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/replace_in_file\n");
 
+    **otype = HEFESTO_VAR_TYPE_INT;
+
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
     arg_file_path = get_arg_from_call(syscall, &offset);
@@ -548,7 +550,6 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
             if ((fp = fopen((char *)file_path, "wb"))) {
                 fwrite(replaced_buffer, 1, osz, fp);
                 fclose(fp);
-                *(int *)result = 1;
             }
         } else {
             *(int *)result = 0;
