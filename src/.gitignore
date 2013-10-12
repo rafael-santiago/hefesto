@@ -1,2 +1,6 @@
-.o
+*.o
+*.a
+*here_unittest
+*hfst-unit
+*main
 Makefile
