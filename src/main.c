@@ -77,8 +77,37 @@ int check_forgefiles_projects_option(hefesto_options_ctx *forgefiles,
     return 1;
 }
 
+hefesto_options_ctx *merge_usr_options_with_ivk(hefesto_options_ctx *usr_opts,
+                                              hefesto_options_ctx *ivk_opts) {
+    char *opt;
+    size_t opt_sz;
+    hefesto_options_ctx *ivk_op;
+    hefesto_common_list_ctx *dp;
+    for (ivk_op = ivk_opts; ivk_op != NULL; ivk_op = ivk_op->next) {
+        if (get_hefesto_options_ctx_option(ivk_op->option, usr_opts) == NULL) {
+            opt_sz = strlen(ivk_op->option) + 1;
+            for (dp = ivk_op->data; dp != NULL; dp = dp->next) {
+                opt_sz += dp->dsize;
+            }
+            opt = (char *) hefesto_mloc(opt_sz + 1);
+            memset(opt, 0, opt_sz + 1);
+            strncpy(opt, ivk_op->option, opt_sz);
+            strcat(opt, "=");
+            for (dp = ivk_op->data; dp != NULL; dp = dp->next) {
+                strcat(opt, (char *)dp->data);
+                if (dp->next != NULL) {
+                    strcat(opt, ",");
+                }
+            }
+            usr_opts = add_option_to_hefesto_options_ctx(usr_opts, opt);
+            free(opt);
+        }
+    }
+    return usr_opts;
+}
+
 int main(int argc, char **argv) {
-    hefesto_options_ctx *o = NULL, *forgefiles, *projects;
+    hefesto_options_ctx *o = NULL, *forgefiles, *projects, *ivk_o = NULL;
     hefesto_common_list_ctx *fp;
     int o_idx, exit_code = 1;
     char *temp;
@@ -87,9 +116,11 @@ int main(int argc, char **argv) {
         o = add_option_to_hefesto_options_ctx(o, argv[o_idx]);
     }
 
-    if (o == NULL) {
-        o = get_options_from_ivk_file();
-    }
+    ivk_o = get_options_from_ivk_file();
+
+    o = merge_usr_options_with_ivk(o, ivk_o);
+
+    del_hefesto_options_ctx(ivk_o);
 
     if (o != NULL) {
 

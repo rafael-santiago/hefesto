@@ -2288,7 +2288,7 @@ static char *get_next_word_or_string_from_file(FILE *fp, long stop_at) {
                 }
                 if (*s == '\n') inc_current_line_number(); //+
                 if (is_hefesto_blank(*s) || is_hefesto_comment(*s) ||
-                    *s == ',') break;
+                    *s == ',' || *s == ';') break;
                 s++;
             }
         }

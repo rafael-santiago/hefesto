@@ -873,7 +873,7 @@ hefesto-install.prologue() {
             hefesto.sys.echo("\n==================== Hefesto is already installed, uninstalling the older version to install the newest...");
             hefesto.sys.echo("\n====================\n\n");
             var uninstall_cmd type string;
-            $uninstall_cmd = "hefesto --forgefiles=" + hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls");
+            $uninstall_cmd = "hefesto --forgefiles=" + hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls") + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;
             if (hefesto.sys.os_name() == "windows") {
                 var u type int;
                 var temp type string;
@@ -886,7 +886,7 @@ hefesto-install.prologue() {
                 }
                 $uninstall_cmd = $temp;
             }
-            $uninstall_cmd = $uninstall_cmd + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;            
+#            $uninstall_cmd = $uninstall_cmd + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;            
             if (hefesto.sys.run($uninstall_cmd) != 0) {
                 hefesto.sys.exit(1);
             }

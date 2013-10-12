@@ -4,4 +4,4 @@
 # It allows you to invoke the forge just typing "hefesto".
 #
 
---forgefiles=Forgefile.hls --Forgefile-projects=hefesto
+--forgefiles=Forgefile.hls --Forgefile-projects=hefesto --compile-model=release --link-model=shared
