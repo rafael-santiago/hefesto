@@ -14,7 +14,7 @@
 
 char *get_os_name() {
 
-    char *result;
+    char *result = NULL;
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     result = (char *) hefesto_mloc(8);
     strncpy(result, "windows", 7);

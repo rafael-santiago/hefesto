@@ -17,6 +17,7 @@
 #include "hlsc_msg.h"
 #include "synchk.h"
 #include "exprchk.h"
+#include "os_detect.h"
 
 static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
                                       int *errors,
@@ -130,6 +131,8 @@ static int check_helpers_decl_section(FILE *fp, long file_size,
 
 static int check_forge_helpers(char *tok, FILE *fp, const long file_size,
                                const char *toolset_name);
+
+static int should_include_file(const char *inc_on_list);
 
 static int current_line_nr = 1;
 static char current_compile_input[HEFESTO_MAX_BUFFER_SIZE] = "";
@@ -2407,6 +2410,31 @@ static char *expand_include_file_name(const char *file_path,
 
 }
 
+static int should_include_file(const char *inc_on_list) {
+    char os_name[HEFESTO_MAX_BUFFER_SIZE];
+    char *cur_os_name = get_os_name();
+    const char *i;
+    int should_inc = 0;
+    size_t o;
+    o = 0;
+    for (i = inc_on_list; *i != 0 && !should_inc; i++) {
+        if (*i == ',' || *(i+1) == 0) {
+            if (*(i+1) == 0) {
+                os_name[o] = *i;
+                o = (o + 1) % sizeof(os_name);
+            }
+            os_name[o] = 0;
+            should_inc = (strcmp(os_name, cur_os_name) == 0);
+            o = 0;
+        } else {
+            os_name[o] = *i;
+            o = (o + 1) % sizeof(os_name);
+        }
+    }
+    free(cur_os_name);
+    return should_inc;
+}
+
 static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
                                         hefesto_common_list_ctx *incl_list,
                                                                 int *error, 
@@ -2414,7 +2442,8 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
 
     FILE *fp;
     char *tok, *t, *include_file;
-    long stop_at;
+    long stop_at, temp_offset;
+    int should_include = 1;
 
     if (!(fp = fopen(file_path, "rb"))) {
         hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_INCL_IO_ERROR, file_path);
@@ -2431,6 +2460,37 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
     while (!feof(fp) && *error == 0) {
         if (strcmp(tok, "include") == 0) {
             free(tok);
+            temp_offset = ftell(fp);
+            tok = get_next_word_or_string_from_file(fp, stop_at);
+            if (strcmp(tok, "on") == 0) {
+                free(tok);
+                tok = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+                memset(tok, 0, HEFESTO_MAX_BUFFER_SIZE);
+                t = tok;
+                *t = fgetc(fp);
+                while (is_hefesto_blank(*t)) *t = fgetc(fp);
+                t++;
+                while (1) {
+                    *t = fgetc(fp);
+                    if (*t != ',' && !is_hefesto_blank(*t)) {
+                        t++;
+                        *t = fgetc(fp);
+                    }
+                    if (*t == ',') {
+                        t++;
+                        *t = fgetc(fp);
+                        while (is_hefesto_blank(*t)) *t = fgetc(fp);
+                    } else if (is_hefesto_blank(*t)) {
+                        break;
+                    }
+                    t++;
+                }
+                *t = 0;
+                should_include = should_include_file(tok);
+            } else {
+                fseek(fp, temp_offset, SEEK_SET);
+            }
+            free(tok);
             tok = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
             t = tok;
             *t = fgetc(fp);
@@ -2438,31 +2498,35 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
             t++;
             while (*(t-1) != '\n' && *(t-1) != '\r' &&
                    *(t-1) != '#' && !feof(fp) &&
-                   t < (tok + HEFESTO_MAX_BUFFER_SIZE)) {
+                t < (tok + HEFESTO_MAX_BUFFER_SIZE)) {
                 *t = fgetc(fp);
                 t++;
             }
             *(t-1) = 0;
-            if (*tok == 0) {
-                *error = 1;
-                hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_NULL_INCL_FILE, file_path);
-            } else {
-                include_file = expand_include_file_name(tok,
-                                                        hefesto_usr_inc_dir);
-                if (get_hefesto_common_list_ctx_content(include_file,
-                                                        HEFESTO_VAR_TYPE_STRING,
-                                                        incl_list) == NULL) {
-                    if (*include_file != 0) {
-                        incl_list = add_data_to_hefesto_common_list_ctx(incl_list,
-                                                                        include_file,
-                                                               strlen(include_file));
-                    } else {
-                        hlsc_info(HLSCM_MTYPE_GENERAL,
-                                  HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
-                                  tok, include_file);
-                        *error = 1;
+            if (should_include) {
+                if (*tok == 0) {
+                    *error = 1;
+                    hlsc_info(HLSCM_MTYPE_GENERAL,
+                              HLSCM_NULL_INCL_FILE, file_path);
+                } else {
+                    include_file = expand_include_file_name(tok,
+                                                            hefesto_usr_inc_dir);
+                    if (get_hefesto_common_list_ctx_content(include_file,
+                                                 HEFESTO_VAR_TYPE_STRING,
+                                                    incl_list) == NULL) {
+                        if (*include_file != 0) {
+                            incl_list =
+                                add_data_to_hefesto_common_list_ctx(incl_list,
+                                                                 include_file,
+                                                         strlen(include_file));
+                        } else {
+                            hlsc_info(HLSCM_MTYPE_GENERAL,
+                                      HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
+                                      tok, include_file);
+                            *error = 1;
+                        }
+                        free(include_file);
                     }
-                    free(include_file);
                 }
             }
         }
