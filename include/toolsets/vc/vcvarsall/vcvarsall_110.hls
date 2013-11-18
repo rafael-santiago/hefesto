@@ -16,12 +16,14 @@
 #       or empty (attempts to detect the machine architecture).
 #
 
+include ~/toolsets/vc/common/vssetuputils.hls
+
 function vc110_vcvarsall(hwtype type string) : result type int
 {
     var exit_code type int;
     var already_done type string;
     $already_done = hefesto.sys.env("HFSTVS110VCVARSALLWASHERE");
-    if ($already_done == "1") {        
+    if ($already_done == "1") {
         result 0;
     }
     $exit_code = 1;
@@ -51,21 +53,6 @@ function vc110_vcvarsall(hwtype type string) : result type int
     result $exit_code;
 }
 
-function get_cpu_architecture() : result type string
-{
-    var cpu_arch type list;
-    $cpu_arch = hefesto.sys.get_option("cpu-arch");
-    if ($cpu_arch.count() > 0) {
-        result $cpu_arch.item(0);
-    }
-    var arch_from_reg type string;
-    $arch_from_reg = hefesto.sys.env("WINREG:HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment\\PROCESSOR_ARCHITECTURE");
-    if ($arch_from_reg != "x86") {
-        $arch_from_reg = "x64";
-    }
-    result $arch_from_reg;
-}
-
 function set_visual_studio_version(version type string) : result type int
 {
     result hefesto.sys.setenv("VisualStudioVersion", $version);
@@ -73,56 +60,56 @@ function set_visual_studio_version(version type string) : result type int
 
 function vs110_vcvars64_amd64() : result type int
 {
-    
+
     var temp type string;
     var mtype type list;
-    
+
     $temp = hefesto.sys.env("VS110COMNTOOLS");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS Common Tools folder.\n");
         result 1;
     }
-    
+
     $mtype.add_item("No32bit");
     $mtype.add_item("64bit");
-    
+
     vcvars_query_registry($mtype);
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS installation.\n");
         result 1;
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VC installation.\n");
         result 1;
     }
-    
+
     $temp = hefesto.sys.env("FrameworkDir64");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 64bit installation.\n");
         result 1;
     }
     hefesto.sys.setenv("FrameworkDir", $temp);
-    
+
     $temp = hefesto.sys.env("FrameworkVersion64");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 64bit installation.\n");
         result 1;
     }
     hefesto.sys.setenv("FrameworkVersion", $temp);
-    
+
     $temp = hefesto.sys.env("Framework35Version");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the .NET Framework 3.5 version.\n");
-        result 1;        
+        result 1;
     }
-    
+
     var aux type string;
     var aux2 type string;
-    
+
     $temp = hefesto.sys.env("WindowsSdkDir_old");
     if ($temp.len() > 0) {
         $temp = hefesto.sys.env("PATH");
@@ -130,14 +117,14 @@ function vs110_vcvars64_amd64() : result type int
         $temp = hefesto.sys.make_path($temp, "bin\\NETFX 4.0 Tools\\x64") + ";" + $aux + "x64" + ";" + hefesto.sys.make_path($aux, "bin\\NETFX 4.0 Tools") + ";" + $aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-  
+
     $temp = hefesto.sys.env("WindowsSdkDir");
     if ($temp.len() > 0) {
         $aux = hefesto.sys.env("PATH");
         $aux = hefesto.sys.make_path($temp, "bin\\x64") + ";" + hefesto.sys.make_path($temp, "bin\\x86") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
         $aux = hefesto.sys.env("INCLUDE");
-        $aux = hefesto.sys.make_path($temp, "include\\shared") + ";" + hefesto.sys.make_path($temp, "include\\um") + ";" + hefesto.sys.make_path($temp, "include\\winrt") + ";" + aux;
+        $aux = hefesto.sys.make_path($temp, "include\\shared") + ";" + hefesto.sys.make_path($temp, "include\\um") + ";" + hefesto.sys.make_path($temp, "include\\winrt") + ";" + $aux;
         hefesto.sys.setenv("INCLUDE", $aux);
         $aux = hefesto.sys.env("LIB");
         $aux = hefesto.sys.make_path($temp, "lib\\win8\\um\\x64") + ";" + $aux;
@@ -147,7 +134,7 @@ function vs110_vcvars64_amd64() : result type int
         $aux = hefesto.sys.make_path($temp, "References\\CommonConfiguration\\Neutral") + ";" + hefesto.sys.make_path($aux2, "\\Microsoft.VCLibs\\11.0\\References\\CommonConfiguration\\neutral") + ";" + $aux;
         hefesto.sys.setenv("LIBPATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "Team Tools\\Performance Tools\\x64");
     if (vspath_exists($temp) == 1) {
@@ -165,7 +152,7 @@ function vs110_vcvars64_amd64() : result type int
         $aux = hefesto.sys.make_path($temp, "\\HTML Help Workshop") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("ProgramFiles(x86)");
     $temp = hefesto.sys.make_path($temp, "\\HTML Help Workshop");
     if (vspath_exists($temp) == 1) {
@@ -174,34 +161,34 @@ function vs110_vcvars64_amd64() : result type int
         $aux = hefesto.sys.make_path($temp, "\\HTML Help Workshop") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
-    
+
     $aux = hefesto.sys.env("PATH");
     $aux = hefesto.sys.make_path($temp, "Common7\\Tools") + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.env("PATH");
     $aux = hefesto.sys.make_path($temp, "Common7\\IDE") + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.env("PATH");
     $aux = hefesto.sys.make_path($temp, "VCPackages") + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.env("PATH");
     $aux2 = hefesto.sys.make_path("FrameworkDir", hefesto.sys.env("Framework35Version")) + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux2);
-    
+
     $aux = hefesto.sys.env("PATH");
     $aux2 = hefesto.sys.make_path("FrameworkDir", hefesto.sys.env("FrameworkVersion")) + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux2);
-    
+
     $aux = hefesto.sys.env("PATH");
     $aux = hefesto.sys.make_path($temp, "BIN\\amd64") + ";" + $aux;
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow");
     if (vspath_exists($temp) == 1) {
@@ -210,28 +197,28 @@ function vs110_vcvars64_amd64() : result type int
         $aux = hefesto.sys.make_path($temp, "Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\INCLUDE");
     if (vspath_exists($temp) == 1) {
         $temp = hefesto.sys.env("VCINSTALLDIR");
         $aux = hefesto.sys.env("INCLUDE");
         $aux = hefesto.sys.make_path($temp, "ATLMFC\\INCLUDE") + ";" + $aux;
-        hefesto.sys.setenv("INCLUDE", $aux);        
+        hefesto.sys.setenv("INCLUDE", $aux);
     }
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.env("INCLUDE");
     $aux = hefesto.sys.make_path($temp, "INCLUDE") + ";" + $aux;
-    
+
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\LIB\\amd64");
     if (vspath_exists($temp) == 1) {
         $aux = $temp + ";" + hefesto.sys.env("LIB");
-        hefesto.sys.setenv("LIB", $aux);       
+        hefesto.sys.setenv("LIB", $aux);
     }
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "LIB\\amd64") + ";" + hefesto.sys.env("LIB");
     hefesto.sys.setenv("LIB", $aux);
-    
+
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\LIB\\amd64");
     if (vspath_exists($temp) == 1) {
         $aux = $temp + ";" + hefesto.sys.env("LIBPATH");
@@ -240,17 +227,17 @@ function vs110_vcvars64_amd64() : result type int
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "LIB\\amd64") + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $aux);
-    
+
     $aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("Framework35Version")) + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $aux);
-    
+
     $aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("FrameworkVersion")) + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $aux);
-    
+
     hefesto.sys.setenv("Platform", "X64");
-    
+
     hefesto.sys.setenv("CommandPromptType", "Native");
-    
+
     result 0;
 }
 
@@ -259,152 +246,152 @@ function vs110_vcvars_arm() : result type int
 
     var temp type string;
     var mtype type list;
-    
+
     $temp = hefesto.sys.env("VS110COMNTOOLS");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS Common Tools folder.\n");
         result 1;
     }
-    
+
     $mtype.add_item("32bit");
     $mtype.add_item("64bit");
     vcvars_query_registry($mtype);
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS installation.\n");
         result 1;
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VC installation.\n");
         result 1;
     }
-    
+
     $temp = hefesto.sys.env("FrameworkDir32");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 32bit installation.\n");
         result 1;
     }
     hefesto.sys.setenv("FrameworkDir32", $temp);
-    
+
     $temp = hefesto.sys.env("FrameworkVersion32");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 32bit installation.\n");
         result 1;
     }
     hefesto.sys.setenv("FrameworkDir32", $temp);
-    
+
     $temp = hefesto.sys.env("FrameworkDir64");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 64bit installation.\n");
         result 1;
     }
-        
+
     $temp = hefesto.sys.env("FrameworkVersion64");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 64bit installation.\n");
         result 1;
     }
-    
+
     $temp = hefesto.sys.env("Framework35Version");
     if ($temp.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the .NET Framework 3.5 version.\n");
         result 1;
     }
-    
+
     var aux type string;
     var aux2 type string;
-    
+
     $temp = hefesto.sys.env("WindowsSdkDir_old");
     if ($temp.len() > 0) {
         $aux = hefesto.sys.env("PATH");
         $aux = hefesto.sys.make_path($temp, "bin\\NETFX 4.0 Tools") + ";" + hefesto.sys.make_path($temp, "bin") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("WindowsSdkDir");
     if ($temp.len() > 0) {
         $aux = hefesto.sys.env("PATH");
         $aux = hefesto.sys.make_path($temp, "bin\\x86") + ";" + $aux;
         hefesto.sys.setenv("PATH", $aux);
-        
+
         $aux = hefesto.sys.env("INCLUDE");
-        $aux = hefesto.sys.make_path($temp, "include\\shared") + ";" hefesto.sys.make_path($temp, "include\\um") + ";" + hefesto.sys.make_path($temp, "include\\winrt") + ";" + $aux;
+        $aux = hefesto.sys.make_path($temp, "include\\shared") + ";" + hefesto.sys.make_path($temp, "include\\um") + ";" + hefesto.sys.make_path($temp, "include\\winrt") + ";" + $aux;
         hefesto.sys.setenv("INCLUDE", $aux);
-        
+
         $aux = hefesto.sys.env("LIB");
         $aux = hefesto.sys.make_path($temp, "lib\\win8\\um\\ARM") + ";" + $aux;
         hefesto.sys.setenv("LIB", $aux);
-        
+
         $aux = hefesto.sys.env("LIBPATH");
         $aux2 = hefesto.sys.env("ExtensionSDKDir");
         $aux = hefesto.sys.make_path($temp, "References\\CommonConfiguration\\Neutral") + ";" + hefesto.sys.make_path($aux2, "\\Microsoft.VCLibs\\11.0\\References\\CommonConfiguration\\neutral") + ";" + $aux;
         hefesto.sys.setenv("LIBPATH", $aux);       
     }
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "Common7\\IDE\\");
     hefesto.sys.setenv("DevEnvDir", $aux);
-    
+
     $aux = hefesto.sys.make_path($temp, "Team Tools\\Performance Tools");
     if (vspath_exists($aux) == 1) {
         $aux = $aux + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("ProgramFiles");
     $aux = hefesto.sys.make_path($temp, "\\HTML Help Workshop");
     if (vspath_exists($aux) == 1) {
         $aux = $aux + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("ProgramFiles(x86)");
     $aux = hefesto.sys.make_path($temp, "HTML Help Workshop");
     if (vspath_exists($aux) == 1) {
         $aux = $aux + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "VCPackages") + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("Framework35Version")) + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("FrameworkVersion")) + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $temp = hefesto.sys.env("VSINSTALLDIR");
-    $aux = hefesto.sys.env($temp, "Common7\\Tools") + ";" + hefesto.sys.env("PATH");
+    $aux = hefesto.sys.make_path($temp, "Common7\\Tools") + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "BIN") + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.make_path($temp, "BIN\\x86_ARM") + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $aux = hefesto.sys.env("DevEnvDir") + ";" + hefesto.sys.env("PATH");
     hefesto.sys.setenv("PATH", $aux);
-    
+
     $temp = hefesto.sys.env("FSHARPINSTALLDIR");
     if ($temp.len() > 0) {
         $aux = $temp + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("DevEnvDir");
     $temp = hefesto.sys.make_path($temp, "CommonExtensions\\Microsoft\\TestWindow");
     if (vspath_exists($temp) == 1) {
         $aux = $temp + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\INCLUDE");
     if (vspath_exists($temp) == 1) {
@@ -414,44 +401,44 @@ function vs110_vcvars_arm() : result type int
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $aux = hefesto.sys.make_path($temp, "INCLUDE") + ";" + hefesto.sys.env("INCLUDE");
     hefesto.sys.setenv("INCLUDE", $aux);
-    
+
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\LIB\\ARM");
     if (vspath_exists($temp) == 1) {
         $aux = $temp + ";" + hefesto.sys.env("LIB");
         hefesto.sys.setenv("LIB", $aux);
     }
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "LIB\\ARM");
     hefesto.sys.setenv("LIB", $temp);
-    
+
     $temp = hefesto.sys.env("VCINSTALLDIR");
     $temp = hefesto.sys.make_path($temp, "ATLMFC\\LIB\\ARM");
     if (vspath_exists($temp) == 1) {
         $aux = $temp + ";" + hefesto.sys.env("LIBPATH");
         hefesto.sys.setenv("LIBPATH", $aux);
     }
-    
+
     $temp = hefesto.sys.env("LIBPATH");
     $temp = hefesto.sys.make_path($temp, "LIB\\ARM") + ";" + hefesto.sys.env("LIBPATH");
-    hefesto.sys.env("LIBPATH", $temp);
-    
+    hefesto.sys.setenv("LIBPATH", $temp);
+
     $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("Framework35Version")) + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("FrameworkVersion")) + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $temp);
-    
-    $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64", "\\Framework35Version")) + ";" + hefesto.sys.env("LIBPATH");
+
+    $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64"), "\\Framework35Version") + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $temp);
-    
-    $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64", "\\FrameworkVersion")) + ";" + hefesto.sys.env("LIBPATH");
+
+    $temp = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64"), "\\FrameworkVersion") + ";" + hefesto.sys.env("LIBPATH");
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     hefesto.sys.setenv("Platform", "ARM");
-    
+
     hefesto.sys.setenv("CommandPromptType", "Cross");
-    
+
     result 0;
 }
 
@@ -459,92 +446,92 @@ function vs110_vcvars_x86_arm() : result type int
 {
     var mtype type list;
     var s_aux type string;
-    
+
     $s_aux = hefesto.sys.env("VS110COMNTOOLS");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS Common Tools folder.\n");
         result 1;
     }
-       
+
     $mtype.add_item("32bit");
     $mtype.add_item("64bit");
-    
+
     vcvars_query_registry($mtype);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS installation.\n");
         result 1;
-    }    
-    
+    }
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VC installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir64");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 64bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion64");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 64bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("Framework35Version");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the .NET Framework 3.5 version.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
     hefesto.sys.setenv("FrameworkDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
     hefesto.sys.setenv("FrameworkVersion", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("WindowsSdkDir_old");
-    
+
     var temp type string;
-    
+
     if ($s_aux.len() > 0) {
         $s_aux = hefesto.sys.make_path($s_aux, "bin\\NETFX 4.0 Tools") + ";" + hefesto.sys.make_path($s_aux, "bin");
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
-        hefesto.sys.setenv("PATH", $temp);        
+        hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("WindowsSdkDir");
     if ($s_aux.len() > 0) {
         $temp = hefesto.sys.env("PATH");
         $s_aux = hefesto.sys.make_path($s_aux, "bin\\x86");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "include\\shared") + ";" +
                  hefesto.sys.make_path($s_aux, "include\\um") + ";" +
@@ -552,13 +539,13 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = hefesto.sys.env("INCLUDE");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("INCLUDE", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "lib\\win8\\um\\ARM");
         $temp = hefesto.sys.env("LIB");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIB", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "References\\CommonConfiguration\\Neutral");
         $temp = hefesto.sys.env("LIBPATH");
@@ -566,13 +553,13 @@ function vs110_vcvars_x86_arm() : result type int
         $s_aux = hefesto.sys.env("ExtensionSDKDir");
         $s_aux = hefesto.sys.make_path($s_aux, "\\Microsoft.VCLibs\\11.0\\References\\CommonConfiguration\\neutral");
         $temp = $s_aux + ";" + $temp;
-        hefesto.sys.setenv("LIBPATH", $temp);        
+        hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Common7\\IDE");
     hefesto.sys.setenv("DevEnvDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Team Tools\\Performance Tools");
     if (vspath_exists($s_aux) == 1) {
@@ -580,7 +567,7 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("ProgramFiles");
     $s_aux = hefesto.sys.make_path($s_aux, "\\HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
@@ -588,7 +575,7 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("ProgramFiles(x86)");
     $s_aux = hefesto.sys.make_path($s_aux, "\\HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
@@ -596,55 +583,55 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "VCPackages");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Common7\\Tools");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "BIN");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "BIN\\x86_ARM");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("DevEnvDir");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
- 
+
     $s_aux = hefesto.sys.env("FSHARPINSTALLDIR");
     if ($s_aux.len() > 0) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("DevEnvDir");
     $s_aux = hefesto.sys.make_path($s_aux, "CommonExtensions\\Microsoft\\TestWindow");
     if (vspath_exists($s_aux) == 1) {
@@ -652,7 +639,7 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\INCLUDE");
     if (vspath_exists($s_aux) == 1) {
@@ -660,13 +647,13 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("INCLUDE", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "INCLUDE");
     $temp = hefesto.sys.env("INCLUDE");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("INCLUDE", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\LIB\\ARM");
     if (vspath_exists($s_aux) == 1) {
@@ -674,13 +661,13 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIB", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "LIB\\ARM");
     $temp = hefesto.sys.env("LIB");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIB", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\LIB\\ARM");
     if (vspath_exists($s_aux) == 1) {
@@ -688,41 +675,41 @@ function vs110_vcvars_x86_arm() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "LIB\\ARM");
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir64");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir64");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     hefesto.sys.setenv("Platform", "ARM");
-    
+
     hefesto.sys.setenv("CommandPromptType", "Cross");
- 
+
     result 0;
 }
 
@@ -730,75 +717,75 @@ function vs110_vcvars_x86_amd64() : result type int
 {
     var mtype type list;
     var s_aux type string;
-    
+
     $s_aux = hefesto.sys.env("VS110COMNTOOLS");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS Common Tools folder.\n");
         result 1;
     }
-       
+
     $mtype.add_item("32bit");
     $mtype.add_item("64bit");
-    
+
     vcvars_query_registry($mtype);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VC installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir64");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 64bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion64");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 64bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("Framework35Version");
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the .NET Framework 3.5 version.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
     hefesto.sys.setenv("FrameworkDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
     hefesto.sys.setenv("FrameworkVersion", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("WindowsSdkDir_old");
     if ($s_aux.len() > 0) {
         $s_aux = hefesto.sys.make_path($s_aux, "bin\\NETFX 4.0 Tools");
         $s_aux = $s_aux + ";" + hefesto.sys.env("WindowsSdkDir_35") + ";" + hefesto.sys.env("PATH");
         hefesto.sys.setenv("PATH", $s_aux);
     }
-    
+
     $s_aux = hefesto.sys.env("WindowsSdkDir");
     if ($s_aux.len() > 0) {
         var temp type string;
@@ -806,155 +793,155 @@ function vs110_vcvars_x86_amd64() : result type int
         $s_aux = hefesto.sys.make_path($s_aux, "bin\\x86") + ";" +
                  $temp;
         hefesto.sys.setenv("PATH", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "include\\shared") + ";" +
                  hefesto.sys.make_path($s_aux, "include\\um") + ";" +
                  hefesto.sys.make_path($s_aux, "include\\winrt") + ";" +
                  hefesto.sys.env("INCLUDE");
         hefesto.sys.setenv("INCLUDE", $s_aux);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "lib\\win8\\um\\x64") + ";" +
                  hefesto.sys.env("LIB");
         hefesto.sys.setenv("LIB", $s_aux);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $s_aux = hefesto.sys.make_path($s_aux, "References\\CommonConfiguration\\Neutral") + ";" +
                  hefesto.sys.make_path(hefesto.sys.env("ExtensionSDKDir"), "\\Microsoft.VCLibs\\11.0\\References\\CommonConfiguration\\neutral") + ";" +
                  hefesto.sys.env("LIBPATH");
         hefesto.sys.setenv("LIBPATH", $s_aux);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VSINSTALLDIR"), "Common7\\IDE");
     hefesto.sys.setenv("DevEnvDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VSINSTALLDIR"), "Team Tools\\Performance Tools");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("ProgramFiles"), "\\HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("ProgramFiles(x86)"), "HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "VCPackages");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VSINSTALLDIR"), "Common7\\Tools");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "BIN");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "BIN\\x86_amd64");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("DevEnvDir");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FSHARPINSTALLDIR");
     if ($s_aux.len() > 0) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("DevEnvDir"), "CommonExtensions\\Microsoft\\TestWindow");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "ATLMFC\\INCLUDE");
     if ($s_aux.len() > 0) {
         $temp = hefesto.sys.env("INCLUDE");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("INCLUDE", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "INCLUDE");
     $temp = hefesto.sys.env("INCLUDE");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("INCLUDE", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "ATLMFC\\LIB\\amd64");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("LIB");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIB", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "LIB\\amd64");
     $temp = hefesto.sys.env("LIB");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIB", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "ATLMFC\\LIB\\amd64");
     if (vspath_exists($s_aux) == 1) {
         $temp = hefesto.sys.env("LIBPATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("VCINSTALLDIR"), "LIB\\amd64");
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir"), hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64"), hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.make_path(hefesto.sys.env("FrameworkDir64"), hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     hefesto.sys.setenv("Platform", "x64");
     hefesto.sys.setenv("CommandPromptType", "Cross");
 
@@ -965,85 +952,85 @@ function vs110_vcvars32_x86() : result type int
 {
     var mtype type list;
     var s_aux type string;
-    
+
     $s_aux = hefesto.sys.env("VS110COMNTOOLS");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS Common Tools folder.\n");
         result 1;
     }
-       
+
     $mtype.add_item("32bit");
     $mtype.add_item("No64bit");
-    
+
     vcvars_query_registry($mtype);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the VS installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the location of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the version of the .NET Framework 32bit installation.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("Framework35Version");
-    
+
     if ($s_aux.len() == 0) {
         hefesto.sys.echo("ERROR: Cannot determine the .NET Framework 3.5 version.\n");
         result 1;
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir32");
-    
+
     hefesto.sys.setenv("FrameworkDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("FrameworkVersion32");
-    
+
     hefesto.sys.setenv("FrameworkVersion32", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("WindowsSdkDir_old");
-    
+
     var temp type string;
-    
+
     if ($s_aux.len() > 0) {
         $s_aux = hefesto.sys.make_path($s_aux, "\\bin\\NETFX 4.0 Tools");
-        $temp = hefesto.sys.env("WindowsSdkDir_35");        
-        $s_aux = $s_aux + ";" + $temp;        
+        $temp = hefesto.sys.env("WindowsSdkDir_35");
+        $s_aux = $s_aux + ";" + $temp;
         $temp = hefesto.sys.env("PATH");
-        $s_aux = $s_aux + ";" + $temp;        
+        $s_aux = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $s_aux);
-                           
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
-        $temp = hefesto.sys.make_path($s_aux, "include\\shared");        
+        $temp = hefesto.sys.make_path($s_aux, "include\\shared");
         $s_aux = hefesto.sys.env("WindowsSdkDir");
-        $s_aux = hefesto.sys.make_path($s_aux, "include\\um");        
-        $temp = $temp + ";" + $s_aux;        
+        $s_aux = hefesto.sys.make_path($s_aux, "include\\um");
+        $temp = $temp + ";" + $s_aux;
         $s_aux = hefesto.sys.env("WindowsSdkDir");
-        $s_aux = hefesto.sys.make_path($s_aux, "include\\winrt");        
-        $temp = $temp + ";" + $s_aux;        
-        $s_aux = hefesto.sys.env("INCLUDE");        
+        $s_aux = hefesto.sys.make_path($s_aux, "include\\winrt");
+        $temp = $temp + ";" + $s_aux;
+        $s_aux = hefesto.sys.env("INCLUDE");
         $temp = $temp + ";" + $s_aux;
         hefesto.sys.setenv("INCLUDE", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $temp = hefesto.sys.make_path($s_aux, "lib\\win8\\um\\x86");
         $s_aux = hefesto.sys.env("LIB");
         $temp = $temp + ";" + $s_aux;
         hefesto.sys.setenv("LIB", $temp);
-        
+
         $s_aux = hefesto.sys.env("WindowsSdkDir");
         $temp = hefesto.sys.make_path($s_aux, "References\\CommonConfiguration\\Neutral");
         $s_aux = hefesto.sys.env("ExtensionSDKDir");
@@ -1053,11 +1040,11 @@ function vs110_vcvars32_x86() : result type int
         $temp = $temp + ";" + $s_aux;
         hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Common7\\IDE");
     hefesto.sys.setenv("DevEnvDir", $s_aux);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Team Tools\\Performance Tools");
     if (vspath_exists($s_aux) == 1) {
@@ -1065,7 +1052,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("ProgramFiles");
     $s_aux = hefesto.sys.make_path($s_aux, "\\HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
@@ -1073,7 +1060,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("ProgramFiles(x86)");
     $s_aux = hefesto.sys.make_path($s_aux, "\\HTML Help Workshop");
     if (vspath_exists($s_aux) == 1) {
@@ -1081,7 +1068,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "\\VCPackages");
     if (vspath_exists($s_aux) == 1) {
@@ -1089,26 +1076,26 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $temp = hefesto.sys.env("PATH");    
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "Common7\\Tools");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "BIN");
     if (vspath_exists($s_aux) == 1) {
@@ -1116,12 +1103,12 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("DevEnvDir");
     $temp = hefesto.sys.env("PATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("PATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("VSINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "VSTSDB\\Deploy");
     if (vspath_exists($s_aux) == 1) {
@@ -1129,14 +1116,14 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("FSHARPINSTALLDIR");
     if ($s_aux.len() > 0) {
         $temp = hefesto.sys.env("PATH");
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("DevEnvDir");
     $s_aux = hefesto.sys.make_path($s_aux, "CommonExtensions\\Microsoft\\TestWindow");
     if (vspath_exists($s_aux) == 1) {
@@ -1144,7 +1131,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("PATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\INCLUDE");
     if (vspath_exists($s_aux) == 1) {
@@ -1152,7 +1139,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("INCLUDE", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "INCLUDE");
     if (vspath_exists($s_aux) == 1) {
@@ -1160,7 +1147,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("INCLUDE", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\LIB");
     if (vspath_exists($s_aux) == 1) {
@@ -1168,7 +1155,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIB", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "LIB");
     if (vspath_exists($s_aux) == 1) {
@@ -1176,7 +1163,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIB", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "ATLMFC\\LIB");
     if (vspath_exists($s_aux) == 1) {
@@ -1184,7 +1171,7 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("VCINSTALLDIR");
     $s_aux = hefesto.sys.make_path($s_aux, "LIB");
     if (vspath_exists($s_aux) == 1) {
@@ -1192,43 +1179,31 @@ function vs110_vcvars32_x86() : result type int
         $temp = $s_aux + ";" + $temp;
         hefesto.sys.setenv("LIBPATH", $temp);
     }
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("Framework35Version"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
+
     $s_aux = hefesto.sys.env("FrameworkDir");
     $s_aux = hefesto.sys.make_path($s_aux, hefesto.sys.env("FrameworkVersion"));
     $temp = hefesto.sys.env("LIBPATH");
     $temp = $s_aux + ";" + $temp;
     hefesto.sys.setenv("LIBPATH", $temp);
-    
-    result 0;
-}
 
-function vspath_exists(path type string) : result type int
-{
-    var old_pwd type string;
-    $old_pwd = hefesto.sys.pwd();
-    hefesto.sys.cd($path);
-    var exists type int;
-    $exists = (hefesto.sys.pwd() == $path ||
-               hefesto.sys.pwd() == ($path + "\\"));    
-    hefesto.sys.cd($old_pwd);
-    result $exists;
+    result 0;
 }
 
 function vcvars_query_registry(mtype type list) : result type int {
     var exit_code type int;
     $exit_code = get_windows_sdk_dir();
-    if ($exit_code != 0) result $exit_code;    
+    if ($exit_code != 0) result $exit_code;
     $exit_code = get_windows_sdk_dir_old();
     if ($exit_code != 0) result $exit_code;
-    $exit_code = get_windows_sdk_dir_35();    
+    $exit_code = get_windows_sdk_dir_35();
     if ($exit_code != 0) result $exit_code;
-    $exit_code = get_extension_sdk_dir();    
+    $exit_code = get_extension_sdk_dir();
     if ($exit_code != 0) result $exit_code;
     $exit_code = get_vs_install_dir();
     if ($exit_code != 0) result $exit_code;
@@ -1241,7 +1216,7 @@ function vcvars_query_registry(mtype type list) : result type int {
     while ($exit_code == 0 && $m < $mtype.count()) {
         if ($mtype.item($m) == "32bit") {
             $exit_code = get_framework_dir32();
-            $exit_code = get_framework_ver32();        
+            $exit_code = get_framework_ver32();
         } else if ($mtype.item($m) == "64bit") {
             $exit_code = get_framework_dir64();
             $exit_code = get_framework_ver64();
@@ -1345,20 +1320,20 @@ function get_extension_sdk_dir() : result type int
     var ext_dir type string;
     var xml_path type string;
     var old_cwd type string;
-    
+
     $old_cwd = hefesto.sys.pwd();
-    
+
     $exit_code = 1;
-    
-    $xml_path = hefesto.sys.env("ProgramFiles");    
+
+    $xml_path = hefesto.sys.env("ProgramFiles");
     $xml_path = hefesto.sys.make_path($xml_path, "\\Microsoft SDKs\\Windows\\v8.0\\ExtensionSDKs\\Microsoft.VCLibs\\11.0");
     hefesto.sys.cd($xml_path);
     if (hefesto.sys.ls("SDKManifest\\.xml") > 0) {
         $ext_dir = hefesto.sys.env("ProgramFiles");
         $ext_dir = hefesto.sys.make_path($ext_dir, "\\Microsoft SDKs\\Windows\\v8.0\\ExtensionSDKs");
-        $exit_code = hefesto.sys.setenv("ExtensionSdkDir", $ext_dir);        
-    }    
-    $xml_path = hefesto.sys.env("ProgramFiles(x86)");    
+        $exit_code = hefesto.sys.setenv("ExtensionSdkDir", $ext_dir);
+    }
+    $xml_path = hefesto.sys.env("ProgramFiles(x86)");
     $xml_path = hefesto.sys.make_path($xml_path, "\\Microsoft SDKs\\Windows\\v8.0\\ExtensionSDKs\\Microsoft.VCLibs\\11.0");
     hefesto.sys.cd($xml_path);
     if (hefesto.sys.ls("SDKManifest\\.xml") > 0) {

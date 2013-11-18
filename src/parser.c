@@ -2244,7 +2244,8 @@ static hefesto_toolset_command_ctx *ld_toolset_commands(FILE *fp,
 
 static char *get_next_word_or_string_from_file(FILE *fp, long stop_at) {
 
-    char *string = (char *) hefesto_mloc((size_t) HEFESTO_MAX_BUFFER_SIZE), *s;
+    char *string = (char *) hefesto_mloc((size_t) HEFESTO_MAX_BUFFER_SIZE + 1);
+    char *s;
 
     memset(string, 0, HEFESTO_MAX_BUFFER_SIZE);
 

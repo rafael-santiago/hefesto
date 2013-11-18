@@ -233,6 +233,12 @@ static void *hefesto_sys_lines_from_file(const char *syscall,
                                          hefesto_func_list_ctx *functions,
                                          hefesto_type_t **otype);
 
+static void *hefesto_sys_call_from_module(const char *syscall,
+                                          hefesto_var_list_ctx **lo_vars,
+                                          hefesto_var_list_ctx **gl_vars,
+                                          hefesto_func_list_ctx *functions,
+                                          hefesto_type_t **otype);
+
 struct hefesto_hvm_syscall {
     void *(*syscall)(const char *syscall,
                      hefesto_var_list_ctx **lo_vars,
@@ -277,7 +283,8 @@ static struct hefesto_hvm_syscall
     set_method(hefesto_sys_time),
     set_method(hefesto_sys_setenv),
     set_method(hefesto_sys_unsetenv),
-    set_method(hefesto_sys_lines_from_file)
+    set_method(hefesto_sys_lines_from_file),
+    set_method(hefesto_sys_call_from_module)
 };
 
 #undef set_method
@@ -422,6 +429,10 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
 
         case HEFESTO_SYS_LINES_FROM_FILE:
             label = "hefesto.sys.lines_from_file(";
+            break;
+
+        case HEFESTO_SYS_CALL_FROM_MODULE:
+            label = "hefesto.sys.call_from_module(";
             break;
 
         default:
@@ -1868,3 +1879,10 @@ static void *hefesto_sys_lines_from_file(const char *syscall,
     return ((void *)result);
 }
 
+static void *hefesto_sys_call_from_module(const char *syscall,
+                                          hefesto_var_list_ctx **lo_vars,
+                                          hefesto_var_list_ctx **gl_vars,
+                                          hefesto_func_list_ctx *functions,
+                                          hefesto_type_t **otype) {
+    return NULL;
+}

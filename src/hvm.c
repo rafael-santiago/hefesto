@@ -553,7 +553,7 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
                 HEFESTO_DEBUG_INFO(0, "hvm/vou fazer o assignment de file\n");
                 var = assign_data_to_hefesto_var_file_type(var, expr_result);
                 HEFESTO_DEBUG_INFO(0, "hvm/ok, feito o assignment de file\n");
-                // don't close the (FILE *) it was pointed by the assignment
+                // don't close the (FILE *) it were pointed by the assignment
                 // above.
                 del_hefesto_file_handle((hefesto_file_handle *)expr_result, 0);
                 HEFESTO_DEBUG_INFO(0, "hvm/ok, liberei o expr_result\n");

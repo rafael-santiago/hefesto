@@ -210,6 +210,11 @@ static int synchk_hefesto_sys_lines_from_file(const char *usr_calling,
                                               hefesto_var_list_ctx *gl_vars,
                                               hefesto_func_list_ctx *functions);
 
+static int synchk_hefesto_sys_call_from_module(const char *usr_calling,
+                                               hefesto_var_list_ctx *lo_vars,
+                                               hefesto_var_list_ctx *gl_vars,
+                                               hefesto_func_list_ctx *functions);
+
 hefesto_type_t get_hefesto_var_type_by_usr_code(const char *var,
                                                 hefesto_var_list_ctx *lo_vars,
                                                 hefesto_var_list_ctx *gl_vars);
@@ -281,7 +286,8 @@ static struct hefesto_syscall_syntax_checker_ctx
     set_hefesto_synchk_slot(synchk_hefesto_sys_time),
     set_hefesto_synchk_slot(synchk_hefesto_sys_setenv),
     set_hefesto_synchk_slot(synchk_hefesto_sys_unsetenv),
-    set_hefesto_synchk_slot(synchk_hefesto_sys_lines_from_file)
+    set_hefesto_synchk_slot(synchk_hefesto_sys_lines_from_file),
+    set_hefesto_synchk_slot(synchk_hefesto_sys_call_from_module)
 
 };
 
@@ -2628,6 +2634,57 @@ static int synchk_hefesto_sys_unsetenv(const char *usr_calling,
                                   lo_vars,
                                   gl_vars,
                                   functions);
+}
+
+static int synchk_hefesto_sys_call_from_module(const char *usr_calling,
+                                               hefesto_var_list_ctx *lo_vars,
+                                               hefesto_var_list_ctx *gl_vars,
+                                               hefesto_func_list_ctx *functions) {
+    char *args;
+    size_t offset = 0;
+    int result = 1;
+    hefesto_var_list_ctx *vp;
+
+    if (is_expected_args_total(usr_calling, 0) ||
+        is_expected_args_total(usr_calling, 1)) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+
+    args = get_arg_from_call(usr_calling, &offset);
+    if (args) {
+        while (result && *args) {
+            if (*args == '$') {
+                vp = get_hefesto_var_list_ctx_name(args+1, lo_vars);
+                if (vp == NULL) {
+                    vp = get_hefesto_var_list_ctx_name(args+1, gl_vars);
+                }
+                if (vp == NULL) {
+                    hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_VAR,
+                              usr_calling);
+                    result = 0;
+                } else if (vp->type != HEFESTO_VAR_TYPE_STRING) {
+                    hlsc_info(HLSCM_MTYPE_SYNTAX,
+                              HLSCM_SYN_ERROR_STRING_TYPE_REQUIRED,
+                              usr_calling);
+                    result = 0;
+                }
+            } else {
+                result = is_hefesto_string(args) ||
+                         is_valid_expression(args, lo_vars,
+                                             gl_vars, functions);
+            }
+            if (result != 0) {
+                free(args);
+                args = get_arg_from_call(usr_calling, &offset);
+            }
+        }
+        free(args);
+    }
+
+    return result;
+
 }
 
 static int synchk_hefesto_sys_lines_from_file(const char *usr_calling,

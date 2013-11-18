@@ -33,7 +33,7 @@
 #define is_hefesto_symbol_charset(c) ( (isalpha((c))) ^ (isdigit((c))) ^\
                                        ((c) == '_') )
 
-#define HEFESTO_SYS_CALLS_NR                            34
+#define HEFESTO_SYS_CALLS_NR                            35
 #define HEFESTO_LIST_METHODS_NR                          8
 #define HEFESTO_STRING_METHODS_NR                        4
 #define HEFESTO_PROJECT_METHODS_NR                       4

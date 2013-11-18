@@ -1,0 +1,26 @@
+function vspath_exists(path type string) : result type int
+{
+    var old_pwd type string;
+    $old_pwd = hefesto.sys.pwd();
+    hefesto.sys.cd($path);
+    var exists type int;
+    $exists = (hefesto.sys.pwd() == $path ||
+               hefesto.sys.pwd() == ($path + "\\"));    
+    hefesto.sys.cd($old_pwd);
+    result $exists;
+}
+
+function get_cpu_architecture() : result type string
+{
+    var cpu_arch type list;
+    $cpu_arch = hefesto.sys.get_option("cpu-arch");
+    if ($cpu_arch.count() > 0) {
+        result $cpu_arch.item(0);
+    }
+    var arch_from_reg type string;
+    $arch_from_reg = hefesto.sys.env("WINREG:HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment\\PROCESSOR_ARCHITECTURE");
+    if ($arch_from_reg != "x86") {
+        $arch_from_reg = "x64";
+    }
+    result $arch_from_reg;
+}
