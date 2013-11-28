@@ -1015,7 +1015,7 @@ hefesto_var_list_ctx *assign_data_to_hefesto_var(hefesto_var_list_ctx *var,
         }
         if (var->type == HEFESTO_VAR_TYPE_STRING ||
             var->type == HEFESTO_VAR_TYPE_INT) {
-            var->contents = 
+            var->contents =
                add_data_to_hefesto_common_list_ctx(var->contents, data, data_sz);
         }
 

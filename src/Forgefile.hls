@@ -38,6 +38,7 @@ function config_basic_ld_deps() : result type none {
     $os = hefesto.sys.os_name();
     if ($os == "linux" || $os == "freebsd") {
         $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-ldl");
     }
 }
 

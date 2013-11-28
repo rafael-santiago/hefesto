@@ -286,7 +286,13 @@ static char *hlsc_messages[HLSCM_NR] = {
     "an accessible var.\n",
 
     // HLSCM_RUNTIME_ERROR_RQUEUE_THREAD_CREATION
-    "unable to run \"%s\" : error on thread creation."
+    "unable to run \"%s\" : error on thread creation.\n",
+
+    // HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE
+    "unable to load module at \"%s\".\n",
+
+    // HLSCM_RUNTIME_UNABLE_TO_FIND_SYMBOL
+    "unable to find symbol \"%s\" in loaded module.\n"
 
 };
 

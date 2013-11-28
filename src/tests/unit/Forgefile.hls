@@ -60,6 +60,7 @@ hfst-unit.prologue() {
     $os_name = hefesto.sys.os_name();
     if ($os_name == "linux" || $os_name == "freebsd") {
         $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-ldl");
     }
 }
 

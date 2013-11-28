@@ -24,6 +24,7 @@
 #include "hvm_winreg.h"
 #include "hlsc_msg.h"
 #include "file_io.h"
+#include "hvm_mod.h"
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
@@ -1884,5 +1885,5 @@ static void *hefesto_sys_call_from_module(const char *syscall,
                                           hefesto_var_list_ctx **gl_vars,
                                           hefesto_func_list_ctx *functions,
                                           hefesto_type_t **otype) {
-    return NULL;
+    return hvm_mod_call(syscall, lo_vars, gl_vars, functions, otype);
 }

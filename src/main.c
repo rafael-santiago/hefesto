@@ -23,6 +23,11 @@ void sigint_watchdog(int signo) {
     HEFESTO_LAST_FORGE_RESULT = 1;
 }
 
+void sigsegv_watchdog(int signo) {
+    printf("\nhvm panic: segmentation fault, exiting...\n");
+    exit(1);
+}
+
 char *get_forgefile_projects_option_label(char *forgefile) {
 
     char *filename = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
@@ -147,6 +152,7 @@ int main(int argc, char **argv) {
                         signal(SIGINT, sigint_watchdog);
                         signal(SIGTERM, sigint_watchdog);
                         signal(SIGABRT, sigint_watchdog);
+                        signal(SIGSEGV, sigsegv_watchdog);
 #if HEFESTO_TGT_OS != HEFESTO_WINDOWS
                         signal(SIGHUP, sigint_watchdog);
 #endif
