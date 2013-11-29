@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <execinfo.h>
 
 void sigint_watchdog(int signo) {
     printf("\nhvm info: aborting execution...\n");
@@ -24,7 +25,23 @@ void sigint_watchdog(int signo) {
 }
 
 void sigsegv_watchdog(int signo) {
-    printf("\nhvm panic: segmentation fault, exiting...\n");
+    size_t size;
+    void *array[50];
+    printf("\nhvm info: hvm execution aborted.\n\n");
+    printf("*** SIGSEV PANIC ***\n\n");
+    printf("%s\n\n", HEFESTO_VERSION_INFO);
+    size = backtrace(array, 50);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    printf("\n\n\"Well, my terminal's locked up,\n");
+    printf("    and I ain't got any Mail,\n");
+    printf("And I can't recall the last time\n");
+    printf("   that my program didn't fail.\n");
+    printf("I've stacks in my structs;\n");
+    printf("   I've got arrays in my queues;\n");
+    printf("I've got the: \n");
+    printf("    Segmentation violation -- Core dumped...\n");
+    printf("       blues.\" -- Segmentation Violation: Core Dumped  Blues");
+    printf("\n\nGoodbye!! :-(\n\n");
     exit(1);
 }
 
