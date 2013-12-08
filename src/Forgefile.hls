@@ -36,9 +36,12 @@ function config_basic_ld_deps() : result type none {
     $ldflags.add_item("here/libhere.a");
     var os type string;
     $os = hefesto.sys.os_name();
-    if ($os == "linux" || $os == "freebsd") {
+    if ($os == "linux") {
         $ldflags.add_item("-lpthread");
         $ldflags.add_item("-ldl");
+    }
+    if ($os == "freebsd") {
+        $ldflags.add_item("-lpthread");
     }
     if (hefesto.sys.os_name() == "windows") {
         $ldflags.del_item("-rdynamic");

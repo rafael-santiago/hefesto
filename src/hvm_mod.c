@@ -122,7 +122,8 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     hp = dlopen(module_filepath, RTLD_LAZY);
     if (hp == NULL) {
-        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE, module_filepath);
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE,
+                  module_filepath, dlerror());
     }
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     hp = LoadLibrary(module_filepath);
