@@ -40,6 +40,9 @@ function config_basic_ld_deps() : result type none {
         $ldflags.add_item("-lpthread");
         $ldflags.add_item("-ldl");
     }
+    if (hefesto.sys.os_name() == "windows") {
+        $ldflags.del_item("-rdynamic");
+    }
 }
 
 hefesto.prologue() {

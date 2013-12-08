@@ -5,6 +5,7 @@
  * the terms of the GNU General Public License version 2.
  *
  */
+#include "types.h"
 #include "structs_io.h"
 #include "options.h"
 #include "htask.h"
@@ -15,7 +16,12 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+
 #include <execinfo.h>
+
+#endif
 
 void sigint_watchdog(int signo) {
     printf("\nhvm info: aborting execution...\n");
@@ -23,6 +29,8 @@ void sigint_watchdog(int signo) {
     HEFESTO_EXIT_CODE = 1;
     HEFESTO_LAST_FORGE_RESULT = 1;
 }
+
+#if HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
 void sigsegv_watchdog(int signo) {
     size_t size;
@@ -44,6 +52,8 @@ void sigsegv_watchdog(int signo) {
     printf("\n\nGoodbye!! :-(\n\n");
     exit(1);
 }
+
+#endif
 
 char *get_forgefile_projects_option_label(char *forgefile) {
 
@@ -169,8 +179,8 @@ int main(int argc, char **argv) {
                         signal(SIGINT, sigint_watchdog);
                         signal(SIGTERM, sigint_watchdog);
                         signal(SIGABRT, sigint_watchdog);
-                        signal(SIGSEGV, sigsegv_watchdog);
 #if HEFESTO_TGT_OS != HEFESTO_WINDOWS
+                        signal(SIGSEGV, sigsegv_watchdog);
                         signal(SIGHUP, sigint_watchdog);
 #endif
                         exit_code = boot_forge(projects, fp->data, o);

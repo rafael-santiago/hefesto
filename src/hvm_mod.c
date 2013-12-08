@@ -14,6 +14,10 @@ typedef void * hefesto_mod_handle;
 
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
+#include <windows.h>
+
+typedef HMODULE hefesto_mod_handle;
+
 #endif
 
 struct hefesto_modio_args {
@@ -35,7 +39,7 @@ typedef void (*hefesto_modfunc)(struct hefesto_modio **);
 
 struct hefesto_ldmod_table {
     char module_path[HEFESTO_MAX_BUFFER_SIZE];
-    hefesto_mod_handle *handle;
+    hefesto_mod_handle handle;
     int ref_count;
     char last_called_sym[HEFESTO_MAX_BUFFER_SIZE];
     hefesto_modfunc sym;
@@ -76,9 +80,9 @@ static struct hefesto_ldmod_table HEFESTO_LDMOD_TABLE[HEFESTO_LDMOD_TABLE_SIZE] 
 
 static hefesto_mod_handle hvm_mod_load(const char *module_filepath);
 
-static int hvm_mod_close(hefesto_mod_handle *mod_handle);
+static int hvm_mod_close(hefesto_mod_handle mod_handle);
 
-static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle *mod_handle,
+static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle mod_handle,
                                        const char *function);
 
 static void del_hefesto_modio(struct hefesto_modio *modio);
@@ -114,13 +118,14 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
             return HEFESTO_LDMOD_TABLE[l].handle;
         }
     }
-    hefesto_mod_handle *hp = NULL;
+    hefesto_mod_handle hp = NULL;
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     hp = dlopen(module_filepath, RTLD_LAZY);
     if (hp == NULL) {
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE, module_filepath);
     }
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    hp = LoadLibrary(module_filepath);
 #endif
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
         if (HEFESTO_LDMOD_TABLE[l].handle == NULL) {
@@ -136,13 +141,15 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     return hp;
 }
 
-static int hvm_mod_close(hefesto_mod_handle *mod_handle) {
+static int hvm_mod_close(hefesto_mod_handle mod_handle) {
     size_t l;
     int retval = 0;
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     if (mod_handle != NULL) {
         retval = dlclose(mod_handle);
     }
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    retval = (FreeLibrary(mod_handle) != 1);
 #endif
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
         if (mod_handle == HEFESTO_LDMOD_TABLE[l].handle) {
@@ -159,7 +166,7 @@ static int hvm_mod_close(hefesto_mod_handle *mod_handle) {
     return retval;
 }
 
-static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle *mod_handle,
+static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle mod_handle,
                                const char *function) {
     hefesto_modfunc fn_p = NULL;
     size_t l;
@@ -171,9 +178,13 @@ static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle *mod_handle,
             break;
         }
     }
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+
     if (mod_handle != NULL && fn_p == NULL) {
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
         fn_p = dlsym(mod_handle, function);
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+        fn_p = (hefesto_modfunc) GetProcAddress(mod_handle, function);
+#endif
         if (l < HEFESTO_LDMOD_TABLE_SIZE) {
             memset(HEFESTO_LDMOD_TABLE[l].last_called_sym, 0,
                    sizeof(HEFESTO_LDMOD_TABLE[l].last_called_sym));
@@ -185,7 +196,7 @@ static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle *mod_handle,
     if (fn_p == NULL) {
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNABLE_TO_FIND_SYMBOL, function);
     }
-#endif
+
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
         if (mod_handle == HEFESTO_LDMOD_TABLE[l].handle) {
             HEFESTO_LDMOD_TABLE[l].ref_count--;
