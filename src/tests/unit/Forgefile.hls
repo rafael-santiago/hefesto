@@ -77,5 +77,8 @@ hfst-unit.epilogue() {
         }
         $retval = hefesto.sys.run($runpath);
     }
+    if ($retval != 0) {
+        hefesto.project.abort($retval);
+    }
 }
 
