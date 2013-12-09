@@ -64,6 +64,9 @@ hfst-unit.prologue() {
     if ($os_name == "linux") {
         $ldflags.add_item("-ldl");
     }
+    if ($os_name == "freebsd") {
+        $ldflags.add_item("-lexecinfo");
+    }
 }
 
 hfst-unit.epilogue() {
