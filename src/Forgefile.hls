@@ -42,6 +42,7 @@ function config_basic_ld_deps() : result type none {
     }
     if ($os == "freebsd") {
         $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-lexecinfo");
     }
     if (hefesto.sys.os_name() == "windows") {
         $ldflags.del_item("-rdynamic");

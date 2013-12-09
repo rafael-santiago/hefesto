@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
 #include <execinfo.h>
 
@@ -29,8 +29,6 @@ void sigint_watchdog(int signo) {
     HEFESTO_EXIT_CODE = 1;
     HEFESTO_LAST_FORGE_RESULT = 1;
 }
-
-#if HEFESTO_TGT_OS == HEFESTO_LINUX
 
 void sigsegv_watchdog(int signo) {
     size_t size;
@@ -52,25 +50,6 @@ void sigsegv_watchdog(int signo) {
     printf("\n\nGoodbye!! :-(\n\n");
     exit(1);
 }
-
-#elif HEFESTO_TGT_OS == HEFESTO_FREEBSD
-
-void sigsegv_watchdog(int signo) {
-    printf("\nhvm info: hvm execution aborted.\n\n");
-    printf("\"Well, my terminal's locked up,\n");
-    printf("    and I ain't got any Mail,\n");
-    printf("And I can't recall the last time\n");
-    printf("   that my program didn't fail.\n");
-    printf("I've stacks in my structs;\n");
-    printf("   I've got arrays in my queues;\n");
-    printf("I've got the: \n");
-    printf("    Segmentation violation -- Core dumped...\n");
-    printf("       blues.\" -- Segmentation Violation: Core Dumped  Blues");
-    printf("\n\nGoodbye!! :-(\n\n");
-    exit(1);
-}
-
-#endif
 
 char *get_forgefile_projects_option_label(char *forgefile) {
 
