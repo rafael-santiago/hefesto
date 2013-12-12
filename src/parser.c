@@ -2590,9 +2590,7 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
 
     includes = get_all_includes(includes, hls_main,
                                 usr_include_directories);
-for (ip = includes; ip != NULL; ip = ip->next) {
-    printf("INCLUDE-FILE: %s\n", ip->data);
-}
+
     if (includes) {
         includes_tail = get_hefesto_common_list_ctx_tail(includes);
         while (includes != NULL && *errors == 0) {
