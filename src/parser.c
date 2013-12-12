@@ -2562,10 +2562,12 @@ static hefesto_common_list_ctx *get_all_includes(
 
     if (curr_tail != last_tail && error == 0) {
         lip = NULL;
-        for (ip = last_tail->next; lip != curr_tail; 
+        for (ip = last_tail->next; lip != curr_tail;
                             lip = ip, ip = ip->next) {
-            includes = get_all_includes(includes, (char *)ip->data,
-                                        hefesto_usr_inc_dir);
+            //includes = get_all_includes(includes, (char *)ip->data,
+            //                            hefesto_usr_inc_dir);
+            includes = get_includes_in_file((char *)ip->data, includes, &error,
+                                            hefesto_usr_inc_dir);
         }
     }
 
@@ -2588,12 +2590,14 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
 
     includes = get_all_includes(includes, hls_main,
                                 usr_include_directories);
-
+for (ip = includes; ip != NULL; ip = ip->next) {
+    printf("INCLUDE-FILE: %s\n", ip->data);
+}
     if (includes) {
         includes_tail = get_hefesto_common_list_ctx_tail(includes);
         while (includes != NULL && *errors == 0) {
             if (includes_tail != includes) {
-                for (ip = includes; ip->next != includes_tail; 
+                for (ip = includes; ip->next != includes_tail;
                                                ip = ip->next);
             } else {
                 ip = includes;
