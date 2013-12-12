@@ -2510,24 +2510,26 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
                     hlsc_info(HLSCM_MTYPE_GENERAL,
                               HLSCM_NULL_INCL_FILE, file_path);
                 } else {
+                    // ainda nao vi uma melhor forma de fazer isso, entao
+                    // por enquanto vai seguir assim mesmo.
                     include_file = expand_include_file_name(tok,
                                                             hefesto_usr_inc_dir);
-                    if (get_hefesto_common_list_ctx_content(include_file,
-                                                 HEFESTO_VAR_TYPE_STRING,
-                                                    incl_list) == NULL) {
-                        if (*include_file != 0) {
-                            incl_list =
-                                add_data_to_hefesto_common_list_ctx(incl_list,
-                                                                 include_file,
-                                                         strlen(include_file));
-                        } else {
-                            hlsc_info(HLSCM_MTYPE_GENERAL,
-                                      HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
-                                      tok, include_file);
-                            *error = 1;
-                        }
-                        free(include_file);
+                    //if (get_hefesto_common_list_ctx_content(include_file,
+                    //                             HEFESTO_VAR_TYPE_STRING,
+                    //                                incl_list) == NULL) {
+                    if (*include_file != 0) {
+                        incl_list =
+                            add_data_to_hefesto_common_list_ctx(incl_list,
+                                                             include_file,
+                                                     strlen(include_file));
+                    } else {
+                        hlsc_info(HLSCM_MTYPE_GENERAL,
+                                  HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
+                                  tok, include_file);
+                        *error = 1;
                     }
+                    free(include_file);
+                    //}
                 }
             }
         }
@@ -2596,9 +2598,11 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
             } else {
                 ip = includes;
             }
+
             if (get_hefesto_common_list_ctx_content(includes_tail->data,
                                                 HEFESTO_VAR_TYPE_STRING,
                                                 parsed_files) == NULL) {
+
                 if ((fp = fopen(includes_tail->data, "rb"))) {
                     fseek(fp, 0L, SEEK_END);
                     stop_at = ftell(fp);
