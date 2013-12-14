@@ -472,8 +472,6 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     FILE *inc_fp;
     long inc_fp_size;
     int inc_errors;
-    hefesto_var_list_ctx *dummy_gl_vars = NULL;
-
 
     if (fp == NULL) return NULL;
     set_current_line_number(1);
@@ -495,11 +493,8 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
             inc_fp_size = ftell(inc_fp);
             fseek(inc_fp, 0L, SEEK_SET);
             if (inc_fp != NULL) {
-                proto_funcs = get_functions(inc_fp, inc_fp_size, &inc_errors, proto_funcs, dummy_gl_vars,
+                proto_funcs = get_functions(inc_fp, inc_fp_size, &inc_errors, proto_funcs, gl_vars,
                                             forge_functions_name);
-            }
-            if (dummy_gl_vars != NULL) {
-                del_hefesto_var_list_ctx(dummy_gl_vars);
             }
             fclose(inc_fp);
         }
