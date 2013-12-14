@@ -19,6 +19,12 @@
 #include "exprchk.h"
 #include "os_detect.h"
 
+typedef struct _hefesto_include_list_ctx {
+    char filepath[4096];
+    struct _hefesto_include_list_ctx *includes;
+    struct _hefesto_include_list_ctx *next;
+}hefesto_include_list_ctx;
+
 static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
                                       int *errors,
                                       const int global_scope);
@@ -38,7 +44,8 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
                                               int *errors,
                                               hefesto_var_list_ctx *gl_vars,
                                   hefesto_options_ctx *forge_functions_name,
-                                  hefesto_func_list_ctx *function_collection);
+                                  hefesto_func_list_ctx *function_collection,
+                                  hefesto_include_list_ctx *local_includes);
 
 static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                             int *errors,
@@ -64,11 +71,6 @@ static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
 static long get_section_end_offset(FILE *fp, const long stop_at);
 
 
-static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
-                                        hefesto_common_list_ctx *incl_list,
-                                                     int *error,
-                                  hefesto_options_ctx *hefesto_usr_inc_dir);
-
 static void set_current_line_number(const int line_nr);
 
 static void set_current_compile_input(const char *file_path);
@@ -92,10 +94,6 @@ static char *get_next_word_or_string_from_file(FILE *fp,
 
 static char *expand_include_file_name(const char *file_path,
                                       hefesto_options_ctx *hefesto_usr_inc_dir);
-
-static hefesto_common_list_ctx
-    *get_all_includes(hefesto_common_list_ctx *includes, const char *file_path,
-                      hefesto_options_ctx *hefesto_usr_inc_dir);
 
 hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
                                                  int *errors,
@@ -134,9 +132,92 @@ static int check_forge_helpers(char *tok, FILE *fp, const long file_size,
 
 static int should_include_file(const char *inc_on_list);
 
+
+#define new_hefesto_include_list_ctx(i) ((i) = (hefesto_include_list_ctx *)\
+                                            hefesto_mloc(\
+                                            sizeof(hefesto_include_list_ctx)),\
+                               memset((i)->filepath, 0, sizeof((i)->filepath)),\
+                                               (i)->includes = NULL, (i)->next = NULL)
+
+static void del_hefesto_include_list_ctx(hefesto_include_list_ctx *list);
+
+static hefesto_include_list_ctx *add_include_to_hefesto_include_list_ctx(
+                        hefesto_include_list_ctx *list,
+                        const char *filepath);
+
+static hefesto_include_list_ctx *get_hefesto_include_list_ctx_tail(
+                                hefesto_include_list_ctx *list);
+
+static hefesto_include_list_ctx *get_hefesto_include_list_ctx_tail(
+                                hefesto_include_list_ctx *list);
+
+static hefesto_include_list_ctx *get_hefesto_include_list_ctx_filepath(
+                                const char *filepath,
+                                hefesto_include_list_ctx *list);
+
+static hefesto_include_list_ctx
+    *get_all_includes(hefesto_include_list_ctx *includes, const char *file_path,
+                      hefesto_options_ctx *hefesto_usr_inc_dir);
+
+static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
+                                        hefesto_include_list_ctx *incl_list,
+                                                     int *error,
+                                  hefesto_options_ctx *hefesto_usr_inc_dir);
+
 static int current_line_nr = 1;
 static char current_compile_input[HEFESTO_MAX_BUFFER_SIZE] = "";
 hefesto_func_list_ctx *current_compiled_function = NULL;
+
+static void del_hefesto_include_list_ctx(hefesto_include_list_ctx *list) {
+    hefesto_include_list_ctx *p, *t;
+    for (p = t = list; t; p = t) {
+        t = p->next;
+        if (p->includes != NULL) {
+            del_hefesto_include_list_ctx(p->includes);
+        }
+        free(p);
+    }
+}
+
+static hefesto_include_list_ctx *add_include_to_hefesto_include_list_ctx(
+                        hefesto_include_list_ctx *list,
+                        const char *filepath) {
+    hefesto_include_list_ctx *h, *p;
+
+    if (list == NULL) {
+        new_hefesto_include_list_ctx(list);
+        h = list;
+        p = h;
+    } else {
+        h = list;
+        p = get_hefesto_include_list_ctx_tail(list);
+        new_hefesto_include_list_ctx(p->next);
+        p = p->next;
+    }
+
+    strncpy(p->filepath, filepath, sizeof(p->filepath)-1);
+
+    return h;
+}
+
+static hefesto_include_list_ctx *get_hefesto_include_list_ctx_tail(
+                                hefesto_include_list_ctx *list) {
+    hefesto_include_list_ctx *p;
+    for (p = list; p->next; p = p->next);
+    return p;
+}
+
+static hefesto_include_list_ctx *get_hefesto_include_list_ctx_filepath(
+                                const char *filepath,
+                                hefesto_include_list_ctx *list) {
+    hefesto_include_list_ctx *p;
+    for (p = list; p; p = p->next) {
+        if (strcmp(p->filepath, filepath) == 0) {
+            return p;
+        }
+    }
+    return NULL;
+}
 
 static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
                                       int *errors,
@@ -380,22 +461,60 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
                                               int *errors,
                                               hefesto_var_list_ctx *gl_vars,
                                   hefesto_options_ctx *forge_functions_name,
-                                 hefesto_func_list_ctx *function_collection) {
+                                 hefesto_func_list_ctx *function_collection,
+                                 hefesto_include_list_ctx *local_includes) {
 
     hefesto_func_list_ctx *functions_decl = function_collection;
     long offset;
+
+    hefesto_func_list_ctx *proto_funcs = NULL;
+    hefesto_include_list_ctx *ip = NULL;
+    FILE *inc_fp;
+    long inc_fp_size;
+    int inc_errors;
+    hefesto_var_list_ctx *dummy_gl_vars = NULL;
+
 
     if (fp == NULL) return NULL;
     set_current_line_number(1);
 
     offset = ftell(fp);
+    // acquiring the local prototypes
     functions_decl = get_functions(fp, stop_at, errors, functions_decl, gl_vars,
                                    forge_functions_name);
+
+    if (functions_decl != NULL) {
+        // (INFO: Santiago): === WARNING nasty trick area                        ===
+        // acquiring the external (but local :Z) prototypes... it'll be freed below,
+        // don't worry about. YES, I know... this is f&@!&@&! uggly.
+        //                                                                       ===
+        proto_funcs = get_hefesto_func_list_ctx_tail(functions_decl);
+        for (ip = local_includes; ip; ip = ip->next) {
+            inc_fp = fopen(ip->filepath, "r");
+            fseek(inc_fp, 0L, SEEK_END);
+            inc_fp_size = ftell(inc_fp);
+            fseek(inc_fp, 0L, SEEK_SET);
+            if (inc_fp != NULL) {
+                proto_funcs = get_functions(inc_fp, inc_fp_size, &inc_errors, proto_funcs, dummy_gl_vars,
+                                            forge_functions_name);
+            }
+            if (dummy_gl_vars != NULL) {
+                del_hefesto_var_list_ctx(dummy_gl_vars);
+            }
+            fclose(inc_fp);
+        }
+    }
+
     fseek(fp, offset, SEEK_SET);
 
     set_current_line_number(1);
     functions_decl = get_functions(fp, stop_at, errors, functions_decl, gl_vars,
                                    forge_functions_name);
+
+    if (proto_funcs != NULL) {
+        del_hefesto_func_list_ctx(proto_funcs->next);
+        proto_funcs->next = NULL;
+    }
 
     return functions_decl;
 
@@ -1235,19 +1354,19 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
     hefesto_func_list_ctx *preloading_p = NULL, *prologue_p = NULL;
     hefesto_func_list_ctx *epilogue_p = NULL;
     void *tmp_res;
-    hefesto_common_list_ctx *includes = NULL, *includes_tail, *ip;
-    hefesto_common_list_ctx *parsed_files = NULL, *includes_cpy = NULL;
+    hefesto_include_list_ctx *includes = NULL, *includes_tail, *ip;
+    hefesto_include_list_ctx *includes_cpy = NULL;
+    hefesto_common_list_ctx *parsed_files = NULL;
 
     includes = get_all_includes(includes, file_path, usr_include_directories);
 
     if (includes) {
 
         if ((includes_tail =
-                get_hefesto_common_list_ctx_tail(includes)) != NULL) {
+                get_hefesto_include_list_ctx_tail(includes)) != NULL) {
             for (ip = includes; ip; ip = ip->next) {
-                includes_cpy = add_data_to_hefesto_common_list_ctx(includes_cpy,
-                                                                   ip->data,
-                                                               strlen(ip->data));
+                includes_cpy = add_include_to_hefesto_include_list_ctx(includes_cpy,
+                                                                       ip->filepath);
             }
         }
 
@@ -1262,16 +1381,16 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 ip = includes;
             }
 
-            if (get_hefesto_common_list_ctx_content(includes_tail->data,
+            if (get_hefesto_common_list_ctx_content(includes_tail->filepath,
                                                     HEFESTO_VAR_TYPE_STRING,
                                                     parsed_files) == NULL) {
 
-                if (!(fp = fopen(includes_tail->data, "rb"))) {
+                if (!(fp = fopen(includes_tail->filepath, "rb"))) {
                     hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_IO_ERROR,
-                              includes_tail->data);
-                    del_hefesto_common_list_ctx(includes);
+                              includes_tail->filepath);
+                    del_hefesto_include_list_ctx(includes);
                     del_hefesto_common_list_ctx(parsed_files);
-                    del_hefesto_common_list_ctx(includes_cpy);
+                    del_hefesto_include_list_ctx(includes_cpy);
                     del_hefesto_project_ctx(project_curr);
                     del_hefesto_func_list_ctx(preloading_p);
                     del_hefesto_func_list_ctx(prologue_p);
@@ -1280,8 +1399,8 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 }
 
                 parsed_files = add_data_to_hefesto_common_list_ctx(parsed_files,
-                                                            includes_tail->data,
-                                                    strlen(includes_tail->data));
+                                                            includes_tail->filepath,
+                                                    strlen(includes_tail->filepath));
 
                 fseek(fp, 0L, SEEK_END);
                 file_size = ftell(fp);
@@ -1290,9 +1409,9 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                     if (get_project_functions(project_curr, fp, file_size,
                                               gl_vars, functions) == 0) {
                         fclose(fp);
-                        del_hefesto_common_list_ctx(includes);
+                        del_hefesto_include_list_ctx(includes);
                         del_hefesto_common_list_ctx(parsed_files);
-                        del_hefesto_common_list_ctx(includes_cpy);
+                        del_hefesto_include_list_ctx(includes_cpy);
                         del_hefesto_project_ctx(project_curr);
                         del_hefesto_func_list_ctx(preloading_p);
                         del_hefesto_func_list_ctx(prologue_p);
@@ -1319,11 +1438,11 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
 
             if (includes_tail != includes) {
                 ip->next = NULL;
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes_tail = (includes->next) ?
-                         get_hefesto_common_list_ctx_tail(includes) : includes;
+                         get_hefesto_include_list_ctx_tail(includes) : includes;
             } else {
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes = NULL;
             }
 
@@ -1336,17 +1455,16 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
         }
 
         if (includes != NULL) {
-            del_hefesto_common_list_ctx(includes);
+            del_hefesto_include_list_ctx(includes);
             includes = NULL;
         }
 
         if (includes_cpy != NULL) {
             for (ip = includes_cpy; ip; ip = ip->next) {
-                includes = add_data_to_hefesto_common_list_ctx(includes,
-                                                               ip->data,
-                                                               strlen(ip->data));
+                includes = add_include_to_hefesto_include_list_ctx(includes,
+                                                                   ip->filepath);
             }
-            del_hefesto_common_list_ctx(includes_cpy);
+            del_hefesto_include_list_ctx(includes_cpy);
         }
 
         del_hefesto_common_list_ctx(parsed_files);
@@ -1357,7 +1475,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
 
         while (includes != NULL && state < 5) {
 
-            includes_tail = get_hefesto_common_list_ctx_tail(includes);
+            includes_tail = get_hefesto_include_list_ctx_tail(includes);
 
             if (includes != includes_tail) {
                 for (ip = includes; ip->next != includes_tail; ip = ip->next);
@@ -1365,14 +1483,14 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 ip = includes;
             }
 
-            if (get_hefesto_common_list_ctx_content(includes_tail->data,
+            if (get_hefesto_common_list_ctx_content(includes_tail->filepath,
                                                     HEFESTO_VAR_TYPE_STRING,
                                                     parsed_files) == NULL) {
 
-                if ((fp = fopen(includes_tail->data, "rb")) == NULL) {
+                if ((fp = fopen(includes_tail->filepath, "rb")) == NULL) {
                     hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_IO_ERROR,
-                              includes_tail->data);
-                    del_hefesto_common_list_ctx(includes);
+                              includes_tail->filepath);
+                    del_hefesto_include_list_ctx(includes);
                     del_hefesto_common_list_ctx(parsed_files);
                     del_hefesto_func_list_ctx(preloading_p);
                     del_hefesto_func_list_ctx(prologue_p);
@@ -1430,7 +1548,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                     del_hefesto_func_list_ctx(preloading_p);
                                     del_hefesto_func_list_ctx(prologue_p);
                                     del_hefesto_func_list_ctx(epilogue_p);
-                                    del_hefesto_common_list_ctx(includes);
+                                    del_hefesto_include_list_ctx(includes);
                                     del_hefesto_common_list_ctx(parsed_files);
                                     return NULL;
                                 }
@@ -1443,7 +1561,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                 del_hefesto_func_list_ctx(preloading_p);
                                 del_hefesto_func_list_ctx(prologue_p);
                                 del_hefesto_func_list_ctx(epilogue_p);
-                                del_hefesto_common_list_ctx(includes);
+                                del_hefesto_include_list_ctx(includes);
                                 del_hefesto_common_list_ctx(parsed_files);
                                 return NULL;
                             }
@@ -1464,19 +1582,19 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 fclose(fp);
                 if (includes_tail != includes) {
                     ip->next = NULL;
-                    del_hefesto_common_list_ctx(includes_tail);
+                    del_hefesto_include_list_ctx(includes_tail);
                     includes_tail = (includes->next) ? 
-                        get_hefesto_common_list_ctx_tail(includes) :
+                        get_hefesto_include_list_ctx_tail(includes) :
                             includes;
                 } else {
-                    del_hefesto_common_list_ctx(includes_tail);
+                    del_hefesto_include_list_ctx(includes_tail);
                     includes = NULL;
                 }
             }
         }
 
         if (includes != NULL) {
-            del_hefesto_common_list_ctx(includes);
+            del_hefesto_include_list_ctx(includes);
         }
 
         del_hefesto_common_list_ctx(parsed_files);
@@ -1750,14 +1868,14 @@ hefesto_options_ctx *get_forge_functions_name(const char *file_path,
     long file_size, offset;
     hefesto_toolset_command_ctx *commands = NULL;
     hefesto_options_ctx *forge_functions_list = NULL;
-    hefesto_common_list_ctx *includes = NULL, *includes_tail, *ip;
+    hefesto_include_list_ctx *includes = NULL, *includes_tail, *ip;
     hefesto_common_list_ctx *parsed_files = NULL;
 
     includes = get_all_includes(includes, file_path, usr_include_directories);
 
     if (includes) {
 
-        includes_tail = get_hefesto_common_list_ctx_tail(includes);
+        includes_tail = get_hefesto_include_list_ctx_tail(includes);
 
         while (includes != NULL) {
 
@@ -1767,19 +1885,19 @@ hefesto_options_ctx *get_forge_functions_name(const char *file_path,
                 ip = includes;
             }
 
-            if (get_hefesto_common_list_ctx_content(includes_tail->data,
+            if (get_hefesto_common_list_ctx_content(includes_tail->filepath,
                                                     HEFESTO_VAR_TYPE_STRING,
                                                     parsed_files) == NULL) {
 
-                if (!(fp = fopen(includes_tail->data, "rb"))) {
-                    del_hefesto_common_list_ctx(includes);
+                if (!(fp = fopen(includes_tail->filepath, "rb"))) {
+                    del_hefesto_include_list_ctx(includes);
                     del_hefesto_common_list_ctx(parsed_files);
                     return NULL;
                 }
 
                 parsed_files = add_data_to_hefesto_common_list_ctx(parsed_files,
-                                                            includes_tail->data,
-                                                    strlen(includes_tail->data));
+                                                            includes_tail->filepath,
+                                                    strlen(includes_tail->filepath));
 
                 fseek(fp, 0L, SEEK_END);
                 file_size = ftell(fp);
@@ -1853,11 +1971,11 @@ hefesto_options_ctx *get_forge_functions_name(const char *file_path,
             }
             if (includes_tail != includes) {
                 ip->next = NULL;
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes_tail = (includes->next) ?
-                    get_hefesto_common_list_ctx_tail(includes) : includes;
+                    get_hefesto_include_list_ctx_tail(includes) : includes;
             } else {
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes = NULL;
             }
         }
@@ -1939,7 +2057,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
     char *toolset_name = NULL, *forge_function = NULL, *tok;
     hefesto_toolset_command_ctx *commands;
     hefesto_func_list_ctx *forge_function_p = NULL;
-    hefesto_common_list_ctx *includes = NULL, *includes_tail, *ip;
+    hefesto_include_list_ctx *includes = NULL, *includes_tail, *ip;
     hefesto_common_list_ctx *parsed_files = NULL;
     long file_size, offset, offset2;
 
@@ -1948,7 +2066,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
 
     if (includes) {
 
-        includes_tail = get_hefesto_common_list_ctx_tail(includes);
+        includes_tail = get_hefesto_include_list_ctx_tail(includes);
 
         while (includes != NULL) {
 
@@ -1959,17 +2077,17 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                 ip = includes;
             }
 
-            if (get_hefesto_common_list_ctx_content(includes_tail->data,
+            if (get_hefesto_common_list_ctx_content(includes_tail->filepath,
                                                     HEFESTO_VAR_TYPE_STRING,
                                                     parsed_files) == NULL) {
 
                 parsed_files = add_data_to_hefesto_common_list_ctx(parsed_files,
-                                                            includes_tail->data,
-                                                    strlen(includes_tail->data));
+                                                            includes_tail->filepath,
+                                                    strlen(includes_tail->filepath));
 
-                if (!(fp = fopen(includes_tail->data, "rb"))) {
+                if (!(fp = fopen(includes_tail->filepath, "rb"))) {
                     del_hefesto_common_list_ctx(parsed_files);
-                    del_hefesto_common_list_ctx(includes);
+                    del_hefesto_include_list_ctx(includes);
                     return t;
                 }
 
@@ -2026,7 +2144,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                         free(forge_function);
                                         del_hefesto_common_list_ctx(
                                                            parsed_files);
-                                        del_hefesto_common_list_ctx(
+                                        del_hefesto_include_list_ctx(
                                                                includes);
                                         return t;
                                     }
@@ -2034,7 +2152,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                                 toolset_name, t) != NULL) {
                                         hlsc_info(HLSCM_MTYPE_GENERAL,
                                                   HLSCM_TOOLSET_OVERLD_WARN,
-                                                  includes_tail->data,
+                                                  includes_tail->filepath,
                                                   toolset_name);
                                     }
                                     fseek(fp, offset, SEEK_SET);
@@ -2054,7 +2172,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                             free(forge_function);
                                             del_hefesto_common_list_ctx(
                                                                parsed_files);
-                                            del_hefesto_common_list_ctx(
+                                            del_hefesto_include_list_ctx(
                                                                    includes);
                                             return t;
                                         }
@@ -2071,7 +2189,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                             free(forge_function);
                                             del_hefesto_common_list_ctx(
                                                                    parsed_files);
-                                            del_hefesto_common_list_ctx(
+                                            del_hefesto_include_list_ctx(
                                                                        includes);
                                             return t;
                                         }
@@ -2093,7 +2211,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                 } else {
                                     free(tok);
                                     del_hefesto_common_list_ctx(parsed_files);
-                                    del_hefesto_common_list_ctx(includes);
+                                    del_hefesto_include_list_ctx(includes);
                                     hlsc_info(HLSCM_MTYPE_GENERAL,
                                         HLSCM_SYN_ERROR_TOOLSET_DECL_ERROR);
                                     return t;
@@ -2115,11 +2233,11 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
             }
             if (includes_tail != includes) {
                 ip->next = NULL;
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes_tail = (includes->next) ? 
-                   get_hefesto_common_list_ctx_tail(includes) : includes;
+                   get_hefesto_include_list_ctx_tail(includes) : includes;
             } else {
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes = NULL;
             }
         }
@@ -2436,15 +2554,16 @@ static int should_include_file(const char *inc_on_list) {
     return should_inc;
 }
 
-static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
-                                        hefesto_common_list_ctx *incl_list,
-                                                                int *error, 
+static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
+                                        hefesto_include_list_ctx *incl_list,
+                                                                int *error,
                                   hefesto_options_ctx *hefesto_usr_inc_dir) {
 
     FILE *fp;
     char *tok, *t, *include_file;
     long stop_at, temp_offset;
     int should_include = 1;
+    hefesto_include_list_ctx *ip;
 
     if (!(fp = fopen(file_path, "rb"))) {
         hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_INCL_IO_ERROR, file_path);
@@ -2514,22 +2633,22 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
                     // por enquanto vai seguir assim mesmo.
                     include_file = expand_include_file_name(tok,
                                                             hefesto_usr_inc_dir);
-                    //if (get_hefesto_common_list_ctx_content(include_file,
-                    //                             HEFESTO_VAR_TYPE_STRING,
-                    //                                incl_list) == NULL) {
-                    if (*include_file != 0) {
-                        incl_list =
-                            add_data_to_hefesto_common_list_ctx(incl_list,
-                                                             include_file,
-                                                     strlen(include_file));
-                    } else {
-                        hlsc_info(HLSCM_MTYPE_GENERAL,
-                                  HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
-                                  tok, include_file);
-                        *error = 1;
+                    if ((ip = get_hefesto_include_list_ctx_filepath(include_file,
+                                                      incl_list)) == NULL) {
+                        if (*include_file != 0) {
+                            incl_list =
+                                add_include_to_hefesto_include_list_ctx(
+                                                         incl_list,
+                                                         include_file);
+                        } else {
+                            hlsc_info(HLSCM_MTYPE_GENERAL,
+                                      HLSCM_UNABLE_TO_RESOLVE_FILE_NAME_WARN,
+                                      tok, include_file);
+                            *error = 1;
+                        }
                     }
+
                     free(include_file);
-                    //}
                 }
             }
         }
@@ -2545,29 +2664,37 @@ static hefesto_common_list_ctx *get_includes_in_file(const char *file_path,
 
 }
 
-static hefesto_common_list_ctx *get_all_includes(
-                                          hefesto_common_list_ctx *includes,
+static hefesto_include_list_ctx *get_all_includes(
+                                          hefesto_include_list_ctx *includes,
                                                       const char *file_path,
                                  hefesto_options_ctx *hefesto_usr_inc_dir) {
 
-    hefesto_common_list_ctx *ip, *lip, *curr_tail = NULL, *last_tail = NULL;
+    hefesto_include_list_ctx *ip, *lip, *curr_tail = NULL, *last_tail = NULL;
+    hefesto_include_list_ctx *temp_copy;
+    hefesto_include_list_ctx *incl_order = NULL;
     int error = 0;
+    int has_add = 0;
 
-    includes = add_data_to_hefesto_common_list_ctx(includes, file_path,
-                                                   strlen(file_path));
-    last_tail = get_hefesto_common_list_ctx_tail(includes);
+    includes = add_include_to_hefesto_include_list_ctx(includes, file_path);
+    last_tail = get_hefesto_include_list_ctx_tail(includes);
     includes = get_includes_in_file(file_path, includes, &error,
-                                    hefesto_usr_inc_dir);
-    curr_tail = get_hefesto_common_list_ctx_tail(includes);
+                                              hefesto_usr_inc_dir);
 
-    if (curr_tail != last_tail && error == 0) {
-        lip = NULL;
-        for (ip = last_tail->next; lip != curr_tail;
-                            lip = ip, ip = ip->next) {
-            //includes = get_all_includes(includes, (char *)ip->data,
-            //                            hefesto_usr_inc_dir);
-            includes = get_includes_in_file((char *)ip->data, includes, &error,
-                                            hefesto_usr_inc_dir);
+    for (ip = includes; ip; ip = ip->next) {
+        ip->includes = get_includes_in_file(ip->filepath, ip->includes, &error,
+                                              hefesto_usr_inc_dir);
+    }
+
+    for (ip = includes; ip; ip = ip->next) {
+//        printf("INCLUDE: %s\n", ip->filepath);
+        for (lip = ip->includes; lip; lip = lip->next) {
+//            printf("\t%s\n", lip->filepath);
+            if (get_hefesto_include_list_ctx_filepath(lip->filepath, includes) == NULL) {
+                includes = add_include_to_hefesto_include_list_ctx(includes, lip->filepath);
+                last_tail = get_hefesto_include_list_ctx_tail(includes);
+                last_tail->includes = get_includes_in_file(last_tail->filepath, last_tail->includes, &error,
+                                              hefesto_usr_inc_dir);
+            }
         }
     }
 
@@ -2581,18 +2708,24 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
                                       hefesto_options_ctx *forge_functions_name,
                                   hefesto_options_ctx *usr_include_directories) {
 
-    hefesto_common_list_ctx *includes = NULL, *includes_tail, *ip;
+    hefesto_include_list_ctx *includes = NULL, *includes_tail, *ip;
+    hefesto_include_list_ctx *incls_in_file = NULL, *inp;
     hefesto_common_list_ctx *parsed_files = NULL;
     hefesto_func_list_ctx *code = NULL;
     hefesto_var_list_ctx *curr_src_gl_vars, *gl_p;
     FILE *fp;
     long stop_at;
+    int load_later = 0;
 
     includes = get_all_includes(includes, hls_main,
                                 usr_include_directories);
-
+/*
+for (ip = includes; ip != NULL; ip = ip->next) {
+    printf("INC: %s\n", ip->filepath);
+}
+*/
     if (includes) {
-        includes_tail = get_hefesto_common_list_ctx_tail(includes);
+        includes_tail = get_hefesto_include_list_ctx_tail(includes);
         while (includes != NULL && *errors == 0) {
             if (includes_tail != includes) {
                 for (ip = includes; ip->next != includes_tail;
@@ -2601,14 +2734,16 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
                 ip = includes;
             }
 
-            if (get_hefesto_common_list_ctx_content(includes_tail->data,
+            if (get_hefesto_common_list_ctx_content(includes_tail->filepath,
                                                 HEFESTO_VAR_TYPE_STRING,
                                                 parsed_files) == NULL) {
 
-                if ((fp = fopen(includes_tail->data, "rb"))) {
+                if ((fp = fopen(includes_tail->filepath, "rb"))) {
                     fseek(fp, 0L, SEEK_END);
                     stop_at = ftell(fp);
                     fseek(fp, 0L, SEEK_SET);
+
+                    del_hefesto_include_list_ctx(incls_in_file);
 
                     curr_src_gl_vars = get_vars(fp, stop_at, errors, 1);
 
@@ -2620,7 +2755,7 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
                                                                      gl_p->type);
                         } else {
                             hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_GLVAR_REDECL_IN,
-                                      includes_tail->data);
+                                      includes_tail->filepath);
                             (*errors)++;
                         }
                     }
@@ -2628,35 +2763,37 @@ hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
 
                     if (*errors == 0) {
                         fseek(fp, 0L, SEEK_SET);
-                        set_current_compile_input(includes_tail->data);
+
+                        set_current_compile_input(includes_tail->filepath);
                         code = parse_functions(fp, stop_at, errors, *gl_vars,
-                                               forge_functions_name, code);
+                                               forge_functions_name, code,
+                                               includes_tail->includes);
                         parsed_files =
                            add_data_to_hefesto_common_list_ctx(parsed_files,
-                                                        includes_tail->data,
-                                                strlen(includes_tail->data));
+                                                        includes_tail->filepath,
+                                                strlen(includes_tail->filepath));
                     }
                     fclose(fp);
                 } else {
                     (*errors)++;
                     hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_IO_ERROR,
-                              includes_tail->data);
+                              includes_tail->filepath);
                 }
             }
             if (includes_tail != includes) {
                 ip->next = NULL;
-                del_hefesto_common_list_ctx(includes_tail);
-                includes_tail = (includes->next) ? 
-                    get_hefesto_common_list_ctx_tail(includes) : includes;
+                del_hefesto_include_list_ctx(includes_tail);
+                includes_tail = (includes->next) ?
+                    get_hefesto_include_list_ctx_tail(includes) : includes;
             } else {
-                del_hefesto_common_list_ctx(includes_tail);
+                del_hefesto_include_list_ctx(includes_tail);
                 includes = NULL;
             }
         }
         if (parsed_files != NULL) {
             del_hefesto_common_list_ctx(parsed_files);
         }
-        del_hefesto_common_list_ctx(includes);
+        del_hefesto_include_list_ctx(includes);
     } else printf("none!\n");
 
     return code;

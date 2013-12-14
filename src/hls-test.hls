@@ -3,6 +3,7 @@ include ~/string.hls
 include ~/conv.hls
 include ~/optutil.hls
 include ~/fsutil.hls
+include incbug.hls
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -110,6 +111,10 @@ mylab.prologue() {
     hefesto.sys.echo("BEFORE hmodfunctest CALL = " + $foo + "\n");
     $hmodfunctest_retval = hefesto.sys.call_from_module("../../libhmodtest.so", "hmodfunctest", $foo);
     hefesto.sys.echo("AFTER hmodfunctest CALL = " + $foo + " [" + $hmodfunctest_retval + "]\n");
+    $foo = "abc.c";
+    $foo.replace("\\..*$", ".obj");
+    funcao_bugosa();
+    hefesto.sys.echo("FOO = " + $foo + "\n");
     hefesto.sys.echo("*** done.\n");
 }
 
