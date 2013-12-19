@@ -238,24 +238,24 @@ fi
 
 if test $ALL_OK -eq 1
 then
-echo "### Compiled."
+#echo "### Compiled."
 
-echo "### Now running unit tests"
+#echo "### Now running unit tests"
 
 # Running unit tests
 
-cd tests/unit
-$COMPILER -c main.c
-$COMPILER -c htest.c
-$LINKER $UNIT_TEST
-./main
+#cd tests/unit
+#$COMPILER -c main.c
+#$COMPILER -c htest.c
+#$LINKER $UNIT_TEST
+#./main
 
-if test $? -gt 0
-then
-    ALL_OK=0
-fi
+#if test $? -gt 0
+#then
+#    ALL_OK=0
+#fi
 
-cd ../../
+#cd ../../
 
 if test $ALL_OK -eq 1
 then

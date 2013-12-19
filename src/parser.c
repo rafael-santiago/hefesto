@@ -51,7 +51,8 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                             int *errors,
                                    hefesto_func_list_ctx *functions_decl,
                                    hefesto_var_list_ctx *gl_vars,
-                                   hefesto_options_ctx *forge_functions_name);
+                                   hefesto_options_ctx *forge_functions_name,
+                                   int only_prototypes);
 
 static int is_valid_function_arg_list(const char *argl);
 
@@ -479,7 +480,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     offset = ftell(fp);
     // acquiring the local prototypes
     functions_decl = get_functions(fp, stop_at, errors, functions_decl, gl_vars,
-                                   forge_functions_name);
+                                   forge_functions_name, 1);
 
     if (functions_decl != NULL) {
         // (INFO: Santiago): === WARNING nasty trick area                        ===
@@ -494,7 +495,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
             fseek(inc_fp, 0L, SEEK_SET);
             if (inc_fp != NULL) {
                 proto_funcs = get_functions(inc_fp, inc_fp_size, &inc_errors, proto_funcs, gl_vars,
-                                            forge_functions_name);
+                                            forge_functions_name, 1);
             }
             fclose(inc_fp);
         }
@@ -504,7 +505,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
 
     set_current_line_number(1);
     functions_decl = get_functions(fp, stop_at, errors, functions_decl, gl_vars,
-                                   forge_functions_name);
+                                   forge_functions_name, 0);
 
     if (proto_funcs != NULL) {
         del_hefesto_func_list_ctx(proto_funcs->next);
@@ -561,7 +562,8 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                             int *errors,
                                     hefesto_func_list_ctx *functions_decl,
                                     hefesto_var_list_ctx *gl_vars,
-                                    hefesto_options_ctx *forge_functions_name) {
+                                    hefesto_options_ctx *forge_functions_name,
+                                    int only_prototypes) {
 
     hefesto_func_list_ctx *functions, *f;
     char *buffer = NULL, *name = NULL, c, *section = NULL;
@@ -681,7 +683,7 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                      get_hefesto_func_list_ctx_name(name,
                                                           functions_decl) :
                                                                         NULL;
-                                if (functions_decl == NULL || f == NULL) {
+                                if (only_prototypes) {
                                     add_function_header(&functions, name,
                                                         get_var_type(buffer),
                                                         argl);

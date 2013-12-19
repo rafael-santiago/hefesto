@@ -61,7 +61,7 @@ hefesto.prologue() {
         config_basic_ld_deps();
         # Now we'll invoke the libhere's forge
         hefesto.sys.cd("here");
-        hefesto.sys.forge("here", "Forgefile.hls", "");
+        hefesto.sys.forge("here", "Forgefile.hls", "--compile-model=debug");
         hefesto.sys.cd("..");
         # If all ok, now we forge the Hefesto app...
         if (hefesto.sys.last_forge_result() == 0) {

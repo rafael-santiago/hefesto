@@ -232,7 +232,7 @@ void del_hefesto_var_list_ctx(hefesto_var_list_ctx *list) {
 
     hefesto_var_list_ctx *p, *t;
 
-    for (p = t = list; p; p = t) {
+    for (p = t = list; t; p = t) {
         t = p->next;
         if (p->contents) {
             if (p->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {

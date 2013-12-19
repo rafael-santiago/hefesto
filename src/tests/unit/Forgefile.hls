@@ -40,7 +40,7 @@ function get_hfst_objs() : result type none {
     $l = 0;
     while ($l < $ldflags.count()) {
         $tmp = $ldflags.item($l);
-        if ($tmp.match(".*main\.o$") == 1) {
+        if ($tmp.match(".*main\\.o$") == 1) {
             $ldflags.del_index($l);
             break;
         }
