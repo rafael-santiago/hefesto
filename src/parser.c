@@ -489,7 +489,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
         //                                                                       ===
         proto_funcs = get_hefesto_func_list_ctx_tail(functions_decl);
         for (ip = local_includes; ip; ip = ip->next) {
-            inc_fp = fopen(ip->filepath, "r");
+            inc_fp = fopen(ip->filepath, "rb");
             fseek(inc_fp, 0L, SEEK_END);
             inc_fp_size = ftell(inc_fp);
             fseek(inc_fp, 0L, SEEK_SET);
