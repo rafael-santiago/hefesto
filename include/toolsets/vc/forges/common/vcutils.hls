@@ -5,6 +5,8 @@
 # Description: Some common utilities to be used in all vc's toolsets.
 #
 
+include ~/fsutil.hls
+
 function vc_get_filename(artifact type string) : result type string {
     var al type int;
     var a type int;
@@ -35,35 +37,45 @@ function vc_should_compile(srcfile type string) : result type int {
 }
 
 function vc_mk_compile_cmd(source type string, incs type string,
-                           cflags type string, isrelease type int,
+                           cflags type string, obj_dir type string,
+                           isrelease type int, 
                            isstatic type int) : result type string {
     var cmd type string;
+    var object type string;
+            
+    $object = filenamewnoext(filenamefrompath($source)) + ".obj";
+    $object = hefesto.sys.make_path($obj_dir, $object);
+    
     if ($isrelease == 1) {
         if ($isstatic == 1) {
-            $cmd = hefesto.toolset.compile_release_static($source, $incs, $cflags);
+            $cmd = hefesto.toolset.compile_release_static($source, $object, $incs, $cflags);
         } else {
-            $cmd = hefesto.toolset.compile_release_shared($source, $incs, $cflags);
+            $cmd = hefesto.toolset.compile_release_shared($source, $object, $incs, $cflags);
         }
     } else {
         if ($isstatic == 1) {
-            $cmd = hefesto.toolset.compile_debug_static($source, $incs, $cflags);
+            $cmd = hefesto.toolset.compile_debug_static($source, $object, $incs, $cflags);
         } else {
-            $cmd = hefesto.toolset.compile_debug_shared($source, $incs, $cflags);
+            $cmd = hefesto.toolset.compile_debug_shared($source, $object, $incs, $cflags);
         }
     }
+    
     result $cmd;
 }
 
 function vc_sync_compile_src(source type string, incs type string,
-                             cflags type string, isrelease type int,
+                             cflags type string, obj_dir type string,
+                             isrelease type int,
                              isstatic type int) : result type int {
     var cmd type string;
-    $cmd = vc_mk_compile_cmd($source, $incs, $cflags, $isrelease, $isstatic);
+    $cmd = vc_mk_compile_cmd($source, $incs, $cflags, $obj_dir,
+                             $isrelease, $isstatic);
     result hefesto.sys.run($cmd);    
 }
 
 function vc_async_compile_srcs(sources type list, incs type string,
-                               cflags type string, isrelease type int,
+                               cflags type string, obj_dir type string,
+                               isrelease type int,
                                isstatic type int) : result type int {
     var cmds type list;
     var cmd type string;
@@ -98,7 +110,8 @@ function vc_async_compile_srcs(sources type list, incs type string,
         while ($q < $qsize_nr && $s < $sources.count()) {
             $curr_src_file = $sources.item($s);
             if (vc_should_compile($curr_src_file) == 1) {
-                $cmd = vc_mk_compile_cmd($curr_src_file, $incs, $cflags, $isrelease, $isstatic);
+                $cmd = vc_mk_compile_cmd($curr_src_file, $incs, $cflags, $obj_dir,
+                                         $isrelease, $isstatic);
                 $cmds.add_item($cmd);
                 $aux_compiled.add_item($curr_src_file);
             }
@@ -126,35 +139,20 @@ function vc_async_compile_srcs(sources type list, incs type string,
     result $exit_code;
 }
 
-function vc_objs_from_srcs(srcs type list) : result type string {
-    var filename type string;
-    var f type int;
+function vc_objs_from_srcs(srcs type list,
+                           obj_dir type string) : result type string {
     var objname type string;
-    var o type int;
-    var s type int;
     var obj_str_list type string;
+    var s type int;
     
     $obj_str_list = "";
     
     $s = 0;
     while ($s < $srcs.count()) {
-        $filename = $srcs.item($s);
-        
-        $f = $filename.len() - 1;
-        while ($f > 0 && $filename.at($f) != ".") {
-            $f = $f - 1;
-        }
-        $objname = "";
-        $o = 0;
-        while ($o < $f) {
-            $objname = $objname + $filename.at($o);
-            $o = $o + 1;
-        }
-        if ($f > 0) {
-            $objname = $objname + ".obj ";
-            $obj_str_list = $obj_str_list + $objname;
-        }
-        
+        $objname = $srcs.item($s);
+        $objname = filenamewnoext(filenamefrompath($objname)) + ".obj";
+        $objname = hefesto.sys.make_path($obj_dir, $objname);
+        $obj_str_list = $obj_str_list + $objname + " ";
         $s = $s + 1;
     }
     

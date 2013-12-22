@@ -5,10 +5,12 @@
 include ~/toolsets/vc/vc110-lib.hls
 include ~/toolsets/vc/forges/common/vcutils.hls
 include ~/toolsets/vc/vcvarsall/vcvarsall_110.hls
+include ~/fsutil.hls
 
 function vc110_lib_forge(sources type list, includepaths type list,
                          cflags type list, libpaths type list,
                          ldflags type list, libname type string) : result type int {
+                         
     var exit_code type int;
     $exit_code = 0;
     
@@ -23,6 +25,31 @@ function vc110_lib_forge(sources type list, includepaths type list,
     if ($exit_code != 0) {
         hefesto.sys.echo(hefesto.project.toolset() + " critical error: unable to configure VC110 environment!\n");
         result $exit_code;
+    }
+    
+    var obj_output_dir type list;
+    var obj_dir type string;
+    
+    $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
+    
+    if ($obj_output_dir.count() > 0) {
+        $obj_dir = $obj_output_dir.item(0);
+        mktree($obj_dir);
+    } else {
+        $obj_dir = hefesto.sys.pwd();        
+    }
+    
+    var bin_output_dir type list;
+    var bin_output type string;
+    
+    $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
+    
+    if ($bin_output_dir.count() > 0) {
+        $bin_output = $bin_output_dir.item(0);
+        mktree($bin_output);
+        $bin_output = hefesto.sys.make_path($bin_output, $libname);
+    } else {
+        $bin_output = $libname;        
     }
     
     if ($sources.count() == 0) {
@@ -109,6 +136,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
                 $exit_code = vc_sync_compile_src($curr_src_file,
                                                  $includepaths_str,
                                                  $cflags_str,
+                                                 $obj_dir,
                                                  $isrelease,
                                                  $isstatic);
                 if ($exit_code == 0) {
@@ -130,6 +158,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
         $exit_code = vc_async_compile_srcs($sources,
                                            $includepaths_str,
                                            $cflags_str,
+                                           $obj_dir,
                                            $isrelease,
                                            $isstatic);    
     }
@@ -137,7 +166,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
     if ($exit_code == 0) {
         hefesto.sys.echo("*** All sources were compiled.\n\n*** Linking...\n");        
         var binary type string;
-        $binary = $libname;
+        $binary = $bin_output;
         if (($binary.match("\\.lib$") > -1 || $binary.match("\\.a$") > -1) &&
             $isstatic == 0) {
             $binary = vc110_get_libname($binary) + ".dll";
@@ -148,6 +177,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
         if ($compilation_nr > 0) {
             # linking...
             $exit_code = vc_link_objects2lib($sources,
+                                             $obj_dir,
                                              $libpaths_str,
                                              $ldflags_str,
                                              $binary,
@@ -166,13 +196,15 @@ function vc110_lib_forge(sources type list, includepaths type list,
     result $exit_code;
 }
 
-function vc_link_objects2lib(sources type list, libs type string,
+function vc_link_objects2lib(sources type list,
+                             obj_dir type string,
+                             libs type string,
                              ldflags type string, libname type string,
                              isrelease type int, isstatic type int) : result type int {
     var cmd type string;
     var objects type string;    
     var retcode type int;
-    $objects = vc_objs_from_srcs($sources);
+    $objects = vc_objs_from_srcs($sources, $obj_dir);
     $retcode = 1;
     if ($isstatic == 1) {
         $cmd = hefesto.toolset.lib($libname, $objects, $libs, $ldflags);
