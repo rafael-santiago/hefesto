@@ -21,6 +21,10 @@
 #       --link-model=<static|shared>: select for shared or static.
 #                                     (the default is shared)
 #       --ldflags=<linker flags>: flags that must be passed to linker.
+#       --obj-output-dir=<path> - indicates the output dir for the object
+#                                 files.
+#       --bin-output-dir=<path> - indicates the output dir for the binary
+#                                 file.
 #
 # FINAL USERS, WARNING:
 # --------------------
@@ -29,6 +33,7 @@
 #
 
 include ~/toolsets/gcc/forges/common.hls
+include ~/fsutil.hls
 
 var gcc_c_project_forge_dirty_files_nr type int;
 
@@ -46,7 +51,7 @@ function gcc_mk_app_compilation_command(src_name type string,
     result $cmd;
 }
 
-function gcc_compile_source_list(sources type list, includes type string, cflags type string) : result type int {
+function gcc_compile_source_list(sources type list, includes type string, cflags type string, obj_dir type string) : result type int {
     var size type int;
     var i type int;
     var exit_code type int;
@@ -59,14 +64,20 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
     var is_release type int;
     var curr_src_file type string;
     var regex type string;
+
     $size = $sources.count();
+
     if ($size == 0) result 0;
+
     $qsize_list = hefesto.sys.get_option("qsize");
+
     if ($qsize_list.count() > 0) {
         $qsize = $qsize_list.item(0);
     }
+
     $compile_model = hefesto.sys.get_option("compile-model");
     $is_release = 1;
+
     if ($compile_model.count() > 0) {
         if ($compile_model.item(0) != "release" &&
             $compile_model.item(0) != "debug") {
@@ -75,13 +86,16 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
         }
         $is_release = ($compile_model.item(0) == "release");
     }
+
     $exit_code = 0;
     $i = 0;
+
     $gcc_c_project_forge_dirty_files_nr = 0;
+
     if ($qsize <= 1) {
         while ($i < $size && $exit_code == 0) {
             $ofile = $sources.item($i);
-            $ofile = gcc_mk_ofile_name($ofile);
+            $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
             $regex = gcc_mk_regex_pattern_from_filepath($ofile);
             if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
@@ -104,7 +118,7 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
     } else {
         while ($i < $size) {
             $ofile = $sources.item($i);
-            $ofile = gcc_mk_ofile_name($ofile);            
+            $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
             $regex = gcc_mk_regex_pattern_from_filepath($ofile);
             if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
@@ -170,6 +184,29 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
         result 0;
     }
 
+    var obj_output_dir type list;
+    var obj_dir type string;
+
+    $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
+    if ($obj_output_dir.count() > 0) {
+        $obj_dir = $obj_output_dir.item(0);
+        mktree($obj_dir);
+    } else {
+        $obj_dir = hefesto.sys.pwd();
+    }
+
+    var bin_output_dir type list;
+    var bin_output type string;
+
+    $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
+    if ($bin_output_dir.count() > 0) {
+        $bin_output = $bin_output_dir.item(0);
+        mktree($bin_output);
+        $bin_output = hefesto.sys.make_path($bin_output, $APPNAME);
+    } else {
+        $bin_output = $APPNAME;
+    }
+
     $exit_code = 0;
 
     $includes = gcc_mk_gcc_incl_str_opt($INCLUDES); #  GCC's include list option string
@@ -179,20 +216,19 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     #  compiling...
     hefesto.sys.echo("*** compiling...\n");
 
-    $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags); # ver pq nao passa a lista com o total de conteudos correto
-    $regex = hefesto.sys.make_path(hefesto.sys.pwd(), $APPNAME);
-    $regex = gcc_mk_regex_pattern_from_filepath($regex);
+    $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); # ver pq nao passa a lista com o total de conteudos correto
+    $regex = gcc_mk_regex_pattern_from_filepath($bin_output);
     if ($gcc_c_project_forge_dirty_files_nr == 0 && hefesto.sys.ls($regex) == 0) {
         $gcc_c_project_forge_dirty_files_nr = 1;
     }
 
     if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
-        $objects = gcc_mk_ofiles_str_opt($SOURCES);
+        $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
         $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
         $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
         #  linking...
         hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");
-        $exit_code = gcc_link_ofiles($objects, $libraries, $ldflags, $APPNAME);
+        $exit_code = gcc_link_ofiles($objects, $libraries, $ldflags, $bin_output);
     }
 
     if ($exit_code == 0) {
