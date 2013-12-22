@@ -113,6 +113,9 @@ static void del_hefesto_modio(struct hefesto_modio *modio) {
 
 static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     size_t l = 0;
+#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    LPSTR err_msg = NULL;
+#endif
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
         if (strcmp(module_filepath, HEFESTO_LDMOD_TABLE[l].module_path) == 0) {
             return HEFESTO_LDMOD_TABLE[l].handle;
@@ -127,19 +130,32 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     }
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     hp = LoadLibrary(module_filepath);
+    if (hp == NULL) {
+        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                      FORMAT_MESSAGE_FROM_SYSTEM |
+                      FORMAT_MESSAGE_IGNORE_INSERTS,
+                      NULL, GetLastError(),
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      err_msg, 0, NULL);
+        hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE,
+                  module_filepath, err_msg);
+        LocalFree(err_msg);
+    }
 #endif
-    for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
-        if (HEFESTO_LDMOD_TABLE[l].handle == NULL) {
-            memset(HEFESTO_LDMOD_TABLE[l].module_path, 0,
-                   sizeof(HEFESTO_LDMOD_TABLE[l].module_path));
-            strncpy(HEFESTO_LDMOD_TABLE[l].module_path, module_filepath,
-                    sizeof(HEFESTO_LDMOD_TABLE[l].module_path)-1);
-            HEFESTO_LDMOD_TABLE[l].handle = hp;
-            HEFESTO_LDMOD_TABLE[l].ref_count = HEFESTO_LDMOD_MAX_REF_COUNT;
-            break;
+    if (hp != NULL) {
+        for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
+            if (HEFESTO_LDMOD_TABLE[l].handle == NULL) {
+                memset(HEFESTO_LDMOD_TABLE[l].module_path, 0,
+                       sizeof(HEFESTO_LDMOD_TABLE[l].module_path));
+                strncpy(HEFESTO_LDMOD_TABLE[l].module_path, module_filepath,
+                        sizeof(HEFESTO_LDMOD_TABLE[l].module_path)-1);
+                HEFESTO_LDMOD_TABLE[l].handle = hp;
+                HEFESTO_LDMOD_TABLE[l].ref_count = HEFESTO_LDMOD_MAX_REF_COUNT;
+                break;
+            }
         }
     }
-    return hp;
+    return hp;    
 }
 
 static int hvm_mod_close(hefesto_mod_handle mod_handle) {
@@ -312,6 +328,8 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
         }
         // okay, we're still alive ;)
         del_hefesto_var_list_ctx(args);
+    } else {
+        **otype = HEFESTO_VAR_TYPE_NONE;
     }
 
     return res;

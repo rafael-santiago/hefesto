@@ -354,4 +354,3 @@ here_search_program_ctx *here_compile(const char *regex, char *mstatus) {
 
     return search_program;
 }
-

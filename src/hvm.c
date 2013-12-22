@@ -546,7 +546,9 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
 
             case HEFESTO_VAR_TYPE_STRING:
             case HEFESTO_VAR_TYPE_INT:
-                var = assign_data_to_hefesto_var(var, expr_result, out_sz);
+                if (etype != HEFESTO_VAR_TYPE_NONE) {
+                    var = assign_data_to_hefesto_var(var, expr_result, out_sz);
+                }
                 break;
 
             case HEFESTO_VAR_TYPE_FILE_DESCRIPTOR:
