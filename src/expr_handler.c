@@ -11,8 +11,13 @@
 #include "exprchk.h"
 #include "synchk.h"
 #include "parser.h"
+#include "mem.h"
 
 #define hefesto_set_expr_op(o,p) { o, p }
+
+#define is_hefesto_op(o) ( o == '+' || o == '-' || o == '*' || o == '/' ||\
+                           o == '=' || o == '>' || o == '<' || o == '&' ||\
+                           o == '|' || o == '^' || o == '%' || o == '!')
 
 static struct hefesto_expr_ops_ctx HEFESTO_EXPR_OPS[HEFESTO_EXPR_OPS_NR] = {
   hefesto_set_expr_op("+\0", 1),
@@ -40,6 +45,8 @@ static struct hefesto_expr_ops_ctx HEFESTO_EXPR_OPS[HEFESTO_EXPR_OPS_NR] = {
 
 static char *infix2postfix_function_args(const char *expr_args,
                                          const size_t esize);
+
+static int is_postfixed(const char *expr);
 
 static char *infix2postfix_function_args(const char *expr_args,
                                          const size_t esize) {
@@ -100,6 +107,12 @@ char *infix2postfix(const char *expr, const size_t esize, const int main_call) {
 
     term = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     memset(term, 0, HEFESTO_MAX_BUFFER_SIZE);
+
+    if (is_postfixed(expr)) {
+        strncpy(term, expr, HEFESTO_MAX_BUFFER_SIZE-1);
+        return term;
+    }
+
     t = term;
     *t = 0;
 
@@ -291,4 +304,68 @@ ssize_t get_op_index(const char *op) {
 
     return -1;
 
+}
+
+static int is_postfixed(const char *expr) {
+    const char *ep;
+    int state = 0;
+    char *buffer = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    char *b_end = buffer + HEFESTO_MAX_BUFFER_SIZE;
+    char *bp = buffer;
+    int retval = 0;
+    for (ep = expr; *ep != 0 && !retval && state < 3; ep++) {
+        if (!is_hefesto_blank(*ep) && !is_hefesto_op(*ep)) {
+            if (bp < b_end) {
+                *bp = *ep;
+                bp++;
+                if (is_hefesto_string_tok(*ep)) {
+                    ep++;
+                    while (!is_hefesto_string_tok(*ep) &&
+                           *ep != 0 && bp < b_end) {
+                        *bp = *ep;
+                        if (*ep == '\\') {
+                            bp++;
+                            ep++;
+                            *bp = *ep;
+                        }
+                        bp++;
+                        ep++;
+                    }
+                    *bp = *ep;
+                    bp++;
+                }
+            }
+        } else {
+            if (bp == buffer && is_hefesto_op(*ep)) {
+                *bp = *ep;
+                ep++;
+                bp++;
+            }
+            if (bp == buffer) continue;
+            *bp = 0;
+            switch (state) {
+                case 0:
+                case 1:
+                    if (is_hefesto_op(*buffer)) {
+                        state = 3; // it is not the expected.
+                    }
+                    state++;
+                    break;
+
+                case 2:
+                    if (!is_hefesto_op(*buffer)) {
+                        state = 3; // it is not the expected.
+                    }
+                    state++;
+                    if (state == 3) {
+                        retval = 1;
+                    }
+                    break;
+            }
+            bp = buffer;
+            if (is_hefesto_op(*ep)) ep--;
+        }
+    }
+    free(buffer);
+    return retval;
 }

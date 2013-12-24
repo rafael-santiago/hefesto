@@ -115,7 +115,12 @@ mylab.prologue() {
     $foo.replace("\\..*$", ".obj");
     funcao_bugosa();
     hefesto.sys.echo("FOO = " + $foo + "\n");
-    hefesto.sys.echo("*** done.\n");
+    $foo = hefesto.sys.make_path($foo, $foo + "ec" + "ti" + "ve " + haha("it " + "works" + " fine " + "dude!!"));
+    hefesto.sys.echo("*** done. ("+ $foo + ")\n");
+}
+
+function haha(myadd type string) : result type string {
+    result "hoho " + $myadd;
 }
 
 function test_buf_fucked_oh_no(install_dir type string) : result type string {
