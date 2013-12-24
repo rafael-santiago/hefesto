@@ -155,7 +155,7 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
             }
         }
     }
-    return hp;    
+    return hp;
 }
 
 static int hvm_mod_close(hefesto_mod_handle mod_handle) {
@@ -181,6 +181,15 @@ static int hvm_mod_close(hefesto_mod_handle mod_handle) {
         }
     }
     return retval;
+}
+
+void hvm_mod_ldmod_table_cleanup() {
+    size_t l;
+    for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
+        if (HEFESTO_LDMOD_TABLE[l].handle != NULL) {
+            hvm_mod_close(HEFESTO_LDMOD_TABLE[l].handle);
+        }
+    }
 }
 
 static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle mod_handle,

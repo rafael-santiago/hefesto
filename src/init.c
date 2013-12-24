@@ -9,6 +9,7 @@
 #include "types.h"
 #include "vfs.h"
 #include "mem.h"
+#include "hvm_mod.h"
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
@@ -28,4 +29,5 @@ void hefesto_init() {
 
 void hefesto_deinit() {
     clear_hefesto_file_ptr_pool();
+    hvm_mod_ldmod_table_cleanup();
 }
