@@ -10,28 +10,28 @@ include ~/fsutil.hls
 function vc_get_filename(artifact type string) : result type string {
     var al type int;
     var a type int;
-    
+
     $al = $artifact.len() - 1;
-    
+
     while ($al > 0 && $artifact.at($al) != ".") $al = $al - 1;
-    
+
     var return type string;
-    
+
     $a = 0;
     $return = "";
-    
+
     while ($a < $al) {
         $return = $return + $artifact.at($a);
         $a = $a + 1;
     }
-    
+
     result $return;
 }
 
 function vc_should_compile(srcfile type string) : result type int {
     var objfile type string;
     var should type int;
-    $objfile = vc_get_filename($srcfile) + ".obj";    
+    $objfile = vc_get_filename($srcfile) + ".obj";
     $should = hefesto.toolset.file_has_change($srcfile) || (hefesto.sys.ls($objfile) == 0);
     result $should;
 }
@@ -42,10 +42,10 @@ function vc_mk_compile_cmd(source type string, incs type string,
                            isstatic type int) : result type string {
     var cmd type string;
     var object type string;
-            
+
     $object = filenamewnoext(filenamefrompath($source)) + ".obj";
     $object = hefesto.sys.make_path($obj_dir, $object);
-    
+
     if ($isrelease == 1) {
         if ($isstatic == 1) {
             $cmd = hefesto.toolset.compile_release_static($source, $object, $incs, $cflags);
@@ -59,7 +59,7 @@ function vc_mk_compile_cmd(source type string, incs type string,
             $cmd = hefesto.toolset.compile_debug_shared($source, $object, $incs, $cflags);
         }
     }
-    
+
     result $cmd;
 }
 
@@ -70,7 +70,7 @@ function vc_sync_compile_src(source type string, incs type string,
     var cmd type string;
     $cmd = vc_mk_compile_cmd($source, $incs, $cflags, $obj_dir,
                              $isrelease, $isstatic);
-    result hefesto.sys.run($cmd);    
+    result hefesto.sys.run($cmd);
 }
 
 function vc_async_compile_srcs(sources type list, incs type string,
@@ -85,24 +85,24 @@ function vc_async_compile_srcs(sources type list, incs type string,
     var q type int;
     var exit_code type int;
     var curr_src_file type string;
-    
+
     $qsize = hefesto.sys.get_option("qsize");
     if ($qsize.count() > 0) {
         $qsize_nr = $qsize.item(0);
     } else {
         $qsize_nr = 1;
     }
-    
+
     $exit_code = 0;
-    
+
     $s = 0;
-    
+
     var compiled type list;
     var aux_compiled type list;
     var compilation_nr type int;
-    
+
     $compilation_nr = 0;
-    
+
     while ($s < $sources.count() && $exit_code == 0) {
         $cmds.clear();
         $q = 0;
@@ -131,11 +131,11 @@ function vc_async_compile_srcs(sources type list, incs type string,
             }
         }
     }
-    
+
     if ($compilation_nr > 0) {
         hefesto.toolset.base_refresh($compiled);
     }
-    
+
     result $exit_code;
 }
 
@@ -144,9 +144,9 @@ function vc_objs_from_srcs(srcs type list,
     var objname type string;
     var obj_str_list type string;
     var s type int;
-    
+
     $obj_str_list = "";
-    
+
     $s = 0;
     while ($s < $srcs.count()) {
         $objname = $srcs.item($s);
@@ -155,7 +155,7 @@ function vc_objs_from_srcs(srcs type list,
         $obj_str_list = $obj_str_list + $objname + " ";
         $s = $s + 1;
     }
-    
+
     result $obj_str_list;
 }
 

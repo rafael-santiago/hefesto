@@ -23,38 +23,38 @@ function vc110_app_forge(sources type list, includepaths type list,
                          cflags type list, libpaths type list,
                          ldflags type list, appname type string) : result type int {
     var exit_code type int;
-    $exit_code = 0;    
-    
+    $exit_code = 0;
+
     #
     # Try to detect the cpu architecture.
     #
     # If you need to specify an architecture use --cpu-arch=<arch> option.
     #
-    
+
     $exit_code = vc110_vcvarsall("");
-    
+
     if ($exit_code != 0) {
         hefesto.sys.echo(hefesto.project.toolset() + " critical error: unable to configure VC110 environment!\n");
         result $exit_code;
     }
-    
-        var obj_output_dir type list;
+
+    var obj_output_dir type list;
     var obj_dir type string;
-    
+
     $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
-    
+
     if ($obj_output_dir.count() > 0) {
         $obj_dir = $obj_output_dir.item(0);
         mktree($obj_dir);
     } else {
         $obj_dir = hefesto.sys.pwd();
     }
-    
+
     var bin_output_dir type list;
     var bin_output type string;
-    
+
     $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
-    
+
     if ($bin_output_dir.count() > 0) {
         $bin_output = $bin_output_dir.item(0);
         mktree($bin_output);
@@ -62,15 +62,15 @@ function vc110_app_forge(sources type list, includepaths type list,
     } else {
         $bin_output = $appname;
     }
-    
+
     if ($sources.count() == 0) {
         hefesto.sys.echo(hefesto.project.toolset() + " critical error: no files to process!\n");
         result 1;
     }
-    
+
     var isrelease type int;
     var compilemodel type list;
-    
+
     $compilemodel = hefesto.sys.get_option("compile-model");
     if ($compilemodel.count() > 0) {
         if ($compilemodel.item(0) == "release") {
@@ -86,10 +86,10 @@ function vc110_app_forge(sources type list, includepaths type list,
     } else {
         $isrelease = 1;
     }
-    
+
     var isstatic type int;
     var linkmodel type list;
-    
+
     $linkmodel = hefesto.sys.get_option("link-model");
     if ($linkmodel.count() != 0) {
         if ($linkmodel.item(0) == "static") {
@@ -105,42 +105,42 @@ function vc110_app_forge(sources type list, includepaths type list,
     } else {
         $isstatic = 1;
     }
-       
+
     var includepaths_str type string;
     var libpaths_str type string;
     var ldflags_str type string;
     var cflags_str type string;
-    
+
     $includepaths_str = vcincs2string($includepaths);
     $libpaths_str = vclibs2string($libpaths);
     $ldflags_str = vcflags2string($ldflags);
     $cflags_str = vcflags2string($cflags);
-    
+
     var s type int;
-    
+
     hefesto.sys.echo("*** Compiling... please wait...\n");
-    
+
     # compiling...
-    
+
     $s = 0;
-    
+
     var qsize type list;
     var qsize_nr type int;
-    
+
     $qsize = hefesto.sys.get_option("qsize");
     if ($qsize.count() > 0) {
         $qsize_nr = $qsize.item(0);
     } else {
         $qsize_nr = 1;
     }
-    
+
     var curr_src_file type string;
     var compiled type list;
     var compilation_nr type int;
-    
+
     $compilation_nr = 0;
-    
-    if ($qsize_nr == 1) {    
+
+    if ($qsize_nr == 1) {
         while ($s < $sources.count() && $exit_code == 0) {
             $curr_src_file = $sources.item($s);
             if (vc_should_compile($curr_src_file) == 1) {
@@ -165,15 +165,15 @@ function vc110_app_forge(sources type list, includepaths type list,
         if ($compilation_nr > 0) {
             hefesto.toolset.base_refresh($compiled);
         }
-    } else {    
+    } else {
         $exit_code = vc_async_compile_srcs($sources,
                                            $includepaths_str,
                                            $cflags_str,
                                            $obj_dir,
                                            $isrelease,
-                                           $isstatic);    
+                                           $isstatic);
     }
-    
+
     if ($exit_code == 0) {
         hefesto.sys.echo("*** All sources were compiled.\n\n*** Linking...\n");
         if (hefesto.sys.ls($appname + "$") == 0 && $compilation_nr == 0) {
@@ -196,7 +196,7 @@ function vc110_app_forge(sources type list, includepaths type list,
     } else {
         hefesto.sys.echo("*** Errors were found.\n");
     }
-    
+
     result $exit_code;
 }
 
