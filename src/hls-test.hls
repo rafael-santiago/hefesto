@@ -115,7 +115,7 @@ mylab.prologue() {
     $foo.replace("\\..*$", ".obj");
     funcao_bugosa();
     hefesto.sys.echo("FOO = " + $foo + "\n");
-    $foo = hefesto.sys.make_path($foo, $foo + "ec" + "ti" + "ve " + haha("it " + "works" + " fine " + "dude!!"));
+    $foo = hefesto.sys.make_path($foo, $foo + ((("ec" + ("ti" + "ve ")))) + haha("it " + "works" + " fine " + "dude!!"));
     hefesto.sys.echo("*** done. ("+ $foo + ")\n");
 }
 

@@ -515,16 +515,17 @@ int synchk_check_language_production(const char *command,
                             v++;
                             while (!is_hefesto_string_tok(*c) && *c != 0) {
                                 *v = *c;
-                                c++;
-                                v++;
                                 if (*c == '\\') {
-                                    *v = *c;
                                     c++;
                                     v++;
+                                    *v = *c;
                                 }
+                                c++;
+                                v++;
                                 *v = 0;
                             }
                             *v = *c;
+                            //c--;
                         }
                     }
                     if (*c == ';') {
@@ -540,6 +541,7 @@ int synchk_check_language_production(const char *command,
                                       HLSCM_SYN_ERROR_INVAL_EXPR, cmd_p);
                         }
                     } else {
+                        *v = 0;
                         hlsc_info(HLSCM_MTYPE_SYNTAX,
                                   HLSCM_SYN_ERROR_LNTERM_MISSING, cmd_p);
                         result = 0;
@@ -2074,7 +2076,7 @@ char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
     if (*c == 0 || *c == ')' || *c == ';') return arg;
     a = (char *) c;
     omx = 0;
-    for (; *c != 0 && !omx && *c != ';'; c++) {
+    for (; *c != 0 && !omx && *c != ';' && *c != ','; c++) {
         if (is_hefesto_string_tok(*c)) {
             c++;
             while (!is_hefesto_string_tok(*c) && *c != 0) {
@@ -2089,7 +2091,7 @@ char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
     if (omx) {
         o = 1;
         omx = 0;
-        for (; o > 0 && *c != 0 && *c != ';' && *c != ','; c++) {
+        for (; /*o > 0 &&*/ *c != 0 && *c != ';' && *c != ','; c++) {
             if (is_hefesto_string_tok(*c)) {
                 c++;
                 while (!is_hefesto_string_tok(*c) && *c != 0) {
@@ -2166,10 +2168,11 @@ char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
     while (is_hefesto_blank(*c)) c++;
 
     *offset = (c - calling_buffer);
-    if (arg && *arg != 0 && *arg != '(' && strlen(arg) > 1) {
+    /*if (arg && *arg != 0 && *arg != '(' && strlen(arg) > 1) {
         if (arg[strlen(arg)-2] == ')' &&
             !is_hefesto_string_tok(arg[strlen(arg)-1])) {
             arg[strlen(arg)-2] = 0;
+            printf("ARG: %s\n", arg);
             *offset -= 2;
         }
         if (strlen(arg) > 1) {
@@ -2178,9 +2181,35 @@ char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
                 *a = 0;
             }
         }
+    }*/
+    if (strlen(arg) > 1) {
+        // trimming
+        for (a = &arg[strlen(arg)-1]; a != arg && is_hefesto_blank(*a); a--) {
+            *a = 0;
+        }
+        o = 0;
+        for (a = arg; *a != 0; a++) {
+            if (*a == '(') {
+                o++;
+            } else if (*a == ')') {
+                o--;
+            } else if (is_hefesto_string_tok(*a)) {
+                a++;
+                while (!is_hefesto_string_tok(*a) && *a != 0) {
+                    if (*a == '\\') a++;
+                    a++;
+                }
+            }
+        }
+
+        if (o == -1 && *(c + 1) == 0) {
+            *(a-1) = 0;
+        }
     }
+
     if (*c == ')' && *(c+1) == ',') {
         *offset += 2;
+        if (*offset == '(') *offset -= 1;
     }
 
     return arg;
