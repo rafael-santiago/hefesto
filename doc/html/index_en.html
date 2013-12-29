@@ -127,6 +127,7 @@
 		<TR><TD>time()</TD><TD>returns a string representing the system time based on provided format</TD></TR>
                 <TR><TD>setenv()</TD><TD>creates an environment variable</TD></TR>
                 <TR><TD>unsetenv()</TD><TD>removes an environment variable</TD></TR>
+                <TR><TD>call_from_module()</TD><TD>calls functions coded into a shared library</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -650,7 +651,18 @@
 			<LI><CODE>&nbsp;hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 		</OL>        
-		
+
+        <H5><B><U>call_from_module()</U></B></H5>
+        
+		Calls functions coded into a shared library. These functions must be implemented using a special struct, more details about how to
+                write hefesto's modules can be found in document destinated to it.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.call_from_module("/usr/shared/mymods/my_killer_mod.so", "my_killer_func", "arg1", "arg2", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+        
 		<BR><BR><A HREF = "#topics">Back</A>
 		
 		<!-- hls toolset dialect -->

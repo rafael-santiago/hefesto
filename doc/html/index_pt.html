@@ -141,9 +141,10 @@
                 <TR><TD>last_forge_result()</TD><TD>obtém o exit code do último processo de forja executado</TD></TR>
                 <TR><TD>forge()</TD><TD>invoca um outro projeto de forja</TD></TR>
                 <TR><TD>byref()</TD><TD>atualiza os valores de um argumento de função para a variável externa que foi passada como esse argumento local</TD></TR>
-				<TR><TD>time()</TD><TD>retorna uma string representando o tempo do sistema de acordo com o formato passado</TD></TR>
+		<TR><TD>time()</TD><TD>retorna uma string representando o tempo do sistema de acordo com o formato passado</TD></TR>
                 <TR><TD>setenv()</TD><TD>cria uma variável de ambiente</TD></TR>
                 <TR><TD>unsetenv()</TD><TD>remove uma variável de ambiente</TD></TR>
+                <TR><TD>call_from_module()</TD><TD>chama uma função implementada em uma biblioteca dinâmica</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -672,7 +673,20 @@
 			<LI><CODE>&nbsp;hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 		</OL>        
+
+        <H5><B><U>call_from_module()</U></B></H5>
 		
+		Chama uma função implementada numa biblioteca dinâmica.<BR><BR>
+
+                O módulo precisa conter funções implementadas utilizando uma estrutura de dados especial. Mais informações sobre isso podem
+                ser encontradas no documento destinado a especificar os detalhes de implementação de módulos para o hefesto.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.call_from_moduke("/usr/share/mymods/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+
 		<BR><BR><A HREF = "#topics">Voltar</A>
 		
         <!-- hls toolset dialect -->
