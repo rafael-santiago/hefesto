@@ -1514,7 +1514,7 @@ static void *eval_leq(hefesto_common_stack_ctx *a,
 
         case HEFESTO_VAR_TYPE_STRING:
             if (a->data && b->data) {
-                *r_int = (a->dsize <= b->dsize);
+                *r_int = (strcmp(a->data, b->data) <= 0);
             }
             break;
 
@@ -1564,7 +1564,7 @@ static void *eval_ged(hefesto_common_stack_ctx *a,
 
         case HEFESTO_VAR_TYPE_STRING:
             if (a->data && b->data) {
-                *r_int = (a->dsize >= b->dsize);
+                *r_int = (strcmp(a->data, b->data) >= 0);
             }
             break;
 
@@ -1614,7 +1614,8 @@ static void *eval_less(hefesto_common_stack_ctx *a,
 
         case HEFESTO_VAR_TYPE_STRING:
             if (a->data && b->data) {
-                *r_int = (a->dsize < b->dsize);
+                *r_int = (strcmp(a->data, b->data) < 0);
+
             }
             break;
 
@@ -1664,7 +1665,7 @@ static void *eval_greater(hefesto_common_stack_ctx *a,
 
         case HEFESTO_VAR_TYPE_STRING:
             if (a->data && b->data) {
-                *r_int = (a->dsize > b->dsize);
+                *r_int = (strcmp(a->data, b->data) > 0);
             }
             break;
 
