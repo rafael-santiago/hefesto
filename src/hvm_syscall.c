@@ -492,9 +492,9 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
 
     FILE *fp;
     const char *s;
-    char *arg_file_path = NULL, *arg_file_path_pfix = NULL;
-    char *arg_regex = NULL, *arg_regex_pfix = NULL;
-    char *arg_replace_text = NULL, *arg_replace_text_pfix = NULL;
+    char *arg_file_path = NULL;
+    char *arg_regex = NULL;
+    char *arg_replace_text = NULL;
     void *regex = NULL;
     void *file_path = NULL;
     void *replace_text = NULL;
@@ -516,31 +516,24 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
     offset = s - syscall + 1;
     arg_file_path = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_file_path_pfix = infix2postfix(arg_file_path, strlen(arg_file_path), 1);
-    file_path = expr_eval(arg_file_path_pfix, lo_vars, gl_vars,
+    file_path = expr_eval(arg_file_path, lo_vars, gl_vars,
                           functions, &etype, &osz);
     arg_regex = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_regex_pfix = infix2postfix(arg_regex, strlen(arg_regex), 1);
-    regex = expr_eval(arg_regex_pfix, lo_vars, gl_vars, functions, &etype, &osz);
+    regex = expr_eval(arg_regex, lo_vars, gl_vars, functions, &etype, &osz);
     if ((search_program = here_compile(regex, errors)) != NULL) {
         arg_replace_text = get_arg_from_call(syscall, &offset);
         etype = HEFESTO_VAR_TYPE_STRING;
-        arg_replace_text_pfix = infix2postfix(arg_replace_text,
-                                              strlen(arg_replace_text), 1);
-        replace_text = expr_eval(arg_replace_text_pfix, lo_vars, gl_vars,
+        replace_text = expr_eval(arg_replace_text, lo_vars, gl_vars,
                                  functions, &etype, &osz);
         replace_text_size = strlen((char *)replace_text);
 
         if (!(fp = fopen((char *)file_path, "rb"))) {
             *(int *)result = -1;
             free(arg_file_path);
-            free(arg_file_path_pfix);
             free(arg_regex);
-            free(arg_regex_pfix);
             free(regex);
             free(arg_replace_text);
-            free(arg_replace_text_pfix);
             free(replace_text);
             free(file_path);
             return result;
@@ -574,11 +567,8 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
     }
 
     if (arg_file_path != NULL) free(arg_file_path);
-    if (arg_file_path_pfix != NULL) free(arg_file_path_pfix);
     if (arg_regex != NULL) free(arg_regex);
-    if (arg_regex_pfix != NULL) free(arg_regex_pfix);
     if (arg_replace_text != NULL) free(arg_replace_text);
-    if (arg_replace_text_pfix != NULL) free(arg_replace_text_pfix);
     if (file_path != NULL) free(file_path);
     if (regex != NULL) free(regex);
     if (replace_text != NULL) free(replace_text);
@@ -695,7 +685,7 @@ static void *hefesto_sys_fopen(const char *syscall,
     hefesto_type_t etype = HEFESTO_VAR_TYPE_FILE_DESCRIPTOR;
     size_t osz;
     size_t offset;
-    char *arg_file_path, *arg_file_path_pfix, *arg_mode, *arg_mode_pfix;
+    char *arg_file_path, *arg_mode;
     const char *s;
     void *result;
 
@@ -703,21 +693,17 @@ static void *hefesto_sys_fopen(const char *syscall,
     offset = s - syscall + 1;
     arg_file_path = get_arg_from_call(syscall, &offset);
     arg_mode = get_arg_from_call(syscall, &offset);
-    arg_file_path_pfix = infix2postfix(arg_file_path, strlen(arg_file_path), 1);
-    file_path = expr_eval(arg_file_path_pfix, lo_vars, gl_vars,
+    file_path = expr_eval(arg_file_path, lo_vars, gl_vars,
                           functions, &etype, &osz);
-    arg_mode_pfix = infix2postfix(arg_mode, strlen(arg_mode), 1);
-    mode = expr_eval(arg_mode_pfix, lo_vars, gl_vars, functions, &etype, &osz);
+    mode = expr_eval(arg_mode, lo_vars, gl_vars, functions, &etype, &osz);
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fopen(%s,%s)\n", file_path, mode);
     result = hefesto_fopen(file_path, mode);
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fopen(%s, %s): %x\n", file_path,
                                                                      mode,
                                                                      result);
     free(arg_file_path);
-    free(arg_file_path_pfix);
     free(file_path);
     free(arg_mode);
-    free(arg_mode_pfix);
     free(mode);
 
     **otype = HEFESTO_VAR_TYPE_FILE_DESCRIPTOR;
@@ -733,7 +719,7 @@ static void *hefesto_sys_fwrite(const char *syscall,
                                 hefesto_type_t **otype) {
     const char *s;
     size_t offset;
-    char *arg_fd, *arg_size, *arg_size_pfix, *arg_buf, *arg_buf_pfix;
+    char *arg_fd, *arg_size, *arg_buf;
     hefesto_file_handle *fd;
     void *size;
     void *buf;
@@ -755,23 +741,19 @@ static void *hefesto_sys_fwrite(const char *syscall,
                                          functions);
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/fd: %x\n", fd);
     etype = HEFESTO_VAR_TYPE_INT;
-    arg_size_pfix = infix2postfix(arg_size, strlen(arg_size), 1);
-    size = expr_eval(arg_size_pfix, lo_vars, gl_vars, functions, &etype,
+    size = expr_eval(arg_size, lo_vars, gl_vars, functions, &etype,
                      &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_buf_pfix = infix2postfix(arg_buf, strlen(arg_buf), 1);
-    buf = expr_eval(arg_buf_pfix, lo_vars, gl_vars, functions, &etype,
+    buf = expr_eval(arg_buf, lo_vars, gl_vars, functions, &etype,
                     &offset);
     result = (void *) hefesto_mloc(sizeof(int));
     *(int *)result = hefesto_fwrite((char *)buf, *((size_t *) size), fd);
-    HEFESTO_DEBUG_INFO(0, 
+    HEFESTO_DEBUG_INFO(0,
         "hvm_syscall/hefesto_fwrite result: %d\n", *(int *)result);
 
     free(arg_fd);
     free(arg_size);
-    free(arg_size_pfix);
     free(arg_buf);
-    free(arg_buf_pfix);
     free(size);
     free(buf);
 
@@ -787,7 +769,7 @@ static void *hefesto_sys_fread(const char *syscall,
 
     const char *s;
     size_t offset;
-    char *arg_fd, *arg_size, *arg_size_pfix, *arg_buf;
+    char *arg_fd, *arg_size, *arg_buf;
     hefesto_file_handle *fd;
     void *size;
     char *tmp;
@@ -805,8 +787,7 @@ static void *hefesto_sys_fread(const char *syscall,
     fd = get_file_descriptor_by_var_name(arg_fd + 1, *lo_vars,
                                          *gl_vars, functions);
     etype = HEFESTO_VAR_TYPE_INT;
-    arg_size_pfix = infix2postfix(arg_size, strlen(arg_size), 1);
-    size = expr_eval(arg_size_pfix, lo_vars, gl_vars, functions,
+    size = expr_eval(arg_size, lo_vars, gl_vars, functions,
                      &etype, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
     result = (void *) hefesto_mloc(sizeof(int));
@@ -827,7 +808,6 @@ static void *hefesto_sys_fread(const char *syscall,
                                                                buf->type);
     free(arg_fd);
     free(arg_size);
-    free(arg_size_pfix);
     free(arg_buf);
     free(size);
 
@@ -957,7 +937,7 @@ static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
     void *plist, *ret = NULL;
     const char *s, *se;
     char *sr;
-    char *str_run, *str_run_pf;
+    char *str_run;
     size_t osize;
 
     for (s = &syscall[strlen(syscall)-1]; *s != ')'; s--);
@@ -969,14 +949,10 @@ static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
     for (sr = str_run; s != se; s++, sr++) *sr = *s;
     *sr = 0;
 
-    str_run_pf = infix2postfix(str_run, strlen(str_run), 1);
+    etype = HEFESTO_VAR_TYPE_LIST;
+    plist = expr_eval(str_run, lo_vars, gl_vars, functions, &etype, &osize);
 
     free(str_run);
-
-    etype = HEFESTO_VAR_TYPE_LIST;
-    plist = expr_eval(str_run_pf, lo_vars, gl_vars, functions, &etype, &osize);
-
-    free(str_run_pf);
 
     if (plist != NULL) {
         if (etype == HEFESTO_VAR_TYPE_LIST) {
@@ -1204,7 +1180,7 @@ static void *hefesto_sys_fseek(const char *syscall,
     const char *s;
     size_t offset;
     char *arg_fd_name;
-    char *arg_pos, *arg_pos_pfix;
+    char *arg_pos;
     void *result = (void *) hefesto_mloc(sizeof(int));
     hefesto_file_handle *fp_handle;
     hefesto_type_t etype;
@@ -1215,15 +1191,13 @@ static void *hefesto_sys_fseek(const char *syscall,
     arg_fd_name = get_arg_from_call(syscall, &offset);
     arg_pos = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_INT;
-    arg_pos_pfix = infix2postfix(arg_pos, strlen(arg_pos), 1);
-    pos = expr_eval(arg_pos_pfix, lo_vars, gl_vars, functions, &etype, &offset);
+    pos = expr_eval(arg_pos, lo_vars, gl_vars, functions, &etype, &offset);
     fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1, *lo_vars,
                                                 *gl_vars, functions);
     *(int *)result = hefesto_fseek(fp_handle, *(long *)pos);
 
     free(pos);
     free(arg_pos);
-    free(arg_pos_pfix);
     free(arg_fd_name);
 
     return result;
@@ -1340,7 +1314,7 @@ static void *hefesto_sys_exit(const char *syscall,
                               hefesto_type_t **otype) {
 
     const char *s;
-    char *arg_code, *arg_code_pfix;
+    char *arg_code;
     void *code;
     size_t offset;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
@@ -1348,14 +1322,12 @@ static void *hefesto_sys_exit(const char *syscall,
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
     arg_code = get_arg_from_call(syscall, &offset);
-    arg_code_pfix = infix2postfix(arg_code, strlen(arg_code), 1);
-    code = expr_eval(arg_code_pfix, lo_vars, gl_vars, functions,
+    code = expr_eval(arg_code, lo_vars, gl_vars, functions,
                      &etype, &offset);
     HEFESTO_EXIT_CODE = *(int *)code;
     HEFESTO_LAST_FORGE_RESULT = HEFESTO_EXIT_CODE;
 
     free(arg_code);
-    free(arg_code_pfix);
     free(code);
     HEFESTO_EXIT = 1;
 
@@ -1385,7 +1357,7 @@ static void *hefesto_sys_get_option(const char *syscall,
 
     const char *s;
     void *result = NULL;
-    char *arg_option, *arg_option_pfix;
+    char *arg_option;
     void *option;
     size_t offset;
     hefesto_type_t etype;
@@ -1398,9 +1370,8 @@ static void *hefesto_sys_get_option(const char *syscall,
         s = get_arg_list_start_from_call(syscall);
         offset = s - syscall + 1;
         arg_option = get_arg_from_call(syscall, &offset);
-        arg_option_pfix = infix2postfix(arg_option, strlen(arg_option), 1);
         etype = HEFESTO_VAR_TYPE_STRING;
-        option = expr_eval(arg_option_pfix, lo_vars, gl_vars, functions,
+        option = expr_eval(arg_option, lo_vars, gl_vars, functions,
                            &etype, &offset);
         if (option != NULL) {
             free(arg_option);
@@ -1417,7 +1388,6 @@ static void *hefesto_sys_get_option(const char *syscall,
             result = (void *) cp;
         }
         free(arg_option);
-        free(arg_option_pfix);
         free(option);
     }
 
@@ -1433,7 +1403,6 @@ static void *hefesto_sys_make_path(const char *syscall,
 
     const char *s;
     char *arg1, *arg2;
-    char *arg1_pfixd, *arg2_pfixd;
     void *expd_arg1, *expd_arg2;
     size_t offset;
     hefesto_type_t etype;
@@ -1445,32 +1414,28 @@ static void *hefesto_sys_make_path(const char *syscall,
     offset = s - syscall + 1;
 
     arg1 = get_arg_from_call(syscall, &offset);
-    arg1_pfixd = infix2postfix(arg1, strlen(arg1), 1);
 
     arg2 = get_arg_from_call(syscall, &offset);
-    arg2_pfixd = infix2postfix(arg2, strlen(arg2), 1);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    expd_arg1 = expr_eval(arg1_pfixd,
+    expd_arg1 = expr_eval(arg1,
                           lo_vars, gl_vars,
                           functions, &etype, &offset);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    expd_arg2 = expr_eval(arg2_pfixd,
+    expd_arg2 = expr_eval(arg2,
                           lo_vars, gl_vars,
                           functions, &etype, &offset);
 
     result = (void *) hefesto_make_path(expd_arg1,
                                         expd_arg2,
                                         strlen(expd_arg1) +
-                                             strlen(expd_arg2) + 2);
+                                        strlen(expd_arg2) + 2);
 
     free(arg1);
-    free(arg1_pfixd);
     free(expd_arg1);
 
     free(arg2);
-    free(arg2_pfixd);
     free(expd_arg2);
 
     return result;
@@ -1501,7 +1466,6 @@ static void *hefesto_sys_forge(const char *syscall,
 
     const char *s;
     char *prj, *hls, *opt;
-    char *prj_pfixd, *hls_pfixd, *opt_pfixd;
     void *expd_prj, *expd_hls, *expd_opt;
     size_t offset;
     hefesto_type_t etype;
@@ -1517,26 +1481,23 @@ static void *hefesto_sys_forge(const char *syscall,
     offset = s - syscall + 1;
 
     prj = get_arg_from_call(syscall, &offset);
-    prj_pfixd = infix2postfix(prj, strlen(prj), 1);
 
     hls = get_arg_from_call(syscall, &offset);
-    hls_pfixd = infix2postfix(hls, strlen(hls), 1);
 
     opt = get_arg_from_call(syscall, &offset);
-    opt_pfixd = infix2postfix(opt, strlen(opt), 1);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    expd_prj = expr_eval(prj_pfixd,
+    expd_prj = expr_eval(prj,
                          lo_vars, gl_vars,
                          functions, &etype, &offset);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    expd_hls = expr_eval(hls_pfixd,
+    expd_hls = expr_eval(hls,
                          lo_vars, gl_vars,
                          functions, &etype, &offset);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    expd_opt = expr_eval(opt_pfixd,
+    expd_opt = expr_eval(opt,
                          lo_vars, gl_vars,
                          functions, &etype, &offset);
 
@@ -1566,13 +1527,10 @@ static void *hefesto_sys_forge(const char *syscall,
     *(int *)result = r;
 
     free(prj);
-    free(prj_pfixd);
     free(hls);
-    free(hls_pfixd);
     free(expd_prj);
     free(expd_hls);
     free(opt);
-    free(opt_pfixd);
     free(expd_opt);
 
     return result;
@@ -1689,7 +1647,7 @@ static void *hefesto_sys_time(const char *syscall,
                               hefesto_var_list_ctx **gl_vars,
                               hefesto_func_list_ctx *functions,
                               hefesto_type_t **otype) {
-    char *arg, *pfixd_arg;
+    char *arg;
     const char *s;
     void *expd_arg;
     size_t offset;
@@ -1705,8 +1663,7 @@ static void *hefesto_sys_time(const char *syscall,
 
     arg = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    pfixd_arg = infix2postfix(arg, strlen(arg), 1);
-    expd_arg = expr_eval(pfixd_arg, lo_vars,
+    expd_arg = expr_eval(arg, lo_vars,
                          gl_vars, functions, &etype, &offset);
     if (expd_arg != NULL) {
         t = time(NULL);
@@ -1726,7 +1683,6 @@ static void *hefesto_sys_time(const char *syscall,
     }
 
     free(expd_arg);
-    free(pfixd_arg);
     free(arg);
 
     return result;
@@ -1739,8 +1695,8 @@ static void *hefesto_sys_setenv(const char *syscall,
                                 hefesto_func_list_ctx *functions,
                                 hefesto_type_t **otype) {
     void *result = NULL;
-    char *arg_var, *arg_var_pfixd;
-    char *arg_val, *arg_val_pfixd;
+    char *arg_var;
+    char *arg_val;
     void *var, *val;
     const char *s;
     size_t offset;
@@ -1753,18 +1709,16 @@ static void *hefesto_sys_setenv(const char *syscall,
 
     arg_var = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_var_pfixd = infix2postfix(arg_var, strlen(arg_var), 1);
 
     arg_val = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_val_pfixd = infix2postfix(arg_val, strlen(arg_val), 1);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    var = expr_eval(arg_var_pfixd,
+    var = expr_eval(arg_var,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    val = expr_eval(arg_val_pfixd,
+    val = expr_eval(arg_val,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
     result = (int *) hefesto_mloc(sizeof(int));
@@ -1779,9 +1733,7 @@ static void *hefesto_sys_setenv(const char *syscall,
 #endif
 
     free(arg_var);
-    free(arg_var_pfixd);
     free(arg_val);
-    free(arg_val_pfixd);
     free(var);
     free(val);
 
@@ -1794,7 +1746,7 @@ static void *hefesto_sys_unsetenv(const char *syscall,
                                   hefesto_func_list_ctx *functions,
                                   hefesto_type_t **otype) {
     void *result = NULL;
-    char *arg_var, *arg_var_pfixd;
+    char *arg_var;
     const char *s;
     void *var;
     size_t offset;
@@ -1807,10 +1759,9 @@ static void *hefesto_sys_unsetenv(const char *syscall,
 
     arg_var = get_arg_from_call(syscall, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    arg_var_pfixd = infix2postfix(arg_var, strlen(arg_var), 1);
 
     etype = HEFESTO_VAR_TYPE_STRING;
-    var = expr_eval(arg_var_pfixd,
+    var = expr_eval(arg_var,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
     result = (int *) hefesto_mloc(sizeof(int));
@@ -1826,7 +1777,6 @@ static void *hefesto_sys_unsetenv(const char *syscall,
 #endif
 
     free(arg_var);
-    free(arg_var_pfixd);
     free(var);
 
     return result;
@@ -1839,8 +1789,8 @@ static void *hefesto_sys_lines_from_file(const char *syscall,
                                          hefesto_type_t **otype) {
     hefesto_common_list_ctx *result = NULL;
     const char *s;
-    char *arg_filepath, *arg_filepath_pfix;
-    char *arg_regex, *arg_regex_pfix;
+    char *arg_filepath;
+    char *arg_regex;
     void *filepath;
     void *regex;
     size_t offset, osz;
@@ -1853,21 +1803,17 @@ static void *hefesto_sys_lines_from_file(const char *syscall,
     offset = s - syscall + 1;
 
     arg_filepath = get_arg_from_call(syscall, &offset);
-    arg_filepath_pfix = infix2postfix(arg_filepath, strlen(arg_filepath), 1);
     etype = HEFESTO_VAR_TYPE_STRING;
-    filepath = expr_eval(arg_filepath_pfix, lo_vars, gl_vars, functions,
+    filepath = expr_eval(arg_filepath, lo_vars, gl_vars, functions,
                          &etype, &osz);
 
     arg_regex = get_arg_from_call(syscall, &offset);
-    arg_regex_pfix = infix2postfix(arg_regex, strlen(arg_filepath), 1);
     etype = HEFESTO_VAR_TYPE_STRING;
-    regex = expr_eval(arg_regex_pfix, lo_vars, gl_vars, functions,
+    regex = expr_eval(arg_regex, lo_vars, gl_vars, functions,
                       &etype, &osz);
 
     free(arg_filepath);
-    free(arg_filepath_pfix);
     free(arg_regex);
-    free(arg_regex_pfix);
 
     if ((fp = fopen(filepath, "rb")) != NULL) {
         result = lines_from_file(fp, regex);

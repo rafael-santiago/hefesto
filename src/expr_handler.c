@@ -108,11 +108,6 @@ char *infix2postfix(const char *expr, const size_t esize, const int main_call) {
     term = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     memset(term, 0, HEFESTO_MAX_BUFFER_SIZE);
 
-    if (is_postfixed(expr)) {
-        strncpy(term, expr, HEFESTO_MAX_BUFFER_SIZE-1);
-        return term;
-    }
-
     t = term;
     *t = 0;
 
@@ -306,7 +301,7 @@ ssize_t get_op_index(const char *op) {
 
 }
 
-static int is_postfixed(const char *expr) {
+static int is_postfixed(const char *expr) { // deprecated
     const char *ep;
     int state = 0;
     char *buffer = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);

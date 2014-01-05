@@ -239,7 +239,7 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
                    hefesto_var_list_ctx **gl_vars,
                    hefesto_func_list_ctx *functions, hefesto_type_t **otype) {
     hefesto_var_list_ctx *args = NULL, *ap;
-    char *arg, *arg_pfxd;
+    char *arg;
     const char *s;
     size_t offset, osz;
     hefesto_type_t etype;
@@ -261,19 +261,17 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
     arg = get_arg_from_call(call, &offset);
 
     while (*arg) {
-        arg_pfxd = infix2postfix(arg, strlen(arg), 1);
         etype = HEFESTO_VAR_TYPE_STRING;
-        res = expr_eval(arg_pfxd, lo_vars, gl_vars, functions,
+        res = expr_eval(arg, lo_vars, gl_vars, functions,
                         &etype, &osz);
         if (etype != HEFESTO_VAR_TYPE_STRING && etype != HEFESTO_VAR_TYPE_INT) {
             etype = HEFESTO_VAR_TYPE_INT;
         }
-        args = add_var_to_hefesto_var_list_ctx(args, arg_pfxd, etype);
+        args = add_var_to_hefesto_var_list_ctx(args, arg, etype);
         ap = get_hefesto_var_list_ctx_tail(args);
         ap->contents = add_data_to_hefesto_common_list_ctx(ap->contents,
                                                            res, osz);
         free(res);
-        free(arg_pfxd);
         free(arg);
         arg = get_arg_from_call(call, &offset);
     }

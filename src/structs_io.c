@@ -662,7 +662,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                                         hefesto_var_list_ctx *gl_vars,
                                         size_t *continue_offset) {
 
-    char *b, *cmd_buf_real_start = (char *) cmd_buf;
+    char *b, *cmd_buf_real_start = (char *) cmd_buf, *temp;
     char tok[HEFESTO_MAX_BUFFER_SIZE], *t, *k;
     char buf[2][HEFESTO_MAX_BUFFER_SIZE], *buf_p;
     hefesto_command_list_ctx *p = commands, *h;
@@ -746,7 +746,9 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             HEFESTO_DEBUG_INFO(0, "structs_io/RESULT --\n");
             p->instruction = HEFESTO_RET;
             sz = 0;
-            p->expr = get_next_expression_from_buffer(b, &sz);
+            //p->expr = get_next_expression_from_buffer(b, &sz);
+            temp = get_next_expression_from_buffer(b, &sz);
+            p->expr = infix2postfix(temp, sz, 1);
             b += sz;
         } else if (tok[0] == '$' && *b == '=') {
             HEFESTO_DEBUG_INFO(0, "structs_io/ASSINGMENT --\n");
@@ -805,10 +807,12 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             b++;
             buf_p = get_arg_from_call(b, &sz);
             while (*buf_p) {
+                temp = infix2postfix(buf_p, sz, 1);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
-                                                                buf_p,
-                                                                strlen(buf_p)+1);
+                                                                temp,
+                                                                strlen(temp)+1);
                 free(buf_p);
+                free(temp);
                 buf_p = get_arg_from_call(b, &sz);
             }
             free(buf_p);
@@ -828,9 +832,11 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             sz = 0;
             buf_p = get_arg_from_call(b, &sz);
             while (*buf_p) {
+                temp = infix2postfix(buf_p, sz, 1);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
-                                                                buf_p,
-                                                          strlen(buf_p)+1);
+                                                                temp,
+                                                          strlen(temp)+1);
+                free(temp);
                 free(buf_p);
                 buf_p = get_arg_from_call(b, &sz);
             }

@@ -117,6 +117,14 @@ mylab.prologue() {
     hefesto.sys.echo("FOO = " + $foo + "\n");
     $foo = hefesto.sys.make_path($foo, $foo + ((("ec" + ("ti" + "ve ")))) + haha("it " + "works" + " fine " + "dude!!"));
     hefesto.sys.echo("*** done. ("+ $foo + ")\n");
+    var var type int;
+    $var = hefesto.sys.cp("foo", "bar") == 1;
+    hefesto.sys.echo("$var = " + $var + "\n");
+    if (hefesto.sys.cp("foo", "bar") == 1) {
+        hefesto.sys.echo("copy successful.\n");
+    } else {
+        hefesto.sys.echo("copy unsuccessful.\n");
+    }
 }
 
 function haha(myadd type string) : result type string {

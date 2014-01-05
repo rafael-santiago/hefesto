@@ -243,12 +243,12 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
 
             case HEFESTO_RET: //ret (here) an expression can be used
                 HEFESTO_DEBUG_INFO(0, "hvm/PRE-RET!\n");
-                buf = infix2postfix(cmd->expr, strlen(cmd->expr), 1);
+                //buf = infix2postfix(cmd->expr, strlen(cmd->expr), 1);
                 out_type = HEFESTO_VAR_TYPE_UNTYPED;
-                result = expr_eval(buf, lo_vars, gl_vars, functions,
+                result = expr_eval(cmd->expr, lo_vars, gl_vars, functions,
                                    &out_type, &out_size);
                 HEFESTO_DEBUG_INFO(0, "hvm/RET address: %d\n", result);
-                free(buf);
+                //free(buf);
                 if (should_return) *should_return = 1;
                 return result;
                 break;
