@@ -22,8 +22,76 @@
 #       the  result of get_project_dependencies() in a string variable, then use
 #       this  string in section dependencies on Forgefile's project declaration.
 #
+# Sun 05 Jan 2014 07:37:19 PM BRST:
+#
+#       Now you must to use *** get_c_ccp_deps() *** all the other functions in
+#       this file were deprecated and you shouldn't use these anymore.
+#
+#       -- rs
+#
 
-function get_project_dependencies() : result type string {
+include ~/fsutil.hls
+
+function get_c_cpp_deps() : result type string { # A faster dependency scanner.
+    var files type list;
+    var includes type list;
+    var f type int;
+    var i type int;
+    var dep_chain type string;
+    var str type string;
+    var cwd type string;
+    var exts type list;
+    var e type int;
+    var dep_nr type int;
+
+    $e = 0;
+
+    $exts.add_item("h");
+    $exts.add_item("hpp");
+    $exts.add_item("c");
+    $exts.add_item("C");
+    $exts.add_item("CC");
+    $exts.add_item("cc");
+    $exts.add_item("cpp");
+
+    while ($e < $exts.count()) {
+        $str = ".*\\." + $exts.item($e) + "$";
+        $files.ls($str);
+        $f = 0;
+        $cwd = hefesto.sys.pwd();
+        while ($f < $files.count()) {
+#            hefesto.sys.echo("NOW SCANNING = " + $files.item($f) + "\n");
+            $str = $files.item($f);
+            $dep_chain = $dep_chain + filenamefrompath($str) + ": ";
+            $includes = hefesto.sys.lines_from_file($str, "#include.*$");
+            $i = 0;
+            $dep_nr = 0;
+            while ($i < $includes.count()) {
+                $str = $includes.item($i);
+                $str.replace(".*#include.*(\"|<)", "");
+                $str.replace("(\"|>)$", "");
+                if (isfile($str) == 1) {
+                    $str = hefesto.sys.make_path($cwd, $str);
+                    if ($dep_nr > 0) {
+                        $dep_chain = $dep_chain + "& ";
+                    }
+                    $dep_chain = $dep_chain + $str + " ";
+                    $dep_nr = $dep_nr + 1;
+                }
+                $i = $i + 1;
+            }
+            $dep_chain = $dep_chain + ";\n";
+            $f = $f + 1;
+        }
+        $files.clear();
+        $e = $e + 1;
+    }
+    result $dep_chain;
+}
+
+# ---------------------- DEPRECATED THINGS ----------------------------
+
+function get_project_dependencies() : result type string { # deprecated
     var prj_files type list;
     var prj_files_sz type int;
     var curr_file type string;
@@ -31,7 +99,7 @@ function get_project_dependencies() : result type string {
     var continue_scan type int;
 
     #  getting all files which must be scanned.
-    $prj_files.set_from_fs_by_regex("\\.(h|hpp|c|cc|cpp)$");
+    $prj_files.ls("\\.(h|hpp|c|cc|cpp)$");
 
     $p = 0;
     $continue_scan = 1;
@@ -82,7 +150,7 @@ function get_project_dependencies() : result type string {
     result $dep_chain;
 }
 
-function get_includes_from_file(filepath type string, includes type list) : result type list {
+function get_includes_from_file(filepath type string, includes type list) : result type list { # deprecated
     var fd type file;
     var include_name type string;
     var b type string;
@@ -140,7 +208,7 @@ function get_includes_from_file(filepath type string, includes type list) : resu
     result $includes;
 }
 
-function fexists(filepath type string) : result type int {
+function fexists(filepath type string) : result type int { # deprecated
     var fd type file;
     $fd = hefesto.sys.fopen($filepath, "r");
     if ($fd != 0) {
@@ -150,7 +218,7 @@ function fexists(filepath type string) : result type int {
     result 0;
 }
 
-function get_include_fullpath(include_filename type string, includes_search_paths type list) : result type string {
+function get_include_fullpath(include_filename type string, includes_search_paths type list) : result type string { # deprecated
     var inc_sz type int;
     var i type int;
     var fullpath type string;
@@ -173,7 +241,7 @@ function get_include_fullpath(include_filename type string, includes_search_path
     result "";
 }
 
-function get_file_extension(filepath type string) : result type string {
+function get_file_extension(filepath type string) : result type string { # deprecated
     var return type string;
     var f type int;
     var fs type int;
@@ -193,14 +261,14 @@ function get_file_extension(filepath type string) : result type string {
     result $return;
 }
 
-function is_header_file(filepath type string) : result type int {
+function is_header_file(filepath type string) : result type int { # deprecated
     var ext type string;
     $ext = get_file_extension($filepath);
     if ($ext == "h" || $ext == "hpp") result 1;
     result 0;
 }
 
-function get_imp_filenames_from_header_filename(filepath type string) : result type list {
+function get_imp_filenames_from_header_filename(filepath type string) : result type list { # deprecated
     var imp_filenames type list;
     var f type int;
     var fs type int;
