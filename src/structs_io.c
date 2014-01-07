@@ -939,9 +939,12 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                     p->working_var = get_hefesto_var_list_ctx_name(k+1,
                                                                    gl_vars);
                 }
+                temp = infix2postfix(tok, strlen(tok), 1);
+                //printf("tok: %s\n", temp);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
-                                                                tok,
+                                                                temp,
                                                                 strlen(cmd_buf));
+                free(temp);
             } else {
                 printf("command not found: '%s'\n", cmd_buf);
                 exit(1);

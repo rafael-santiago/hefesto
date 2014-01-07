@@ -126,7 +126,7 @@ mylab.prologue() {
     } else {
         hefesto.sys.echo("copy unsuccessful.\n");
     }
-    hefesto.sys.echo("DEP-CHAIN = " + get_c_cpp_deps() + "\n");
+    hefesto.sys.echo("DEP-CHAIN = " + get_c_cpp_deps_() + "\n");
 }
 
 function get_c_cpp_deps_() : result type string {
@@ -144,7 +144,7 @@ function get_c_cpp_deps_() : result type string {
     #GPF na lib here:
     #$str.ls(".*\\.(h|hpp)$");
     #$str.replace(".*(\"|>)$", "");
-    #$files.ls(".*\\." + $exts.item($e) + "$");
+    #$files.ls(".*\\." + $exts.item($e) + "$"); NULL ap, a expressao nao esta pos-fixada, tentar adotar aquela abordagem geral de deixar tudo pronto e nao se preocupar mais com isso durante a interpretacao
 
     $e = 0;
 
@@ -156,9 +156,11 @@ function get_c_cpp_deps_() : result type string {
     $exts.add_item("cc");
     $exts.add_item("cpp");
 
+#    $str.replace(".*", ("blah" + "bla") + "h" + "!");
+
     while ($e < $exts.count()) {
-        $str = ".*\\." + $exts.item($e) + "$";
-        $files.ls($str);
+#        $str = ".*\\." + $exts.item($e) + "$";
+        $files.ls(".*\\." + $exts.item($e) + "$");
         $f = 0;
         $cwd = hefesto.sys.pwd();
         while ($f < $files.count()) {

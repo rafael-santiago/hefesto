@@ -705,6 +705,9 @@ char *get_next_call_args(const char *expression, size_t *offset) {
     m = method;
 
     *m = *e;
+    if (*e == '(') {
+        parentesis++;
+    }
     e++;
     m++;
 
@@ -759,7 +762,8 @@ char *get_next_call_args(const char *expression, size_t *offset) {
 
     *m = 0;
 
-    *offset = (e - expression);
+    *offset = (e - expression) - 1;
+
     return method;
 
 }
