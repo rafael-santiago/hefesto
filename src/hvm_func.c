@@ -190,8 +190,11 @@ void hvm_init_function_args(const char *args,
     hefesto_var_list_ctx *vp = (*function)->vars, *ap = (*function)->args;
     size_t offset = 0;
     hefesto_instruction_code_t c_intr = hvm_get_current_executed_instruction();
-
-    for (expr = (char *)args; *expr != 0 && *expr != '('; expr++);
+    char *temp = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    strncpy(temp, args, HEFESTO_MAX_BUFFER_SIZE);
+    strcat(temp, ";");
+    //printf("FUNCTION: %s [%s]\n", (*function)->name, temp);
+    for (expr = temp; *expr != 0 && *expr != '('; expr++);
     offset = expr - args + 1;
     expr = get_arg_from_call(args, &offset);
     while (vp != NULL && *expr != 0) {
@@ -211,6 +214,7 @@ void hvm_init_function_args(const char *args,
             expr_pfix = expr;
         }
         etype = vp->type;
+        //printf("\tF-ARG: %s\n", expr_pfix);
         // INFO(Santiago):
         // truque sujo, aqui gl_vars precisa ser varrida primeiro, lo_vars nem
         // precisa pois argumentos nao serao formados por variaveis ou

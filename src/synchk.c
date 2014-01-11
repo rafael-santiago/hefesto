@@ -1080,7 +1080,8 @@ int synchk_string_method_statement(const char *statement,
                     arg = get_arg_from_call(s, &offset);
                     result = (is_hefesto_numeric_constant(arg) ||
                               is_valid_expression(arg, lo_vars, gl_vars, fn)) &&
-                             (*(s + offset) == ')');
+                              (*(s + offset - 1) == ')');
+                             //(*(s + offset) == ')');
                     if (result == 0) {
                         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_EXPR,
                                   statement);
@@ -1244,7 +1245,11 @@ int synchk_list_method_statement(const char *statement,
                 if (result) {
                     free(arg);
                     arg = get_arg_from_call(s, &offset);
-                    result = (*arg == 0) && (*(s + offset) == ')');
+                    //result = (*arg == 0) && (*(s + offset) == ')');
+                    if (*(s + offset - 1) == ';') {
+                        offset--;
+                    }
+                    result = (*arg == 0) && (*(s + offset - 1) == ')');
                     if (result == 0) {
                         if (*(s + offset) != ')') {
                             hlsc_info(HLSCM_MTYPE_SYNTAX,
@@ -1291,7 +1296,11 @@ int synchk_list_method_statement(const char *statement,
                 if (result) {
                     free(arg);
                     arg = get_arg_from_call(s, &offset);
-                    result = (*arg == 0) && (*(s + offset) == ')');
+                    //result = (*arg == 0) && (*(s + offset) == ')');
+                    if (*(s + offset - 1) == ';') {
+                        offset--;
+                    }
+                    result = (*arg == 0) && (*(s + offset - 1) == ')');
                     if (result == 0) {
                         if (*(s + offset) == ')') {
                             hlsc_info(HLSCM_MTYPE_SYNTAX,
@@ -1378,7 +1387,7 @@ static int is_expected_args_total(const char *args, size_t expected) {
     char *arg;
     size_t is = 0, offset = 0;
 
-    while(*(arg = get_arg_from_call(args, &offset))) {
+    while (*(arg = get_arg_from_call(args, &offset))) {
         is++;
         if (arg) free(arg);
     }
@@ -1898,7 +1907,6 @@ static int synchk_hefesto_sys_echo(const char *usr_calling,
         free(args);
         return 0;
     }
-
     if (args) {
         if (is_hefesto_string(args) ||
             is_valid_expression(args, lo_vars, gl_vars, functions)) {
@@ -2061,7 +2069,171 @@ int is_hefesto_numeric_constant(const char *number) {
 
 }
 
-char *get_arg_from_call(const char *calling_buffer, size_t *offset) {
+char *get_arg_from_call(const char *call, size_t *offset) {
+
+    const char *cp = (call + *offset);
+    char *arg = (char *) malloc(65535);
+    char *a;
+    char *t;
+    int o = 0;
+
+//    if (*offset == 0) {
+//        while (*cp != '(' && *cp != ';' && *cp != 0) cp++;
+//        cp++;
+//    }
+
+    memset(arg, 0, 65535);
+
+    if (*cp == 0) return arg;
+
+    while (*cp == ' ') cp++;
+
+    a = arg;
+
+    while (*cp != ',' && *cp != ';' && *cp != 0) {
+        if (*cp == '(') {
+            o++;
+        } else if (*cp == ')') {
+            o--;
+        }
+        if (*cp == '\"') {
+            *a = *cp;
+            a++;
+            cp++;
+            while (*cp != '\"' && *cp != 0) {
+                *a = *cp;
+                if (*cp == '\\') {
+                    *a = *cp;
+                    a++;
+                    cp++;
+                    *a = *cp;
+                }
+                a++;
+                cp++;
+            }
+            *a = *cp;
+            a++;
+            cp++;
+        } else {
+            *a = *cp;
+            cp++;
+            a++;
+        }
+        if ((*cp == ',' || *cp == ';') && o > 0) {
+            *a = *cp;
+            cp++;
+            a++;
+        }
+    }
+
+    if (*cp == ';' || *cp == 0) {
+        //*(a-1) = 0;
+        t = a;
+        while (*a != ';' && a != arg) {
+            a--;
+        }
+        if (*a == ';') {
+            *a = 0;
+        } else {
+            a = t;
+        }
+        /*while (*a != ')' && a != arg) {
+            a--;
+        }
+        if (*a == ')') *a = 0;*/
+        if (o < 0) {
+            while (a != arg && o < 0) {
+                a--;
+                if (*a == ')') {
+                    *a = 0;
+                    o++;
+                }
+            }
+        }
+    }
+
+    if (*cp != 0) {
+        *offset = (cp - call) + 1;
+    } else {
+        *offset = strlen(call);
+    }
+
+    return arg;
+}
+
+char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
+
+    const char *cp = (call + *offset);
+    char *arg = (char *) malloc(65535);
+    char *a;
+    int o = 0;
+
+//    if (*offset == 0) {
+//        while (*cp != '(' && *cp != ';' && *cp != 0) cp++;
+//        cp++;
+//    }
+
+    memset(arg, 0, 65535);
+
+    if (*cp == 0 || *cp == ';') return arg;
+
+    while (*cp == ' ') cp++;
+
+    a = arg;
+
+    while (/**cp != ',' &&*/*cp != ';' && *cp != 0) {
+        if (*cp == '(') {
+            o++;
+        } else if (*cp == ')') {
+            o--;
+        }
+        if (*cp == '\"') {
+            *a = *cp;
+            a++;
+            cp++;
+            while (*cp != '\"' && *cp != 0) {
+                *a = *cp;
+                if (*cp == '\\') {
+                    *a = *cp;
+                    a++;
+                    cp++;
+                    *a = *cp;
+                }
+                a++;
+                cp++;
+            }
+            *a = *cp;
+            a++;
+            cp++;
+            *a = 0;
+            //printf("P-ARG: %s [%c]\n", arg, *cp);
+        } else {
+            *a = *cp;
+            cp++;
+            a++;
+        }
+        if ((*cp == ',' || *cp == ';') && o > 0) {
+            *a = *cp;
+            cp++;
+            a++;
+        }
+    }
+
+    if (*cp == ';' || *cp == 0) {
+        //*(a - 1) = 0;
+    }
+
+    if (*cp != 0) {
+        *offset = (cp - call);
+    } else {
+        *offset = strlen(call);
+    }
+
+    return arg;
+}
+
+
+char *get_arg_from_call_(const char *calling_buffer, size_t *offset) {
 
     char *arg = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     char *a;

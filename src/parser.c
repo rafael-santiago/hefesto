@@ -1057,6 +1057,7 @@ static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
     while (ftell(fp) < stop_at) {
 
         command = get_next_command(fp, stop_at);
+
         HEFESTO_DEBUG_INFO(0, "parsed command = %s %d %d\n", command, stop_at, 
                               ftell(fp));
         if (command != NULL) {

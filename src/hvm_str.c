@@ -178,19 +178,19 @@ char *hvm_str_format(const char *str, hefesto_var_list_ctx **lo_vars,
     size_t sz;
 
     sz = 0;
-    if (hvm_get_current_executed_instruction() != HEFESTO_IF &&
-        hvm_get_current_executed_instruction() != HEFESTO_WHILE &&
-        hvm_get_current_executed_instruction() != HEFESTO_ATTRIB) {
-        str_pfix = infix2postfix(str, strlen(str), 1);
-    } else {
-        str_pfix = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-        memset(str_pfix, 0, HEFESTO_MAX_BUFFER_SIZE);
-        strncpy(str_pfix, str, HEFESTO_MAX_BUFFER_SIZE-1);
-    }
+    //if (hvm_get_current_executed_instruction() != HEFESTO_IF &&
+    //    hvm_get_current_executed_instruction() != HEFESTO_WHILE &&
+    //    hvm_get_current_executed_instruction() != HEFESTO_ATTRIB) {
+        //str_pfix = infix2postfix(str, strlen(str), 1);
+    //} else {
+    //str_pfix = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+    //memset(str_pfix, 0, HEFESTO_MAX_BUFFER_SIZE);
+    //strncpy(str_pfix, str, HEFESTO_MAX_BUFFER_SIZE-1);
+    //}
     HEFESTO_DEBUG_INFO(0, "hvm_str/hvm_str_format = %s\n", str_pfix);
-    str_fmt = expr_eval(str_pfix, lo_vars, gl_vars, functions, &etype, &sz);
-    free(str_pfix);
-
+    str_fmt = expr_eval((char *)str, lo_vars, gl_vars, functions, &etype, &sz);
+    //free(str_pfix);
+    //printf("STR_FMT = %s [EXPR=%s]\n", str_fmt, str);system("read");
     return str_fmt;
 
 }

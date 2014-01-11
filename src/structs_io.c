@@ -664,10 +664,10 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
 
     char *b, *cmd_buf_real_start = (char *) cmd_buf, *temp;
     char tok[HEFESTO_MAX_BUFFER_SIZE], *t, *k;
-    char buf[2][HEFESTO_MAX_BUFFER_SIZE], *buf_p;
+    char buf[2][HEFESTO_MAX_BUFFER_SIZE], *buf_p, *sub_buf_p;
     hefesto_command_list_ctx *p = commands, *h;
     hefesto_instruction_code_t intr_code;
-    size_t sz, o, block_offset;
+    size_t sz, o, block_offset, ssz;
     char end = 0;
     ssize_t m_idx;
     hefesto_func_list_ctx *fp;
@@ -805,7 +805,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             while (is_hefesto_blank(*b)) b++;
             sz = 0;
             b++;
-            buf_p = get_arg_from_call(b, &sz);
+            buf_p = get_arg_from_call_cmdlist(b, &sz);
             while (*buf_p) {
                 temp = infix2postfix(buf_p, sz, 1);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
@@ -813,7 +813,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                                                                 strlen(temp)+1);
                 free(buf_p);
                 free(temp);
-                buf_p = get_arg_from_call(b, &sz);
+                buf_p = get_arg_from_call_cmdlist(b, &sz);
             }
             free(buf_p);
             b += sz;
@@ -830,18 +830,21 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             // agora adicionamos os argumentos da syscall ao
             // contexto generico de parametros
             sz = 0;
-            buf_p = get_arg_from_call(b, &sz);
+            ssz = 0;
+            sub_buf_p = get_arg_from_call_cmdlist(b, &ssz);
+            //strcat(sub_buf_p, ";");
+            buf_p = get_arg_from_call(sub_buf_p, &sz);
             while (*buf_p) {
-                temp = infix2postfix(buf_p, sz, 1);
+                temp = infix2postfix(buf_p, strlen(buf_p), 1);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
                                                                 temp,
                                                           strlen(temp)+1);
                 free(temp);
                 free(buf_p);
-                buf_p = get_arg_from_call(b, &sz);
+                buf_p = get_arg_from_call(sub_buf_p, &sz);
             }
-            free(buf_p);
-            b += sz;
+            free(sub_buf_p);
+            b += ssz;
             while (*b != 0 && !is_hefesto_line_terminator(*b)) b++;
         } else if (strcmp(tok, "var") == 0) {
             HEFESTO_DEBUG_INFO(0, "structs_io/VAR --\n");

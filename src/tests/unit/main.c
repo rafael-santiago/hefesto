@@ -1641,8 +1641,8 @@ char *hvm_str_format_tests() {
     vp = assign_data_to_hefesto_var(vp, "nasci", 5);
     vp = get_hefesto_var_list_ctx_name("years_ago", gl_vars);
     vp = assign_data_to_hefesto_var(vp, "anos atras", 10);
-    fmt_str = hvm_str_format("$I + \" \" + $was_born + \" \" + $age + \" \""
-                             " + $years_ago + \".\"", &lo_vars, &gl_vars, NULL);
+    fmt_str = hvm_str_format("$I \" \" + $was_born + \" \" + $age + \" \""
+                             " + $years_ago + \".\" +", &lo_vars, &gl_vars, NULL);
     HTEST_CHECK("fmt_str != Eu nasci 10000 anos atras.",
                 strcmp(fmt_str, "Eu nasci 10000 anos atras.") == 0);
     del_hefesto_var_list_ctx(lo_vars);

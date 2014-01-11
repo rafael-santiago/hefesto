@@ -44,6 +44,8 @@ int synchk_toolset_command(const char *command,
 
 char *get_arg_from_call(const char *calling_buffer, size_t *offset);
 
+char *get_arg_from_call_cmdlist(const char *call, size_t *offset);
+
 int synchk_function_call(const char *call, hefesto_var_list_ctx *lo_vars,
                          hefesto_var_list_ctx *gl_vars,
                          hefesto_func_list_ctx *functions);
