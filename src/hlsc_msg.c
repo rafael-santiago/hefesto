@@ -292,7 +292,10 @@ static char *hlsc_messages[HLSCM_NR] = {
     "unable to load module at \"%s\" on load attempt it fails with this system message: %s.\n",
 
     // HLSCM_RUNTIME_UNABLE_TO_FIND_SYMBOL
-    "unable to find symbol \"%s\" in loaded module.\n"
+    "unable to find symbol \"%s\" in loaded module.\n",
+
+    // HLSCM_RUNTINE_LINE_IS_TOO_LONG
+    "line is too long: %s \n"
 
 };
 

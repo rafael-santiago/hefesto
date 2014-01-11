@@ -2072,7 +2072,7 @@ int is_hefesto_numeric_constant(const char *number) {
 char *get_arg_from_call(const char *call, size_t *offset) {
 
     const char *cp = (call + *offset);
-    char *arg = (char *) malloc(65535);
+    char *arg = (char *) malloc(HEFESTO_MAX_BUFFER_SIZE);
     char *a;
     char *t;
     int o = 0;
@@ -2082,11 +2082,11 @@ char *get_arg_from_call(const char *call, size_t *offset) {
 //        cp++;
 //    }
 
-    memset(arg, 0, 65535);
+    memset(arg, 0, HEFESTO_MAX_BUFFER_SIZE);
 
     if (*cp == 0) return arg;
 
-    while (*cp == ' ') cp++;
+    while (is_hefesto_blank(*cp)) cp++;
 
     a = arg;
 
@@ -2096,11 +2096,11 @@ char *get_arg_from_call(const char *call, size_t *offset) {
         } else if (*cp == ')') {
             o--;
         }
-        if (*cp == '\"') {
+        if (is_hefesto_string_tok(*cp)) {
             *a = *cp;
             a++;
             cp++;
-            while (*cp != '\"' && *cp != 0) {
+            while (!is_hefesto_string_tok(*cp) && *cp != 0) {
                 *a = *cp;
                 if (*cp == '\\') {
                     *a = *cp;
@@ -2110,6 +2110,12 @@ char *get_arg_from_call(const char *call, size_t *offset) {
                 }
                 a++;
                 cp++;
+                if (a == (arg + HEFESTO_MAX_BUFFER_SIZE)) {
+                    *(a-1) = 0;
+                    hlsc_info(HLSCM_MTYPE_RUNTIME,
+                              HLSCM_RUNTIME_LINE_IS_TOO_LONG, arg);
+                    exit(1);
+                }
             }
             *a = *cp;
             a++;
@@ -2124,8 +2130,12 @@ char *get_arg_from_call(const char *call, size_t *offset) {
             cp++;
             a++;
         }
+        if (a == (arg + HEFESTO_MAX_BUFFER_SIZE)) {
+            *(a-1) = 0;
+            hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_LINE_IS_TOO_LONG, arg);
+            exit(1);
+        }
     }
-
     if (*cp == ';' || *cp == 0) {
         //*(a-1) = 0;
         t = a;
@@ -2164,7 +2174,7 @@ char *get_arg_from_call(const char *call, size_t *offset) {
 char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
 
     const char *cp = (call + *offset);
-    char *arg = (char *) malloc(65535);
+    char *arg = (char *) malloc(HEFESTO_MAX_BUFFER_SIZE);
     char *a;
     int o = 0;
 
@@ -2173,11 +2183,11 @@ char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
 //        cp++;
 //    }
 
-    memset(arg, 0, 65535);
+    memset(arg, 0, HEFESTO_MAX_BUFFER_SIZE);
 
     if (*cp == 0 || *cp == ';') return arg;
 
-    while (*cp == ' ') cp++;
+    while (is_hefesto_blank(*cp)) cp++;
 
     a = arg;
 
@@ -2187,11 +2197,11 @@ char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
         } else if (*cp == ')') {
             o--;
         }
-        if (*cp == '\"') {
+        if (is_hefesto_string_tok(*cp)) {
             *a = *cp;
             a++;
             cp++;
-            while (*cp != '\"' && *cp != 0) {
+            while (!is_hefesto_string_tok(*cp) && *cp != 0) {
                 *a = *cp;
                 if (*cp == '\\') {
                     *a = *cp;
@@ -2201,6 +2211,12 @@ char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
                 }
                 a++;
                 cp++;
+                if (a == (arg + HEFESTO_MAX_BUFFER_SIZE)) {
+                    *(a-1) = 0;
+                    hlsc_info(HLSCM_MTYPE_RUNTIME,
+                              HLSCM_RUNTIME_LINE_IS_TOO_LONG, arg);
+                    exit(1);
+                }
             }
             *a = *cp;
             a++;
@@ -2217,6 +2233,11 @@ char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
             cp++;
             a++;
         }
+        if (a == (arg + HEFESTO_MAX_BUFFER_SIZE)) {
+            *(a-1) = 0;
+            hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_LINE_IS_TOO_LONG, arg);
+            exit(1);
+        }
     }
 
     if (*cp == ';' || *cp == 0) {
@@ -2231,7 +2252,6 @@ char *get_arg_from_call_cmdlist(const char *call, size_t *offset) {
 
     return arg;
 }
-
 
 char *get_arg_from_call_(const char *calling_buffer, size_t *offset) {
 
