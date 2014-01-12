@@ -128,6 +128,9 @@ char *here_matching_test() {
         {"Welcome to beginning of beginning \\0 is next there -->", "^Welcome to .* \\\\0.*>>$", 0},
         {" foobar", "^foobar$", 0},
         {"Blah blah blah", ".*[Rr]afael.*", 0},
+        {"test.h", ".*\\.(h|hpp)$", 1},
+        {"#include \"should-match.h\"", ".*(\\\"|>)$", 1},
+        {"file_io.c", ".*\\.(h|hpp)$", 0},
         {NULL, NULL, 0}
     };
     int m, retval;

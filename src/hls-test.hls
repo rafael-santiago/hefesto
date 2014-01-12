@@ -142,7 +142,7 @@ function get_c_cpp_deps_() : result type string {
     var dep_nr type int;
 
     #GPF na lib here:
-    #$str.ls(".*\\.(h|hpp)$");
+    $files.ls(".*\\.(h|hpp)$");
     #$str.replace(".*(\"|>)$", "");
     #$files.ls(".*\\." + $exts.item($e) + "$"); NULL ap, a expressao nao esta pos-fixada, tentar adotar aquela abordagem geral de deixar tudo pronto e nao se preocupar mais com isso durante a interpretacao
 

@@ -85,6 +85,7 @@ here_search_result_ctx *here_execute_search_program(const char *buffer,
     while (next_step != NULL && b <= buffer_end) {
 
         del_here_search_result_ctx(search_result);
+
         search_result = here_execute_search_program_step(b,
                                                          buffer_end,
                                                          next_step);
@@ -440,7 +441,7 @@ static here_search_result_ctx *match_opt(const char *buffer,
 static here_search_result_ctx *match_dot(const char *buffer,
                                          const char *buffer_end,
                         here_search_program_ctx *search_program) {
-    here_search_result_ctx *search_result;
+    here_search_result_ctx *search_result = NULL;
     int matches = 0;
     const char *b = buffer, *rb;
     int occur_nr = 0;
@@ -475,6 +476,9 @@ static here_search_result_ctx *match_dot(const char *buffer,
                         rb++;
                     }
                 }
+            } else {
+                del_here_search_result_ctx(search_result);
+                new_here_search_result_ctx(search_result);
             }
             matches = 1;
             if (here_matches(search_result)) {

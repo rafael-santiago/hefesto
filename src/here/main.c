@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
     //strncpy(regex, "foo.*foo", sizeof(regex)-1);
     //strncpy(regex, "foo.*foo(abc|d|e|f|(xyz|0123|456|789(i|j)))", sizeof(regex)-1);
     //strncpy(regex, "(bar|baz|(FOO|foo[bar]))", sizeof(regex)-1);
-    strncpy(regex, "Hi, (Larry|Curly|Moe)", sizeof(regex)-1);
+    //strncpy(regex, "Hi, (Larry|Curly|Moe)", sizeof(regex)-1);
+    strncpy(regex, ".*\\.(h|hpp)$", sizeof(regex)-1);
     printf("%s\n", regex);
     //my_search_program = add_regex_to_here_search_program_ctx(my_search_program, regex);
     //strncpy(buffer, "xXbbc", sizeof(buffer)-1);
@@ -60,7 +61,8 @@ int main(int argc, char **argv) {
     }
 
     //strncpy(buffer, "FOO", sizeof(regex)-1);
-    strncpy(buffer, "Hi, Larry!", sizeof(buffer)-1);
+    //strncpy(buffer, "Hi, Larry!", sizeof(buffer)-1);
+    strncpy(buffer, "file_io.c", sizeof(buffer)-1);
     search_result = here_match_string(buffer, my_search_program);
     if (here_matches(search_result)) {
         printf("It matches!\n");

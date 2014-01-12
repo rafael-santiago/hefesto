@@ -30,7 +30,7 @@ here.epilogue() {
 function run_tests() : result type int {
     var retval type int;
     hefesto.sys.cd("test");
-    #$retval = hefesto.sys.forge("here-test", "Forgefile.hls", "");
+    $retval = hefesto.sys.forge("here-test", "Forgefile.hls", "");
     hefesto.sys.cd("..");
     result $retval;
 }
