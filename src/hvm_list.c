@@ -385,13 +385,11 @@ static void *hvm_list_ls(const char *method,
     here_search_result_ctx *search_result;
 
     arg = get_arg_from_call(method, &offset);
-    printf("REGEX: %s\n", arg);system("read");
     data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &offset);
-    printf("REGEX: %s\n", data);system("read");
     free(arg);
 
     if ((search_program = here_compile(data, errors)) != NULL) {
-printf("COMPILED!\n"); system("read");
+
         free(data);
 
         data = hefesto_pwd();
@@ -404,9 +402,7 @@ printf("COMPILED!\n"); system("read");
             while ((de = readdir(dir))) {
                 if ((strcmp(de->d_name, ".") == 0) ||
                     (strcmp(de->d_name, "..") == 0)) continue;
-printf("SEARCHING: %s\n", de->d_name);
                 search_result = here_match_string(de->d_name, search_program);
-printf("DONE...\n");
                 if (here_matches(search_result)) {
                     HEFESTO_DEBUG_INFO(0,
                         "hvm_list/set_from_fs_by_regex %s\n", de->d_name);
