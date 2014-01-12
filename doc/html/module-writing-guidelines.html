@@ -10,7 +10,7 @@
         h5 {font-variant: small-caps; text-decoration: underline}
         table tr {background: rgb(255,249,213); color: blue}
     </STYLE>
-    <H3>How to writing modules for Hefesto</H3>
+    <H3>Module writing guidelines</H3>
     <P ALIGIN="Justify">
         Write modules for Hefesto is a pretty simple task, before anything you need to know the hefesto_modio struct:<BR><BR>
         <OL CLASS="code">
@@ -50,7 +50,7 @@
             <LI><CODE>&nbsp;}</LI></CODE>
             <LI><CODE>}</LI></CODE>
         </OL><BR>
-        Follows and example that if receives a string containing "foo", changes the variable used to pass it for "foobar!" and returns 1 otherwise 0:<BR><BR>
+        Follows an example that if receives a string containing "foo", changes the variable used to pass it for "foobar!" and returns 1 otherwise 0:<BR><BR>
         <OL CLASS="code">
             <LI><CODE>void hmodfunctest(struct hefesto_modio **modio) {</LI></CODE>
             <LI><CODE>&nbsp;if ((*modio) != NULL && (*modio)->args != NULL &&</LI></CODE>
