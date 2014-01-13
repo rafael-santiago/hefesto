@@ -15,5 +15,6 @@
 #define HEFESTO_QSIZE_OPTION_LABEL              "--qsize"
 #define HEFESTO_FORGE_ANYWAY_OPTION_LABEL       "--forge-anyway"
 #define HEFESTO_VERSION_OPTION_LABEL            "--version"
+#define HEFESTO_USER_MODULES_HOME_OPTION_LABEL  "--user-modules-home"
 
 #endif

@@ -9,4 +9,8 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
 
 void hvm_mod_ldmod_table_cleanup();
 
+void set_modules_home(hefesto_options_ctx *options);
+
+void unset_modules_home();
+
 #endif

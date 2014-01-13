@@ -4,6 +4,7 @@
 #include "hvm_alu.h"
 #include "structs_io.h"
 #include "parser.h"
+#include "vfs.h"
 #include <string.h>
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
@@ -19,6 +20,8 @@ typedef void * hefesto_mod_handle;
 typedef HMODULE hefesto_mod_handle;
 
 #endif
+
+static hefesto_options_ctx *HEFESTO_MODULES_HOME = NULL;
 
 struct hefesto_modio_args {
     void *data;
@@ -94,6 +97,8 @@ static void handle_byref(struct hefesto_modio *modio,
                          hefesto_var_list_ctx **lo_vars,
                          hefesto_var_list_ctx **gl_vars);
 
+static char *expand_module_file_name(const char *file_path);
+
 static void del_hefesto_modio_args(struct hefesto_modio_args *args) {
     struct hefesto_modio_args *t, *p;
     for (t = p = args; t; p = t) {
@@ -116,20 +121,22 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     LPSTR err_msg = NULL;
 #endif
+    char *m_fpath = expand_module_file_name(module_filepath);
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
-        if (strcmp(module_filepath, HEFESTO_LDMOD_TABLE[l].module_path) == 0) {
+        if (strcmp(m_fpath, HEFESTO_LDMOD_TABLE[l].module_path) == 0) {
+            free(m_fpath);
             return HEFESTO_LDMOD_TABLE[l].handle;
         }
     }
     hefesto_mod_handle hp = NULL;
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-    hp = dlopen(module_filepath, RTLD_LAZY);
+    hp = dlopen(m_fpath, RTLD_LAZY);
     if (hp == NULL) {
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE,
-                  module_filepath, dlerror());
+                  m_fpath, dlerror());
     }
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
-    hp = LoadLibrary(module_filepath);
+    hp = LoadLibrary(m_fpath);
     if (hp == NULL) {
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                       FORMAT_MESSAGE_FROM_SYSTEM |
@@ -138,7 +145,7 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                       err_msg, 0, NULL);
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE,
-                  module_filepath, err_msg);
+                  m_fpath, err_msg);
         LocalFree(err_msg);
     }
 #endif
@@ -147,7 +154,7 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
             if (HEFESTO_LDMOD_TABLE[l].handle == NULL) {
                 memset(HEFESTO_LDMOD_TABLE[l].module_path, 0,
                        sizeof(HEFESTO_LDMOD_TABLE[l].module_path));
-                strncpy(HEFESTO_LDMOD_TABLE[l].module_path, module_filepath,
+                strncpy(HEFESTO_LDMOD_TABLE[l].module_path, m_fpath,
                         sizeof(HEFESTO_LDMOD_TABLE[l].module_path)-1);
                 HEFESTO_LDMOD_TABLE[l].handle = hp;
                 HEFESTO_LDMOD_TABLE[l].ref_count = HEFESTO_LDMOD_MAX_REF_COUNT;
@@ -155,6 +162,7 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
             }
         }
     }
+    free(m_fpath);
     return hp;
 }
 
@@ -403,4 +411,64 @@ static void handle_byref(struct hefesto_modio *modio,
             }
         }
     }
+}
+
+void set_modules_home(hefesto_options_ctx *options) {
+    hefesto_common_list_ctx *d;
+    char *mod_home;
+    char temp[HEFESTO_MAX_BUFFER_SIZE];
+    mod_home = getenv("HEFESTO_MODULES_HOME");
+    if (mod_home != NULL) {
+        strncpy(temp, "--hefesto-modules-home=", sizeof(temp)-1);
+        strcat(temp, mod_home);
+        HEFESTO_MODULES_HOME =
+            add_option_to_hefesto_options_ctx(HEFESTO_MODULES_HOME,
+                                              temp);
+    } else {
+        new_hefesto_options_ctx(HEFESTO_MODULES_HOME);
+    }
+    if (options != NULL) {
+        for (d = options->data; d; d = d->next) {
+            HEFESTO_MODULES_HOME->data =
+             add_data_to_hefesto_common_list_ctx(HEFESTO_MODULES_HOME->data,
+                                                 d->data,
+                                                 d->dsize);
+        }
+    }
+}
+
+void unset_modules_home() {
+    del_hefesto_options_ctx(HEFESTO_MODULES_HOME);
+    HEFESTO_MODULES_HOME = NULL;
+}
+
+static char *expand_module_file_name(const char *file_path) {
+    char *module_file_path = NULL;
+    size_t path_sz;
+    hefesto_common_list_ctx *d;
+    if (*file_path == '~' && HEFESTO_MODULES_HOME != NULL) {
+        for (d = HEFESTO_MODULES_HOME->data; d != NULL; d = d->next) {
+            module_file_path = hefesto_make_path(d->data,
+                                                 file_path + 1,
+                                                 HEFESTO_MAX_BUFFER_SIZE + 1);
+            if (hefesto_is_file(module_file_path)) {
+                break;
+            } else {
+                free(module_file_path);
+                module_file_path = NULL;
+            }
+        }
+        if (module_file_path == NULL) {
+            path_sz = strlen(file_path);
+            module_file_path = (char *) hefesto_mloc(path_sz + 1);
+            memset(module_file_path, 0, path_sz + 1);
+            strncpy(module_file_path, file_path, path_sz);
+        }
+    } else {
+        path_sz = strlen(file_path);
+        module_file_path = (char *) hefesto_mloc(path_sz + 1);
+        memset(module_file_path, 0, path_sz + 1);
+        strncpy(module_file_path, file_path, path_sz);
+    }
+    return module_file_path;
 }

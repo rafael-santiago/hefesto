@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
             return 0;
         }
 
-        hefesto_init();
+        hefesto_init(o);
         forgefiles =
           get_hefesto_options_ctx_option(HEFESTO_FORGEFILES_OPTION_LABEL, o);
         if (forgefiles != NULL) {

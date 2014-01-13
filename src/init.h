@@ -8,7 +8,10 @@
 #ifndef _HEFESTO_INIT_H
 #define _HEFESTO_INIT_H 1
 
-void hefesto_init();
+#include "types.h"
+
+void hefesto_init(hefesto_options_ctx *options);
+
 void hefesto_deinit();
 
 #endif
