@@ -600,26 +600,28 @@ static void *hvm_list_swap(const char *method,
     if (*((int *)index1) != *((int *)index2)) {
         item1 = get_hefesto_common_list_ctx_index((size_t)*((int *)index1), *list_var);
         item2 = get_hefesto_common_list_ctx_index((size_t)*((int *)index2), *list_var);
-        free(index1);
-        index1 = hefesto_mloc(item1->dsize + 1);
-        memset(index1, 0, item1->dsize + 1);
-        memcpy(index1, item1->data, item1->dsize);
-        outsz = item1->dsize;
+        if (item1 != NULL && item2 != NULL) {
+            free(index1);
+            index1 = hefesto_mloc(item1->dsize + 1);
+            memset(index1, 0, item1->dsize + 1);
+            memcpy(index1, item1->data, item1->dsize);
+            outsz = item1->dsize;
 
-        item1->dsize = item2->dsize;
-        free(item1->data);
-        item1->data = hefesto_mloc(item1->dsize + 1);
-        memset(item1->data, 0, item1->dsize + 1);
-        memcpy(item1->data, item2->data, item1->dsize);
+            item1->dsize = item2->dsize;
+            free(item1->data);
+            item1->data = hefesto_mloc(item1->dsize + 1);
+            memset(item1->data, 0, item1->dsize + 1);
+            memcpy(item1->data, item2->data, item1->dsize);
 
-        item2->dsize = outsz;
-        free(item2->data);
-        item2->data = hefesto_mloc(item2->dsize + 1);
-        memset(item2->data, 0, item2->dsize + 1);
-        memcpy(item2->data, index1, item2->dsize);
+            item2->dsize = outsz;
+            free(item2->data);
+            item2->data = hefesto_mloc(item2->dsize + 1);
+            memset(item2->data, 0, item2->dsize + 1);
+            memcpy(item2->data, index1, item2->dsize);
 
-        free(index1);
-        index1 = NULL;
+            free(index1);
+            index1 = NULL;
+        }
     }
 
     if (index1 != NULL) free(index1);

@@ -129,8 +129,8 @@ mylab.prologue() {
     hefesto.sys.echo("DEP-CHAIN = " + get_c_cpp_deps_() + "\n");
     var test_swap type list;
     var t type int;
-    $test_swap.add_item("a");
     $test_swap.add_item("b");
+#    $test_swap.add_item("a");
     hefesto.sys.echo("LIST BEFORE SWAP = \n");
     $t = 0;
     while ($t < $test_swap.count()) {
