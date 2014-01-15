@@ -1195,7 +1195,7 @@ int synchk_list_method_statement(const char *statement,
     char *temp = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     char *t;
     const char *s;
-    int result = 0;
+    int result = 0, state;
     char *arg, *tmp_arg;
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
@@ -1214,7 +1214,7 @@ int synchk_list_method_statement(const char *statement,
         while (*s != '(' && *s != 0) s++;
 
         if (is_hefesto_list_method(temp) && *s == '(') {
-
+printf("LIST: %s\n", temp);
             s++;
             if (strcmp(temp, ".count") == 0 || strcmp(temp, ".clear") == 0) {
                 while (is_hefesto_blank(*s)) {
@@ -1315,8 +1315,38 @@ int synchk_list_method_statement(const char *statement,
                 }
 
                 free(arg);
+            } else if (strcmp(temp, ".swap") == 0) {
+                result = 1;
+                for (state = 0; state < 2 && result; state++) {
+                    arg = get_arg_from_call(s, &offset);
+                    if (*arg == '$') {
+                        vp = get_hefesto_var_list_ctx_name(arg + 1, lo_vars);
+                        if (vp == NULL) {
+                            vp = get_hefesto_var_list_ctx_name(arg + 1, gl_vars);
+                        }
+                        if (vp != NULL) {
+                            if (vp->type != HEFESTO_VAR_TYPE_INT) {
+                                result = 0;
+                                hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                HLSCM_SYN_ERROR_INCOMP_TYPE_IN_FN_ARG_LIST,
+                                statement, arg + 1);
+                            }
+                        } else {
+                            result = 0;
+                            hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_VAR,
+                                      statement);
+                        }
+                    } else {
+                        result = is_valid_expression(arg, lo_vars, gl_vars, fn);
+                    }
+                    free(arg);
+                }
+                if (result) {
+                    arg = get_arg_from_call(s, &offset);
+                    result = (*arg == 0);
+                    free(arg);
+                }
             }
-
         } else {
             hlsc_info(HLSCM_MTYPE_SYNTAX,
                       HLSCM_SYN_ERROR_ALIEN_STATEMENT,

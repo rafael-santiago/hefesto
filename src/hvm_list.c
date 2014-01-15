@@ -67,7 +67,14 @@ static void *hvm_list_index_of(const char *method,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions);
 
-static void *hvm_del_index(const char *method,
+static void *hvm_list_del_index(const char *method,
+                                hefesto_common_list_ctx **list_var,
+                                hefesto_type_t *otype,
+                                hefesto_var_list_ctx **lo_vars,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions);
+
+static void *hvm_list_swap(const char *method,
                            hefesto_common_list_ctx **list_var,
                            hefesto_type_t *otype,
                            hefesto_var_list_ctx **lo_vars,
@@ -93,7 +100,8 @@ static struct hvm_list_method_call_vector
     set_method(hvm_list_ls),
     set_method(hvm_list_clear),
     set_method(hvm_list_index_of),
-    set_method(hvm_del_index)
+    set_method(hvm_list_del_index),
+    set_method(hvm_list_swap)
 
 };
 
@@ -503,7 +511,7 @@ static void *hvm_list_index_of(const char *method,
 
 }
 
-static void *hvm_del_index(const char *method,
+static void *hvm_list_del_index(const char *method,
                            hefesto_common_list_ctx **list_var,
                            hefesto_type_t *otype,
                            hefesto_var_list_ctx **lo_vars,
@@ -566,4 +574,56 @@ static void *hvm_del_index(const char *method,
     return NULL;
 
 
+}
+
+static void *hvm_list_swap(const char *method,
+                      hefesto_common_list_ctx **list_var,
+                      hefesto_type_t *otype,
+                      hefesto_var_list_ctx **lo_vars,
+                      hefesto_var_list_ctx **gl_vars,
+                      hefesto_func_list_ctx *functions) {
+    char *arg1, *arg2;
+    void *index1, *index2;
+    size_t offset = 0, outsz;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
+    hefesto_common_list_ctx *item1, *item2;
+
+    arg1 = get_arg_from_call(method, &offset);
+    arg2 = get_arg_from_call(method, &offset);
+
+    index1 = expr_eval(arg1, lo_vars, gl_vars, functions, &etype, &outsz);
+    index2 = expr_eval(arg2, lo_vars, gl_vars, functions, &etype, &outsz);
+
+    free(arg1);
+    free(arg2);
+
+    if (*((int *)index1) != *((int *)index2)) {
+        item1 = get_hefesto_common_list_ctx_index((size_t)*((int *)index1), *list_var);
+        item2 = get_hefesto_common_list_ctx_index((size_t)*((int *)index2), *list_var);
+        free(index1);
+        index1 = hefesto_mloc(item1->dsize + 1);
+        memset(index1, 0, item1->dsize + 1);
+        memcpy(index1, item1->data, item1->dsize);
+        outsz = item1->dsize;
+
+        item1->dsize = item2->dsize;
+        free(item1->data);
+        item1->data = hefesto_mloc(item1->dsize + 1);
+        memset(item1->data, 0, item1->dsize + 1);
+        memcpy(item1->data, item2->data, item1->dsize);
+
+        item2->dsize = outsz;
+        free(item2->data);
+        item2->data = hefesto_mloc(item2->dsize + 1);
+        memset(item2->data, 0, item2->dsize + 1);
+        memcpy(item2->data, index1, item2->dsize);
+
+        free(index1);
+        index1 = NULL;
+    }
+
+    if (index1 != NULL) free(index1);
+    free(index2);
+
+    return NULL;
 }

@@ -89,6 +89,7 @@ static char *HEFESTO_LIST_METHODS[] = {
   ".clear",
   ".index_of",
   ".del_index",
+  ".swap",
   "\0"
 };
 

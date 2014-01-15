@@ -1431,8 +1431,12 @@ void del_hefesto_options_ctx(hefesto_options_ctx *options) {
 
     for (p = t = options; t; p = t) {
         t = p->next;
-        del_hefesto_common_list_ctx(p->data);
-        free(p->option);
+        if (p->data != NULL) {
+            del_hefesto_common_list_ctx(p->data);
+        }
+        if (p->option != NULL) {
+            free(p->option);
+        }
         free(p);
     }
 

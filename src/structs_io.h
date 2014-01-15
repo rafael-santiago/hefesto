@@ -95,6 +95,7 @@
 
 #define new_hefesto_options_ctx(o) ( (o) = (hefesto_options_ctx *)\
                         hefesto_mloc(sizeof(hefesto_options_ctx)),\
+                                     (o)->option = NULL,\
                                      (o)->next = NULL, (o)->data = NULL )
 
 #define new_hefesto_dep_chain_ctx(d) ( (d) = (hefesto_dep_chain_ctx *) \
