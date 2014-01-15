@@ -1214,7 +1214,6 @@ int synchk_list_method_statement(const char *statement,
         while (*s != '(' && *s != 0) s++;
 
         if (is_hefesto_list_method(temp) && *s == '(') {
-printf("LIST: %s\n", temp);
             s++;
             if (strcmp(temp, ".count") == 0 || strcmp(temp, ".clear") == 0) {
                 while (is_hefesto_blank(*s)) {
@@ -1277,6 +1276,11 @@ printf("LIST: %s\n", temp);
 
                     if ((result = (vp != NULL))) {
                         result = is_valid_expression(arg, lo_vars, gl_vars, fn);
+                        if (result == 0) {
+                            hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                      HLSCM_SYN_ERROR_INVAL_EXPR,
+                                      statement);
+                        }
                     } else {
                         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_VAR,
                                   statement);
@@ -1338,6 +1342,11 @@ printf("LIST: %s\n", temp);
                         }
                     } else {
                         result = is_valid_expression(arg, lo_vars, gl_vars, fn);
+                        if (result == 0) {
+                            hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                      HLSCM_SYN_ERROR_INVAL_EXPR,
+                                      statement);
+                        }
                     }
                     free(arg);
                 }

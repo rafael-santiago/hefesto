@@ -130,14 +130,14 @@ mylab.prologue() {
     var test_swap type list;
     var t type int;
     $test_swap.add_item("b");
-#    $test_swap.add_item("a");
+    $test_swap.add_item("a");
     hefesto.sys.echo("LIST BEFORE SWAP = \n");
     $t = 0;
     while ($t < $test_swap.count()) {
         hefesto.sys.echo("\tITEM = " + $test_swap.item($t) + "\n");
         $t = $t + 1;
     }
-    $test_swap.swap(0,1);
+    $test_swap.swap(0, 1);
     hefesto.sys.echo("LIST AFTER SWAP = \n");
     $t = 0;
     while ($t < $test_swap.count()) {
