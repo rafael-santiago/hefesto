@@ -170,10 +170,10 @@ function vc110_lib_forge(sources type list, includepaths type list,
         if (($binary.match("\\.lib$") > -1 || $binary.match("\\.a$") > -1) &&
             $isstatic == 0) {
             $binary = vc110_get_libname($binary) + ".dll";
-        }
+        }        
         if (hefesto.sys.ls($binary + "$") == 0 && $compilation_nr == 0) {
             $compilation_nr = 1;
-        }
+        }        
         if ($compilation_nr > 0) {
             # linking...
             $exit_code = vc_link_objects2lib($sources,
@@ -182,7 +182,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
                                              $ldflags_str,
                                              $binary,
                                              $isrelease,
-                                             $isstatic);
+                                             $isstatic);            
             if ($exit_code == 0) {
                 hefesto.sys.echo("*** Link success (output:" + $binary + ")\n");
             } else {
@@ -204,20 +204,20 @@ function vc_link_objects2lib(sources type list,
     var cmd type string;
     var objects type string;
     var retcode type int;
-    $objects = vc_objs_from_srcs($sources, $obj_dir);
+    $objects = vc_objs_from_srcs($sources, $obj_dir);    
     $retcode = 1;
     if ($isstatic == 1) {
-        $cmd = hefesto.toolset.lib($libname, $objects, $libs, $ldflags);
-        $retcode = hefesto.sys.run($cmd);
-        if ($isrelease == 0 && $retcode == 0) {
-            $retcode = vc110_postprocess_pdb($libname);
+        $cmd = hefesto.toolset.lib($libname, $objects, $libs, $ldflags);        
+        $retcode = hefesto.sys.run($cmd);        
+        if ($isrelease == 0 && $retcode == 0) {            
+            $retcode = vc110_postprocess_pdb($libname);            
         }
     } else {
         if ($isrelease == 1) {
             $cmd = hefesto.toolset.dll_release($libname, $objects, $libs, $ldflags);
         } else {
             $cmd = hefesto.toolset.dll_debug($libname, $objects, $libs, $ldflags);
-        }
+        }        
         $retcode = hefesto.sys.run($cmd);
     }
     result $retcode;
@@ -245,13 +245,13 @@ function vc110_get_libname(artifact type string) : result type string {
 }
 
 function vc110_postprocess_pdb(filename type string) : result type int {
-    var retcode type int;
+    var retcode type int;   
     if (hefesto.sys.ls("vc110\\.pdb") == 0) {
         result 1;
-    }
+    }    
     var pdbfile type string;
     $retcode = 1;
-    $pdbfile = vc110_get_libname($filename) + ".pdb";
+    $pdbfile = vc110_get_libname($filename) + ".pdb";    
     if (hefesto.sys.cp("vc110.pdb", $pdbfile) == 1) {
         if (hefesto.sys.rm("vc110.pdb") == 0) {
             $retcode = 0;

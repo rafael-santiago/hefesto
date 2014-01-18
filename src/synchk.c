@@ -2181,7 +2181,7 @@ char *get_arg_from_call(const char *call, size_t *offset) {
         while (*a != ';' && a != arg) {
             a--;
         }
-        if (*a == ';') {
+        if (*a == ';' && *(a+1) == 0) {
             *a = 0;
         } else {
             a = t;

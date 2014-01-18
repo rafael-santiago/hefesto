@@ -257,7 +257,7 @@ function export_env_hefesto_var(install_dir type string) : result type int {
                 $path_env = $path_env + ";";
             }
             $path_env = $path_env + $install_dir + "\\bin";
-            
+
             $exported = (hefesto.sys.setenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\PATH", $path_env) == 0);
         }
     }
@@ -758,15 +758,20 @@ hefesto-install.prologue() {
     $source_files.add_item("../include/toolsets/null/null.hls");
     $source_files.add_item("../include/toolsets/java/forges/java_forge.hls");
     $source_files.add_item("../include/toolsets/java/java.hls");
-    $source_files.add_item("../include/toolsets/java/README");    
+    $source_files.add_item("../include/toolsets/java/README");
     $source_files.add_item("../include/toolsets/vc/common/vssetupenv.hls");
     $source_files.add_item("../include/toolsets/vc/forges/common/vcutils.hls");
     $source_files.add_item("../include/toolsets/vc/forges/vc110_app_forge.hls");
     $source_files.add_item("../include/toolsets/vc/forges/vc110_lib_forge.hls");
     $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_110.hls");
+    $source_files.add_item("../include/toolsets/vc/forges/vc100_app_forge.hls");
+    $source_files.add_item("../include/toolsets/vc/forges/vc100_lib_forge.hls");
+    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_100.hls");
     $source_files.add_item("../include/toolsets/vc/README");
     $source_files.add_item("../include/toolsets/vc/vc110-app.hls");
-    $source_files.add_item("../include/toolsets/vc/vc110-lib.hls");    
+    $source_files.add_item("../include/toolsets/vc/vc110-lib.hls");
+    $source_files.add_item("../include/toolsets/vc/vc100-app.hls");
+    $source_files.add_item("../include/toolsets/vc/vc100-lib.hls");
     $source_files.add_item("../include/conv.hls");
     $source_files.add_item("../include/fsutil.hls");
     $source_files.add_item("../include/optutil.hls");
@@ -807,15 +812,20 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/null/null.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/forges/java_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/java.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/README"));        
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/common/vssetupenv.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/common/vcutils.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_app_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_lib_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_110.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_app_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_lib_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_100.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-lib.hls"));        
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-app.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-lib.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/conv.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/fsutil.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/optutil.hls"));
@@ -848,15 +858,20 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\null\\null.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\forges\\java_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\java.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\README"));        
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\common\\vssetupenv.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\common\\vcutils.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_app_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_lib_forge.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_110.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_app_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_lib_forge.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_100.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-lib.hls"));        
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-app.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-lib.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\conv.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\fsutil.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\optutil.hls"));
@@ -886,7 +901,7 @@ hefesto-install.prologue() {
                 }
                 $uninstall_cmd = $temp;
             }
-#            $uninstall_cmd = $uninstall_cmd + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;            
+#            $uninstall_cmd = $uninstall_cmd + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;
             if (hefesto.sys.run($uninstall_cmd) != 0) {
                 hefesto.sys.exit(1);
             }
