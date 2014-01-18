@@ -1,0 +1,34 @@
+#
+# "vc100-app.hls"
+#       by Rafael Santiago
+#
+# Description: Visual Studio 10.0 visual c toolset
+#
+
+include ~/toolsets/vc/forges/vc100_app_forge.hls
+include ~/toolsets/vc/forges/common/vcutils.hls
+
+#
+# Para gerar pdb em release é só linkar com o commando link_debug
+#
+
+toolset "vc100-app" forge function "vc100_app_forge" : forge helpers "vc_mk_compile_cmd", "vc_link_objects2app", "vc_async_compile_srcs", "vc_should_compile":
+    command "compile_debug_static": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MTd $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_debug_shared": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MDd $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_release_static": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MT $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_release_shared": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MD $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "link_debug": APPNAME, OBJECTS, LIBS, LDFLAGS <
+        link.exe $LDFLAGS /nologo /debug /out:\\"$APPNAME\\" $LIBS $OBJECTS
+    >
+    command "link_release": APPNAME, OBJECTS, LIBS, LDFLAGS <
+        link.exe $LDFLAGS /nologo /out:\\"$APPNAME\\" $LIBS $OBJECTS
+    >
+$
