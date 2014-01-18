@@ -1,0 +1,111 @@
+context default
+    keyword whole function yellow
+    keyword whole var yellow
+    keyword whole while yellow
+    keyword whole if yellow
+    keyword whole else yellow
+    keyword whole list yellow
+    keyword whole int yellow
+    keyword whole string yellow
+    keyword whole file yellow
+    keyword whole none magenta
+    keyword whole result\[\s\t\]type magenta
+    keyword whole result yellow
+    keyword whole type magenta
+    keyword whole project yellow
+    keyword whole toolset yellow
+    keyword whole dependencies magenta
+    keyword whole hefesto brown
+    keyword whole forge yellow
+    keyword whole helpers yellow
+    keyword whole break red
+    keyword whole continue brightgreen
+    keyword whole command yellow
+
+    keyword ( brightcyan
+    keyword ) brightcyan
+    keyword , brightcyan
+    keyword ; brightmagenta
+    keyword : brightcyan
+    keyword { brightcyan
+    keyword } brightcyan
+    keyword == brightcyan
+    keyword && yellow
+    keyword || yellow
+    keyword << brightcyan
+    keyword >> brightcyan
+    keyword = brightcyan
+    keyword ! brightcyan
+    keyword <\[.*\]> white black
+#    keyword \+ yellow
+#    keyword - yellow
+#    keyword \* yellow
+#    keyword / yellow
+    keyword \& brightcyan
+    keyword \| brightcyan
+    keyword < brightcyan
+    keyword > brightcyan
+#    keyword $ magenta
+#    keyword $\[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\]\[\s\t\n\] magenta
+    keyword "*" green
+    keyword .len brightmagenta
+    keyword .at brightmagenta
+    keyword .match brightmagenta
+    keyword .replace brightmagenta
+    keyword .count brightmagenta
+    keyword .add_item brightmagenta
+    keyword .del_item brightmagenta
+    keyword .del_index brightmagenta
+    keyword .item brightmagenta
+    keyword .ls brightmagenta
+    keyword .clear brightmagenta
+    keyword .index_of brightmagenta
+    keyword .swap brightmagenta
+    keyword .sys.echo yellow
+    keyword .sys.replace_in_file yellow
+    keyword .sys.ls yellow
+    keyword .sys.pwd yellow
+    keyword .sys.cd yellow
+    keyword .sys.fopen yellow
+    keyword .sys.fwrite yellow
+    keyword .sys.fread yellow
+    keyword .sys.fclose yellow
+    keyword .sys.cp yellow
+    keyword .sys.run yellow
+    keyword .sys.mkdir yellow
+    keyword .sys.rmdir yellow
+    keyword .sys.rm yellow
+    keyword .sys.env yellow
+    keyword .sys.feof yellow
+    keyword .sys.prompt yellow
+    keyword .sys.fseek yellow
+    keyword .sys.fseek_to_begin yellow
+    keyword .sys.fseek_to_end yellow
+    keyword .sys.fsize yellow
+    keyword .sys.ftell yellow
+    keyword .sys.exit yellow
+    keyword .sys.os_name yellow
+    keyword .sys.get_option yellow
+    keyword .sys.make_path yellow
+    keyword .sys.last_forge_result yellow
+    keyword .sys.forge yellow
+    keyword .sys.byref yellow
+    keyword .sys.time yellow
+    keyword .sys.setenv yellow
+    keyword .sys.unsetenv yellow
+    keyword .sys.lines_from_file yellow
+    keyword .sys.call_from_module yellow
+    keyword .toolset.base_refresh yellow
+    keyword .toolset.file_has_change yellow
+    keyword .project.name yellow
+    keyword .project.toolset yellow
+    keyword .project.dep_chain yellow
+    keyword .project.abort yellow
+    keyword .preloading brightgreen
+    keyword .prologue brightgreen
+    keyword .epilogue brightgreen
+
+context linestart include \n brightred
+
+context # \n cyan
+    spellcheck
