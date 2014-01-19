@@ -134,7 +134,7 @@ static void *hvm_str_at(const char *method,
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
     char *result;
     void *index_p;
-    char *arg, *pfixd_arg;
+    char *arg;
     const char *m;
 
     if (string_var == NULL || (*string_var) == NULL ||
@@ -143,13 +143,8 @@ static void *hvm_str_at(const char *method,
     for (m = method; *m != '(' && *m != 0; m++);
 
     arg = get_next_call_args(m+1, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_STRING_METHOD) {
-        pfixd_arg = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        pfixd_arg = arg;
-    }
-    index_p = expr_eval(pfixd_arg, lo_vars, gl_vars, functions, &etype, &outsz);
+
+    index_p = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
     index = *(size_t *)index_p;
     free(index_p);
 
@@ -162,7 +157,6 @@ static void *hvm_str_at(const char *method,
     }
     *(result+1) = 0;
     *otype = HEFESTO_VAR_TYPE_STRING;
-    free(pfixd_arg);
 
     return result;
 
@@ -232,7 +226,7 @@ static void *hvm_str_match(const char *method,
                            hefesto_func_list_ctx *functions) {
 
     size_t offset = 0, outsz;
-    char *arg, *pfixd_regex;
+    char *arg;
     const char *m;
     char errors[HEFESTO_MAX_BUFFER_SIZE];
     void *usr_regex, *result;
@@ -250,13 +244,8 @@ static void *hvm_str_match(const char *method,
     for (m = method; *m != '(' && *m != 0; m++);
 
     arg = get_arg_from_call(m+1, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_STRING_METHOD) {
-        pfixd_regex = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-       pfixd_regex = arg;
-    }
-    usr_regex = expr_eval(pfixd_regex, lo_vars, gl_vars, functions,
+
+    usr_regex = expr_eval(arg, lo_vars, gl_vars, functions,
                           &etype, &outsz);
     if ((search_program = here_compile(usr_regex, errors)) != NULL) {
         search_result = here_match_string((*string_var)->data,
@@ -267,7 +256,7 @@ static void *hvm_str_match(const char *method,
     } else {
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
     }
-    free(pfixd_regex);
+
     free(usr_regex);
 
     return result;
@@ -282,7 +271,7 @@ static void *hvm_str_replace(const char *method,
                              hefesto_func_list_ctx *functions) {
 
     size_t offset = 0, outsz;
-    char *regex_arg, *pattern_arg, *pfixd_regex, *pfixd_pattern;
+    char *regex_arg, *pattern_arg;
     char *replaced_buffer = NULL;
     const char *m;
     char errors[HEFESTO_MAX_BUFFER_SIZE];
@@ -300,25 +289,14 @@ static void *hvm_str_replace(const char *method,
     for (m = method; *m != '(' && *m != 0; m++);
 
     regex_arg = get_arg_from_call(m+1, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_STRING_METHOD) {
-        pfixd_regex = infix2postfix(regex_arg, strlen(regex_arg), 1);
-        free(regex_arg);
-    } else {
-        pfixd_regex = regex_arg;
-    }
-    pattern_arg = get_arg_from_call(m+1, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_STRING_METHOD) {
-        pfixd_pattern = infix2postfix(pattern_arg, strlen(pattern_arg), 1);
-        free(pattern_arg);
-    } else {
-        pfixd_pattern = pattern_arg;
-    }
 
-    usr_regex = expr_eval(pfixd_regex, lo_vars, gl_vars, functions,
+    pattern_arg = get_arg_from_call(m+1, &offset);
+
+    usr_regex = expr_eval(regex_arg, lo_vars, gl_vars, functions,
                           &etype, &outsz);
 
     if ((search_program = here_compile(usr_regex, errors)) != NULL) {
-        usr_pattern = expr_eval(pfixd_pattern, lo_vars, gl_vars, functions,
+        usr_pattern = expr_eval(pattern_arg, lo_vars, gl_vars, functions,
                                 &etype, &outsz);
 
         *(int *)result = here_replace_string((*string_var)->data,
@@ -338,9 +316,7 @@ static void *hvm_str_replace(const char *method,
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_SYN_ERROR_INVAL_REGEX, errors);
     }
 
-    free(pfixd_regex);
     free(usr_regex);
-    free(pfixd_pattern);
 
     return result;
 

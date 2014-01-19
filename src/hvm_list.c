@@ -153,7 +153,7 @@ static void *hvm_list_item(const char *method,
                            hefesto_var_list_ctx **gl_vars,
                            hefesto_func_list_ctx *functions) {
 
-    char *arg, *arg_pfix;
+    char *arg;
     size_t offset = 0, outsz;
     void *index_p;
     hefesto_type_t etype;
@@ -165,14 +165,9 @@ static void *hvm_list_item(const char *method,
     etype = HEFESTO_VAR_TYPE_INT;
 
     arg = get_next_call_args(method, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_LIST_METHOD) {
-        arg_pfix = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        arg_pfix = arg;
-    }
-    index_p = expr_eval(arg_pfix, lo_vars, gl_vars, functions, &etype, &outsz);
-    free(arg_pfix);
+
+    index_p = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
+
     outsz = *(size_t *)index_p;
     free(index_p);
 
@@ -258,7 +253,7 @@ static void *hvm_list_add_item(const char *method,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions) {
 
-    char *arg, *d, *arg_pfix;
+    char *arg, *d;
     size_t offset = 0, outsz;
     void *data;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
@@ -266,18 +261,12 @@ static void *hvm_list_add_item(const char *method,
     hefesto_var_list_ctx *vp = NULL;
 
     arg = get_arg_from_call(method, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_LIST_METHOD) {
-        arg_pfix = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        arg_pfix = arg;
-    }
 
-    data = expr_eval(arg_pfix, lo_vars, gl_vars, functions, &etype, &outsz);
+    data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
 
     *otype = HEFESTO_VAR_TYPE_INT;
 
-    if (is_hefesto_numeric_constant((char *)arg_pfix)) {
+    if (is_hefesto_numeric_constant((char *)arg)) {
         outsz = sizeof(int);
         etype = HEFESTO_VAR_TYPE_INT;
     } else {
@@ -297,8 +286,6 @@ static void *hvm_list_add_item(const char *method,
     if (vp && vp->subtype == HEFESTO_VAR_TYPE_UNTYPED) {
         vp->subtype = etype;
     }
-
-    free(arg_pfix);
 
     *list_var = add_data_to_hefesto_common_list_ctx(*list_var, data, outsz);
     HEFESTO_DEBUG_INFO(0, "hvm_list/add: dummy:%d %s\n", 
@@ -321,28 +308,21 @@ static void *hvm_list_del_item(const char *method,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions) {
 
-    char *arg, *arg_pfix;
+    char *arg;
     size_t offset = 0, outsz;
     void *data;
     hefesto_type_t etype;
     hefesto_var_list_ctx *vp;
 
     arg = get_arg_from_call(method, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_LIST_METHOD) {
-        arg_pfix = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        arg_pfix = arg;
-    }
-    data = expr_eval(arg_pfix, lo_vars, gl_vars, functions, &etype, &outsz);
 
-    if (is_hefesto_numeric_constant((char *)arg_pfix)) {
+    data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
+
+    if (is_hefesto_numeric_constant((char *)arg)) {
         etype = HEFESTO_VAR_TYPE_INT;
     } else {
         etype = HEFESTO_VAR_TYPE_STRING;
     }
-
-    free(arg_pfix);
 
     //if (is_hefesto_numeric_constant((char *)data)) etype = HEFESTO_VAR_TYPE_INT;
     //else etype = HEFESTO_VAR_TYPE_STRING;
@@ -466,7 +446,7 @@ static void *hvm_list_index_of(const char *method,
                                hefesto_func_list_ctx *functions) {
 
     void *result = hefesto_mloc(sizeof(int));
-    char *arg, *arg_pfix;
+    char *arg;
     void *data;
     hefesto_common_list_ctx *lp, *lpp;
     size_t offset = 0;
@@ -477,18 +457,12 @@ static void *hvm_list_index_of(const char *method,
     *(int *)result = -1;
 
     arg = get_arg_from_call(method, &offset);
-    if (hvm_get_current_executed_instruction() == HEFESTO_LIST_METHOD) {
-        arg_pfix = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        arg_pfix = arg;
-    }
 
-    data = expr_eval(arg_pfix, lo_vars, gl_vars, functions, &etype, &offset);
+    data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &offset);
 
     if (list_var != NULL && *list_var != NULL && (*list_var)->is_dummy_item == 0)
     {
-        if (is_hefesto_numeric_constant(arg_pfix)) {
+        if (is_hefesto_numeric_constant(arg)) {
             etype = HEFESTO_VAR_TYPE_INT;
         } else {
             etype = HEFESTO_VAR_TYPE_STRING;
@@ -504,7 +478,6 @@ static void *hvm_list_index_of(const char *method,
         }
     }
 
-    free(arg_pfix);
     free(data);
 
     return result;
@@ -518,7 +491,7 @@ static void *hvm_list_del_index(const char *method,
                            hefesto_var_list_ctx **gl_vars,
                            hefesto_func_list_ctx *functions) {
 
-    char *arg, *arg_pfix;
+    char *arg;
     size_t offset = 0, outsz;
     void *data;
     hefesto_type_t etype;
@@ -527,14 +500,7 @@ static void *hvm_list_del_index(const char *method,
 
     arg = get_arg_from_call(method, &offset);
 
-    if (hvm_get_current_executed_instruction() == HEFESTO_LIST_METHOD) {
-        arg_pfix = infix2postfix(arg, strlen(arg), 1);
-        free(arg);
-    } else {
-        arg_pfix = arg;
-    }
-    data = expr_eval(arg_pfix, lo_vars, gl_vars, functions, &etype, &outsz);
-    free(arg_pfix);
+    data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
 
     //if (is_hefesto_numeric_constant((char *)data)) etype = HEFESTO_VAR_TYPE_INT;
     //else etype = HEFESTO_VAR_TYPE_STRING;
