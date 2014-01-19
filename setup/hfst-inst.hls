@@ -219,7 +219,8 @@ function export_env_hefesto_var(install_dir type string) : result type int {
         $hefesto_sh_fd = hefesto.sys.fopen("/etc/profile.d/hefesto.sh", "w");
         if ($hefesto_sh_fd != 0) {
             var data_buf type string;
-            $data_buf = "#!/bin/sh\n\nexport HEFESTO_INCLUDES_HOME=" + hefesto.sys.make_path($install_dir, "include") + "\n\n";
+            $data_buf = "#!/bin/sh\n\nexport HEFESTO_INCLUDES_HOME=" + hefesto.sys.make_path($install_dir, "include") + "\n";
+            $data_buf = "export HEFESTO_MODULES_HOME=" + hefesto.sys.make_path($install_dir, "module") + "\n\n";
             $exported = hefesto.sys.fwrite($data_buf, $data_buf.len(), $hefesto_sh_fd);
             if ($exported == $data_buf.len()) {
                 $exported = (hefesto.sys.run("chmod +x /etc/profile.d/hefesto.sh") == 0);
@@ -232,6 +233,7 @@ function export_env_hefesto_var(install_dir type string) : result type int {
         var profile type list;
         $profile = serialize_profile_file();
         $profile.add_item("HEFESTO_INCLUDES_HOME=\"" + hefesto.sys.make_path($install_dir, "include") + "\"; export HEFESTO_INCLUDES_HOME\n");
+        $profile.add_item("HEFESTO_MODULES_HOME=\"" + hefesto.sys.make_path($install_dir, "module") + "\"; export HEFESTO_MODULES_HOME\n");
         $exported = flush_profile_file($profile);
     } else if ($os_name == "windows") {
         var reg_cmd type string;
@@ -248,6 +250,19 @@ function export_env_hefesto_var(install_dir type string) : result type int {
             $t = $t + 1;
         }
         $exported = (hefesto.sys.setenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\HEFESTO_INCLUDES_HOME", $backshd_dir) == 0);
+        if ($exported == 1) {
+            $temp = hefesto.sys.make_path($install_dir, "module");
+            $t = 0;
+            $backshd_dir = "";
+            while ($t < $temp.len()) {
+                if ($temp.at($t) == "\\") {
+                    $backshd_dir = $backshd_dir + "\\";
+                }
+                $backshd_dir = $backshd_dir + $temp.at($t);
+                $t = $t + 1;
+            }
+            $exported = (hefesto.sys.setenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\HEFESTO_MODULES_HOME", $backshd_dir) == 0);
+        }
 
         if ($exported == 1) {
             var path_env type string;
@@ -743,6 +758,10 @@ hefesto-install.prologue() {
         $source_files.add_item("../bin/hefesto.exe");
     }
 
+    # The modules
+
+    $source_files.add_item("../module/README");
+
     # The standard hls scripts
 
     $source_files.add_item("../include/toolsets/common/utils/lang/c/dependency_scanner.hls");
@@ -798,6 +817,8 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/index_en.html"));
         # Binaries
         $dest_files.add_item("/usr/local/bin/hefesto");
+        # The modules
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "module/README"));
         # The standard hls scripts
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hls"));
@@ -844,6 +865,8 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\index_en.html"));
         # Binaries
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "bin\\hefesto.exe"));
+        # The modules
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "module\\README"));
         # The standard hls scripts
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hls"));

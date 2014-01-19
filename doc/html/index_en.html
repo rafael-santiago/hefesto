@@ -663,6 +663,16 @@
 			<LI><CODE>&nbsp;hefesto.sys.call_from_module("/usr/shared/mymods/my_killer_mod.so", "my_killer_func", "arg1", "arg2", 3);</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 		</OL>
+
+                You can use the paths indirection to locate a module if you don't wish to indicate a fullpath inside your hls code on syscall:
+
+            <OL CLASS="code">
+			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.call_from_module("~/my_killer_mod.so", "my_killer_func", "arg1", "arg2", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+
+                In this shown example, the library "my_killer_mod.so" will searched in configurated paths in environment variable <I>HEFESTO_MODULES_HOME</I>.
         
 		<BR><BR><A HREF = "#topics">Back</A>
 		

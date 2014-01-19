@@ -686,7 +686,17 @@
 			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
 			<LI><CODE>&nbsp;hefesto.sys.call_from_moduke("/usr/share/mymods/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);</CODE></LI>
 			<LI><CODE>}</CODE></LI>
-		</OL>
+	</OL>
+
+                Você pode usar indireção de paths para localizar um módulo, caso não queira indicar o path completo para ele em seu código hls:
+
+        <OL CLASS="code">
+			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.call_from_moduke("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+	</OL>
+
+                Nesse exemplo apresentado, a biblioteca "my_killer_mod.so" será procurada nos paths configurados na variável de ambiente <I>HEFESTO_MODULES_HOME</I>.
 
 		<BR><BR><A HREF = "#topics">Voltar</A>
 		
