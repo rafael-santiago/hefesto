@@ -1,6 +1,6 @@
-Uninstall Hefesto using the named script "hfst-inst.hls" contained in this directory
+Uninstall Hefesto using the named script "hfst-inst.hsl" contained in this directory
 
 Outside from install directory, run the follow command to uninstall:
 
-hefesto --forgefiles=<install dir>/setup/hfst-inst.hls --hfst-inst-projects=hefesto-install --uninstall
+hefesto --forgefiles=<install dir>/setup/hfst-inst.hsl --hfst-inst-projects=hefesto-install --uninstall
 

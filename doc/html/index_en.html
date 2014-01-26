@@ -29,7 +29,7 @@
     <H3>Topics</H3>
     
     <A HREF="#overview">Overview</A><BR>
-    <A HREF="#firststeps">First steps in hls<A><BR>
+    <A HREF="#firststeps">First steps in hsl<A><BR>
 	<A HREF="#strlistfacilities">String and list built-in facilitators<A><BR>
 	<A HREF="#syscallsguide">Hefesto syscalls guide<A><BR>
 	<A HREF="#toolsetcomposing">Composing a hefesto's toolset<A><BR>
@@ -53,7 +53,7 @@
 		
 		The toolsets are expressed in a particular language.<BR><BR>
 
-		With a toolset chosen you can build your app/widget/"whateverthing" and also you can use the hls (<B>H</B>efesto's <B>s</B>cripting <B>l</B>anguage) to assist in the pre and post-compilation.<BR><BR>
+		With a toolset chosen you can build your app/widget/"whateverthing" and also you can use the hsl (<B>H</B>efesto's <B>s</B>cript <B>l</B>anguage) to assist in the pre and post-compilation.<BR><BR>
         
 		This means:<BR><BR>
 		&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   - You can set your code: editing some headers to fit version, etc.<BR>        
@@ -67,19 +67,19 @@
 		
         <!-- First steps -->
         <A NAME = "firststeps"></A>
-        <H3>First steps in hls</H3>
+        <H3>First steps in hsl</H3>
         
-		The hls is a procedural language designed with two main goals: to be simple and make things clearer. Sometimes being simple and clearer will require from you more code, but in my opinion is better to write more code and less documentation about what that <FONT COLOR="MAGENTA" FACE="ARIAL BLACK">cute</FONT> little code intends to do. It is a fact that documentation is often not a constant in most projects' build that you work, right?<BR><BR>
+		The hsl is a procedural language designed with two main goals: to be simple and make things clearer. Sometimes being simple and clearer will require from you more code, but in my opinion is better to write more code and less documentation about what that <FONT COLOR="MAGENTA" FACE="ARIAL BLACK">cute</FONT> little code intends to do. It is a fact that documentation is often not a constant in most projects' build that you work, right?<BR><BR>
 	
-        There are some build scripting languages very minimalist and very confused. In contrast, Hls is simple but not primitive.<BR><BR>
+        There are some build scripting languages very minimalist and very confused. In contrast, hsl is simple but not primitive.<BR><BR>
 		    
 		Basically you can write functions, clauses with "if / [else]" and loops via the primitive "while".<BR><BR>
 
-		Yes, <B><U>Hls is a typed language</U></B>. Variables need to be declared, the rule is: "if you will use a variable, please announce it first." If you declare it more than once, the Hefesto's Hls compiler will complain about the fact.<BR><BR>
+		Yes, <B><U>hsl is a typed language</U></B>. Variables need to be declared, the rule is: "if you will use a variable, please announce it first." If you declare it more than once, the Hefesto's hsl compiler will complain about the fact.<BR><BR>
 		
-		Hls has a number of features commonly needed in build tasks. The features "built-in" are called "syscalls". Syscalls are responsible by the abstraction layer between the build and the platform on which this task runs. So, for example, to copy a file from one place to another is the same thing on both Linux and Windows.<BR><BR>
+		hsl has a number of features commonly needed in build tasks. The features "built-in" are called "syscalls". Syscalls are responsible by the abstraction layer between the build and the platform on which this task runs. So, for example, to copy a file from one place to another is the same thing on both Linux and Windows.<BR><BR>
         
-		Now let's see some code in Hls:<BR><BR>
+		Now let's see some code in hsl:<BR><BR>
         
         <OL CLASS="code">
 			<LI><CODE>function hello_world() : result type none {</CODE></LI>
@@ -147,7 +147,7 @@
 		Function arguments must be declared under the scheme <B><I>var_name</I> type <I>type_name</I></B>. All variables must be accessed with the dollar symbol prefixing them. The result keyword is used to abort execution of the function, returning the passed value to the caller.
 		<BR><BR>
 
-        Loops in Hls are very simple, take a look:<BR><BR>
+        Loops in hsl are very simple, take a look:<BR><BR>
 		        
         <OL CLASS="code">
 			<LI><CODE>function print_sequence(limit type int) : result type none {</CODE></LI>
@@ -517,7 +517,7 @@
         
         <H5><B><U>os_name()</U></B></H5>
         
-		Returns the name of the operating system where your hls is running. The return is always the name in lower-case and without any version information.<BR><BR>
+		Returns the name of the operating system where your hsl is running. The return is always the name in lower-case and without any version information.<BR><BR>
         
         <OL CLASS="code">
 			<LI><CODE>function env_sample() : result type none {</CODE></LI>
@@ -565,12 +565,12 @@
         </OL>
         
         <H5><B><U>forge()</U></B></H5>
-        Calls a forge project. The first argument is the project name contained in the second argument which is the hls containing the declaration of the project. The third argument is the user options.
+        Calls a forge project. The first argument is the project name contained in the second argument which is the hsl containing the declaration of the project. The third argument is the user options.
 		<BR><BR>
 		
         <OL CLASS="code">
 			<LI><CODE>function forge_sample() : result type none {</CODE></LI>
-			<LI><CODE>&nbsp;hefesto.sys.forge("foolib", "local_deps.hls", "--user-includes-home=../alt_incs --pre-submit-me");</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.forge("foolib", "local_deps.hsl", "--user-includes-home=../alt_incs --pre-submit-me");</CODE></LI>
 			<LI><CODE>&nbsp;if (hefesto.sys.last_forge_result() == 0) {</CODE></LI>
 			<LI><CODE>&nbsp;&nbsp;hefesto.sys.echo("foolib built with success.\n");</CODE></LI>
 			<LI><CODE>&nbsp;} else {</CODE></LI>
@@ -664,7 +664,7 @@
 			<LI><CODE>}</CODE></LI>
 		</OL>
 
-                You can use the paths indirection to locate a module if you don't wish to indicate a fullpath inside your hls code on syscall:
+                You can use the paths indirection to locate a module if you don't wish to indicate a fullpath inside your hsl code on syscall:
 
             <OL CLASS="code">
 			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
@@ -676,16 +676,16 @@
         
 		<BR><BR><A HREF = "#topics">Back</A>
 		
-		<!-- hls toolset dialect -->
+		<!-- hsl toolset dialect -->
         <A NAME = "toolsetcomposing"></A>
         <H3>Composing a Hefesto's toolset</H3>
         
-		Create a Hefesto toolset means indicate how to format commands to build something. The subset of hls used for this task is more a configuration language than a programming language.
+		Create a Hefesto toolset means indicate how to format commands to build something. The subset of hsl used for this task is more a configuration language than a programming language.
 		<BR><BR>
         
 		Every command toolset is a string, a formatted string. These commands can be invoked via <B>hefesto.toolset.*</B>.<BR>
 		
-        <H5>The hls toolset "dialect"</H5>
+        <H5>The hsl toolset "dialect"</H5>
         
 		Below you can see the example of a small toolset:<BR><BR>
         
@@ -744,7 +744,7 @@
 		                
 		<H5>The forge function</H5>
         
-		The forge function is expressed in standard hls. The arguments received by this function depends on how it is designed, there is no fixed pattern for this.<BR><BR>
+		The forge function is expressed in standard hsl. The arguments received by this function depends on how it is designed, there is no fixed pattern for this.<BR><BR>
 		
 		The arguments defines how the user will configure the Forgefile, the script used by Hefesto to forge him "someware".<BR><BR>
         
@@ -774,7 +774,7 @@
         <A NAME = "forgingprojectswithhefesto"></A>
         <H3>Forging projects with Hefesto</H3>
         
-		Ok, you already know all about hls... toolset configuration, how to integrate a hls function to run the build task, etc... but you still don't know how to use all these things to forge something.
+		Ok, you already know all about hsl... toolset configuration, how to integrate a hsl function to run the build task, etc... but you still don't know how to use all these things to forge something.
 		<BR>
                 
         <H5>The forge "dialect"</H5>
@@ -782,7 +782,7 @@
 		Here is a "Forgefile":<BR><BR>
         
         <OL CLASS="code">
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls<BR></CODE>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hsl<BR></CODE>
 			<LI><CODE></CODE></LI>
 			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
 			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
@@ -795,7 +795,7 @@
         
         <BR>
         
-		The hls allows you to include the contents of a file inside another via the reserved word "include". The "~" symbol indicates that the included file is located in a well known place set in the environment variable "HEFESTO_INCLUDES_HOME." If the file is relative/local you need only indicate the relative path without the HEFESTO_INCLUDES_HOME abstraction, a.k.a "~".
+		The hsl allows you to include the contents of a file inside another via the reserved word "include". The "~" symbol indicates that the included file is located in a well known place set in the environment variable "HEFESTO_INCLUDES_HOME." If the file is relative/local you need only indicate the relative path without the HEFESTO_INCLUDES_HOME abstraction, a.k.a "~".
 		<BR><BR>
 		
 		Variables must be declared, do you remember?<BR><BR>
@@ -845,7 +845,7 @@
 		For the project "aquiles-armor" we can populate our lists inside the prologue function, see:<BR><BR>
 		        
         <OL CLASS="code">
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hsl</CODE></LI>
 			<LI><CODE></CODE></LI>
 			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
 			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
@@ -901,7 +901,7 @@
 		In the project declaration you should put this dep chain as a string, after the declaration of the toolset and prefixed by keyword "dependencies":<BR><BR>
         
 		<OL CLASS="code">
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hsl</CODE></LI>
 			<LI><CODE></CODE></LI>
 			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
 			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
@@ -918,13 +918,13 @@
 		
 		There is no built-in function that detects module dependencies, it was not implemented because Hefesto is not designed only for a few types of programming languages, you can expand Hefesto to help you to build anything. This is the main Hefesto's idea.<BR><BR>
         
-		The dependency scanners can be encoded in hls. A function that returns a string, the dependency chain.<BR><BR>
+		The dependency scanners can be encoded in hsl. A function that returns a string, the dependency chain.<BR><BR>
 		
 		In the project dependencies declaration section you can use a string variable instead of a literal string. Using this you can set the variable with the return of a dependency scanner. You must assign this in the function preloading, because the project is loaded and configured at this stage. Here is an example:
 		<BR><BR>
         
         <OL CLASS="code">
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hsl</CODE></LI>
 			<LI><CODE></CODE></LI>
 			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
 			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
@@ -952,8 +952,8 @@
 		<BR><BR>
         
         <OL CLASS="code">
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hls</CODE></LI>
-			<LI><CODE>&nbsp;include ~/hcore/toolsets/vs.hls</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/gcc.hsl</CODE></LI>
+			<LI><CODE>&nbsp;include ~/hcore/toolsets/vs.hsl</CODE></LI>
 			<LI><CODE></CODE></CODE></LI>
 			<LI><CODE>&nbsp;var sources type list;</CODE></LI>
 			<LI><CODE>&nbsp;var includes type list;</CODE></LI>
@@ -981,7 +981,7 @@
 		<A NAME = "theapp"></A>
         <H3>The Hefesto application</H3>
         
-		The Hefesto application is the hls compiler and interpreter. It is controlled via command line options.<BR><BR>
+		The Hefesto application is the hsl compiler and interpreter. It is controlled via command line options.<BR><BR>
         
 		
 		Options can be provided to Hefesto in the following ways:<BR><BR>
@@ -996,7 +996,7 @@
 		
 		A specific toolset can read several options because it is important to know about the used toolset. You should always read the toolset documentation before start to use it.<BR><BR>
 
-		Most options are relevant in the hls implementation context, this will depends from the toolset developer and/or the forge project creator, but some options are internal. They are:
+		Most options are relevant in the hsl implementation context, this will depends from the toolset developer and/or the forge project creator, but some options are internal. They are:
 		<BR><BR>
 				
 		<CENTER>
@@ -1012,14 +1012,14 @@
         
 		<BR>
 	
-		When you indicate the Forgefile via the "--forgefiles" option you need to specify the projects to forge via --hls-without-your-extension-projects="project" option, see:<BR><BR>
+		When you indicate the Forgefile via the "--forgefiles" option you need to specify the projects to forge via --hsl-without-your-extension-projects="project" option, see:<BR><BR>
 	
 		<CENTER>
-			<I>hefesto --forgefiles="/usr/bin/hefesto/samples/hefesto-sample.hls" --<B>hefesto-sample-</B>projects="aquiles-armor"</I>
+			<I>hefesto --forgefiles="/usr/bin/hefesto/samples/hefesto-sample.hsl" --<B>hefesto-sample-</B>projects="aquiles-armor"</I>
 		</CENTER>
 		
 		<BR>
-		The above command will forge the project "achiles-armor" configurated in "hefesto-sample.hls".
+		The above command will forge the project "achiles-armor" configurated in "hefesto-sample.hsl".
 		
 		        
 		<BR><BR><A HREF = "#topics">Back</A>
