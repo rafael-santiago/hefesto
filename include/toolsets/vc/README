@@ -3,15 +3,15 @@ The Hefesto's Vc-110 toolset start guide
 
 With hefesto's vc-110 toolset you can build executables and libraries using Visual C compiler from Visual Studio 11.
 
-The first thing to do is include the main hls file related with this toolset.
+The first thing to do is include the main hsl file related with this toolset.
 
 To executables you must use:
 
-include ~/toolsets/vc/vc110-app.hls
+include ~/toolsets/vc/vc110-app.hsl
 
 To libraries you must use:
 
-include ~/toolsets/vc/vc110-lib.hls
+include ~/toolsets/vc/vc110-lib.hsl
 
 Both toolsets receive five lists and one string as arguments.
 
@@ -29,9 +29,9 @@ The string is the output name for yours exe, lib.
 
 Follows all it coded:
 
-# "hello-world.hls"
+# "hello-world.hsl"
 
-include ~/toolsets/vc/vc110-app.hls
+include ~/toolsets/vc/vc110-app.hsl
 
 var sources type list;
 var includes type list;
@@ -65,10 +65,10 @@ The option --mk-pdb requests the creation of pdb files when compilation model is
 
 Some examples:
 
-> hefesto --forgefiles=hello-world.hls --hello-world-projects=hello-world
+> hefesto --forgefiles=hello-world.hsl --hello-world-projects=hello-world
 
-> hefesto --forgefiles=hello-world.hls --hello-world-projects=hello-world --compile-model=debug
+> hefesto --forgefiles=hello-world.hsl --hello-world-projects=hello-world --compile-model=debug
 
-> hefesto --forgefiles=hello-world.hls --hello-world-projects=hello-world --mk-pdb --ldflags=res\\bla.lib,res\\blanet.lib,wsock32.lib --includes=additional\\includes\\bla\\,additional\\includes\\blanet
+> hefesto --forgefiles=hello-world.hsl --hello-world-projects=hello-world --mk-pdb --ldflags=res\\bla.lib,res\\blanet.lib,wsock32.lib --includes=additional\\includes\\bla\\,additional\\includes\\blanet
 
 If you wish know how to handle dependencies between implementation files take a look in Hefesto's Documentation.

@@ -1,0 +1,250 @@
+#                                                 Sat 23 Mar 2013 07:48:56 PM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "string.hsl"
+#
+# Description: common string functions.
+#
+
+#
+# Returns the reverse of an input string.
+#
+# @str = Input string;
+#
+function reverse_string(str type string) : result type string {
+    var s type int;
+    var strrev type string;
+    $s = $str.len() - 1;
+    while ($s >= 0) {
+        $strrev = $strrev + $str.at($s);
+        $s = $s - 1;
+    }
+    result $strrev;
+}
+
+#
+# Splits a string returning a list containing the result.
+#
+# @str = String that must be splitted;
+# @ctok = Elements separator symbol;
+#
+function split_string(str type string, ctok type string) : result type list {
+    var s type int;
+    var s_len type int;
+    var sub_str type string;
+    var strings type list;
+    $s_len = $str.len();
+    $s = 0;
+    while ($s < $s_len) {
+        if ($str.at($s) != $ctok) {
+            $sub_str = $sub_str + $str.at($s);
+        } else
+            if ($sub_str.len() > 0) {
+                $strings.add_item($sub_str);
+                $sub_str = "";
+            }
+        $s = $s + 1;
+    }
+    if ($sub_str.len() > 0) {
+        $strings.add_item($sub_str);
+    }
+    result $strings;
+}
+
+#
+# Makes a string with the supplied list elements.
+#
+# @elements = The list which contains the elements;
+# @tok = The separator symbol used to separate the elements in result string;
+#
+function make_string(elements type list, tok type string) : result type string {
+    var e type int;
+    var e_size type int;
+    var str_elements type string;
+    $e_size = $elements.count();
+    $e = 0;
+    while ($e < $e_size) {
+        $str_elements = $str_elements + $elements.item($e);
+        $e = $e + 1;
+        if ($e != $e_size) $str_elements = $str_elements + $tok;
+    }
+    result $str_elements;
+}
+
+#
+# Returns the lower version of a string.
+#
+# @str = input string;
+#
+function strlwr(str type string) : result type string {
+    var alpha type list;
+    var temp type string;
+    var t type int;
+    var chr type string;
+    $temp = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    $t = 0;
+    while ($t < $temp.len()) {
+        $chr = $temp.at($t);
+        $alpha.add_item($chr);
+        $t = $t + 1;
+    }
+    var return type string;
+    var idx type int;
+    $t = 0;
+    while ($t < $str.len()) {
+        $chr = $str.at($t);
+        $idx = $alpha.index_of($chr);
+        if ($idx == -1 || $idx > 25) {
+            $return = $return + $str.at($t);
+        } else {
+            $return = $return + $alpha.item($idx + 26);
+        }
+        $t = $t + 1;
+    }
+    result $return;
+}
+
+#
+# Returns the upper version of a string.
+#
+# @str = input string;
+#
+function strupr(str type string) : result type string {
+    var alpha type list;
+    var temp type string;
+    var t type int;
+    var chr type string;
+    $temp = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    $t = 0;
+    while ($t < $temp.len()) {
+        $chr = $temp.at($t);
+        $alpha.add_item($chr);
+        $t = $t + 1;
+    }
+    var return type string;
+    var idx type int;
+    $t = 0;
+    while ($t < $str.len()) {
+        $chr = $str.at($t);
+        $idx = $alpha.index_of($chr);
+        if ($idx == -1 || $idx > 25) {
+            $return = $return + $str.at($t);
+        } else {
+            $return = $return + $alpha.item($idx + 26);
+        }
+        $t = $t + 1;
+    }
+    result $return;
+}
+
+#
+# Returns the input string without left trailing blanks.
+#
+# @str = input string;
+#
+function ltrim(str type string) : result type string {
+    var blanks type list;
+    $blanks.add_item("\n");
+    $blanks.add_item("\t");
+    $blanks.add_item("\r");
+    $blanks.add_item(" ");
+    var s type int;
+    $s = 0;
+    while ($s < $str.len() && $blanks.index_of($str.at($s)) > -1) $s = $s + 1;
+    var return type string;
+    while ($s < $str.len()) {
+        $return = $return + $str.at($s);
+        $s = $s + 1;
+    }
+    result $return;
+}
+
+#
+# Returns the input string without right trailing blanks.
+#
+# @str = input string;
+#
+function rtrim(str type string) : result type string {
+    var blanks type list;
+    $blanks.add_item("\n");
+    $blanks.add_item("\t");
+    $blanks.add_item("\r");
+    $blanks.add_item(" ");
+    var s_sz type int;
+    $s_sz = $str.len() - 1;
+    while ($s_sz != 0 && $blanks.index_of($str.at($s_sz)) > -1) $s_sz = $s_sz - 1;
+    var s type int;
+    $s = 0;
+    var return type string;
+    while ($s <= $s_sz) {
+        $return = $return + $str.at($s);
+        $s = $s + 1;
+    }
+    result $return;
+}
+
+#
+# Returns the input string without left/middle/right trailing blanks.
+#
+# @str = input string;
+#
+function trim(str type string) : result type string {
+    var tmpstr type string;
+    $tmpstr = ltrim(rtrim($str));
+    var t type int;
+    $t = 0;
+    var blanks type list;
+    $blanks.add_item("\n");
+    $blanks.add_item("\t");
+    $blanks.add_item("\r");
+    $blanks.add_item(" ");
+    var return type string;
+    while ($t < $tmpstr.len()) {
+        $return = $return + $tmpstr.at($t);
+        if ($blanks.index_of($tmpstr.at($t)) > -1) {
+            while ($blanks.index_of($tmpstr.at($t)) > -1 && $t < $tmpstr.len())
+                $t = $t + 1;
+        } else {
+            $t = $t + 1;
+        }
+    }
+    result $return;
+}
+
+#
+# Returns the start index of substring into the input string.
+#
+# @str = input string;
+# @substr = substring;
+#
+function strpos(str type string, substr type string) : result type int {
+    var start_index type int;
+    $start_index = -1;
+    var sb_len type int;
+    var s_len type int;
+    $sb_len = $substr.len();
+    $s_len = $str.len();
+    if ($sb_len > $s_len) result -1;
+    var s type int;
+    var sb type int;
+    $s = 0;
+    var s_tmp type int;
+    while ($s < $s_len && $start_index == -1) {
+        $s_tmp = $s + 1;
+        $sb = 0;
+        while ($sb < $sb_len && $s < $s_len) {
+            if ($substr.at($sb) != $str.at($s)) {
+                break;
+            }
+            $s = $s + 1;
+            $sb = $sb + 1;
+        }
+        if ($sb == $sb_len) $start_index = $s_tmp - 1;
+        $s = $s_tmp;
+    }
+    result $start_index;
+}

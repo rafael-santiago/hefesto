@@ -1,0 +1,36 @@
+#                                                 Sun 31 Mar 2013 12:59:53 AM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "optutil.hsl"
+#
+# Description: common utilities envolving command line options.
+#
+#
+
+#
+# Returns the string representation from command line.
+#
+# @option = the desired option;
+#
+function get_usr_str_opt(option type string) : result type string {
+    var usr_opt type string;
+    var contents type list;
+    $contents = hefesto.sys.get_option($option);
+    if ($contents.count() > 0) {
+        $usr_opt = "--" + $option + "=";
+        var c type int;
+        $c = 0;
+        while ($c < $contents.count()) {
+            $usr_opt = $usr_opt + $contents.item($c);
+            $c = $c + 1;
+            if ($c != $contents.count()) {
+                $usr_opt = $usr_opt + ",";
+            }
+        }
+    }
+    result $usr_opt;
+}

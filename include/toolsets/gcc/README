@@ -5,12 +5,12 @@
 The hefesto's C/C++ toolset allows you to compile and link executables and libraries using GCC
 compiler.
 
-In order to build an application with hefesto you must use the toolset coded inside "gcc-app.hls" file,
-located under "toolsets/gcc/gcc-app.hls".
+In order to build an application with hefesto you must use the toolset coded inside "gcc-app.hsl" file,
+located under "toolsets/gcc/gcc-app.hsl".
 
 The first thing to do is to include this important file in your Forgefile, in the following way:
 
-    include ~/toolsets/gcc/gcc-app.hls
+    include ~/toolsets/gcc/gcc-app.hsl
     
 After you can declare your project to forge it:
 
@@ -48,13 +48,13 @@ If you need to force the compilation of all project source files, use the comman
 The toolsets used to compile/link libraries works in the same described way.
 
 The toolset used to link static/shared libraries is named "gcc-c-lib" for C language and "gcc-cc-lib" for
-C++ language, is located under "toolsets/gcc/gcc-lib.hls". 
+C++ language, is located under "toolsets/gcc/gcc-lib.hsl". 
 
 If you want scan dependencies instead of hardcode it, you can use the dependency scanner located in
-"toolsets/common/utils/lang/c/dependency_scanner.hls", the usage is fairly simple:
+"toolsets/common/utils/lang/c/dependency_scanner.hsl", the usage is fairly simple:
 
-    include ~/toolsets/gcc/gcc-app.hls
-    include ~/toolsets/common/utils/lang/c/dependency_scanner.hls
+    include ~/toolsets/gcc/gcc-app.hsl
+    include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 
     var mydeps type string;
     var source_list type list;
@@ -77,20 +77,20 @@ Some forge invocation examples:
 
     * An application that uses posix threads in release/shared models [default compile/link models]
     
-        hefesto --forgefiles=myprojname.hls --myprojname-projects=myprojname --ldflags=-lpthread
+        hefesto --forgefiles=myprojname.hsl --myprojname-projects=myprojname --ldflags=-lpthread
         
     * An application that uses posix threads in debug/shared models
         
-        hefesto --forgefiles=myprojname.hls --myprojname-projects=myprojname --compile-model=debug --ldflags=-lpthread
+        hefesto --forgefiles=myprojname.hsl --myprojname-projects=myprojname --compile-model=debug --ldflags=-lpthread
         
     * An application that uses posix threads in release/static models
 
-        hefesto --forgefiles=myprojname.hls --myprojname-projects=myprojname --link-model=static --ldflags=-lpthread
+        hefesto --forgefiles=myprojname.hsl --myprojname-projects=myprojname --link-model=static --ldflags=-lpthread
         
     * An application that uses posix threads in debug/static models
     
-        hefesto --forgefiles=myprojname.hls --myprojname-projects=myprojname --compile-model=debug --link-model=static --ldflags=-lpthread
+        hefesto --forgefiles=myprojname.hsl --myprojname-projects=myprojname --compile-model=debug --link-model=static --ldflags=-lpthread
         
     * An application that uses posix threads, math lib and some foo static lib
     
-        hefesto --forgefiles=myprojname.hls --myprojname-projects=myprojname --ldflags=-lpthread,-lm,../res/foo/foo.a
+        hefesto --forgefiles=myprojname.hsl --myprojname-projects=myprojname --ldflags=-lpthread,-lm,../res/foo/foo.a

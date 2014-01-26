@@ -1,0 +1,20 @@
+#
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "null.hsl"
+#
+# Description: a null toolset to be used to test
+#              some functions, etc. ;)
+#
+
+toolset "no-tool-any-set"
+ forge function "null_forge" :
+$
+
+function null_forge(res type int) : result type int {
+    result $res;
+}

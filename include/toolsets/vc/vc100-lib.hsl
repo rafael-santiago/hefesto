@@ -1,0 +1,32 @@
+#
+# "vc100-lib.hsl"
+#       by Rafael Santiago
+#
+# Description: Visual Studio 10.0 Library toolset.
+#
+include ~/toolsets/vc/forges/vc100_lib_forge.hsl
+include ~/toolsets/vc/forges/common/vcutils.hsl
+
+toolset "vc100-lib" forge function "vc100_lib_forge" : forge helpers "vc_link_objects2lib", "vc_mk_compile_cmd", "vc_async_compile_srcs", "vc_should_compile":
+    command "compile_debug_static": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MTd $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_debug_shared": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MDd $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_release_static": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MT $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "compile_release_shared": SOURCE, OBJECT, INCLUDES, CFLAGS <
+        cl.exe $CFLAGS /nologo /MD $INCLUDES /c $SOURCE /Zi /Fo$OBJECT
+    >
+    command "lib": LIBNAME, OBJS, LIBPATHS, LDFLAGS <
+        lib.exe /OUT:\\"$LIBNAME\\" /NOLOGO $LIBPATHS $LDFLAGS $OBJS
+    >    
+    command "dll_debug": DLLNAME, OBJS, LIBS, LDFLAGS <
+        link.exe $LDFLAGS /NOLOGO /DEBUG /DLL /OUT:\\"$DLLNAME\\" $LIBS $OBJS
+    >
+    command "dll_release": DLLNAME, OBJS, LIBS, LDFLAGS <
+        link.exe $LDFLAGS /NOLOGO /DLL /OUT:\\"$DLLNAME\\" $LIBS $OBJS
+    >
+$

@@ -1,0 +1,142 @@
+#
+# "version_handler.hsl"
+#       by Rafael Santiago
+#
+
+include ~/conv.hsl
+
+function is_valid_version_no(version_no type string) : result type int {
+    var is_valid type int;
+    var v type int;
+    var dots_nr type int;
+    $v = 0;
+    $is_valid = 1;
+    while ($v < $version_no.len() && $is_valid == 1) {
+        if ($version_no.at($v) != ".") {
+            $is_valid = isdigit($version_no.at($v));
+        } else {
+            $dots_nr = $dots_nr + 1;
+        }
+        $v = $v + 1;
+    }
+    if ($is_valid == 1) {
+        $is_valid = ($dots_nr == 2);
+    }
+    result $is_valid;
+}
+
+function get_version_data(version type string, data_index type int) : result type string {
+    var data type string;
+    var v type int;
+    var dots_nr type int;
+    $dots_nr = 0;
+    $v = 0;
+    while ($dots_nr < $data_index) {
+        if ($version.at($v) == ".") {
+            $dots_nr = $dots_nr + 1;
+        }
+        $v = $v + 1;
+    }
+    while ($v < $version.len()) {
+        if ($version.at($v) == ".") {
+            break;
+        } else {
+            $data = $data + $version.at($v);
+        }
+        $v = $v + 1;
+    }
+    result $data;
+}
+
+function get_major_version(version type string) : result type string {
+    result get_version_data($version, 0);
+}
+
+function get_minor_version(version type string) : result type string {
+    result get_version_data($version, 1);
+}
+
+function get_sub_version(version type string) : result type string {
+    result get_version_data($version, 2);
+}
+
+function get_build_version(version type string) : result type string {
+    result get_version_data($version, 3);
+}
+
+function inc_hfst_version(curr_version type string, new_version type string) : result type int {
+    var cmajor type string;
+    var nmajor type string;
+    var cminor type string;
+    var nminor type string;
+    var csub type string;
+    var nsub type string;
+    var cbuild type string;
+    var nbuild type int;
+
+    $cmajor = get_major_version($curr_version);
+    $cminor = get_minor_version($curr_version);
+    $csub = get_sub_version($curr_version);
+    $cbuild = get_build_version($curr_version);
+
+    $nmajor = get_major_version($new_version);
+    $nminor = get_minor_version($new_version);
+    $nsub = get_sub_version($new_version);
+
+    if ($cmajor == $nmajor &&
+        $cminor == $nminor &&
+        $csub == $nsub) {
+        $nbuild = str2int($cbuild) + 1;
+    } else {
+        $nbuild = 1;
+    }
+
+    var final_version type string;
+
+    $final_version = $nmajor + "." + $nminor + "." + $nsub + "." + $nbuild;
+
+    var rep_nr type int;
+
+    $rep_nr = hefesto.sys.replace_in_file("version_no.h", "#define HEFESTO_VERSION.*[0123456789]\.[0123456789]\.[0123456789]\.[0123456789].*\n", "#define HEFESTO_VERSION \"" + $final_version + "\"\n");
+
+    result ($rep_nr > 0);
+}
+
+function hfst_version_config() : result type int {
+    var retval type int;
+    var temp_opt type list;
+    $retval = 1;
+    $temp_opt = hefesto.sys.get_option("release-build");
+    if ($temp_opt.count() > 0) {
+        $retval = 0;
+        $temp_opt = hefesto.sys.get_option("version-no");
+        var version_no type string;
+        if ($temp_opt.count() > 0) {
+            $version_no = $temp_opt.item(0);
+        } else {
+            $version_no = hefesto.sys.prompt("\nType Hefesto's version number is (x.x.x) = ");
+        }
+        if (is_valid_version_no($version_no) == 0) {
+            hefesto.sys.echo("BUILD ERROR: Invalid version number! Please check it and try again...\n\n");
+        } else {
+            var version_no_h_ln type list;
+            var curr_version type string;
+            $retval = hefesto.sys.run("git checkout version_no.h");
+            if ($retval == 0) {
+                $version_no_h_ln = hefesto.sys.lines_from_file("version_no.h", "#define HEFESTO_VERSION .*");
+                if ($version_no_h_ln.count() > 0) {
+                    $curr_version = $version_no_h_ln.item(0);
+                    $curr_version.replace("#define HEFESTO_VERSION \"", "");
+                    $curr_version.replace("\"$", "");
+                    $retval = (inc_hfst_version($curr_version, $version_no) > 0);
+                    if ($retval == 1) {
+                        $retval = (hefesto.sys.run("git commit version_no.h -m \"Build number increment.\"") == 0);
+                    }
+                }
+            } else {
+                hefesto.sys.echo("ERROR: git checkout version_no.h\n");
+            }
+        }
+    }
+    result $retval;
+}

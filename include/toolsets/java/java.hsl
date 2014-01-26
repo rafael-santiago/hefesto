@@ -1,0 +1,32 @@
+#                                                 Sat 04 May 2013 09:31:52 AM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+# "java.hsl"
+#       by Rafael Santiago
+#
+#
+# Description: A simple Java toolset with support to compilation and 
+#              "jar packing".
+#
+
+include ~/toolsets/java/forges/java_forge.hsl
+
+toolset "java" forge function "java_mk_class_files" : forge helpers "jar_project":
+    command "javac_d": SOURCE, JAVAC_OPTIONS <
+        javac -g $SOURCE $JAVAC_OPTIONS
+    >
+    command "javac_r": SOURCE, JAVAC_OPTIONS <
+        javac -g:none $SOURCE $JAVAC_OPTIONS
+    >
+    command "jar": JARNAME <
+        jar -cvf $JARNAME *.class
+    >
+    command "jar_m": JARNAME, MANIFEST <
+        jar -cvfm $JARNAME $MANIFEST *.class
+    >
+$

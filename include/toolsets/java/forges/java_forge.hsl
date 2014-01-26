@@ -1,0 +1,178 @@
+#                                                 Sat 04 May 2013 09:40:50 AM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+# "java_forge.hsl"
+#       by Rafael Santiago
+#
+# Description: concentrates all compilation logic and jar file generation.
+#
+#   The toolset options are:
+#
+#       --mk-jar = requests the .jar generation [optional]
+#
+#       --jar-name = overrides the .jar default name (which is
+#                                          <main_src_file.jar>) [optional]
+#
+#       --javac-model  = (release|debug) [optional, the default is release]
+#
+#       --mk-jar-manifest = request the basic manifest generation [optional]
+#
+#       --jar-manifest = specifies the user manifest filepath [optional,
+#                                     overrides --mk-jar-manifest option]
+#
+
+function java_mk_class_files(main_src_file type string,
+                             javac_options type list) : result type int {
+    var exit_code type int;
+    var str_javac_cmd type string;
+    var javac_options_str type string;
+    var javacmodel type list;
+
+    hefesto.sys.echo("*** compiling... ");
+
+    $javac_options_str = get_javac_options_str($javac_options);
+    
+    $javacmodel = hefesto.sys.get_option("javac-model");
+    
+    if ($javacmodel.count() > 0 &&
+        $javacmodel.item(0) == "debug") {
+        $str_javac_cmd = hefesto.toolset.javac_d($main_src_file, $javac_options_str);
+    } else {
+        if ($javacmodel.count() > 0 &&
+            $javacmodel.item(0) != "release") {
+            hefesto.sys.echo(hefesto.project.toolset() + " internal error: unknown compile model: \"" +
+                        $javacmodel.item(0) + "\".\n");
+            result 1;
+        }
+        $str_javac_cmd = hefesto.toolset.javac_r($main_src_file, $javac_options_str);
+    }
+
+    $exit_code = hefesto.sys.run($str_javac_cmd);
+
+    if ($exit_code == 0) {
+        hefesto.sys.echo("compiled!\n");
+        var mkjar type list;
+        $mkjar = hefesto.sys.get_option("mk-jar");
+        if ($mkjar.count() > 0) {
+            $exit_code = jar_project($main_src_file);
+        }
+    } else {
+        hefesto.sys.echo("*** compilation error(s).\n");
+    }
+
+    result $exit_code;
+}
+
+function get_javac_options_str(javac_options type list) : result type string
+{
+    var javac_options_str type string;
+    var j type int;
+    $j = 0;
+    $javac_options_str = "";
+    while ($j < $javac_options.count()) {
+        $javac_options_str = $javac_options_str + $javac_options.item($j);
+        $j = $j + 1;
+    }
+    result $javac_options_str;
+}
+
+function jar_project(main_src_file type string) : result type int {
+    var exit_code type int;
+    var jar_filename type string;
+    var jarname type list;
+    var jarmanifest type list;
+    var manifest_filepath type string;
+    hefesto.sys.echo("*** generating the jar file...\n");
+    $exit_code = 1;
+    $jarname = hefesto.sys.get_option("jar-name");
+    if ($jarname.count() > 0) {
+        $jar_filename = $jarname.item(0);
+    } else {
+        $jar_filename = get_jar_filename_from_src_filename($main_src_file);
+    }
+    $jarmanifest = hefesto.sys.get_option("jar-manifest");
+    if ($jarmanifest.count() > 0) {
+        $manifest_filepath = $jarmanifest.item(0);
+    } else {
+        var mkjarmanifest type list;
+        $mkjarmanifest = hefesto.sys.get_option("mk-jar-manifest");
+        if ($mkjarmanifest.count() > 0) {
+            $manifest_filepath = get_class_name_from_file($main_src_file) + ".manifest";
+            if (mk_default_manifest($main_src_file, $manifest_filepath) == 0) {
+                hefesto.sys.echo(hefesto.project.toolset() + " internal error: unable to make default manifest.\n");
+                hefesto.sys.rm($manifest_filepath);
+                result 1;
+            }
+        }
+    }
+    var jar_cmd type string;
+    if ($manifest_filepath.len() == 0) {
+        $jar_cmd = hefesto.toolset.jar($jar_filename);
+    } else {
+        $jar_cmd = hefesto.toolset.jar_m($jar_filename, $manifest_filepath);
+    }
+    $exit_code = hefesto.sys.run($jar_cmd);
+    if ($exit_code == 1) {
+        hefesto.sys.echo("*** jar file wasn't generated.\n");
+    } else {
+        hefesto.sys.echo("*** jar file generated (to: " + $jar_filename + ").\n");
+    }
+    if ($mkjarmanifest.count() > 0) {
+        hefesto.sys.rm($manifest_filepath);
+    }
+    result $exit_code;
+}
+
+function get_class_name_from_file(src_filename type string) : result type string {
+    var class_filename type string;
+    var se type int;
+    $se = $src_filename.len() - 1;
+    $class_filename = "";
+    while ($se > 0 && $src_filename.at($se) != ".") {
+        $se = $se - 1;
+    }
+    if ($se > 0) {
+        var s type int;
+        $s = 0;
+        while ($s < $se) {
+            $class_filename = $class_filename + $src_filename.at($s);
+            $s = $s + 1;
+        }
+    }
+    result $class_filename;
+}
+
+function get_jar_filename_from_src_filename(src_filename type string) : 
+                                        result type string {
+    result (get_class_name_from_file($src_filename) + ".jar");
+}
+
+function mk_default_manifest(main_src_file type string,
+                             manifest_filename type string) : result type int {
+    var manifest_fd type file;
+    var all_ok type int;
+    $all_ok = 0;
+    $manifest_fd = hefesto.sys.fopen($manifest_filename, "w");
+    if ($manifest_fd != 0) {
+        var data type string;
+        var total type int;
+        $data = "Manifest-Version: 1.0\n";
+        $data = $data + "Created-By: Hefesto's java toolset at ";
+        $data = $data + hefesto.sys.time("%H:%M:%S") + " on ";
+        $data = $data + hefesto.sys.time("%m/%d/%Y") + "\n";
+        $data = $data + "Main-Class: ";
+        $total = hefesto.sys.fwrite($data, $data.len(), $manifest_fd);
+        if ($total == $data.len()) {
+            $data = get_class_name_from_file($main_src_file) + "\n";
+            $total = hefesto.sys.fwrite($data, $data.len(), $manifest_fd);
+            if ($total == $data.len()) $all_ok = 1;
+        }
+        hefesto.sys.fclose($manifest_fd);
+    }
+    result $all_ok;
+}

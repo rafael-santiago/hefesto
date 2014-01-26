@@ -1,0 +1,17 @@
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+include ~/toolsets/latex/forges/latex_forge_stuff.hsl
+
+toolset "latex-htool" forge function "latex_src_forge" :
+    command "compile_and_mkdvi": MAIN_SOURCE_FILE, USR_OPTIONS <
+        latex -halt-on-error $USR_OPTIONS $MAIN_SOURCE_FILE
+    >
+    command "dvi2pdf": GENERATED_DVI, OUTPUT_PDF <
+        dvipdf $GENERATED_DVI $OUTPUT_PDF
+    >
+$

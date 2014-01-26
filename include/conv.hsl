@@ -1,0 +1,204 @@
+#                                                 Fri 29 Mar 2013 11:41:11 AM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "conv.hsl"
+#
+# Description: Some commons conversion routines.
+#
+
+#
+# Returns 1 if string's char passed is a hexadecimal digit.
+#
+# @s_chr = the string's char to be verified;
+#
+function isxdigit(s_chr type string) : result type int {
+    var xd type list;
+    $xd.add_item("0");
+    $xd.add_item("1");
+    $xd.add_item("2");
+    $xd.add_item("3");
+    $xd.add_item("4");
+    $xd.add_item("5");
+    $xd.add_item("6");
+    $xd.add_item("7");
+    $xd.add_item("8");
+    $xd.add_item("9");
+    $xd.add_item("0");
+    $xd.add_item("A");
+    $xd.add_item("B");
+    $xd.add_item("C");
+    $xd.add_item("D");
+    $xd.add_item("E");
+    $xd.add_item("F");
+    $xd.add_item("a");
+    $xd.add_item("b");
+    $xd.add_item("c");
+    $xd.add_item("d");
+    $xd.add_item("e");
+    $xd.add_item("f");
+    result ($xd.index_of($s_chr) > -1);
+}
+
+#
+# Returns the hexadecimal representation of a 32-bit number.
+#
+# @dec = the value to be converted into hexadecimal representation;
+#
+function int2hex(dec type int) : result type string {
+    var xvalue type string;
+    var d type int;
+    var n type int;
+    var xds type string;
+    $xds = "0123456789abcdef";
+    $d = 0;
+    while ($d < 8) {
+        $n = ($dec >> (28 - (4 * $d))) & 0xf;
+        $xvalue = $xvalue + $xds.at($n);
+        $d = $d + 1;
+    }
+    result $xvalue;
+}
+
+#
+# Returns if the string's char passed is a valid decimal digit.
+#
+# @s_dig = the digit to be checked;
+#
+function isdigit(s_dig type string) : result type int {
+    var d type list;
+    $d.add_item("0");
+    $d.add_item("1");
+    $d.add_item("2");
+    $d.add_item("3");
+    $d.add_item("4");
+    $d.add_item("5");
+    $d.add_item("6");
+    $d.add_item("7");
+    $d.add_item("8");
+    $d.add_item("9");
+    result ($d.index_of($s_dig) > -1);
+}
+
+#
+# Returns if the string passed is a valid int number.
+#
+# @s_int = the decimal number to be verified;
+#
+function isdecimal(s_int type string) : result type int {
+    var s type int;
+    if ($s_int.at(0) != "+" && $s_int.at(0) != "-" &&
+        isdigit($s_int.at(0)) == 0) {
+        result 0;
+    }
+    $s = 1;
+    while ($s < $s_int.len()) {
+        if (isdigit($s_int.at($s)) == 0)
+            result 0;
+        $s = $s + 1;
+    }
+    result 1;
+}
+
+#
+# Returns if the string passed is a valid hex number.
+#
+# @s_int = the hex number to be checked;
+#
+function ishex(s_hex type string) : result type int {
+    var s type int;
+    while ($s < $s_hex.len()) {
+        if (isxdigit($s_hex.at($s)) == 0)
+            result 0;
+        $s = $s + 1;
+    }
+    result 1;
+}
+
+#
+# Returns the int value of a nibble.
+#
+# @x = the nibble...;
+#
+function xnib2int(x type string) : result type int {
+    if ($x == "0") result 0;
+    if ($x == "1") result 1;
+    if ($x == "2") result 2;
+    if ($x == "3") result 3;
+    if ($x == "4") result 4;
+    if ($x == "5") result 5;
+    if ($x == "6") result 6;
+    if ($x == "7") result 7;
+    if ($x == "8") result 8;
+    if ($x == "9") result 9;
+    if ($x == "a" || $x == "A") result 10;
+    if ($x == "b" || $x == "B") result 11;
+    if ($x == "c" || $x == "C") result 12;
+    if ($x == "d" || $x == "D") result 13;
+    if ($x == "e" || $x == "E") result 14;
+    if ($x == "f" || $x == "F") result 15;
+    result 0;
+}
+
+#
+# Returns the decimal representation of a hex value.
+#
+# @xvalue = the string representing the hexadecimal number;
+#
+function hex2int(xvalue type string) : result type int {
+    var x type int;
+    var value type int;
+    if (ishex($xvalue) == 0) result 0;
+    $value = 0;
+    $x = 0;
+    while ($x < $xvalue.len()) {
+        $value = ($value << 4) | xnib2int($xvalue.at($x));
+        $x = $x + 1;
+    }
+    result $value;
+}
+
+#
+# Returns the decimal representation of a decimal string value.
+#
+# @svalue = the decimal string value;
+#
+function str2int(svalue type string) : result type int {
+    var s type int;
+    var neg type int;
+    var val type int;
+    var digit type int;
+    var digits type list;
+    $s = 0;
+    $neg = 0;
+    $val = 0;
+    while ($svalue.at($s) == " " || $svalue.at($s) == "\t") $s = $s + 1;
+    if ($svalue.at($s) == "-") {
+        $s = $s + 1;
+        $neg = 1;
+    } else if ($svalue.at($s) == "+") {
+        $s = $s + 1;
+    }
+    $digits.add_item("0");
+    $digits.add_item("1");
+    $digits.add_item("2");
+    $digits.add_item("3");
+    $digits.add_item("4");
+    $digits.add_item("5");
+    $digits.add_item("6");
+    $digits.add_item("7");
+    $digits.add_item("8");
+    $digits.add_item("9");
+    while ($s < $svalue.len()) {
+        $digit = $digits.index_of($svalue.at($s));
+        $val = ($val * 10) + $digit;
+        $s = $s + 1;
+    }
+    if ($neg == 1) {
+        $val = -1 * $val;
+    }
+    result $val;
+}

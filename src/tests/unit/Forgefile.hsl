@@ -1,0 +1,87 @@
+#
+# "Forgefile.hsl"
+#
+# Description: Hefesto's unit tests.
+#
+#       by Rafael Santiago
+#
+
+#
+# Relevant user options:
+#
+#       --includes=<list>       # defines extra includes' directories;
+#       --libraries=<list>      # defines extra libraries' directories;
+#       --ldflags=<list>        # defines extra linking options;
+#       --cflags=<list>         # defines extra compiler options;
+#
+
+include ~/toolsets/gcc/gcc-app.hsl
+
+var sources type list;
+var includes type list;
+var libraries type list;
+var ldflags type list;
+var cflags type list;
+
+project hfst-unit : toolset "gcc-c-app" : $sources,
+                                          $includes,
+                                          $cflags,
+                                          $libraries,
+                                          $ldflags,
+                                          "hfst-unit";
+
+function get_hfst_objs() : result type none {
+    var tmp type string;
+    $tmp = hefesto.sys.pwd();
+    hefesto.sys.cd("../../");
+    $ldflags.ls(".*\.o$");
+    hefesto.sys.cd($tmp);
+    var l type int;
+    $l = 0;
+    while ($l < $ldflags.count()) {
+        $tmp = $ldflags.item($l);
+        if ($tmp.match(".*main\\.o$") == 1) {
+            $ldflags.del_index($l);
+            break;
+        }
+        $l = $l + 1;
+    }
+}
+
+hfst-unit.prologue() {
+    $includes = hefesto.sys.get_option("includes");
+    $libraries = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+    $cflags = hefesto.sys.get_option("cflags");
+    $sources.ls(".*\.c$");
+    get_hfst_objs();
+    $ldflags.add_item("../../here/libhere.a");
+    var os_name type string;
+    $os_name = hefesto.sys.os_name();
+    if ($os_name == "linux" || $os_name == "freebsd") {
+        $ldflags.add_item("-lpthread");
+    }
+    if ($os_name == "linux") {
+        $ldflags.add_item("-ldl");
+    }
+    if ($os_name == "freebsd") {
+        $ldflags.add_item("-lexecinfo");
+    }
+}
+
+hfst-unit.epilogue() {
+    var retval type int;
+    if (hefesto.sys.last_forge_result() == 0) {
+        var runpath type string;
+        if (hefesto.sys.os_name() == "windows") {
+            $runpath = "hfst-unit.exe";
+        } else {
+            $runpath = "./hfst-unit";
+        }
+        $retval = hefesto.sys.run($runpath);
+    }
+    if ($retval != 0) {
+        hefesto.project.abort($retval);
+    }
+}
+

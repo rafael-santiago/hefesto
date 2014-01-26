@@ -1,0 +1,44 @@
+#                                              Tue 12 Feb 2013 10:43:53 PM BRST
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "gcc-app.hsl"
+#       by Rafael Santiago
+#
+#  Description: C/C++ Toolsets based on GCC for applications.
+#
+
+include ~/toolsets/gcc/forges/gcc_c_app_forge.hsl
+
+toolset "gcc-c-app" forge function "gcc_c_binary_forge" : forge helpers "gcc_compile_source_list", "gcc_link_ofiles", "gcc_mk_app_compilation_command":
+    command "compile_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "compile_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "link_shared": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+        gcc -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+    >
+    command "link_static": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+        gcc -static -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+    >
+$
+
+toolset "gcc-cc-app" forge function "gcc_c_binary_forge" : forge helpers "gcc_compile_source_list", "gcc_link_ofiles", "gcc_mk_app_compilation_command":
+    command "compile_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "compile_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "link_shared": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+        g++ -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+    >
+    command "link_static": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+        g++ -static -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+    >
+$

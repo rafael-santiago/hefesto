@@ -1,0 +1,60 @@
+#                                              Mon 08 Apr 2013 09:39:07 PM BRT
+#
+#                              Copyright (C) 2013 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+# This is free software. You can redistribute it and/or modify under the terms
+# of the GNU General Public License version 2.
+#
+# "gcc-lib.hsl"
+#       by Rafael Santiago
+#
+#  Description: C/C++ Lib Toolsets for libraries based on GCC.
+#
+
+include ~/toolsets/gcc/forges/gcc_c_lib_forge.hsl
+
+toolset "gcc-c-lib" forge function "gcc_c_lib_forge" : forge helpers "gcc_compile_source_list", "gcc_ar_ofiles", "gcc_so_ofiles", "gcc_mk_lib_compilation_command":
+    command "compile_static_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "compile_static_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "compile_shared_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -c -fPIC $CFLAGS $SOURCE -o $OUTFILE
+    >
+    command "compile_shared_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        gcc -g -c -fPIC $CFLAGS $SOURCE -o $OUTFILE
+    >
+    command "ar": LIBNAME, OBJECTS <
+        ar -r $LIBNAME $OBJECTS
+    >
+    command "so": LIBNAME, OBJECTS <
+        gcc -shared $OBJECTS -o $LIBNAME
+    >
+$
+
+toolset "gcc-cc-lib" forge function "gcc_c_lib_forge" : forge helpers "gcc_compile_source_list", "gcc_ar_ofiles", "gcc_so_ofiles", "gcc_mk_lib_compilation_command":
+    command "compile_static_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -c $SOURCE $INCLUDES, $CFLAGS -o $OUTFILE
+    >
+    command "compile_static_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+    >
+    command "compile_shared_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -c -fPIC $CFLAGS $SOURCE -o $OUTFILE
+    >
+    command "compile_shared_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+        g++ -g -c -fPIC $CFLAGS $SOURCE -o $OUTFILE
+    >
+    command "ar": LIBNAME, OBJECTS <
+        ar -r $LIBNAME $OBJECTS
+    >
+    command "so": LIBNAME, OBJECTS <
+        g++ -shared $OBJECTS -o $LIBNAME
+    >
+$
