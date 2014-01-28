@@ -1149,9 +1149,8 @@ int synchk_string_method_statement(const char *statement,
                                     vp = get_hefesto_var_list_ctx_name(arg+1,
                                                                      gl_vars);
                                 }
-                                if (result == 0 ||
-                                    (vp &&
-                                     vp->type != HEFESTO_VAR_TYPE_STRING)) {
+                                if (vp &&
+                                    vp->type != HEFESTO_VAR_TYPE_STRING) {
                                     hlsc_info(HLSCM_MTYPE_SYNTAX,
                                               HLSCM_SYN_ERROR_INVAL_EXPR,
                                               statement);
