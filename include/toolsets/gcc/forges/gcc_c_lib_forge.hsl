@@ -193,7 +193,7 @@ function gcc_c_lib_forge(SOURCES type list, INCLUDES type list, CFLAGS type list
     $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
     if ($bin_output_dir.count() > 0) {
         $bin_output = $bin_output_dir.item(0);
-        mktree($obj_dir);
+        mktree($bin_output);
         $bin_output = hefesto.sys.make_path($bin_output, $LIBNAME);
     } else {
         $bin_output = $LIBNAME;
