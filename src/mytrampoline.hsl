@@ -1,5 +1,5 @@
-#include hls-test.hls
-include mytrampoline2.hls
+#include hsl-test.hsl
+include mytrampoline2.hsl
 function trampoline() : result type none {
 #    hefesto.sys.echo("RES = " + tolwrcase("TRAMPOLINE()") + "\n");
     trampoline2();

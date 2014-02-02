@@ -1,10 +1,10 @@
-include ~/toolsets/null/null.hls
-include ~/string.hls
-include ~/conv.hls
-include ~/optutil.hls
-include ~/fsutil.hls
-include incbug.hls
-include ~/toolsets/common/utils/lang/c/dependency_scanner.hls
+include ~/toolsets/null/null.hsl
+include ~/string.hsl
+include ~/conv.hsl
+include ~/optutil.hsl
+include ~/fsutil.hsl
+include incbug.hsl
+include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -110,7 +110,7 @@ mylab.prologue() {
     var hmodfunctest_retval type int;
     $foo = "foo";
     hefesto.sys.echo("BEFORE hmodfunctest CALL = " + $foo + "\n");
-    $hmodfunctest_retval = hefesto.sys.call_from_module("../../libhmodtest.so", "hmodfunctest", $foo);
+    $hmodfunctest_retval = hefesto.sys.call_from_module("../../libhmodtest", "hmodfunctest", $foo);
     hefesto.sys.echo("AFTER hmodfunctest CALL = " + $foo + " [" + $hmodfunctest_retval + "]\n");
     $foo = "abc.c";
     $foo.replace("\\..*$", ".obj");

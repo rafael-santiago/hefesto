@@ -2386,11 +2386,21 @@ char *hvm_call_from_module_syscall_test() {
                      "$retval = hefesto.sys.call_from_module(\"./libhmodtest.so\", \"hmodfunctest\", $foo);"
                      "result ($foo == \"foobar!\" && $retval == 1);"
                      "}";
+    char *hls_code_no_ext = "function call_from_module_test() : result type int {\n"
+                     "var retval type int;\n"
+                     "var foo type string;\n"
+                     "$foo = \"foo\";"
+                     "$retval = hefesto.sys.call_from_module(\"./libhmodtest\", \"hmodfunctest\", $foo);"
+                     "result ($foo == \"foobar!\" && $retval == 1);"
+                     "}";
     hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL, *vp;
     hefesto_func_list_ctx *function = NULL;
     void *res;
     int errors = 0;
     printf("-- hvm_call_from_module_syscall_test\n");
+
+    // module loading with extension
+
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "foo", HEFESTO_VAR_TYPE_STRING);
     vp = get_hefesto_var_list_ctx_tail(lo_vars);
     assign_data_to_hefesto_var(vp, "boo", 3);
@@ -2402,7 +2412,7 @@ char *hvm_call_from_module_syscall_test() {
                                          &errors,
                                          &gl_vars, NULL, NULL);
     remove("call_from_module_test.hls");
-    if (function == NULL) exit(1);
+    HTEST_CHECK("function == NULL", function != NULL);
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
     HTEST_CHECK("extraction_result != 1", errors == 1);
     res = hvm_call_function("call_from_module_test()",
@@ -2413,6 +2423,48 @@ char *hvm_call_from_module_syscall_test() {
     del_hefesto_func_list_ctx(function);
     free(res);
     remove("libhmodtest.so");
+
+    gl_vars = NULL;
+    lo_vars = NULL;
+    function = NULL;
+    errors = 0;
+
+    // it's very important for validate the next test!
+    hvm_mod_ldmod_table_cleanup();
+
+    // module loading without extension
+
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "foo", HEFESTO_VAR_TYPE_STRING);
+    vp = get_hefesto_var_list_ctx_tail(lo_vars);
+    assign_data_to_hefesto_var(vp, "boo", 3);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
+    vp = get_hefesto_var_list_ctx_tail(lo_vars);
+    assign_data_to_hefesto_var(vp, &errors, sizeof(errors));
+    create_test_code("call_from_module_test.hls", hls_code_no_ext);
+    function = compile_and_load_hls_code("call_from_module_test.hls",
+                                         &errors,
+                                         &gl_vars, NULL, NULL);
+    remove("call_from_module_test.hls");
+    HTEST_CHECK("function == NULL", function != NULL);
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.dll");
+#endif
+    HTEST_CHECK("extraction_result != 1", errors == 1);
+    res = hvm_call_function("call_from_module_test()",
+                             &lo_vars, &gl_vars, function);
+    HTEST_CHECK("res == NULL", res != NULL);
+    HTEST_CHECK("res != 1", *(int *)res == 1);
+    del_hefesto_var_list_ctx(lo_vars);
+    del_hefesto_func_list_ctx(function);
+    free(res);
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    remove("libhmodtest.so");
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    remove("libhmodtest.dll");
+#endif
+
     printf("-- passed.\n");
     return NULL;
 }

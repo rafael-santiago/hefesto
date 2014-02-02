@@ -30,7 +30,7 @@
 #       -- rs
 #
 
-include ~/fsutil.hls
+include ~/fsutil.hsl
 
 function get_c_cpp_deps() : result type string { # A faster dependency scanner.
     var files type list;

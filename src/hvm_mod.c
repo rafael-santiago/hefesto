@@ -99,6 +99,8 @@ static void handle_byref(struct hefesto_modio *modio,
 
 static char *expand_module_file_name(const char *file_path);
 
+static char *module_extension_completion(const char *module_filepath);
+
 static void del_hefesto_modio_args(struct hefesto_modio_args *args) {
     struct hefesto_modio_args *t, *p;
     for (t = p = args; t; p = t) {
@@ -116,12 +118,39 @@ static void del_hefesto_modio(struct hefesto_modio *modio) {
     free(modio);
 }
 
+static char *module_extension_completion(const char *module_filepath) {
+    int has_ext = 0;
+    const char *m;
+    char *retval = NULL;
+    for (m = module_filepath; *m != 0; m++);
+    for (m--; m != module_filepath && *m != '.' &&
+             *m != '/' && *m != HEFESTO_PATH_SEP; m--);
+    has_ext = (*m == '.' && m != module_filepath);
+    if (!has_ext) {
+        retval = (char *) hefesto_mloc(strlen(module_filepath) + 8);
+        memset(retval, 0, strlen(module_filepath) + 8);
+        strncpy(retval, module_filepath, strlen(module_filepath));
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+        strcat(retval, ".so");
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+        strcat(retval, ".dll");
+#endif
+    } else {
+        retval = (char *) hefesto_mloc(strlen(module_filepath) + 1);
+        memset(retval, 0, strlen(module_filepath) + 1);
+        memcpy(retval, module_filepath, strlen(module_filepath));
+    }
+    return retval;
+}
+
 static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     size_t l = 0;
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     LPSTR err_msg = NULL;
 #endif
-    char *m_fpath = expand_module_file_name(module_filepath);
+    char *normalized_mfpath = module_extension_completion(module_filepath);
+    char *m_fpath = expand_module_file_name(normalized_mfpath);
+    free(normalized_mfpath);
     for (l = 0; l < HEFESTO_LDMOD_TABLE_SIZE; l++) {
         if (strcmp(m_fpath, HEFESTO_LDMOD_TABLE[l].module_path) == 0) {
             free(m_fpath);
