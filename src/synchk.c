@@ -13,6 +13,7 @@
 #include "exprchk.h"
 #include "hvm_toolset.h"
 #include "hlsc_msg.h"
+#include "hvm_str.h"
 #include <string.h>
 
 static int synchk_is_file_descriptor(const char *var,
@@ -1285,7 +1286,8 @@ int synchk_list_method_statement(const char *statement,
                                   statement);
                     }
                 } else {
-                    tmp_arg = strip_quotes_from_string(arg);
+                    //tmp_arg = strip_quotes_from_string(arg);
+                    tmp_arg = hvm_str_format(arg, &lo_vars, &gl_vars, fn);
                     if ((search_program = here_compile(tmp_arg, errors)) == NULL) {
                         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_REGEX,
                                   statement, errors);
@@ -1500,7 +1502,7 @@ static int synchk_hefesto_sys_ls(const char *usr_calling,
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
     here_search_program_ctx *sp = NULL;
-
+    char *regex;
     args = get_arg_from_call(usr_calling, &offset);
 
     if (!is_expected_args_total(usr_calling, 1)) {
@@ -1511,7 +1513,8 @@ static int synchk_hefesto_sys_ls(const char *usr_calling,
     }
 
     if (args) {
-        if (is_hefesto_string(args) && (sp = here_compile(args, NULL))) {
+        regex = hvm_str_format(args, &lo_vars, &gl_vars, functions);
+        if (is_hefesto_string(args) && (sp = here_compile(regex, NULL))) {
             if (sp != NULL) {
                 del_here_search_program_ctx(sp);
             }
@@ -1538,7 +1541,7 @@ static int synchk_hefesto_sys_ls(const char *usr_calling,
                 return 1;
             }
         }
-
+        free(regex);
         free(args);
 
     }

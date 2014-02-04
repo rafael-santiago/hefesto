@@ -263,3 +263,23 @@ function rmtree(dtree type string) : result type int {
     }
     result $all_removed;
 }
+
+#
+# Returns a list with the subdirectories under the directory passed.
+#
+function lsdir() : result type list {
+    var retval type list;
+    var cwd_content type list;
+    var c type int;
+    var temp type string;
+    $cwd_content.ls(".*");
+    $c = 0;
+    while ($c < $cwd_content.count()) {
+        $temp = $cwd_content.item($c);
+        if (isdir($temp)) {
+            $retval.add_item($temp);
+        }
+        $c = $c + 1;
+    }
+    result $retval;
+}
