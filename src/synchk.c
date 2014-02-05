@@ -1196,7 +1196,7 @@ int synchk_list_method_statement(const char *statement,
     char *t;
     const char *s;
     int result = 0, state;
-    char *arg, *tmp_arg;
+    char *arg, *tmp_arg, *pfxd_arg;
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
     here_search_program_ctx *search_program;
@@ -1287,7 +1287,9 @@ int synchk_list_method_statement(const char *statement,
                     }
                 } else {
                     //tmp_arg = strip_quotes_from_string(arg);
-                    tmp_arg = hvm_str_format(arg, &lo_vars, &gl_vars, fn);
+                    pfxd_arg = infix2postfix(arg, 1);
+                    tmp_arg = hvm_str_format(pfxd_arg, &lo_vars, &gl_vars, fn);
+                    free(pfxd_arg);
                     if ((search_program = here_compile(tmp_arg, errors)) == NULL) {
                         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_REGEX,
                                   statement, errors);
