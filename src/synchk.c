@@ -14,6 +14,7 @@
 #include "hvm_toolset.h"
 #include "hlsc_msg.h"
 #include "hvm_str.h"
+#include "expr_handler.h"
 #include <string.h>
 
 static int synchk_is_file_descriptor(const char *var,
@@ -1287,7 +1288,7 @@ int synchk_list_method_statement(const char *statement,
                     }
                 } else {
                     //tmp_arg = strip_quotes_from_string(arg);
-                    pfxd_arg = infix2postfix(arg, 1);
+                    pfxd_arg = infix2postfix(arg, strlen(arg), 1);
                     tmp_arg = hvm_str_format(pfxd_arg, &lo_vars, &gl_vars, fn);
                     free(pfxd_arg);
                     if ((search_program = here_compile(tmp_arg, errors)) == NULL) {
