@@ -30,6 +30,12 @@
 #include <string.h>
 #include <time.h>
 
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+
+#include <sys/wait.h>
+
+#endif
+
 static void *hefesto_sys_replace_in_file(const char *syscall,
                                          hefesto_var_list_ctx **lo_vars,
                                          hefesto_var_list_ctx **gl_vars,
@@ -910,7 +916,7 @@ static void *hefesto_sys_run(const char *syscall,
         free(str_fmt);
     }
 
-    if ((vp && vp->type == HEFESTO_VAR_TYPE_LIST) || 
+    if ((vp && vp->type == HEFESTO_VAR_TYPE_LIST) ||
         (fp && fp->result_type == HEFESTO_VAR_TYPE_LIST)) {
         ret = hefesto_nrun(syscall, lo_vars, gl_vars, functions, otype);
     } else {
@@ -918,6 +924,9 @@ static void *hefesto_sys_run(const char *syscall,
         ret = (int *) hefesto_mloc(sizeof(int));
         HEFESTO_DEBUG_INFO(0, "hvm_syscall/run: %s\n", str_fmt);
         *ret = system(str_fmt);
+        if (*ret != -1) {
+            *ret = WEXITSTATUS(*ret);
+        }
         free(str_fmt);
     }
 
@@ -958,6 +967,9 @@ static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
         if (etype == HEFESTO_VAR_TYPE_LIST) {
             ret = (int *) hefesto_mloc(sizeof(int));
             *(int *)ret = hvm_rqueue_run(plist);
+            if (*(int *)ret != EXIT_SUCCESS) {
+                *(int *)ret = EXIT_FAILURE;
+            }
         }
         del_hefesto_common_list_ctx((hefesto_common_list_ctx *)plist);
     }

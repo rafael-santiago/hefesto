@@ -189,5 +189,10 @@ int main(int argc, char **argv) {
                HEFESTO_FORGEFILES_OPTION_LABEL,
                HEFESTO_PROJECTS_OPTION_LABEL_PREFIX);
     }
+
+    if (exit_code > 1) {
+        exit_code = EXIT_FAILURE;
+    }
+
     return exit_code;
 }

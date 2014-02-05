@@ -532,16 +532,17 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
 
     if (var == NULL) var = get_hefesto_var_list_ctx_name(cmd->params->data,
                                                          *gl_vars);
+
     if (var) {
 
         etype = var->type;
 
         expr_result = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype,
                                 &out_sz);
+
         HEFESTO_DEBUG_INFO(0,
              "hvm/attrib expr: %s etype: %d vtype: %d dest: %s\n",
                  cmd->expr, etype, var->type, cmd->params->data);
-
         switch (var->type) {
 
             case HEFESTO_VAR_TYPE_STRING:
@@ -588,7 +589,7 @@ int hvm_forge_project(hefesto_project_ctx *project,
                       hefesto_var_list_ctx **gl_vars,
                       hefesto_func_list_ctx *functions) {
 
-    int build_result = 0;
+    //int build_result = 0;
     void *result;
     char *expr_pfix;
     char forge_invocation[HEFESTO_MAX_BUFFER_SIZE] = "";
@@ -704,6 +705,6 @@ int hvm_forge_project(hefesto_project_ctx *project,
 
     HEFESTO_CURRENT_PROJECT = last_project;
 
-    return build_result;
+    return HEFESTO_LAST_FORGE_RESULT;
 
 }
