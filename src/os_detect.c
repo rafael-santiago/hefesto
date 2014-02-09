@@ -11,6 +11,17 @@
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <sys/stat.h>
+
+static size_t get_procfile_size(FILE *fp) {
+    size_t retval = 0;
+    while (!feof(fp)) {
+        retval++;
+        fgetc(fp);
+    }
+    fseek(fp, 0L, SEEK_SET);
+    return retval;
+}
 
 char *get_os_name() {
 
@@ -22,10 +33,12 @@ char *get_os_name() {
     result[7] = 0;
 #elif HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     FILE *ostype = fopen("/proc/sys/kernel/ostype", "r");
+    size_t ostype_size = 0;
     if (ostype != NULL) {
-        result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-        memset(result, 0, HEFESTO_MAX_BUFFER_SIZE);
-        fread(result, 1, HEFESTO_MAX_BUFFER_SIZE-1, ostype);
+        ostype_size = get_procfile_size(ostype);
+        result = (char *) hefesto_mloc(ostype_size + 1);
+        memset(result, 0, ostype_size);
+        fread(result, 1, ostype_size, ostype);
         for (r = result; *r != 0; r++) {
             *r = tolower(*r);
         }
