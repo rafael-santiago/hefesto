@@ -21,9 +21,9 @@ function vc100_vcvarsall(hwtype type string) : result type int {
         $hwtype = get_cpu_architecture();
     }
 
-    if ($hwtype == "x86") {
+    if ($hwtype == "x86" || $hwtype == "32") {
         $exit_code = vs100_vcvars32_x86();
-    } else if ($hwtype == "amd64") {
+    } else if ($hwtype == "amd64" || $hwtype == "64") {
         $exit_code = vs100_vcvars64_x64();
     } else if ($hwtype == "x64") {
         $exit_code = vs100_vcvars64_x64();
