@@ -15,18 +15,30 @@
 char *get_os_name() {
 
     char *result = NULL;
+    char *r;
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     result = (char *) hefesto_mloc(8);
     strncpy(result, "windows", 7);
     result[7] = 0;
-#elif HEFESTO_TGT_OS == HEFESTO_LINUX
-    result = (char *) hefesto_mloc(6);
-    strncpy(result, "linux", 5);
-    result[5] = 0;
-#elif HEFESTO_TGT_OS == HEFESTO_FREEBSD
-    result = (char *) hefesto_mloc(8);
-    strncpy(result, "freebsd", 7);
-    result[7] = 0;
+#elif HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    FILE *ostype = fopen("/proc/sys/kernel/ostype", "r");
+    if (ostype != NULL) {
+        result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
+        memset(result, 0, HEFESTO_MAX_BUFFER_SIZE);
+        fread(result, 1, HEFESTO_MAX_BUFFER_SIZE-1, ostype);
+        for (r = result; *r != 0; r++) {
+            *r = tolower(*r);
+        }
+        for (r--; (*r == ' '  || *r == '\r' ||
+                   *r == '\n' || *r == '\t') && r != result; r--) {
+            *r = 0;
+        }
+        fclose(ostype);
+    } else {
+        result = (char *) hefesto_mloc(8);
+        strncpy(result, "freebsd", 7);
+        result[7] = 0;
+    }
 #else
     result = (char *) hefesto_mloc(15);
     strncpy(result, "superunknownos", 14);
