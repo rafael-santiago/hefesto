@@ -217,13 +217,13 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     var cpu_arch type list;
     $cpu_arch = hefesto.sys.get_option("cpu-arch");
     if ($cpu_arch.count() > 0) {
-        var choosen_arch type string;
-        $choosen_arch = $cpu_arch.item(0);
-        if ($choosen_arch != "32" && $choosen_arch != "64") {
+        var chosen_arch type string;
+        $chosen_arch = $cpu_arch.item(0);
+        if ($chosen_arch != "32" && $chosen_arch != "64") {
             hefesto.sys.echo(hefesto.project.toolset() + " fatal error: invalid value for cpu-arch option must be '32' or '64'.\n");
             result 1;
         }
-        $cflags = $cflags + " -m" + $choosen_arch;
+        $cflags = $cflags + " -m" + $chosen_arch;
     }
 
     #  compiling...
