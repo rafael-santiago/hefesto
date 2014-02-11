@@ -181,8 +181,16 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     var regex type string;
 
     if ($SOURCES.count() == 0) {
+        if (hefesto.project.toolset() == "gcc-c-app") {
+            $SOURCES.ls(".*\\.c$");
+        } else {
+            $SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
+        }
+    }
+
+    if ($SOURCES.count() == 0) {
         hefesto.sys.echo("\t(empty source list)\n");
-        result 0;
+        result 1;
     }
 
     var obj_output_dir type list;
@@ -215,9 +223,10 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options 
 
     var cpu_arch type list;
+    var chosen_arch type string;
     $cpu_arch = hefesto.sys.get_option("cpu-arch");
+    $chosen_arch = "";
     if ($cpu_arch.count() > 0) {
-        var chosen_arch type string;
         $chosen_arch = $cpu_arch.item(0);
         if ($chosen_arch != "32" && $chosen_arch != "64") {
             hefesto.sys.echo(hefesto.project.toolset() + " fatal error: invalid value for cpu-arch option must be '32' or '64'.\n");
@@ -238,6 +247,9 @@ function gcc_c_binary_forge(SOURCES type list, INCLUDES type list, CFLAGS type l
     if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
         $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
         $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
+        if ($chosen_arch.len() > 0) {
+            $ldflags = $ldflags + "-m" + $chosen_arch;
+        }
         $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
         #  linking...
         hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");

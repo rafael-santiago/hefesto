@@ -27,6 +27,15 @@ function vc110_lib_forge(sources type list, includepaths type list,
         result $exit_code;
     }
 
+    if ($sources.count() == 0) {
+        $sources.ls(".*\\.(c|cc|cpp|CC|Cpp|CPP)$");
+    }
+
+    if ($sources.count() == 0) {
+        hefesto.sys.echo(hefesto.project.toolset() + " ERROR: empty source list!\n");
+        result 1;
+    }
+
     var obj_output_dir type list;
     var obj_dir type string;
 

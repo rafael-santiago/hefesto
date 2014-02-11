@@ -161,8 +161,16 @@ function gcc_c_lib_forge(SOURCES type list, INCLUDES type list, CFLAGS type list
     var is_static_library type string;
 
     if ($SOURCES.count() == 0) {
+        if (hefesto.project.toolset() == "gcc-c-lib") {
+            $SOURCES.ls(".*\\.c$");
+        } else {
+            $SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
+        }
+    }
+
+    if ($SOURCES.count() == 0) {
         hefesto.sys.echo("\t(empty source list)\n");
-        result 0;
+        result 1;
     }
 
     $link_model = hefesto.sys.get_option("link-model");
