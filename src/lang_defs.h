@@ -36,7 +36,7 @@
 #define HEFESTO_SYS_CALLS_NR                            35
 #define HEFESTO_LIST_METHODS_NR                          9
 #define HEFESTO_STRING_METHODS_NR                        4
-#define HEFESTO_PROJECT_METHODS_NR                       4
+#define HEFESTO_PROJECT_METHODS_NR                       5
 
 int is_hefesto_type(const char *type);
 

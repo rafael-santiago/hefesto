@@ -106,6 +106,7 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     ".toolset",
     ".dep_chain",
     ".abort",
+    ".cmdline",
     "\0"
 };
 

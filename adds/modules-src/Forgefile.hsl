@@ -1,0 +1,48 @@
+include ~/toolsets/null/null.hsl
+include ~/fsutil.hsl
+
+var exit_code type int;
+
+project hefesto-modules : toolset "no-tool-any-set" : 0;
+
+function do_forge(cwd type list) : result type int {
+    var exit_code type int;
+    var dirs type list;
+    var c type int;
+    var old_cwd type string;
+    var new_cwd type string;
+    $exit_code = 0;
+    $c = 0;
+    while ($c < $cwd.count() && $exit_code == 0) {
+        $old_cwd = hefesto.sys.pwd();
+        $new_cwd = $cwd.item($c);
+        hefesto.sys.cd($new_cwd);
+        if (hefesto.sys.ls("\\.ivk$") == 1) {
+            $exit_code = hefesto.sys.run("hefesto " + hefesto.project.cmdline());
+        }
+        if ($exit_code == 0) {
+            $dirs = lsdir();
+            if ($dirs.count() > 0) {
+                $exit_code = do_forge($dirs);
+            }
+        }
+        hefesto.sys.cd($old_cwd);
+        $c = $c + 1;
+    }
+    result $exit_code;
+}
+
+hefesto-modules.prologue() {
+    var cwd type list;
+    hefesto.sys.echo("-- Now forging all sub-projects... wait...\n\n");
+    $cwd = lsdir();
+    $exit_code = do_forge($cwd);
+}
+
+hefesto-modules.epilogue() {
+    if ($exit_code == 0) {
+        hefesto.sys.echo("\n-- Forge successful\n\n");
+    } else {
+        hefesto.sys.echo("\n-- Forge failure!\n\n");
+    }
+}

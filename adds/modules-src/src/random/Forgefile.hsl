@@ -1,0 +1,28 @@
+include ~/toolsets/gcc/gcc-lib.hsl
+
+var sources type list;
+var includes type list;
+var cflags type list;
+var binary type string;
+
+project random : toolset "gcc-c-lib" : $sources,
+                                       $includes,
+                                       $cflags,
+                                       $binary;
+
+random.prologue() {
+    if (hefesto.sys.os_name() != "windows") {
+        $binary = "librandom.so";
+    } else {
+        $binary = "librandom.dll";
+    }
+    $sources.ls(".*\\.c$");
+}
+
+random.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        hefesto.sys.echo("\n< " + hefesto.project.name() + " module forged >\n");
+    } else {
+        hefesto.sys.echo("\n< error in " + hefesto.project.name() + " module forge >\n");
+    }
+}

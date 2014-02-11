@@ -101,6 +101,7 @@ context default
     keyword .project.toolset yellow
     keyword .project.dep_chain yellow
     keyword .project.abort yellow
+    keyword .project.cmdline yellow
     keyword .preloading brightgreen
     keyword .prologue brightgreen
     keyword .epilogue brightgreen

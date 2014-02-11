@@ -144,6 +144,7 @@ mylab.prologue() {
         hefesto.sys.echo("\tITEM = " + $test_swap.item($t) + "\n");
         $t = $t + 1;
     }
+    hefesto.sys.echo("CMDLINE = " + hefesto.project.cmdline() + "\n");
 }
 
 function get_c_cpp_deps_() : result type string {

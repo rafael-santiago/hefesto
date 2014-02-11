@@ -35,13 +35,20 @@ static void *hefesto_project_abort(const char *method,
                                    hefesto_func_list_ctx *functions,
                                    hefesto_type_t *otype);
 
+static void *hefesto_project_options(const char *method,
+                                     hefesto_var_list_ctx **lo_vars,
+                                     hefesto_var_list_ctx **gl_vars,
+                                     hefesto_func_list_ctx *functions,
+                                     hefesto_type_t *otype);
+
 
 static struct hefesto_project_method_callvector
         HEFESTO_PROJECT_METHOD_EXEC_TABLE[HEFESTO_PROJECT_METHODS_NR] = {
     {hefesto_project_name},
     {hefesto_project_toolset},
     {hefesto_project_dep_chain},
-    {hefesto_project_abort}
+    {hefesto_project_abort},
+    {hefesto_project_options}
 };
 
 char
@@ -169,4 +176,48 @@ static void *hefesto_project_abort(const char *method,
     return retval;
 }
 
+static void *hefesto_project_options(const char *method,
+                                     hefesto_var_list_ctx **lo_vars,
+                                     hefesto_var_list_ctx **gl_vars,
+                                     hefesto_func_list_ctx *functions,
+                                     hefesto_type_t *otype) {
+    void *retval = NULL;
+    size_t retval_size = 0;
+    hefesto_options_ctx *o;
+    hefesto_common_list_ctx *d;
+    //char project_option[HEFESTO_MAX_BUFFER_SIZE];
+    *otype = HEFESTO_VAR_TYPE_STRING;
+    //strncpy(project_option, "--", sizeof(project_option)-1);
+    //strcat(project_option, HEFESTO_CURRENT_PROJECT->name);
+    //strcat(project_option, "-projects");
+    for (o = HEFESTO_OPTIONS; o; o = o->next) {
+        if (strcmp(o->option, "--forgefiles") == 0 ||
+            strstr(o->option, "-projects") != NULL) continue;
+        retval_size += strlen(o->option) + 1;
+        for (d = o->data; d; d = d->next) {
+            retval_size += d->dsize;
+        }
+        retval_size += 1;
+    }
+    retval = hefesto_mloc(retval_size + 1);
+    memset(retval, 0, retval_size + 1);
+    if (retval_size > 0) {
+        for (o = HEFESTO_OPTIONS; o; o = o->next) {
+            if (strcmp(o->option, "--forgefiles") == 0 ||
+                strstr(o->option, "-projects") != NULL) continue;
+            if (*(char *)retval == 0) {
+                strncpy(retval, o->option, retval_size - 1);
+            } else {
+                strcat(retval, " ");
+                strcat(retval, o->option);
+            }
+            for (d = o->data; d; d = d->next) {
+                strcat(retval, "=");
+                strcat(retval, d->data);
+                if (d->next != NULL) strcat(retval, ",");
+            }
+        }
+    }
+    return retval;
+}
 
