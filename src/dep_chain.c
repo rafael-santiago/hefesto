@@ -121,6 +121,7 @@ hefesto_dep_chain_ctx
 void find_dep_chain_updates(hefesto_dep_chain_ctx **dep_chain) {
 
     hefesto_dep_chain_ctx *d, *dd;
+    hefesto_common_list_ctx *dep;
     char *cwd;
     int new_dirty = 1;
 
@@ -142,6 +143,7 @@ void find_dep_chain_updates(hefesto_dep_chain_ctx **dep_chain) {
 
             for (dd = *dep_chain; dd && !new_dirty; dd = dd->next) {
                 if (dd == d || !dd->dirty) continue;
+
                 if (get_hefesto_common_list_ctx_content(dd->file_path,
                                                         HEFESTO_VAR_TYPE_STRING,
                                                         d->deps)) {
