@@ -16,6 +16,7 @@
 #       --install               # requests the compiled package installing;
 
 include ~/toolsets/gcc/gcc-app.hsl
+include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include version_handler.hsl
 
 var sources type list;
@@ -24,13 +25,15 @@ var libraries type list;
 var ldflags type list;
 var cflags type list;
 
-project hefesto : toolset "gcc-c-app" :
-                            $sources,
-                            $includes,
-                            $cflags,
-                            $libraries,
-                            $ldflags,
-                            "../bin/hefesto";
+var deps type string;
+
+project hefesto : toolset "gcc-c-app" : dependencies $deps :
+                                                     $sources,
+                                                     $includes,
+                                                     $cflags,
+                                                     $libraries,
+                                                     $ldflags,
+                                                     "../bin/hefesto";
 
 function config_basic_ld_deps() : result type none {
     $ldflags.add_item("here/libhere.a");
@@ -66,6 +69,7 @@ hefesto.prologue() {
         # If all ok, now we forge the Hefesto app...
         if (hefesto.sys.last_forge_result() == 0) {
             hefesto.sys.echo("--\n");
+            $deps = get_c_cpp_deps();
             $sources.ls(".*\.c$");
         }
     } else {

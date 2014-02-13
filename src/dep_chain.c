@@ -70,6 +70,8 @@ hefesto_dep_chain_ctx
 
             while (*u != '&' && *u != ';' && *u != 0) u++;
 
+            if (*dep == 0) continue;
+
             if (hefesto_is_relative_path(dep)) {
                 strncpy(temp_file_path, dep, sizeof(temp_file_path)-1);
                 free(dep);
