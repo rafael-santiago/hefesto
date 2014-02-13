@@ -1486,6 +1486,7 @@ static void *hefesto_sys_forge(const char *syscall,
     char prj_opt[1024];
     int r;
     hefesto_options_ctx *curr_opts = NULL, *swp_opts = NULL;
+    hefesto_dep_chain_ctx *swp_dep_chain = NULL;
 
     **otype = HEFESTO_VAR_TYPE_INT;
 
@@ -1523,6 +1524,9 @@ static void *hefesto_sys_forge(const char *syscall,
     swp_opts = HEFESTO_OPTIONS;
     HEFESTO_OPTIONS = NULL;
 
+    swp_dep_chain = HEFESTO_CURRENT_DEP_CHAIN;
+    HEFESTO_CURRENT_DEP_CHAIN = NULL;
+
     r = boot_forge(prjs, expd_hls, curr_opts);
 
     if (HEFESTO_EXIT_FORGE) {
@@ -1533,6 +1537,7 @@ static void *hefesto_sys_forge(const char *syscall,
     del_hefesto_options_ctx(prjs);
 
     HEFESTO_OPTIONS = swp_opts;
+    HEFESTO_CURRENT_DEP_CHAIN = swp_dep_chain;
 
     del_hefesto_options_ctx(curr_opts);
 

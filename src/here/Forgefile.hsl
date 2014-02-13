@@ -1,4 +1,5 @@
 include ~/toolsets/gcc/gcc-lib.hsl
+include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 
 var deps type string;
 var sources type list;
@@ -7,12 +8,13 @@ var cflags type list;
 var libraries type list;
 var ldflags type list;
 
-project here : toolset "gcc-c-lib" : $sources,
-                                     $includes,
-                                     $cflags,
-                                     "libhere.a" ;
+project here : toolset "gcc-c-lib" : dependencies $deps : $sources,
+                                                          $includes,
+                                                          $cflags,
+                                                          "libhere.a" ;
 
 here.prologue() {
+    $deps = get_c_cpp_deps();
     $sources.ls(".*\.c$");
 }
 
