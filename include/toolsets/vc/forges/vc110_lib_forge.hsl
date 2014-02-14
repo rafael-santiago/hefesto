@@ -179,10 +179,10 @@ function vc110_lib_forge(sources type list, includepaths type list,
         if (($binary.match("\\.lib$") > -1 || $binary.match("\\.a$") > -1) &&
             $isstatic == 0) {
             $binary = vc110_get_libname($binary) + ".dll";
-        }        
-        if (hefesto.sys.ls($binary + "$") == 0 && $compilation_nr == 0) {
+        }
+        if (isfile($binary) == 0 && $compilation_nr == 0) {
             $compilation_nr = 1;
-        }        
+        }
         if ($compilation_nr > 0) {
             # linking...
             $exit_code = vc_link_objects2lib($sources,

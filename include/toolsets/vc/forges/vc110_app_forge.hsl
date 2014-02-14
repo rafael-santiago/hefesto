@@ -185,7 +185,7 @@ function vc110_app_forge(sources type list, includepaths type list,
 
     if ($exit_code == 0) {
         hefesto.sys.echo("*** All sources were compiled.\n\n*** Linking...\n");
-        if (hefesto.sys.ls($appname + "$") == 0 && $compilation_nr == 0) {
+        if (isfile($appname) == 0 && $compilation_nr == 0) {
             $compilation_nr = 1;
         }
         if ($compilation_nr > 0) {

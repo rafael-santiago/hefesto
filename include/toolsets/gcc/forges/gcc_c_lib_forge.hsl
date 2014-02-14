@@ -68,7 +68,7 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
     var curr_src_file type string;
     var link_model type list;
     var is_static type int;
-    var regex type string;
+#    var regex type string;
 
     $size = $sources.count();
     if ($size == 0) result 0;
@@ -103,8 +103,8 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
         while ($i < $size && $exit_code == 0) {
             $ofile = $sources.item($i);
             $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
-            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
-            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
+#            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || isfile($ofile) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
                 $curr_src_file = $sources.item($i);
                 $exit_code = hefesto.sys.run(gcc_mk_lib_compilation_command($curr_src_file, $ofile, $includes, $cflags, $is_release, $is_static));
@@ -126,8 +126,8 @@ function gcc_compile_source_list(sources type list, includes type string, cflags
         while ($i < $size) {
             $ofile = $sources.item($i);
             $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
-            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
-            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || hefesto.sys.ls($regex) == 0) {
+#            $regex = gcc_mk_regex_pattern_from_filepath($ofile);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 || isfile($ofile) == 0) {
                 $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
                 $curr_src_file = $sources.item($i);
                 $run_list.add_item(gcc_mk_lib_compilation_command($curr_src_file, $ofile, $includes, $cflags, $is_release, $is_static));
@@ -230,10 +230,10 @@ function gcc_c_lib_forge(SOURCES type list, INCLUDES type list, CFLAGS type list
 
     $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir);
 
-    var regex type string;
-    $regex = gcc_mk_regex_pattern_from_filepath($bin_output);
+#    var regex type string;
+#    $regex = gcc_mk_regex_pattern_from_filepath($bin_output);
 
-    if ($gcc_c_project_forge_dirty_files_nr == 0 && hefesto.sys.ls($regex) == 0) {
+    if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
         $gcc_c_project_forge_dirty_files_nr = 1;
     }
 

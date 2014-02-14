@@ -180,7 +180,7 @@ function vc100_lib_forge(sources type list, includepaths type list,
             $isstatic == 0) {
             $binary = vc100_get_libname($binary) + ".dll";
         }
-        if (hefesto.sys.ls($binary + "$") == 0 && $compilation_nr == 0) {
+        if (isfile($binary) == 0 && $compilation_nr == 0) {
             $compilation_nr = 1;
         }
         if ($compilation_nr > 0) {

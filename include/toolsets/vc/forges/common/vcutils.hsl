@@ -32,7 +32,7 @@ function vc_should_compile(srcfile type string) : result type int {
     var objfile type string;
     var should type int;
     $objfile = vc_get_filename($srcfile) + ".obj";
-    $should = hefesto.toolset.file_has_change($srcfile) || (hefesto.sys.ls($objfile) == 0);
+    $should = hefesto.toolset.file_has_change($srcfile) || (isfile($objfile) == 0);
     result $should;
 }
 
