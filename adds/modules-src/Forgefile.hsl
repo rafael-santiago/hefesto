@@ -1,5 +1,5 @@
 include ~/toolsets/null/null.hsl
-include ~/toolsets/utils.hsl
+include ~/toolsets/utils/forge_projects.hsl
 include ~/fsutil.hsl
 
 var exit_code type int;
@@ -10,7 +10,7 @@ hefesto-modules.prologue() {
     var cwd type list;
     hefesto.sys.echo("-- Now forging all sub-projects... wait...\n\n");
     $cwd = lsdir();
-    $exit_code = do_forge($cwd);
+    $exit_code = forge_projects($cwd);
 }
 
 hefesto-modules.epilogue() {

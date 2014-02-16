@@ -1,6 +1,6 @@
 include ~/fsutil.hsl
 
-function do_forge(cwd type list) : result type int {
+function forge_projects(cwd type list) : result type int {
     var exit_code type int;
     var dirs type list;
     var c type int;
@@ -18,7 +18,7 @@ function do_forge(cwd type list) : result type int {
         if ($exit_code == 0) {
             $dirs = lsdir();
             if ($dirs.count() > 0) {
-                $exit_code = do_forge($dirs);
+                $exit_code = forge_projects($dirs);
             }
         }
         hefesto.sys.cd($old_cwd);
