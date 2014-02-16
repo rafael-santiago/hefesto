@@ -1,5 +1,13 @@
 include ~/fsutil.hsl
 
+#
+# This function recursivelly calls the default forge of projects
+# which are under passed cwd.
+#
+# @cwd = a list containing all initial directories  that  must
+#        be scanned for projects with a configurated .ivk file
+#
+
 function forge_projects(cwd type list) : result type int {
     var exit_code type int;
     var dirs type list;
