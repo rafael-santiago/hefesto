@@ -1,0 +1,258 @@
+#
+# "devcpp_project_generator.hsl"
+#       by Rafael Santiago
+#
+# All you need to do to generating a basic  .dev  file  is
+# to call the devcpp_project_generator() function, passing
+# as argument the desired project name  without  the  .dev
+# extension from directory where this .dev  file  must  be
+# saved.
+#
+
+include ~/fsutil.hsl
+
+function devcpp_project_generator(main_project_name type string) : result type int {
+    var dev_project_filename type string;
+    var devfile type file;
+    var project_folders type list;
+    var project_directories type list;
+
+    $dev_project_filename = $main_project_name + ".dev";
+
+    $devfile = hefesto.sys.fopen($dev_project_filename, "wb");
+
+    if ($devfile == 0) {
+        hefesto.sys.echo("dev_cpp_prgen ERROR: unable to create \"" + $dev_project_filename + "\"\n");
+        result 0;
+    }
+
+    var regex type string;
+    $regex = ".*\\.(c|cc|cpp|Cc|Cpp|CC|CPP|h|H|hpp|Hpp|HPP)$";
+
+    $project_folders = find_src_folders(lsdir(), $regex);
+
+    $project_directories = find_src_folders_aux(lsdir(), $regex);
+
+
+    # Writting the main section
+
+    write_project_section_to_dev_file($devfile, $main_project_name, $project_folders);
+
+    # Writting the unit sections...
+
+    var current_cwd type string;
+    $current_cwd = hefesto.sys.pwd();
+
+    var pf_i type int;
+    var pd_i type int;
+    var u_ct type int;
+    var f_i type int;
+
+    var filepath type string;
+    var foldername type string;
+
+    var filepaths type list;
+
+    $pf_i = 1;
+    $pd_i = 0;
+    $u_ct = 1;
+
+    $filepaths.ls($regex);
+    $f_i = 0;
+    $foldername = $project_folders.item(0);
+
+    while ($f_i < $filepaths.count()) {
+        $filepath = $filepaths.item($f_i);
+        write_unit_section_to_dev_file($devfile,
+                                       $u_ct,
+                                       $filepath,
+                                       $foldername);
+        $f_i = $f_i + 1;
+        $u_ct = $u_ct + 1;
+    }
+
+    while ($pf_i < $project_folders.count()) {
+        $foldername = $project_folders.item($pf_i);
+        hefesto.sys.cd($project_directories.item($pd_i));
+        $f_i = 0;
+        $filepaths.clear();
+        $filepaths.ls($regex);
+        while ($f_i < $filepaths.count()) {
+            $filepath = $filepaths.item($f_i);
+            write_unit_section_to_dev_file($devfile,
+                                           $u_ct,
+                                           $filepath,
+                                           $foldername);
+            $f_i = $f_i + 1;
+            $u_ct = $u_ct + 1;
+        }
+        $pd_i = $pd_i + 1;
+        $pf_i = $pf_i + 1;
+    }
+
+    # done!
+
+    hefesto.sys.cd($current_cwd);
+
+    # writting a bogus version section
+
+    write_version_info_section_to_dev_file($devfile);
+
+    hefesto.sys.fclose($devfile);
+
+    # now we just write how many units there are in .dev file
+
+    $u_ct = $u_ct - 1;
+    hefesto.sys.replace_in_file($dev_project_filename, "UnitCount=__UNITCOUNT__", "UnitCount=" + $u_ct);
+
+    result 1;
+}
+
+function find_src_folders(cwd type list, regex type string) : result type list {
+    var retval type list;
+    var stage type list;
+    var project_root type string;
+    var pr_offset type int;
+    var p type int;
+    var s type int;
+    var curr_proj_name type string;
+
+    $project_root = hefesto.sys.pwd();
+    $stage = find_src_folders_aux($cwd, $regex);
+
+#    if (hefesto.sys.os_name() == "windows") {
+#        $project_root.replace("\\", "/");
+#    }
+
+    #
+    # getting the master project name
+    #
+    $pr_offset = $project_root.len() - 1;
+    while ($pr_offset > 0 && $project_root.at($pr_offset) != "/") {
+        $pr_offset = $pr_offset - 1;
+    }
+
+    $p = $pr_offset + 1;
+    $curr_proj_name =  "";
+    while ($p < $project_root.len()) {
+        $curr_proj_name = $curr_proj_name + $project_root.at($p);
+        $p = $p + 1;
+    }
+    $retval.add_item($curr_proj_name);
+
+    if ($stage.count() > 0) {
+        $s = 0;
+        while ($s < $stage.count()) {
+            $project_root = $stage.item($s);
+            $p = $pr_offset + 1;
+            $curr_proj_name = "";
+            while ($p < $project_root.len()) {
+                $curr_proj_name = $curr_proj_name + $project_root.at($p);
+                $p = $p + 1;
+            }
+            $retval.add_item($curr_proj_name);
+            $s = $s + 1;
+        }
+    }
+    result $retval;
+}
+
+function find_src_folders_aux(cwd type list, regex type string) : result type list {
+    var retval type list;
+    var tmp type list;
+    var tmpcwd type list;
+    var c type int;
+    var t type int;
+    var old_cwd type string;
+    var new_cwd type string;
+    $c = 0;
+    $old_cwd = hefesto.sys.pwd();
+    while ($c < $cwd.count()) {
+        $new_cwd = $cwd.item($c);
+        hefesto.sys.cd($new_cwd);
+        if (hefesto.sys.ls($regex) > 0) {
+            $retval.add_item($new_cwd);
+        }
+        $tmpcwd = lsdir();
+        $tmp.clear();
+        if ($tmpcwd.count() > 0) {
+            $tmp = find_src_folders_aux($tmpcwd, $regex);
+            $t = 0;
+            while ($t < $tmp.count()) {
+                $new_cwd = $tmp.item($t);
+                if ($retval.index_of($new_cwd) == -1) {
+                    $retval.add_item($new_cwd);
+                }
+                $t = $t + 1;
+            }
+        }
+        $c = $c + 1;
+    }
+    hefesto.sys.cd($old_cwd);
+    result $retval;
+}
+
+function write_project_section_to_dev_file(fp type file,
+                                           main_project_name type string,
+                                           project_folders type list) : result type none {
+    var buffer type string;
+    var p type int;
+    $buffer = "[Project]\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "FileName=" + $main_project_name + ".dev\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Name=" + $main_project_name + "\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "UnitCount=__UNITCOUNT__\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Type=1\nVer=1\nObjFiles=\nIncludes=\nLibs=\nPrivateResource=\nResourceIncludes=\nMakeIncludes=\nCompiler=\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "CppCompiler=\nLinker=\nIsCpp=0\nIcon=\nExeOutput=\nObjectOutput=\nOverrideOutput=0\nOverrideOutputName=\nHostApplication=\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Folders=";
+    $p = 0;
+    while ($p < $project_folders.count()) {
+        $buffer = $buffer + $project_folders.item($p);
+        if ($p < ($project_folders.count() - 1)) {
+            $buffer = $buffer + ",";
+        }
+        $p = $p + 1;
+    }
+    $buffer = $buffer + "\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "CommandLine=\nUseCustomMakefile=0\nCustomMakefile=\nIncludeVersionInfo=0\nSupportXPThemes=0\nCompilerSet=0\nCompilerSettings=0000000000000000000000\n\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+}
+
+function write_unit_section_to_dev_file(fp type file,
+                                        unit_index type int,
+                                        filepath type string,
+                                        foldername type string) : result type none {
+    var buffer type string;
+    $buffer = "[Unit" + $unit_index + "]\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "FileName=" + $filepath + "\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "CompileCpp=0\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Folder=" + $foldername + "\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Compile=1\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Link=1\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "Priority=1000\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "OverrideBuildCmd=1\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "BuildCmd=\n\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+}
+
+function write_version_info_section_to_dev_file(fp type file) : result type none {
+    var buffer type string;
+    $buffer = "[VersionInfo]\nMajor=0\nMinor=1\nRelease=1\nBuild=1\nLanguageID=\nCharsetID=\nCompanyName=\nFileVersion=\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+    $buffer = "FileDescription=\nInternalName=\nLegalCopyright=\nLegalTrademarks=\nOriginalFilename=\nProductName=\nProductVersion=\nAutoIncBuildNr=0\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
+}

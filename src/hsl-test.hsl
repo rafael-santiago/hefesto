@@ -5,6 +5,7 @@ include ~/optutil.hsl
 include ~/fsutil.hsl
 include incbug.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+include ~/generators/devcpp_project_generator.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -126,7 +127,7 @@ mylab.prologue() {
     } else {
         hefesto.sys.echo("copy unsuccessful.\n");
     }
-    hefesto.sys.echo("DEP-CHAIN = " + get_c_cpp_deps_() + "\n");
+    #hefesto.sys.echo("DEP-CHAIN = " + get_c_cpp_deps_() + "\n");
     var test_swap type list;
     var t type int;
     $test_swap.add_item("b");
@@ -145,6 +146,18 @@ mylab.prologue() {
         $t = $t + 1;
     }
     hefesto.sys.echo("CMDLINE = " + hefesto.project.cmdline() + "\n");
+#    var srcs type list;
+#    $srcs = find_src_folders(lsdir(), ".*\\.(c|cc)");
+#    $t = 0;
+#    while ($t < $srcs.count()) {
+#        hefesto.sys.echo("PROJECT DIRECTORY = " + $srcs.item($t) + "\n");
+#        $t = $t + 1;
+#    }
+    if (devcpp_project_generator("hefesto") == 1) {
+        hefesto.sys.echo("hefesto.dev generated ;-)\n");
+    } else {
+        hefesto.sys.echo("error during hefesto.dev generation :-(\n");
+    }
 }
 
 function get_c_cpp_deps_() : result type string {
