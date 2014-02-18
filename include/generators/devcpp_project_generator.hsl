@@ -124,9 +124,9 @@ function find_src_folders(cwd type list, regex type string) : result type list {
         $project_root.replace("\\", "/");
     }
 
-    #
+
     # getting the master project name
-    #
+
     $pr_offset = $project_root.len() - 1;
     while ($pr_offset > 0 && $project_root.at($pr_offset) != "/") {
         $pr_offset = $pr_offset - 1;
@@ -203,6 +203,7 @@ function write_project_section_to_dev_file(fp type file,
                                            project_folders type list) : result type none {
     var buffer type string;
     var p type int;
+    var aux_folder type string;
     $buffer = "[Project]\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
     $buffer = "FileName=" + $main_project_name + ".dev\n";
@@ -219,6 +220,16 @@ function write_project_section_to_dev_file(fp type file,
     $p = 0;
     while ($p < $project_folders.count()) {
         $buffer = $buffer + $project_folders.item($p);
+        $aux_folder = hefesto.sys.make_path($project_folders.item($p), "headers");
+        if (hefesto.sys.os_name() == "windows") {
+            $aux_folder.replace("\\", "/");
+        }
+        $buffer = $buffer + "," + $aux_folder + ",";
+        $aux_folder = hefesto.sys.make_path($project_folders.item($p), "sources");
+        if (hefesto.sys.os_name() == "windows") {
+            $aux_folder.replace("\\", "/");
+        }
+        $buffer = $buffer + $aux_folder;
         if ($p < ($project_folders.count() - 1)) {
             $buffer = $buffer + ",";
         }
@@ -235,13 +246,22 @@ function write_unit_section_to_dev_file(fp type file,
                                         filepath type string,
                                         foldername type string) : result type none {
     var buffer type string;
+    var temp type string;
     $buffer = "[Unit" + $unit_index + "]\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
     $buffer = "FileName=" + $filepath + "\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
     $buffer = "CompileCpp=0\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
-    $buffer = "Folder=" + $foldername + "\n";
+    if ($filepath.match(".*\\.(c|cpp|cc|C|CC|CPP)$") == 1) {
+        $temp = hefesto.sys.make_path($foldername, "sources");
+    } else if ($filepath.match(".*\\.(h|H|hpp|Hpp|HPP)$") == 1) {
+        $temp = hefesto.sys.make_path($foldername, "headers");
+    }
+    if (hefesto.sys.os_name() == "windows") {
+        $temp.replace("\\", "/");
+    }
+    $buffer = "Folder=" + $temp + "\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
     $buffer = "Compile=1\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
