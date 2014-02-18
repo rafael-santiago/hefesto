@@ -120,9 +120,9 @@ function find_src_folders(cwd type list, regex type string) : result type list {
     $project_root = hefesto.sys.pwd();
     $stage = find_src_folders_aux($cwd, $regex);
 
-#    if (hefesto.sys.os_name() == "windows") {
-#        $project_root.replace("\\", "/");
-#    }
+    if (hefesto.sys.os_name() == "windows") {
+        $project_root.replace("\\", "/");
+    }
 
     #
     # getting the master project name
@@ -170,6 +170,9 @@ function find_src_folders_aux(cwd type list, regex type string) : result type li
     while ($c < $cwd.count()) {
         $new_cwd = $cwd.item($c);
         hefesto.sys.cd($new_cwd);
+        if (hefesto.sys.os_name() == "windows") {
+            $new_cwd.replace("\\", "/");
+        }
         if (hefesto.sys.ls($regex) > 0) {
             $retval.add_item($new_cwd);
         }
@@ -180,6 +183,9 @@ function find_src_folders_aux(cwd type list, regex type string) : result type li
             $t = 0;
             while ($t < $tmp.count()) {
                 $new_cwd = $tmp.item($t);
+                if (hefesto.sys.os_name() == "windows") {
+                    $new_cwd.replace("\\", "/");
+                }
                 if ($retval.index_of($new_cwd) == -1) {
                     $retval.add_item($new_cwd);
                 }
