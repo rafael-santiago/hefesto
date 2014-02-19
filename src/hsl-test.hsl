@@ -6,6 +6,7 @@ include ~/fsutil.hsl
 include incbug.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include ~/generators/devcpp_project_generator.hsl
+include ~/generators/codeblocks_project_generator.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -153,11 +154,12 @@ mylab.prologue() {
 #        hefesto.sys.echo("PROJECT DIRECTORY = " + $srcs.item($t) + "\n");
 #        $t = $t + 1;
 #    }
-    if (devcpp_project_generator("hefesto") == 1) {
-        hefesto.sys.echo("hefesto.dev generated ;-)\n");
-    } else {
-        hefesto.sys.echo("error during hefesto.dev generation :-(\n");
-    }
+#    if (devcpp_project_generator("hefesto") == 1) {
+#        hefesto.sys.echo("hefesto.dev generated ;-)\n");
+#    } else {
+#        hefesto.sys.echo("error during hefesto.dev generation :-(\n");
+#    }
+    codeblocks_project_generator("hefesto");
 }
 
 function get_c_cpp_deps_() : result type string {
