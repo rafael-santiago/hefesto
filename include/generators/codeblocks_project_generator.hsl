@@ -14,6 +14,7 @@ function codeblocks_project_generator(project_name type string) : result type in
     var srcs type list;
     var src_filepath type string;
     var s type int;
+    var parent_path type string;
     $cbp_fp = hefesto.sys.fopen($project_name + ".cbp", "wb");
     if ($cbp_fp == 0) {
         hefesto.sys.echo("codeblocks_project_generator ERROR: unable to create .cbp file.\n");
@@ -21,15 +22,47 @@ function codeblocks_project_generator(project_name type string) : result type in
     }
     write_cbp_base_prologue($cbp_fp, $project_name);
     $srcs = codeblocks_generator_find_sources(lsdir(), ".*(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$");
+    $src_filepath = hefesto.sys.pwd();
+    hefesto.sys.cd("..");
+    $parent_path = hefesto.sys.pwd();
+    hefesto.sys.cd($src_filepath);
     $s = 0;
     while ($s < $srcs.count()) {
         $src_filepath = $srcs.item($s);
+        $src_filepath = codeblocks_get_relative_filepath($src_filepath);
         write_unit_to_cbp($cbp_fp, $src_filepath);
         $s = $s + 1;
     }
     write_cbp_base_epilogue($cbp_fp);
     hefesto.sys.fclose($cbp_fp);
     result 1;
+}
+
+function codeblocks_get_relative_filepath(filepath type string) : result type string {
+    var f type int;
+    var relative_filepath type string;
+    var sep_count type int;
+    $f = $filepath.len() - 1;
+    $sep_count = 0;
+    while ($f > 0 && $sep_count < 2) {
+        if (hefesto.sys.os_name() == "windows") {
+            if (($filepath.at($f) == "\\" ||
+                 $filepath.at($f) == "/")) {
+                $sep_count = $sep_count + 1;
+            }
+        } else {
+            if ($filepath.at($f) == "/") {
+                $sep_count = $sep_count + 1;
+            }
+        }
+        $f = $f - 1;
+    }
+    $f = $f + 2;
+    while ($f < $filepath.len()) {
+        $relative_filepath = $relative_filepath + $filepath.at($f);
+        $f = $f + 1;
+    }
+    result $relative_filepath;
 }
 
 function codeblocks_generator_find_sources(cwd type list, regex type string) : result type list {
