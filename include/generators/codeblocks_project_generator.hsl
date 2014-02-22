@@ -27,7 +27,7 @@ function codeblocks_project_generator(project_name type string,
         result 0;
     }
     write_cbp_base_prologue($cbp_fp, $project_name, $bld_cmd_dbg, $cln_cmd_dbg, $rbld_cmd_dbg, $bld_cmd_rel, $cln_cmd_rel, $rbld_cmd_rel);
-    $srcs = codeblocks_generator_find_sources(lsdir(), ".*(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$");
+    $srcs = codeblocks_generator_find_sources(lsdir(), ".*\\.(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$");
     $parent_path = hefesto.sys.pwd();
     $s = 0;
     while ($s < $srcs.count()) {
