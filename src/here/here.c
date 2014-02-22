@@ -111,9 +111,7 @@ here_search_program_ctx *here_compile(const char *regex, char *mstatus) {
         }
         return NULL;
     }
-
     for (rp = regex; *rp != 0; rp++) {
-
         switch (*rp) {
             case '[':
                 rp++;
@@ -251,7 +249,7 @@ here_search_program_ctx *here_compile(const char *regex, char *mstatus) {
                 break;
         }
         // checking if possible complement makes sense.
-        rp++;
+        if (*rp != 0) rp++;
         if (*rp == '+' || *rp == '*' || *rp == '?') {
             //just ignore it ;)
         } else if (*rp == '[' || *rp == '(') {

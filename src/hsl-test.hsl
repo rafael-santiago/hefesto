@@ -159,7 +159,13 @@ mylab.prologue() {
 #    } else {
 #        hefesto.sys.echo("error during hefesto.dev generation :-(\n");
 #    }
-    codeblocks_project_generator("hefesto");
+    codeblocks_project_generator("./hefesto",
+                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug",
+                                 "", 
+                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug --forge-anyway",
+                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
+                                 "",
+                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway");
 }
 
 function get_c_cpp_deps_() : result type string {
