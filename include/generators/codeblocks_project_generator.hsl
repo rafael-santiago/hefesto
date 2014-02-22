@@ -9,7 +9,13 @@
 
 include ~/fsutil.hsl
 
-function codeblocks_project_generator(project_name type string) : result type int {
+function codeblocks_project_generator(project_name type string,
+                                      bld_cmd_dbg type string,
+                                      cln_cmd_dbg type string,
+                                      rbld_cmd_dbg type string,
+                                      bld_cmd_rel type string,
+                                      cln_cmd_rel type string,
+                                      rbld_cmd_rel type string) : result type int {
     var cbp_fp type file;
     var srcs type list;
     var src_filepath type string;
@@ -20,7 +26,7 @@ function codeblocks_project_generator(project_name type string) : result type in
         hefesto.sys.echo("codeblocks_project_generator ERROR: unable to create .cbp file.\n");
         result 0;
     }
-    write_cbp_base_prologue($cbp_fp, $project_name);
+    write_cbp_base_prologue($cbp_fp, $project_name, $bld_cmd_dbg, $cln_cmd_dbg, $rbld_cmd_dbg, $bld_cmd_rel, $cln_cmd_rel, $rbld_cmd_rel);
     $srcs = codeblocks_generator_find_sources(lsdir(), ".*(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$");
     $parent_path = hefesto.sys.pwd();
     $s = 0;
@@ -99,7 +105,9 @@ function codeblocks_generator_find_sources(cwd type list, regex type string) : r
     result $retval;
 }
 
-function write_cbp_base_prologue(cbp_fp type file, project_title type string) : result type none {
+function write_cbp_base_prologue(cbp_fp type file, project_title type string,
+                                 bld_cmd_dbg type string, cln_cmd_dbg type string, rbld_cmd_dbg type string,
+                                 bld_cmd_rel type string, cln_cmd_rel type string, rbld_cmd_rel type string) : result type none {
     var buffer type string;
     var b type int;
     var current_foldername type string;
@@ -132,6 +140,11 @@ function write_cbp_base_prologue(cbp_fp type file, project_title type string) : 
     $buffer = "\t<FileVersion major=\"1\" minor=\"6\" />\n\t<Project>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t<Option title=\"" + $project_title + "\" />\n";
+    $buffer.replace("\\", "");
+    $buffer.replace("/", "");
+    $buffer.replace("\\.", "");
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t<Option makefile_is_custom=\"1\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t<Option pch_mode=\"2\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
@@ -149,6 +162,16 @@ function write_cbp_base_prologue(cbp_fp type file, project_title type string) : 
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t\t\t<Option compiler=\"null\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t<MakeCommands>\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<Build command=\"" + $bld_cmd_dbg + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<Clean command=\"" + $cln_cmd_dbg + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<AskRebuildNeeded command=\"" + $rbld_cmd_dbg + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t</MakeCommands>\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t\t</Target>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t\t<Target title=\"Release\">\n";
@@ -160,6 +183,16 @@ function write_cbp_base_prologue(cbp_fp type file, project_title type string) : 
     $buffer = "\t\t\t\t<Option type=\"1\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t\t\t<Option compiler=\"null\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t<MakeCommands>\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<Build command=\"" + $bld_cmd_rel + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<Clean command=\"" + $cln_cmd_rel + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t\t<AskRebuildNeeded command=\"" + $rbld_cmd_rel + "\" />\n";
+    hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
+    $buffer = "\t\t\t\t</MakeCommands>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
     $buffer = "\t\t\t</Target>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
