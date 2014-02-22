@@ -377,11 +377,19 @@ static here_search_result_ctx *match_opt(const char *buffer,
             free(sub_buffer);
 
             del_here_search_result_ctx(search_result);
+
             search_result = here_execute_search_program(buffer,
                                                         buffer_end,
                                                         sub_search);
 
             matches = here_matches(search_result);
+            if (matches) {
+                if (sub_search->next == NULL &&
+                    sub_search->ctype == HERE_CTYPE_CMATCH &&
+                    sub_search->ccomp == HERE_CTYPE_NONE) {
+                    matches = (search_result->start_at == buffer);
+                }
+            }
 
             if ((search_program->ccomp == HERE_CTYPE_STAR ||
                 search_program->ccomp == HERE_CTYPE_QUESTION) && !matches) {

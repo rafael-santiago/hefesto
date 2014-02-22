@@ -131,6 +131,8 @@ char *here_matching_test() {
         {"test.h", ".*\\.(h|hpp)$", 1},
         {"#include \"should-match.h\"", ".*(\\\"|>)$", 1},
         {"file_io.c", ".*\\.(h|hpp)$", 0},
+        {"hmod-freebsd-port.path", ".*\\.(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$", 0},
+        {"hmod-freebsd-port.path", "\\..*(h|hpp)$", 1},
         {NULL, NULL, 0}
     };
     int m, retval;
