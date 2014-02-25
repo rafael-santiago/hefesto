@@ -313,7 +313,7 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
         result 0;
     }
     var buffer type string;
-    $buffer = "﻿<?xml versi\"1.0\" encoding=\"utf-8\"?>\n";
+    $buffer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
     $buffer = "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
@@ -387,7 +387,13 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
         if ($data.match(".*\\.(h|hpp|H|Hpp|HPP)$") == 1) {
             $buffer = "    <ClInclude Include=\"" + $data + "\">\n";
             hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
-            $filter = hefesto.sys.make_path("Header Files", visualstudio_project_get_filter_from_filepath($data));
+            $data = visualstudio_project_get_filter_from_filepath($data);
+            if ($data.len() > 0) {
+                $filter = hefesto.sys.make_path("Header Files", $data);
+                $filter.replace("/", "\\");
+            } else {
+                $filter = "Header Files";
+            }
             $buffer = "      <Filter>" + $filter + "</Filter>\n";
             hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
             $buffer = "    </ClInclude>\n";
@@ -406,7 +412,13 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
         if ($data.match(".*\\.(c|cc|cpp|C|Cc|Cpp|CPP|CC)$") == 1) {
             $buffer = "    <ClCompile Include=\"" + $data + "\">\n";
             hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
-            $filter = hefesto.sys.make_path("Source Files", visualstudio_project_get_filter_from_filepath($data));
+            $data = visualstudio_project_get_filter_from_filepath($data);
+            if ($data.len() > 0) {
+                $filter = hefesto.sys.make_path("Source Files", $data);
+                $filter.replace("/", "\\");
+            } else {
+                $filter = "Source Files";
+            }
             $buffer = "      <Filter>" + $filter + "</Filter>\n";
             hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
             $buffer = "    </ClCompile>\n";
