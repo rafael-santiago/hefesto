@@ -7,6 +7,7 @@ include incbug.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include ~/generators/devcpp_project_generator.hsl
 include ~/generators/codeblocks_project_generator.hsl
+include ~/generators/visualstudio_project_generator.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -159,13 +160,19 @@ mylab.prologue() {
 #    } else {
 #        hefesto.sys.echo("error during hefesto.dev generation :-(\n");
 #    }
-    codeblocks_project_generator("./hefesto",
-                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug",
-                                 "", 
-                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug --forge-anyway",
-                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
-                                 "",
-                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway");
+#    codeblocks_project_generator("./hefesto",
+#                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug",
+#                                 "", 
+#                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug --forge-anyway",
+#                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
+#                                 "",
+#                                 "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway");
+    visualstudio_project_generator("Hefesto",
+                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug",
+                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug --forge-anyway",
+                                   "hefesto --forgegiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
+                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway",
+                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --clean");
 }
 
 function get_c_cpp_deps_() : result type string {
