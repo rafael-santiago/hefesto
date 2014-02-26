@@ -1,4 +1,38 @@
+#
+# "visualstudio_project_generator.hsl"
+#       by Rafael Santiago
+#
+# In order to generate a Visual C .sln just call visualstudio_project_generator(),
+# being your cwd the main project source directory.
+#
+
 include ~/fsutil.hsl
+
+function visualstudio_project_generator(project_name type string,
+                                        debug_build_command type string,
+                                        debug_rebuild_command type string,
+                                        release_build_command type string,
+                                        release_rebuild_command type string,
+                                        clean_command type string) : result type int {
+    if (visualstudio_project_generator_mksln($project_name) == 0) {
+        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".sln.\n");
+        result 0;
+    }
+    var project_sources type list;
+    $project_sources = visualstudio_find_src_files(lsdir());
+    if (visualstudio_project_mkvcxproj($project_name, $project_sources,
+                                       $debug_build_command, $debug_rebuild_command,
+                                       $release_build_command, $release_rebuild_command,
+                                       $clean_command) == 0) {
+        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".vcxproj.\n");
+        result 0;
+    }
+    if (visualstudio_project_mkvcxproj_filters($project_name, $project_sources) == 0) {
+        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".vcxproj.filters.\n");
+        result 0;
+    }
+    result 1;
+}
 
 function visualstudio_project_generator_mksln(project_name type string) : result type int {
     var sln type file;
@@ -291,18 +325,33 @@ function visualstudio_project_get_filters_list(sources type list) : result type 
     var s type int;
     var buf type string;
     var item type string;
+    var b type int;
+    var filter type string;
 
     $s = 0;
     while ($s < $sources.count()) {
         $item = $sources.item($s);
         if ($item.match(".*\\.(c|cpp|cc|C|CPP|CC|Cpp|Cc|h|hpp|H|Hpp|HPP)$") == 1) {
             $buf = visualstudio_project_get_filter_from_filepath($item);
-            if ($buf.len() > 0 && $retval.index_of($buf) == -1) {
-                $retval.add_item($buf);
+            $b = 0;
+            $filter = "";
+            while ($b < $buf.len()) {
+                if ($buf.at($b) == "\\" || $buf.at($b) == "/") {
+                    if ($retval.index_of($filter) == -1) {
+                        $retval.add_item($filter);
+                    }
+                }
+                $filter = $filter + $buf.at($b);
+                $b = $b + 1;
+            }
+            if ($filter.len() > 0 && $retval.index_of($filter) == -1) {
+                $filter.replace("/", "\\");
+                $retval.add_item($filter);
             }
         }
         $s = $s + 1;
     }
+
     result $retval;
 }
 
@@ -354,6 +403,7 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
     while ($f < $filters.count()) {
         $filter = $filters.item($f);
         $data = hefesto.sys.make_path("Header Files", $filter);
+        $data.replace("/", "\\");
         $buffer = "    <Filter Include=\"" + $data + "\">\n";
         hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
         $buffer = "      <UniqueIdentifier>{0a814b34-62b0-4e37-9223-e20d4280520d}</UniqueIdentifier>\n";
@@ -367,6 +417,7 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
     while ($f < $filters.count()) {
         $filter = $filters.item($f);
         $data = hefesto.sys.make_path("Source Files", $filter);
+        $data.replace("/", "\\");
         $buffer = "    <Filter Include=\"" + $data + "\">\n";
         hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj_f);
         $buffer = "      <UniqueIdentifier>{2c9f2c04-67ab-4c32-b3d5-9e6f11dbc451}</UniqueIdentifier>\n";
@@ -460,30 +511,4 @@ function visualstudio_find_src_files(cwd type list) : result type list {
     }
     hefesto.sys.cd($oldcwd);
     result $retval;
-}
-
-function visualstudio_project_generator(project_name type string,
-                                        debug_build_command type string,
-                                        debug_rebuild_command type string,
-                                        release_build_command type string,
-                                        release_rebuild_command type string,
-                                        clean_command type string) : result type int {
-    if (visualstudio_project_generator_mksln($project_name) == 0) {
-        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".sln.\n");
-        result 0;
-    }
-    var project_sources type list;
-    $project_sources = visualstudio_find_src_files(lsdir());
-    if (visualstudio_project_mkvcxproj($project_name, $project_sources,
-                                       $debug_build_command, $debug_rebuild_command,
-                                       $release_build_command, $release_rebuild_command,
-                                       $clean_command) == 0) {
-        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".vcxproj.\n");
-        result 0;
-    }
-    if (visualstudio_project_mkvcxproj_filters($project_name, $project_sources) == 0) {
-        hefesto.sys.echo("visualstudio_project_generator ERROR: unable to generate " + $project_name + ".vcxproj.filters.\n");
-        result 0;
-    }
-    result 1;
 }
