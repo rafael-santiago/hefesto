@@ -55,7 +55,7 @@ function visualstudio_project_generator_mksln(project_name type string) : result
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
     $buffer = "\t\tDebug|Win32 = Debug|Win32\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
-    $buffer = "\t\tRelease|Win32 = Release|Win3\n";
+    $buffer = "\t\tRelease|Win32 = Release|Win32\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
     $buffer = "\tEndGlobalSection\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
