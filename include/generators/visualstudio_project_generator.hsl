@@ -61,14 +61,14 @@ function visualstudio_project_generator_mksln(project_name type string) : result
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
     $buffer = "\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
-    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Debug|Custom target.ActiveCfg = Debug|Custom target\n";
+    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Debug|Custom target.ActiveCfg = Debug|Win32\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
-    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Debug|Custom target.Build.0 = Debug|Custom target\n";
+#    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Debug|Win32.Build.0 = Debug|Win32\n";
+#    hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
+    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Release|Custom target.ActiveCfg = Release|Win32\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
-    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Release|Custom target.ActiveCfg = Release|Custom target\n";
-    hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
-    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Release|Custom target.Build.0 = Release|Custom target\n";
-    hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
+#    $buffer = "\t\t{C64987D7-69D4-4D73-A487-AA7ABC3A4F01}.Release|Win32.Build.0 = Release|Win32\n";
+#    hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
     $buffer = "\tEndGlobalSection\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $sln);
     $buffer = "\tGlobalSection(SolutionProperties) = preSolution\n";
@@ -105,7 +105,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "    <Configuration>Debug</Configuration>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = "    <Platform>Custom target</Platform>\n";
+    $buffer = "    <Platform>Win32</Platform>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "  </ProjectConfiguration>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
@@ -113,7 +113,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "    <Configuration>Release</Configuration>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = "    <Platform>Custom target</Platform>\n";
+    $buffer = "    <Platform>Win32</Platform>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "  </ProjectConfiguration>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
