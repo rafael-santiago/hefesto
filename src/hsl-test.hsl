@@ -170,7 +170,7 @@ mylab.prologue() {
     visualstudio_project_generator("Hefesto",
                                    "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug",
                                    "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=debug --forge-anyway",
-                                   "hefesto --forgegiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
+                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release",
                                    "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway",
                                    "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --clean");
 }
