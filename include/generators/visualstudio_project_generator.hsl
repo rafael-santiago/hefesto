@@ -129,7 +129,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = " <Import Project=\"$(VCTargetsPath)\Microsoft.Cpp.Default.props\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Custom target'\" Label=\"Configuration\">\n";
+    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\" Label=\"Configuration\">\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "   <ConfigurationType>Makefile</ConfigurationType>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
@@ -141,7 +141,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = " </PropertyGroup>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Custom target'\" Label=\"Configuration\">\n";
+    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\" Label=\"Configuration\">\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "   <ConfigurationType>Makefile</ConfigurationType>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
@@ -175,7 +175,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = " <PropertyGroup Label=\"UserMacros\" />\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Custom target'\">\n";
+    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\">\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "   <NMakeBuildCommandLine>" + $debug_build_command + "</NMakeBuildCommandLine>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
@@ -185,7 +185,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = " </PropertyGroup>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
-    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Custom target'\">\n";
+    $buffer = " <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\">\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
     $buffer = "   <NMakeBuildCommandLine>" + $release_build_command + "</NMakeBuildCommandLine>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $vcxproj);
