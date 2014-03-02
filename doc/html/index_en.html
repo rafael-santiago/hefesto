@@ -147,6 +147,8 @@
 		Function arguments must be declared under the scheme <B><I>var_name</I> type <I>type_name</I></B>. All variables must be accessed with the dollar symbol prefixing them. The result keyword is used to abort execution of the function, returning the passed value to the caller.
 		<BR><BR>
 
+        If a function should has local scope and not acessed by anyone extern from module, the modifier <B>local</B> must preceed the declaration of this function.<BR><BR>
+
         Loops in hsl are very simple, take a look:<BR><BR>
 		        
         <OL CLASS="code">
@@ -170,7 +172,7 @@
                 <TR><TD>int</TD><TD>Integer</TD></TR>
                 <TR><TD>string</TD><TD>Text</TD></TR>
                 <TR><TD>file</TD><TD>A reference to a file, it will be handled via file i/o syscalls</TD></TR>
-                <TR><TD>list</TD><TD>Can stores integer or string (which is initially added to the list, defines the type of list)</TD></TR>
+                <TR><TD>list</TD><TD>Can stores integer or string (which is initially added to the list, defines the type of the list)</TD></TR>
             </TABLE>
         </CENTER>
     
