@@ -183,7 +183,7 @@ static char *hlsc_messages[HLSCM_NR] = {
     "%s : token '(' is expected.\n",
 
     // HLSCM_SYN_ERROR_ALIEN_FN_CALL
-    "%s : unknown function call.\n",
+    "%s : unknown function call or out of scope.\n",
 
     // HLSCM_SYN_ERROR_TOO_MANY_ARGS_IN_FN_CALL
     "%s : too many args to call function.\n",
@@ -260,6 +260,9 @@ static char *hlsc_messages[HLSCM_NR] = {
 
     // HLSCM_SYN_ERROR_INCOMPLETE_EXPR_OR_STMT
     "%s : code block contains incomplete/invalid expression or statement.\n",
+
+    // HLSCM_SYN_ERROR_FN_REDECL
+    "%s : redeclared function.\n",
 
     // HLSCM_RUNTIME_ERROR_BYREF_NULL_FN_IN_EXECUTION
     "hefesto.sys.byref exception: any function is executing now.\n",

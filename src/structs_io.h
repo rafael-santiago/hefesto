@@ -32,7 +32,8 @@
                         f->name = NULL, f->next = NULL, f->args = NULL,\
                         f->vars = NULL, f->fds = NULL,\
                         f->code = NULL, f->result = NULL,\
-                        f->result_type = HEFESTO_VAR_TYPE_UNTYPED )
+                        f->result_type = HEFESTO_VAR_TYPE_UNTYPED,\
+                        f->decl_at = NULL )
 
 #define new_hefesto_command_list_ctx(c) ( c = (hefesto_command_list_ctx *)\
                            hefesto_mloc(sizeof(hefesto_command_list_ctx)),\
@@ -193,6 +194,8 @@ hefesto_var_list_ctx *assign_data_to_hefesto_var_file_type(
 hefesto_func_list_ctx *add_func_to_hefesto_func_list_ctx(
                                         hefesto_func_list_ctx *list,
                                                    const char *name,
+                                    const char *decl_at,
+                                    const int is_local,
                                     const hefesto_type_t result_type);
 
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_tail(
@@ -202,6 +205,11 @@ void del_hefesto_func_list_ctx(hefesto_func_list_ctx *list);
 
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_name(const char *name,
                                             hefesto_func_list_ctx *list);
+
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_name(const char *name,
+                                                      const char *curr_module,
+                                                  hefesto_func_list_ctx *list);
+
 
 hefesto_var_list_ctx *add_arg_list_to_hefesto_func_list_ctx(const char *argl);
 

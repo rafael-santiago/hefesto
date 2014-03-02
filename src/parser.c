@@ -106,6 +106,7 @@ static char *strip_comment_lines_from_command_block(const char *command);
 
 static void add_function_header(hefesto_func_list_ctx **functions,
                                 const char *name,
+                                const int is_local,
                                 const hefesto_type_t type,
                                 const char *argl);
 
@@ -474,6 +475,15 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     long inc_fp_size;
     int inc_errors;
 
+    char *parent_filepath;
+    size_t parent_filepath_size = strlen(get_current_compile_input());
+
+    parent_filepath = (char *) hefesto_mloc(parent_filepath_size + 1);
+    memset(parent_filepath, 0, parent_filepath_size + 1);
+    if (parent_filepath_size > 0) {
+        strncpy(parent_filepath, get_current_compile_input(), parent_filepath_size);
+    }
+
     if (fp == NULL) return NULL;
     set_current_line_number(1);
 
@@ -485,7 +495,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     if (functions_decl != NULL) {
         // (INFO: Santiago): === WARNING nasty trick area                        ===
         // acquiring the external (but local :Z) prototypes... it'll be freed below,
-        // don't worry about. YES, I know... this is f&@!&@&! uggly.
+        // don't worry about. YES, I know... this is an ugly thing.
         //                                                                       ===
         proto_funcs = get_hefesto_func_list_ctx_tail(functions_decl);
         for (ip = local_includes; ip; ip = ip->next) {
@@ -494,6 +504,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
             inc_fp_size = ftell(inc_fp);
             fseek(inc_fp, 0L, SEEK_SET);
             if (inc_fp != NULL) {
+                set_current_compile_input(ip->filepath);
                 proto_funcs = get_functions(inc_fp, inc_fp_size, &inc_errors, proto_funcs, gl_vars,
                                             forge_functions_name, 1);
             }
@@ -502,7 +513,8 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     }
 
     fseek(fp, offset, SEEK_SET);
-
+    set_current_compile_input(parent_filepath);
+    free(parent_filepath);
     set_current_line_number(1);
     functions_decl = get_functions(fp, stop_at, errors, functions_decl, gl_vars,
                                    forge_functions_name, 0);
@@ -518,11 +530,14 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
 
 static void add_function_header(hefesto_func_list_ctx **functions,
                                 const char *name,
+                                const int is_local,
                                 const hefesto_type_t type,
                                 const char *argl) {
 
     (*functions) = add_func_to_hefesto_func_list_ctx((*functions),
                                                      name,
+                                                     get_current_compile_input(),
+                                                     is_local,
                                                      type);
 
     get_hefesto_func_list_ctx_tail((*functions))->args =
@@ -565,12 +580,13 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                     hefesto_options_ctx *forge_functions_name,
                                     int only_prototypes) {
 
-    hefesto_func_list_ctx *functions, *f;
+    hefesto_func_list_ctx *functions, *f, *ff;
     char *buffer = NULL, *name = NULL, c, *section = NULL;
     char argl[HEFESTO_MAX_BUFFER_SIZE];
     size_t a, o;
     long offset, end_offset, curr_offset;
     int tmp_line_nr;
+    int is_local = 0;
 
     functions = functions_decl;
 
@@ -595,6 +611,7 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                     c = fgetc_back(fp);
                 }
             } else {
+                offset = ftell(fp);
                 while (c != '(' && ftell(fp) < stop_at) {
                     if (c == '\n') {
                         inc_current_line_number();
@@ -611,7 +628,7 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
             argl[safe_index(a++, HEFESTO_MAX_BUFFER_SIZE)] = c;
             argl[safe_index(a, HEFESTO_MAX_BUFFER_SIZE)] = 0;
             if(!is_valid_function_arg_list(argl)) {
-                hlsc_info(HLSCM_MTYPE_GENERAL, 
+                hlsc_info(HLSCM_MTYPE_GENERAL,
                           HLSCM_PARSE_ERROR_IN_FN, name);
                 (*errors)++;
                 goto ___free_buffers;
@@ -680,11 +697,27 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                                    "parser/function = %s %s\n",
                                                    name,argl);
                                 f = (functions_decl != NULL) ?
-                                     get_hefesto_func_list_ctx_name(name,
+                                     get_hefesto_func_list_ctx_scoped_name(
+                                                          name,
+                                                get_current_compile_input(),
                                                           functions_decl) :
                                                                         NULL;
+                                if (f && !f->is_local) {
+                                    for (ff = functions_decl; ff;
+                                         ff = ff->next) {
+                                       if (ff->is_local || ff == f) continue;
+                                       if (strcmp(ff->name, f->name) == 0) {
+                                            hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                                      HLSCM_SYN_ERROR_FN_REDECL,
+                                                      f->name);
+                                            (*errors)++;
+                                            goto ___free_buffers;
+                                       }
+                                    }
+                                }
                                 if (only_prototypes) {
                                     add_function_header(&functions, name,
+                                                        is_local,
                                                         get_var_type(buffer),
                                                         argl);
                                 } else {
@@ -708,6 +741,7 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                 free(name);
                                 name = NULL;
                                 HEFESTO_DEBUG_INFO(0, "--\n");
+                                is_local = 0;
                             } else {
                                 hlsc_info(HLSCM_MTYPE_GENERAL,
                                           HLSCM_INVAL_FN_RESTYPE,
@@ -741,10 +775,13 @@ ___free_buffers:
                 section = NULL;
             }
         } else {
+            is_local = 0;
             if  (strcmp(buffer, "forge") == 0) {
                 name = get_next_word_from_file(fp, stop_at);
                 free(name);
                 name = NULL;
+            } else if (strcmp(buffer, HEFESTO_FUNC_DECL_LSCOPE_WORD) == 0) {
+                is_local = 1;
             }
             free(buffer);
         }
@@ -1111,7 +1148,8 @@ static int is_really_section_end(FILE *fp, const long stop_at) {
                (strcmp(reserv_word, "project") == 0)          ||
                (strstr(reserv_word, ".preloading()") != NULL) ||
                (strstr(reserv_word, ".prologue()") != NULL)   ||
-               (strstr(reserv_word, ".epilogue()") != NULL));
+               (strstr(reserv_word, ".epilogue()") != NULL)   ||
+               (strcmp(reserv_word, "local") == 0));
         free(reserv_word);
     }
     return end;
@@ -1309,7 +1347,7 @@ static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
                 fseek(fp, offset, SEEK_SET);
                 *prj_functions[p].fn_p =
                     add_func_to_hefesto_func_list_ctx(*prj_functions[p].fn_p,
-                                                      decl_label,
+                                                      decl_label, NULL, 1,
                                                       HEFESTO_VAR_TYPE_NONE);
                 fn_ptr = get_hefesto_func_list_ctx_tail(*prj_functions[p].fn_p);
                 if ((result = compile_code(fn_ptr, functions, gl_vars, NULL, fp,
@@ -1996,12 +2034,12 @@ static int check_helpers_decl_section(FILE *fp, long file_size,
         //
         // INFO(Santiago):
         //
-        // problema conceitual: a funcao de forja precisa ser carregada 
-        // e compilada antes de chegar aqui... se um ajundante de forja 
-        // fizer uma chamada a hefesto.toolset.* a compilacao quebra 
-        // antes, entao avisar que uma funcao nao foi encontrada por 
-        // estar grafada de forma errada ou o include nao ter sido 
-        // informado nao tem muito sentido nem relevancia nesse 
+        // problema conceitual: a funcao de forja precisa ser carregada
+        // e compilada antes de chegar aqui... se um ajundante de forja
+        // fizer uma chamada a hefesto.toolset.* a compilacao quebra
+        // antes, entao avisar que uma funcao nao foi encontrada por
+        // estar grafada de forma errada ou o include nao ter sido
+        // informado nao tem muito sentido nem relevancia nesse
         // ponto do processamento.
         //
         /*
@@ -2198,7 +2236,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                                                    commands);
                                     // volta no offset padrao (depois do nome
                                     // do toolset) para manter o parsing igual
-                                    // era antes dos forge helpers.
+                                    // ao que era antes dos forge helpers.
                                     fseek(fp, offset2, SEEK_SET);
                                     if (tok != NULL) {
                                         free(tok);

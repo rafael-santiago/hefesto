@@ -1569,6 +1569,7 @@ char *hefesto_func_list_ctx_tests() {
     printf("-- running hefesto_func_list_ctx_tests\n");
     flist = add_func_to_hefesto_func_list_ctx(flist,
                                               "hls_int_type_function",
+                                              NULL, 0,
                                               HEFESTO_VAR_TYPE_INT);
     HTEST_CHECK("hls_int_type_function not found",
                 get_hefesto_func_list_ctx_name("hls_int_type_function",

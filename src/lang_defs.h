@@ -18,6 +18,7 @@
 #define HEFESTO_FUNC_DECL_WORD                                 "function"
 #define HEFESTO_FUNC_RESULT_DECL_WORD_0                        "result"
 #define HEFESTO_FUNC_RESULT_DECL_WORD_1                        "type"
+#define HEFESTO_FUNC_DECL_LSCOPE_WORD                          "local"
 
 #define HEFESTO_PROJECT_DECL_WORD                              "project"
 #define HEFESTO_TOOLSET_DECL_WORD                              "toolset"

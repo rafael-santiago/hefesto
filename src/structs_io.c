@@ -276,6 +276,8 @@ void del_hefesto_var_list_ctx_contents(hefesto_var_list_ctx **list) {
 
 hefesto_func_list_ctx *add_func_to_hefesto_func_list_ctx(
                       hefesto_func_list_ctx *list, const char *name,
+                      const char *decl_at,
+                      const int is_local,
                       const hefesto_type_t result_type) {
 
     hefesto_func_list_ctx *p, *h;
@@ -295,6 +297,12 @@ hefesto_func_list_ctx *add_func_to_hefesto_func_list_ctx(
     p->name = (char *) hefesto_mloc(strlen(name)+1);
     memset(p->name,0,strlen(name)+1);
     strncpy(p->name,name,strlen(name)+1);
+    if (decl_at != NULL) {
+        p->decl_at = (char *) hefesto_mloc(strlen(decl_at)+1);
+        memset(p->decl_at, 0, strlen(decl_at)+1);
+        strncpy(p->decl_at, decl_at, strlen(decl_at));
+    }
+    p->is_local = is_local;
     p->result_type = result_type;
 
     return h;
@@ -323,6 +331,7 @@ void del_hefesto_func_list_ctx(hefesto_func_list_ctx *list) {
         if (p->code) del_hefesto_command_list_ctx(p->code);
         if (p->result) free(p->result);
         if (p->name) free(p->name);
+        if (p->decl_at) free(p->decl_at);
         free(p);
     }
 
@@ -338,6 +347,27 @@ hefesto_func_list_ctx *get_hefesto_func_list_ctx_name(const char *name,
 
     return NULL;
 
+}
+
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_name(const char *name,
+                                                             const char *curr_module,
+                                                             hefesto_func_list_ctx *list) {
+    hefesto_func_list_ctx *p = NULL;
+    if (curr_module != NULL) {
+        for (p = list; p; p = p->next) {
+            if (strcmp(name, p->name) == 0 &&
+                strcmp(curr_module, p->decl_at) == 0) {
+                return p;
+            }
+        }
+    }
+
+    if (p == NULL) {
+        p = get_hefesto_func_list_ctx_name(name, list);
+        if (p && !p->is_local) return p; // this is a non local function
+    }
+
+    return NULL;
 }
 
 hefesto_var_list_ctx *add_arg_list_to_hefesto_func_list_ctx(const char *argl) {
@@ -876,13 +906,14 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 *buf_p = 0;
             }
             if (buf[0][0] == '$') exit(1);
-            (*function)->vars = 
+            (*function)->vars =
                add_var_to_hefesto_var_list_ctx((*function)->vars,
                                                buf[0],
                                                get_var_type(buf[1]));
         } else if (*b == '(') {
             // e uma funcao
-            if ((fp = get_hefesto_func_list_ctx_name(tok, functions))) { 
+            if ((fp = get_hefesto_func_list_ctx_scoped_name(tok,
+                                    get_current_compile_input(), functions))) {
                 p->instruction = HEFESTO_CALL;
                 p->func = fp;
                 HEFESTO_DEBUG_INFO(0, "structs_io/call: %s\n",

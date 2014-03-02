@@ -121,7 +121,7 @@ void *hvm_call_function(const char *func_call,
                         hefesto_func_list_ctx *functions) {
 
     char *f_lbl, *fc, *fl;
-    hefesto_func_list_ctx *function;
+    hefesto_func_list_ctx *function, *curr_exec_fp;
     void *result = NULL;
     struct stacked_function_execution_point_ctx *sv_p;
 
@@ -137,8 +137,12 @@ void *hvm_call_function(const char *func_call,
     *fl = 0;
 
     for (fc = (char *)func_call; is_hefesto_blank(*fc); fc++);
-
-    if ((function = get_hefesto_func_list_ctx_name(f_lbl, functions))) {
+    curr_exec_fp = hvm_get_current_executed_function();
+    if ((function = get_hefesto_func_list_ctx_scoped_name(f_lbl,
+                                         (curr_exec_fp) ?
+                                                curr_exec_fp->decl_at
+                                            :   NULL,
+                                                          functions))) {
 
         // INFO(Santiago): saves the execution context.
         sv_p = hvm_save_execution_point(function);
@@ -171,7 +175,6 @@ void *hvm_exec_function(hefesto_func_list_ctx *function,
 
     result = hvm_exec_command_list(function->code, &function->vars,
                                    gl_vars, functions, NULL);
-
     return result;
 
 }

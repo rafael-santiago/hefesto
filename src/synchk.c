@@ -972,10 +972,13 @@ int synchk_function_call(const char *call, hefesto_var_list_ctx *lo_vars,
         result = 0;
         hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_ARG_LIST_NOT_OPENED, call);
     } else {
-        if (!(fp = get_hefesto_func_list_ctx_name(function, functions))) {
+        if (!(fp = get_hefesto_func_list_ctx_scoped_name(function,
+                                                         get_current_compile_input(),
+                                                         functions))) {
             result = 0;
             hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_ALIEN_FN_CALL, call);
         } else {
+
             for (va = fp->args, expected_args = 0; va;
                       va = va->next, expected_args++);
 

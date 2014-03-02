@@ -146,6 +146,8 @@ typedef struct _hefesto_file_descriptors_ctx { // obsoleto
 
 typedef struct _hefesto_func_list_ctx {
   char *name;
+  char *decl_at;
+  int is_local;
   hefesto_type_t result_type;
   hefesto_var_list_ctx *args;
   hefesto_var_list_ctx *vars;
