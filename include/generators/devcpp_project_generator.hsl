@@ -108,7 +108,7 @@ function devcpp_project_generator(main_project_name type string) : result type i
     result 1;
 }
 
-function find_src_folders(cwd type list, regex type string) : result type list {
+local function find_src_folders(cwd type list, regex type string) : result type list {
     var retval type list;
     var stage type list;
     var project_root type string;
@@ -157,7 +157,7 @@ function find_src_folders(cwd type list, regex type string) : result type list {
     result $retval;
 }
 
-function find_src_folders_aux(cwd type list, regex type string) : result type list {
+local function find_src_folders_aux(cwd type list, regex type string) : result type list {
     var retval type list;
     var tmp type list;
     var tmpcwd type list;
@@ -198,9 +198,9 @@ function find_src_folders_aux(cwd type list, regex type string) : result type li
     result $retval;
 }
 
-function write_project_section_to_dev_file(fp type file,
-                                           main_project_name type string,
-                                           project_folders type list) : result type none {
+local function write_project_section_to_dev_file(fp type file,
+                                                 main_project_name type string,
+                                                 project_folders type list) : result type none {
     var buffer type string;
     var p type int;
     var aux_folder type string;
@@ -241,10 +241,10 @@ function write_project_section_to_dev_file(fp type file,
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
 }
 
-function write_unit_section_to_dev_file(fp type file,
-                                        unit_index type int,
-                                        filepath type string,
-                                        foldername type string) : result type none {
+local function write_unit_section_to_dev_file(fp type file,
+                                              unit_index type int,
+                                              filepath type string,
+                                              foldername type string) : result type none {
     var buffer type string;
     var temp type string;
     $buffer = "[Unit" + $unit_index + "]\n";
@@ -275,7 +275,7 @@ function write_unit_section_to_dev_file(fp type file,
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);
 }
 
-function write_version_info_section_to_dev_file(fp type file) : result type none {
+local function write_version_info_section_to_dev_file(fp type file) : result type none {
     var buffer type string;
     $buffer = "[VersionInfo]\nMajor=0\nMinor=1\nRelease=1\nBuild=1\nLanguageID=\nCharsetID=\nCompanyName=\nFileVersion=\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $fp);

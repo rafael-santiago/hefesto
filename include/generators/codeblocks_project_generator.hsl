@@ -41,7 +41,7 @@ function codeblocks_project_generator(project_name type string,
     result 1;
 }
 
-function codeblocks_get_relative_filepath(filepath type string) : result type string {
+local function codeblocks_get_relative_filepath(filepath type string) : result type string {
     var f type int;
     var cwd type string;
     var relative_filepath type string;
@@ -54,7 +54,7 @@ function codeblocks_get_relative_filepath(filepath type string) : result type st
     result $relative_filepath;
 }
 
-function codeblocks_generator_find_sources(cwd type list, regex type string) : result type list {
+local function codeblocks_generator_find_sources(cwd type list, regex type string) : result type list {
     var retval type list;
     var c type int;
     var tmp type string;
@@ -105,9 +105,9 @@ function codeblocks_generator_find_sources(cwd type list, regex type string) : r
     result $retval;
 }
 
-function write_cbp_base_prologue(cbp_fp type file, project_title type string,
-                                 bld_cmd_dbg type string, cln_cmd_dbg type string, rbld_cmd_dbg type string,
-                                 bld_cmd_rel type string, cln_cmd_rel type string, rbld_cmd_rel type string) : result type none {
+local function write_cbp_base_prologue(cbp_fp type file, project_title type string,
+                                       bld_cmd_dbg type string, cln_cmd_dbg type string, rbld_cmd_dbg type string,
+                                       bld_cmd_rel type string, cln_cmd_rel type string, rbld_cmd_rel type string) : result type none {
     var buffer type string;
     var b type int;
     var current_foldername type string;
@@ -200,7 +200,7 @@ function write_cbp_base_prologue(cbp_fp type file, project_title type string,
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
 }
 
-function write_cbp_base_epilogue(cbp_fp type file) : result type none {
+local function write_cbp_base_epilogue(cbp_fp type file) : result type none {
     var buffer type string;
     $buffer = "\t\t<Extensions>\n\t\t\t<code_completion />\n\t\t\t<envvars />\n\t\t\t<debugger />\n\t\t\t<lib_finder disable_auto=\"1\" />\n\t\t</Extensions>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
@@ -208,7 +208,7 @@ function write_cbp_base_epilogue(cbp_fp type file) : result type none {
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);
 }
 
-function write_unit_to_cbp(cbp_fp type file, src_filepath type string) : result type none {
+local function write_unit_to_cbp(cbp_fp type file, src_filepath type string) : result type none {
     var buffer type string;
     $buffer = "\t\t<Unit filename=\""+ $src_filepath + "\">\n\t\t\t<Option compilerVar=\"CC\" />\n\t\t</Unit>\n";
     hefesto.sys.fwrite($buffer, $buffer.len(), $cbp_fp);

@@ -34,7 +34,7 @@ function visualstudio_project_generator(project_name type string,
     result 1;
 }
 
-function visualstudio_project_generator_mksln(project_name type string) : result type int {
+local function visualstudio_project_generator_mksln(project_name type string) : result type int {
     var sln type file;
     $sln = hefesto.sys.fopen($project_name + ".sln", "wb");
     if ($sln == 0) {
@@ -83,12 +83,12 @@ function visualstudio_project_generator_mksln(project_name type string) : result
     result 1;
 }
 
-function visualstudio_project_mkvcxproj(project_name type string, sources type list,
-                                        debug_build_command type string,
-                                        debug_rebuild_command type string,
-                                        release_build_command type string,
-                                        release_rebuild_command type string,
-                                        clean_command type string) : result type int {
+local function visualstudio_project_mkvcxproj(project_name type string, sources type list,
+                                              debug_build_command type string,
+                                              debug_rebuild_command type string,
+                                              release_build_command type string,
+                                              release_rebuild_command type string,
+                                              clean_command type string) : result type int {
     var vcxproj type file;
     $vcxproj = hefesto.sys.fopen($project_name + ".vcxproj", "wb");
     if ($vcxproj == 0) {
@@ -279,7 +279,7 @@ function visualstudio_project_mkvcxproj(project_name type string, sources type l
     result 1;
 }
 
-function visualstudio_project_get_filter_from_filepath(filepath type string) : result type string {
+local function visualstudio_project_get_filter_from_filepath(filepath type string) : result type string {
     var buf type string;
     var b type int;
     var b_end type int;
@@ -320,7 +320,7 @@ function visualstudio_project_get_filter_from_filepath(filepath type string) : r
     result $buf;
 }
 
-function visualstudio_project_get_filters_list(sources type list) : result type list {
+local function visualstudio_project_get_filters_list(sources type list) : result type list {
     var retval type list;
     var s type int;
     var buf type string;
@@ -355,7 +355,7 @@ function visualstudio_project_get_filters_list(sources type list) : result type 
     result $retval;
 }
 
-function visualstudio_project_mkvcxproj_filters(project_name type string, sources type list) : result type int {
+local function visualstudio_project_mkvcxproj_filters(project_name type string, sources type list) : result type int {
     var vcxproj_f type file;
     $vcxproj_f = hefesto.sys.fopen($project_name + ".vcxproj.filters", "wb");
     if ($vcxproj_f == 0) {
@@ -485,7 +485,7 @@ function visualstudio_project_mkvcxproj_filters(project_name type string, source
     result 1;
 }
 
-function visualstudio_find_src_files(cwd type list) : result type list {
+local function visualstudio_find_src_files(cwd type list) : result type list {
     var retval type list;
     var c type int;
     var element type string;
