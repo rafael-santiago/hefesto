@@ -169,6 +169,7 @@ static void *eval_string_constant(char *s, size_t *osize) {
 
     char *result;
     char *tmp, *sp, *tp;
+    char buf[20];
 
     if (s == NULL) return NULL;
 
@@ -195,6 +196,12 @@ static void *eval_string_constant(char *s, size_t *osize) {
 
                     case 'r':
                         *tp = '\r';
+                        break;
+
+                    case 'x':
+                        sprintf(buf, "%c%c", *(sp+2), *(sp+3));
+                        *tp = (char) strtoul(buf, NULL, 16);
+                        sp += 2;
                         break;
 
                     default:
