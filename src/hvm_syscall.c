@@ -1644,7 +1644,7 @@ static void *hefesto_sys_byref(const char *syscall,
             } else {
                 hlsc_info(HLSCM_MTYPE_RUNTIME,
                           HLSCM_RUNTIME_ERROR_BYREF_GLVAR_OUT_OF_SCOPE,
-                          vp_s->contents->data);
+                          vp_s->name);
             }
         } else {
             hlsc_info(HLSCM_MTYPE_RUNTIME,

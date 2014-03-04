@@ -8,6 +8,7 @@ include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include ~/generators/devcpp_project_generator.hsl
 include ~/generators/codeblocks_project_generator.hsl
 include ~/generators/visualstudio_project_generator.hsl
+include ~/accacia.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -178,6 +179,19 @@ mylab.prologue() {
 #                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --compile-model=release --forge-anyway",
 #                                   "hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=hefesto --clean");
     get_c_cpp_deps_();
+    accacia_textstyle("bold");
+    accacia_textcolor("red");
+    hefesto.sys.echo("red\n");
+    accacia_textcolor("green");
+    hefesto.sys.echo("green\n");
+    accacia_textcolor("blue");
+    hefesto.sys.echo("blue\n");
+    accacia_screennormalize();
+#    accacia_drawbox(10, 10, 100, 100, "white");
+#    accacia_screennormalize();
+    var buf type string;
+    accacia_gets($buf);
+    hefesto.sys.echo($buf + "\n");
 }
 
 function get_c_cpp_deps_() : result type string {
