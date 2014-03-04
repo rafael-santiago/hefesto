@@ -611,6 +611,7 @@ int hvm_forge_project(hefesto_project_ctx *project,
     // executes the prologue
 
     if (project->prologue && project->prologue->code) {
+        hvm_set_current_executed_function(project->prologue);
         result = hvm_exec_function(project->prologue,
                                    &project->prologue->vars,
                                    gl_vars, functions);
@@ -661,7 +662,7 @@ int hvm_forge_project(hefesto_project_ctx *project,
         sv_p = hvm_save_execution_point(project->toolset->forge);
         hvm_init_function_args(forge_invocation, gl_vars, gl_vars, functions,
                                &project->toolset->forge);
-
+        hvm_set_current_executed_function(project->toolset->forge);
         result = hvm_exec_function(project->toolset->forge,
                                    &project->toolset->forge->vars, gl_vars,
                                    functions);
@@ -693,6 +694,7 @@ int hvm_forge_project(hefesto_project_ctx *project,
     // executes the epilogue
     if (project && !HEFESTO_EXIT_FORGE) {
         if (project->epilogue && project->epilogue->code) {
+            hvm_set_current_executed_function(project->epilogue);
             result = hvm_exec_function(project->epilogue,
                                        &project->epilogue->vars,
                                        gl_vars, functions);
