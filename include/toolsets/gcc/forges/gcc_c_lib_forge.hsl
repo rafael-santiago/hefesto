@@ -34,9 +34,9 @@ include ~/fsutil.hsl
 
 var gcc_c_project_forge_dirty_files_nr type int;
 
-function gcc_mk_lib_compilation_command(src_file type string, ofile type string,
-                                        includes type string, cflags type string,
-                                        is_release type int, is_static type int) : result type string {
+local function gcc_mk_lib_compilation_command(src_file type string, ofile type string,
+                                              includes type string, cflags type string,
+                                              is_release type int, is_static type int) : result type string {
     var cmd type string;
     if ($is_release == 1) {
         if ($is_static == 1) {

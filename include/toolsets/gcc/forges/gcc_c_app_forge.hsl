@@ -38,11 +38,11 @@ include ~/fsutil.hsl
 
 var gcc_c_project_forge_dirty_files_nr type int;
 
-function gcc_mk_app_compilation_command(src_name type string,
-                                        outfile type string,
-                                        includes type string,
-                                        cflags type string,
-                                        is_release type int) : result type string {
+local function gcc_mk_app_compilation_command(src_name type string,
+                                              outfile type string,
+                                              includes type string,
+                                              cflags type string,
+                                              is_release type int) : result type string {
     var cmd type string;
     if ($is_release == 1) {
         $cmd = hefesto.toolset.compile_r($src_name, $outfile, $includes, $cflags);

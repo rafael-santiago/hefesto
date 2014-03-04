@@ -26,7 +26,7 @@ static char *get_next_invoke_line(FILE *ivk) {
             while (c != '\n' && !feof(ivk) && lp != lp_end) {
                 lp++;
                 c = fgetc(ivk);
-                *lp = c;
+                if (!feof(ivk)) *lp = c;
             }
         }
     }
