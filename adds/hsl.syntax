@@ -1,4 +1,5 @@
 context default
+    keyword whole local yellow
     keyword whole function yellow
     keyword whole var yellow
     keyword whole while yellow
