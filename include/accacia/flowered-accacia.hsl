@@ -1,0 +1,271 @@
+#
+# "bloomed-accacia.hsl"
+#       by Rafael Santiago
+#
+#  This is just a port of accacia C library to hsl ;)
+#
+
+include ~/string.hsl
+
+function accacia_gotoxy(x type int, y type int) : result type none {
+    hefesto.sys.echo("\x1b[" + $x + ";" + $y + "H");
+}
+
+function accacia_clrscr() : result type none {
+    hefesto.sys.echo("\x1b[2J");
+}
+
+function accacia_cursorup(y type int) : result type none {
+    hefesto.sys.echo("\x1b[" + $y + "A");
+}
+
+function accacia_cursordown(y type int) : result type none {
+    hefesto.sys.echo("\x1b[" + $y + "B");
+}
+
+function accacia_cursorforward(x type int) : result type none {
+    hefesto.sys.echo("\x1b[" + $x + "C");
+}
+
+function accacia_cursorbackward(x type int) : result type none {
+    hefesto.sys.echo("\x1b[" + $x + "D");
+}
+
+function accacia_delline() : result type none {
+    hefesto.sys.echo("\x1b[K");
+}
+
+function accacia_savecursorposition() : result type none {
+    hefesto.sys.echo("\x1b[s");
+}
+
+function accacia_restorecursorposition() : result type none {
+    hefesto.sys.echo("\x1b[u");
+}
+
+local function accacia_apply_color(wanted_color type string, colors type list, cl_base type int) : result type none {
+    var usrcl type string;
+    var usrcli type int;
+    var color type int;
+
+    $usrcl = strupr($wanted_color);
+
+    $color = $cl_base;
+
+    $usrcli = $colors.index_of($usrcl);
+
+    if ($usrcli == -1) {
+        $usrcli = 0;
+    }
+
+    $color = $color + $usrcli;
+
+    hefesto.sys.echo("\x1b[" + $color + "m");
+}
+
+function accacia_textcolor(color type string) : result type none {
+    var colors type list;
+    $colors.add_item("BLACK");
+    $colors.add_item("RED");
+    $colors.add_item("GREEN");
+    $colors.add_item("YELLOW");
+    $colors.add_item("BLUE");
+    $colors.add_item("MAGENTA");
+    $colors.add_item("CYAN");
+    $colors.add_item("WHITE");
+    accacia_apply_color($color, $colors, 30);
+}
+
+function accacia_textbackground(color type string) : result type none {
+    var colors type list;
+    $colors.add_item("BLACK");
+    $colors.add_item("RED");
+    $colors.add_item("GREEN");
+    $colors.add_item("YELLOW");
+    $colors.add_item("BLUE");
+    $colors.add_item("MAGENTA");
+    $colors.add_item("CYAN");
+    $colors.add_item("WHITE");
+    accacia_apply_color($color, $colors, 40);
+}
+
+function accacia_screennormalize() : result type none {
+    hefesto.sys.echo("\x1b[m");
+}
+
+function accacia_textstyle(style type string) : result type none {
+    var styles type list;
+    var usrsty type string;
+    var styles_indexes type list;
+    var sty_idx type int;
+
+    $usrsty = strupr(trim($style));
+
+    $styles.add_item("DEFAULT");
+    $styles.add_item("BOLD");
+    $styles.add_item("NOT BOLD");
+    $styles.add_item("UNDERLINED");
+    $styles.add_item("NOT UNDERLINED");
+    $styles.add_item("BLINKING");
+    $styles.add_item("NOT BLINKING");
+    $styles.add_item("INVERS");
+    $styles.add_item("NOT INVERS");
+
+    $styles_indexes.add_item("0");
+    $styles_indexes.add_item("1");
+    $styles_indexes.add_item("22");
+    $styles_indexes.add_item("4");
+    $styles_indexes.add_item("24");
+    $styles_indexes.add_item("5");
+    $styles_indexes.add_item("25");
+    $styles_indexes.add_item("7");
+    $styles_indexes.add_item("27");
+
+    $sty_idx = $styles.index_of($usrsty);
+
+    if ($sty_idx == -1) {
+        $sty_idx = 0;
+    }
+
+    hefesto.sys.echo("\x1b[" + $styles_indexes.item($sty_idx) + "m");
+}
+
+local function accacia_boxmaker(x type int, y type int, width type int, height type int, color type string, fillchar type string) : result type none {
+    var i type int;
+    var j type int;
+    var xtemp type int;
+    var ytemp type int;
+
+    $xtemp = $x;
+
+    accacia_textbackground($color);
+
+    $i = 0;
+    while ($i < $width) {
+        $j = 0;
+        $ytemp = $y;
+        while ($j < $height) {
+            accacia_gotoxy($xtemp, $ytemp);
+            hefesto.sys.echo($fillchar.at(0));
+            $j = $j + 1;
+            $ytemp = $ytemp + 1;
+        }
+        $i = $i + 1;
+        $xtemp = $xtemp + 1;
+    }
+    accacia_gotoxy($x, $y);
+}
+
+function accacia_drawbox(x type int, y type int, width type int, height type int, color type string) : result type none {
+    accacia_boxmaker($x, $y, $width, $height, $color, " ");
+}
+
+function accacia_drawboxwcharfill(x type int, y type int, width type int, height type int, fillchar type string, text_color type string, background_color type string) : result type none {
+    accacia_textcolor($text_color);
+    accacia_boxmaker($x, $y, $width, $height, $text_color, $fillchar);
+}
+
+function accacia_drawtopmargin(x type int, y type int, width type int, title type string, title_color type string, margin_color type string, box_color type string) : result type none {
+    var i type int;
+    accacia_textbackground($margin_color);
+    accacia_gotoxy($x, $y);
+    $i = 0;
+    while ($i < $width) {
+        hefesto.sys.echo(" ");
+        $i = $i + 1;
+    }
+    if ($title.len() > 0) {
+        accacia_gotoxy($x, $y);
+        accacia_textcolor($title_color);
+        hefesto.sys.echo($title);
+    }
+    accacia_textbackground($box_color);
+    accacia_gotoxy($x, $y + 1);
+}
+
+function accacia_drawbottommargin(x type int, y type int, width type int, height type int, title type string, title_color type string, margin_color type string, box_color type string) : result type none {
+    var i type int;
+    accacia_textbackground($margin_color);
+    accacia_gotoxy($x, $y + $height);
+    $i = 0;
+    while ($i < $width) {
+        hefesto.sys.echo(" ");
+        $i = $i + 1;
+    }
+    if ($title.len() > 0) {
+        accacia_gotoxy($x, $y + $height);
+        accacia_textcolor($title_color);
+        hefesto.sys.echo($title);
+    }
+    accacia_textbackground($box_color);
+    accacia_gotoxy($x, $y);
+}
+
+function accacia_drawleftmargin(x type int, y type int, height type int, margin_color type string, box_color type string) : result type none {
+    var i type int;
+    var ytemp type int;
+    accacia_textbackground($margin_color);
+    $i = 0;
+    $ytemp = $y;
+    while ($ytemp <= ($y + $height)) {
+        accacia_gotoxy($x, $ytemp);
+        hefesto.sys.echo(" ");
+        $ytemp = $ytemp + 1;
+    }
+    accacia_textbackground($box_color);
+    accacia_gotoxy($x + 1, $y);
+}
+
+function accacia_drawrightmargin(x type int, y type int, width type int, height type int, margin_color type string, box_color type string) : result type none {
+    var i type int;
+    var ytemp type int;
+    accacia_textbackground($margin_color);
+    $i = 0;
+    $ytemp = $y;
+    while ($ytemp <= ($y + $height)) {
+        accacia_gotoxy($x + $width - 1, $ytemp);
+        hefesto.sys.echo(" ");
+        $ytemp = $ytemp + 1;
+    }
+    accacia_textbackground($box_color);
+    accacia_gotoxy($x, $y);
+}
+
+function accacia_drawboxgine(x type int, y type int, width type int, height type int, box_color type string, margin_color type string, top_title type string, top_title_color type string, bottom_title type string, bottom_title_color type string, margin_top type int, margin_bottom type int, margin_left type int, margin_right type int) : result type none {
+    accacia_drawbox($x, $y, $width, $height, $box_color);
+    if ($margin_left) {
+        accacia_drawleftmargin($x, $y, $height, $margin_color, $box_color);
+    }
+    if ($margin_top) {
+        accacia_drawtopmargin($x, $y, $width, $top_title, $top_title_color, $margin_color, $box_color);
+    }
+    if ($margin_right) {
+        accacia_drawrightmargin($x, $y, $width, $height, $margin_color, $box_color);
+    }
+    if ($margin_bottom) {
+        accacia_drawbottommargin($x, $y, $width, $height, $bottom_title, $bottom_title_color, $margin_color, $box_color);
+    }
+}
+
+function accacia_gets(buf type string) : result type none {
+    $buf = hefesto.sys.prompt("");
+    hefesto.sys.byref($buf);
+}
+
+function accacia_kbhit() : result type int {
+    var retval type int;
+    $retval = hefesto.sys.call_from_module("~/accacia/libaccacia", "accacia_kbhit");
+    result $retval;
+}
+
+function accacia_getch() : result type int {
+    var c type int;
+    $c = hefesto.sys.call_from_module("~/accacia/libaccacia", "accacia_getch");
+    result $c;
+}
+
+function accacia_getkey() : result type int {
+    var retval type int;
+    $retval = hefesto.sys.call_from_module("~/accacia/libaccacia", "accacia_getkey");
+    result $retval;
+}

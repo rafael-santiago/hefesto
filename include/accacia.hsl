@@ -1,0 +1,8 @@
+#
+# "accacia.hsl"
+#       by Rafael Santiago
+#
+#  This is just a port of accacia C library to hsl ;)
+#
+include on linux, freebsd ~/accacia/flowered-accacia.hsl
+include on windows ~/accacia/withered-accacia.hsl
