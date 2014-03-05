@@ -186,12 +186,20 @@ mylab.prologue() {
     hefesto.sys.echo("green\n");
     accacia_textcolor("blue");
     hefesto.sys.echo("blue\n");
-    accacia_screennormalize();
-#    accacia_drawbox(10, 10, 100, 100, "white");
 #    accacia_screennormalize();
-    var buf type string;
-    accacia_gets($buf);
-    hefesto.sys.echo($buf + "\n");
+#    accacia_drawbox(10, 10, 5, 10, "BLUE");
+    accacia_screennormalize();
+#    var buf type string;
+#    hefesto.sys.echo("Type something: ");
+#    accacia_gets($buf);
+#    accacia_textbackground("magenta");
+#    accacia_textcolor("yellow");
+#    hefesto.sys.echo($buf + "\n");
+#    accacia_screennormalize();
+#    accacia_delline();
+    while (accacia_kbhit() == 0) {
+        hefesto.sys.echo(".\n");
+    }
 }
 
 function get_c_cpp_deps_() : result type string {

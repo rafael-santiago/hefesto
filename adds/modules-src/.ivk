@@ -1,1 +1,1 @@
---forgefiles=Forgefile.hsl --Forgefile-projects=hefesto-modules
+--forgefiles=Forgefile.hsl --Forgefile-projects=hefesto-modules --link-model=shared
