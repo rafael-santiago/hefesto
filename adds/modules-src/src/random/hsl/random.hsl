@@ -1,18 +1,16 @@
 #
 # "random.hsl"    < Thu 30 Jan 2014 10:15:27 PM BRST >
-# by Rafael Santiago
+#       by Rafael Santiago
 #
 
 function random(max_range type int) : result type int {
     var random_value type int;
-    var modname type string;
-    if (hefesto.sys.os_name() != "windows") {
-        $modname = "~/librandom.so";
-    } else {
-        $modname = "~/librandom.dll";
-    }
-    $random_value = hefesto.sys.call_from_module($modname,
+    $random_value = hefesto.sys.call_from_module("~/librandom",
                                                  "hsl_random",
                                                  $max_range);
     result $random_value
+}
+
+function srand(seed type int) : result type none {
+    hefesto.sys.call_from_module("~/librandom", "hsl_randomseed", $seed);
 }

@@ -14,3 +14,13 @@ void hsl_random(struct hefesto_modio **modio) {
     *(int *)(*modio)->ret = (rand() %
                               (*((int *)(*modio)->args->data)));
 }
+
+void hsl_randomseed(struct hefesto_modio **modio) {
+    if ((*modio) == NULL || (*modio)->args == NULL ||
+        (*modio)->args->data == NULL) {
+        return;
+    }
+    (*modio)->rtype = HEFESTO_VAR_TYPE_NONE;
+    (*modio)->ret = NULL;
+    srand(*(int *)(*modio)->args->data);
+}

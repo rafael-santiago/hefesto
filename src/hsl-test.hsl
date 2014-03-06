@@ -12,9 +12,7 @@ include ~/accacia.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
-local function reverse_string(str type string) : result type string {
-    result "ab" + "C!!";
-}
+local function _reverse_string(str type string) : result type none { }
 
 mylab.prologue() {
     #test_buf_fucked_oh_no("C:\\hefesto");

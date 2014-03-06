@@ -52,7 +52,7 @@ struct hefesto_ldmod_table {
 
 #define HEFESTO_LDMOD_MAX_REF_COUNT 20
 
-struct hefesto_ldmod_table HEFESTO_LDMOD_TABLE[HEFESTO_LDMOD_TABLE_SIZE] = {
+static struct hefesto_ldmod_table HEFESTO_LDMOD_TABLE[HEFESTO_LDMOD_TABLE_SIZE] = {
     {"(null)", NULL, 0, "(null)", NULL},
     {"(null)", NULL, 0, "(null)", NULL},
     {"(null)", NULL, 0, "(null)", NULL},

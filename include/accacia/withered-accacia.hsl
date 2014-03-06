@@ -1,0 +1,63 @@
+#
+# "withered-accacia.hsl"
+#       by Rafael Santiago
+#
+#  A Windows mimic of accacia :-\
+#
+
+function accacia_gotoxy(x type int, y type int) : result type none { }
+
+function accacia_clrscr() : result type none { }
+
+function accacia_cursorup(y type int) : result type none { }
+
+function accacia_cursordown(y type int) : result type none { }
+
+function accacia_cursorforward(x type int) : result type none { }
+
+function accacia_cursorbackward(x type int) : result type none { }
+
+function accacia_delline() : result type none { }
+
+function accacia_savecursorposition() : result type none { }
+
+function accacia_restorecursorposition() : result type none { }
+
+function accacia_textcolor(color type string) : result type none { }
+
+function accacia_textbackground(color type string) : result type none { }
+
+function accacia_screennormalize() : result type none { }
+
+function accacia_textstyle(style type string) : result type none { }
+
+function accacia_drawbox(x type int, y type int, width type int, height type int, color type string) : result type none { }
+
+function accacia_drawboxwcharfill(x type int, y type int, width type int, height type int, fillchar type string, text_color type string, background_color type string) : result type none { }
+
+function accacia_drawtopmargin(x type int, y type int, width type int, title type string, title_color type string, margin_color type string, box_color type string) : result type none { }
+
+function accacia_drawbottommargin(x type int, y type int, width type int, height type int, title type string, title_color type string, margin_color type string, box_color type string) : result type none { }
+
+function accacia_drawleftmargin(x type int, y type int, height type int, margin_color type string, box_color type string) : result type none { }
+
+function accacia_drawrightmargin(x type int, y type int, width type int, height type int, margin_color type string, box_color type string) : result type none { }
+
+function accacia_drawboxgine(x type int, y type int, width type int, height type int, box_color type string, margin_color type string, top_title type string, top_title_color type string, bottom_title type string, bottom_title_color type string, margin_top type int, margin_bottom type int, margin_left type int, margin_right type int) : result type none { }
+
+function accacia_gets(buf type string) : result type none {
+    $buf = hefesto.sys.prompt("");
+    hefesto.sys.byref($buf);
+}
+
+function accacia_kbhit() : result type int {
+    result 1;
+}
+
+function accacia_getch() : result type int {
+    result 0;
+}
+
+function accacia_getkey() : result type int {
+    result 0;
+}
