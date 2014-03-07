@@ -1,0 +1,34 @@
+include ~/toolsets/gcc/gcc-lib.hsl
+include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+
+var sources type list;
+var includes type list;
+var cflags type list;
+var binary type string;
+
+var deps type string;
+
+project accacia : toolset "gcc-c-lib" : dependencies $deps : $sources,
+                                                             $includes,
+                                                             $cflags,
+                                                             $binary;
+
+accacia.prologue() {
+    $sources.ls(".*\\.c$");
+    $includes = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    if (hefesto.sys.os_name() != "windows") {
+        $binary = "libaccacia.so";
+    } else {
+        $binary = "libaccacia.dll";
+    }
+    $deps = get_c_cpp_deps();
+}
+
+accacia.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        hefesto.sys.echo("\n< " + hefesto.project.name() + " module forged >\n");
+    } else {
+        hefesto.sys.echo("\n< error in " + hefesto.project.name() + " module forge >\n");
+    }
+}

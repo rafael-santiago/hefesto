@@ -6,29 +6,34 @@ var exit_code type int;
 
 project hefesto-modules : toolset "no-tool-any-set" : 0;
 
-hefesto-modules.prologue() {
-    var cwd type list;
-    hefesto.sys.echo("-- Now forging all sub-projects... wait...\n\n");
-    $cwd = lsdir();
-    $exit_code = forge_projects($cwd);
-    var a type list;
-    var b type list;
-    var c type list;
-    ld_mod_dir_struct($a, $b, $c);
-    var d type int;
-    $d = 0;
-    while ($d < $a.count()) {
-        hefesto.sys.echo($a.item($d) + " - " + $b.item($d) + " - " + $c.item($d) + "\n");
-        $d = $d + 1;
-    }
+var publish type list;
 
+hefesto-modules.prologue() {
+    $publish = hefesto.sys.get_option("publish");
+    if ($publish.count() == 0) {
+        var cwd type list;
+        hefesto.sys.echo("-- Now forging all sub-projects... wait...\n\n");
+        $cwd = lsdir();
+        $exit_code = forge_projects($cwd);
+    } else {
+        hefesto.sys.echo("-- Now publishing all modules configurated in \"mod-dir-struct.conf\"... wait...\n\n");
+        $exit_code = publisher();
+    }
 }
 
 hefesto-modules.epilogue() {
-    if ($exit_code == 0) {
-        hefesto.sys.echo("\n-- Forge successful\n\n");
+    if ($publish.count() == 0) {
+        if ($exit_code == 0) {
+            hefesto.sys.echo("\n-- Forge successful\n\n");
+        } else {
+            hefesto.sys.echo("\n-- Forge failure!\n\n");
+        }
     } else {
-        hefesto.sys.echo("\n-- Forge failure!\n\n");
+        if ($exit_code == 0) {
+            hefesto.sys.echo("-- Published!\n\n");
+        } else {
+            hefesto.sys.echo("-- Publishing failure!\n\n");
+        }
     }
 }
 
@@ -126,10 +131,10 @@ local function ld_mod_dir_struct(platform type list, modname type list, target_s
     hefesto.sys.byref($target_subdir);
 }
 
-local function publisher() : result type int {
-    var published type int;
+function publisher() : result type int {
     var oldpath type string;
-    $published = 0;
+    var publishing_exit_code type int;
+    $publishing_exit_code = 1;
 
     # cleaning the modules directory
 #    $oldpath = hefesto.sys.pwd();
@@ -144,6 +149,48 @@ local function publisher() : result type int {
     # reading "mod-dir-struct.conf"
 
     ld_mod_dir_struct($platform, $modname, $target_subdir);
+    $publishing_exit_code = publish_modules($platform, $modname, $target_subdir);
 
-    result $published;
+    result $publishing_exit_code;
+}
+
+local function publish_modules(platform type list, modname type list, target_subdir type list) : result type int {
+    var i type int;
+    var platform_it type string;
+    var modname_it type string;
+    var target_subdir_it type string;
+    var src_path type string;
+    var dest_path type string;
+    var res type int;
+    var filter type string;
+    var exit_code type int;
+    $exit_code = 1;
+    $i = 0;
+    $res = 1;
+    while ($i < $platform.count() && $res == 1) {
+        $platform_it = $platform.item($i);
+        $filter = ".*" + hefesto.sys.os_name() + ".*";
+        if ($platform_it.match($filter) == 1) {
+            $modname_it = $modname.item($i);
+            $target_subdir_it = $target_subdir.item($i);
+            $src_path = hefesto.sys.make_path("src", $modname_it);
+            $src_path = hefesto.sys.make_path($src_path, "bin");
+            $dest_path = hefesto.sys.make_path("../../module", $modname_it);
+            if (isdir($dest_path) == 0) {
+                hefesto.sys.mkdir($dest_path);
+            }
+            hefesto.sys.echo("-- Copying from " + hefesto.sys.make_path($src_path, "*") + " to " + $dest_path + "...\n");
+            $res = hefesto.sys.cp($src_path, $dest_path);
+            if ($res == 0) {
+                hefesto.sys.echo("-- Failure...\n\n");
+            } else {
+                hefesto.sys.echo("-- Done.\n\n");
+            }
+        }
+        $i = $i + 1;
+    }
+    if ($res == 1) {
+        $exit_code = 0;
+    }
+    result $exit_code;
 }
