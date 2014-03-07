@@ -1622,6 +1622,7 @@ static void *hefesto_sys_byref(const char *syscall,
                             if (vp_d->contents) {
                                 vp_d->contents =
                                     cp_hefesto_common_list_ctx(vp_s->contents);
+                                vp_d->subtype = vp_s->subtype;
                             } else {
                                 hlsc_info(HLSCM_MTYPE_RUNTIME,
                                     HLSCM_RUNTIME_ERROR_BYREF_UNINITZD_SRC_VAR,

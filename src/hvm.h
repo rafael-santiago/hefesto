@@ -10,6 +10,8 @@
 
 #include "types.h"
 
+void hvm_set_last_executed_function(hefesto_func_list_ctx *function);
+
 void hvm_set_current_executed_function(hefesto_func_list_ctx *function);
 
 hefesto_func_list_ctx *hvm_get_current_executed_function();

@@ -67,6 +67,7 @@ struct stacked_function_execution_point_ctx *hvm_save_execution_point(
     }
 
     exec_point_p->curr_code = hvm_get_current_executed_function();
+    exec_point_p->last_code = hvm_get_last_executed_function();
     HEFESTO_DEBUG_INFO("-- FUNCTION %s CONTEXT SAVED\n",
                        hvm_get_current_executed_function()->name);
     return exec_point_p;
@@ -111,6 +112,7 @@ void hvm_restore_execution_point(hefesto_func_list_ctx **function,
     }
 
     hvm_set_current_executed_function(execution_point->curr_code);
+    hvm_set_last_executed_function(execution_point->last_code);
     HEFESTO_DEBUG_INFO("-- FUNCTION %s CONTEXT RESTORED\n",
                        hvm_get_current_executed_function()->name);
 

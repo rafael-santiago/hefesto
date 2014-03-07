@@ -30,3 +30,4 @@ random.epilogue() {
         hefesto.sys.echo("\n< error in " + hefesto.project.name() + " module forge >\n");
     }
 }
+

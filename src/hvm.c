@@ -64,6 +64,10 @@ hefesto_func_list_ctx *hvm_current_executed_function = NULL;
 
 hefesto_func_list_ctx *hvm_last_executed_function = NULL;
 
+void hvm_set_last_executed_function(hefesto_func_list_ctx *function) {
+    hvm_last_executed_function = function;
+}
+
 void hvm_set_current_executed_function(hefesto_func_list_ctx *function) {
     hvm_last_executed_function = hvm_current_executed_function;
     hvm_current_executed_function = function;

@@ -11,6 +11,17 @@ hefesto-modules.prologue() {
     hefesto.sys.echo("-- Now forging all sub-projects... wait...\n\n");
     $cwd = lsdir();
     $exit_code = forge_projects($cwd);
+    var a type list;
+    var b type list;
+    var c type list;
+    ld_mod_dir_struct($a, $b, $c);
+    var d type int;
+    $d = 0;
+    while ($d < $a.count()) {
+        hefesto.sys.echo($a.item($d) + " - " + $b.item($d) + " - " + $c.item($d) + "\n");
+        $d = $d + 1;
+    }
+
 }
 
 hefesto-modules.epilogue() {
@@ -19,4 +30,120 @@ hefesto-modules.epilogue() {
     } else {
         hefesto.sys.echo("\n-- Forge failure!\n\n");
     }
+}
+
+# Module publishing stuff
+
+local function clean_directory(dir type list) : result type none {
+    var d type int;
+    var curr_path type string;
+    var old_path type string;
+    $d = 0;
+    while ($d < $dir.count()) {
+        $curr_path = $dir.item($d);
+        if (isdir($curr_path) == 1) {
+            $old_path = hefesto.sys.pwd();
+            hefesto.sys.cd($curr_path);
+            clean_directory(lsdir());
+            hefesto.sys.cd($old_path);
+            hefesto.sys.rmdir($curr_path);
+        } else {
+            hefesto.sys.rm($curr_path);
+        }
+        $d = $d + 1;
+    }
+}
+
+local function is_comment(line type string) : result type int {
+    var l type int;
+    $l = 0;
+    while (($line.at($l) == "\n") ||
+           ($line.at($l) == "\r") ||
+           ($line.at($l) == " ")  ||
+           ($line.at($l) == "\t") &&
+           ($l < $line.len())) {
+        $l = $l + 1;
+    }
+    result ($line.at($l) == "#");
+}
+
+local function is_blankline(line type string) : result type int {
+    var l type int;
+    var is_blankline type int;
+    $is_blankline = 1;
+    $l = 0;
+    while (($is_blankline == 1) && ($l < $line.len())) {
+        $is_blankline = ($line.at($l) == "\n") ||
+                        ($line.at($l) == "\r") ||
+                        ($line.at($l) == "\t") ||
+                        ($line.at($l) == " ");
+        $l = $l + 1;
+    }
+    result $is_blankline;
+}
+
+local function ld_mod_dir_struct(platform type list, modname type list, target_subdir type list) : result type none {
+    var raw_file type list;
+    var r type int;
+    var line type string;
+    var l type int;
+    var data2add type string;
+    var state type int;
+    $raw_file = hefesto.sys.lines_from_file("mod-dir-struct.conf", ".*");
+    $r = 0;
+    while ($r < $raw_file.count()) {
+        $line = $raw_file.item($r);
+        if ((is_blankline($line) == 0) &&
+            (is_comment($line) == 0)) {
+            $state = 0;
+            $l = 0;
+            while ($state < 3) {
+                while (($line.at($l) == " ") ||
+                       ($line.at($l) == "\t")) {
+                    $l = $l + 1;
+                }
+                $data2add = "";
+                while (($l < $line.len()) &&
+                       ($line.at($l) != " ") &&
+                       ($line.at($l) != "\t")) {
+                    $data2add = $data2add + $line.at($l);
+                    $l = $l + 1;
+                }
+                if ($state == 0) {
+                    $platform.add_item($data2add);
+                } else if ($state == 1) {
+                    $modname.add_item($data2add);
+                } else if ($state == 2) {
+                    $target_subdir.add_item($data2add);
+                }
+                $state = $state + 1;
+            }
+        }
+        $r = $r + 1;
+    }
+    hefesto.sys.byref($platform);
+    hefesto.sys.byref($modname);
+    hefesto.sys.byref($target_subdir);
+}
+
+local function publisher() : result type int {
+    var published type int;
+    var oldpath type string;
+    $published = 0;
+
+    # cleaning the modules directory
+#    $oldpath = hefesto.sys.pwd();
+#    hefesto.sys.cd("../../module");
+#    clean_directory(lsdir());
+#    hefesto.sys.cd($oldpath);
+
+    var platform type list;
+    var modname type list;
+    var target_subdir type list;
+
+    # reading "mod-dir-struct.conf"
+
+    ld_mod_dir_struct($platform, $modname, $target_subdir);
+
+    result $published;
 }

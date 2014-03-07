@@ -288,11 +288,12 @@ static void *hvm_list_add_item(const char *method,
     }
 
     *list_var = add_data_to_hefesto_common_list_ctx(*list_var, data, outsz);
-    HEFESTO_DEBUG_INFO(0, "hvm_list/add: dummy:%d %s\n", 
+    HEFESTO_DEBUG_INFO(0, "hvm_list/add: dummy:%d %s\n",
                 (*list_var)->is_dummy_item,
                 get_hefesto_common_list_ctx_tail(*list_var)->data);
 
     free(data);
+    free(arg);
 
     result = (void *) hefesto_mloc(sizeof(int));
     *(int *)result = 1;
