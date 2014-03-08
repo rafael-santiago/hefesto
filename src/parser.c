@@ -1347,7 +1347,8 @@ static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
                 fseek(fp, offset, SEEK_SET);
                 *prj_functions[p].fn_p =
                     add_func_to_hefesto_func_list_ctx(*prj_functions[p].fn_p,
-                                                      decl_label, NULL, 1,
+                                                      decl_label,
+                                              get_current_compile_input(), 1,
                                                       HEFESTO_VAR_TYPE_NONE);
                 fn_ptr = get_hefesto_func_list_ctx_tail(*prj_functions[p].fn_p);
                 if ((result = compile_code(fn_ptr, functions, gl_vars, NULL, fp,

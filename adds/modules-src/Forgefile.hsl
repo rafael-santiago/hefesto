@@ -131,7 +131,7 @@ local function ld_mod_dir_struct(platform type list, modname type list, target_s
     hefesto.sys.byref($target_subdir);
 }
 
-function publisher() : result type int {
+local function publisher() : result type int {
     var oldpath type string;
     var publishing_exit_code type int;
     $publishing_exit_code = 1;
