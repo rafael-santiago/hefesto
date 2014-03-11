@@ -89,7 +89,7 @@ hefesto.epilogue() {
             $install = hefesto.sys.get_option("install");
             if ($install.count() > 0) {
                 hefesto.sys.cd("../setup");
-                hefesto.sys.forge("hefesto-install", "hfst-inst.hls", "");
+                hefesto.sys.forge("hefesto-install", "hfst-inst.hsl", "");
                 hefesto.sys.cd("../src");
             } else {
                 var releasebuild type list;
