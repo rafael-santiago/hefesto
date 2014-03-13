@@ -9,6 +9,7 @@ include ~/generators/devcpp_project_generator.hsl
 include ~/generators/codeblocks_project_generator.hsl
 include ~/generators/visualstudio_project_generator.hsl
 include ~/accacia.hsl
+include ~/not.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
 
@@ -195,9 +196,30 @@ mylab.prologue() {
 #    hefesto.sys.echo($buf + "\n");
 #    accacia_screennormalize();
 #    accacia_delline();
-    while (accacia_kbhit() == 0) {
-        hefesto.sys.echo(".\n");
+#    while (accacia_kbhit() == 0) {
+#        hefesto.sys.echo(".\n");
+#    }
+    hefesto.sys.echo("RESULT = " + mk_output_filename("filme-do-pele.wmv", "mp4conversor") + "\n");
+
+    if (not(isdir("tests"))) {
+        hefesto.sys.echo("It's not a dir!\n");
+    } else {
+        hefesto.sys.echo("It's a dir!\n");
     }
+}
+
+function mk_output_filename(filename type string, task type string) : result type string {
+    var ext type string;
+    if ($task == "mp4conversor") {
+        $ext = ".mp4";
+    } else if ($task == "mp3fromvid") {
+        $ext = ".mp3";
+    } else {
+        $ext = "";
+    }
+    if ($ext.len() > 0)
+        $filename.replace("\\..*$", $ext);
+    result $filename;
 }
 
 function get_c_cpp_deps_() : result type string {

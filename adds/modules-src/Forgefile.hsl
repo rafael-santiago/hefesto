@@ -16,7 +16,9 @@ hefesto-modules.prologue() {
         $cwd = lsdir();
         $exit_code = forge_projects($cwd);
     } else {
-        hefesto.sys.echo("-- Now publishing all modules configurated in \"mod-dir-struct.conf\"... wait...\n\n");
+        hefesto.sys.echo("-- Now publishing all modules " +
+                         "configurated in \"mod-dir-struct.conf\"" +
+                         "... wait...\n\n");
         $exit_code = publisher();
     }
 }
@@ -43,6 +45,18 @@ local function clean_directory(dir type list) : result type none {
     var d type int;
     var curr_path type string;
     var old_path type string;
+    var files type list;
+
+    $files.ls(".*");
+    $d = 0;
+    while ($d < $files.count()) {
+        $curr_path = $files.item($d);
+        if (isdir($curr_path) == 0 && $curr_path.match("README") == 0) {
+            hefesto.sys.rm($curr_path);
+        }
+        $d = $d + 1;
+    }
+
     $d = 0;
     while ($d < $dir.count()) {
         $curr_path = $dir.item($d);
@@ -52,8 +66,6 @@ local function clean_directory(dir type list) : result type none {
             clean_directory(lsdir());
             hefesto.sys.cd($old_path);
             hefesto.sys.rmdir($curr_path);
-        } else {
-            hefesto.sys.rm($curr_path);
         }
         $d = $d + 1;
     }
@@ -87,7 +99,8 @@ local function is_blankline(line type string) : result type int {
     result $is_blankline;
 }
 
-local function ld_mod_dir_struct(platform type list, modname type list, target_subdir type list) : result type none {
+local function ld_mod_dir_struct(platform type list, modname type list,
+                                 target_subdir type list) : result type none {
     var raw_file type list;
     var r type int;
     var line type string;
@@ -137,10 +150,10 @@ local function publisher() : result type int {
     $publishing_exit_code = 1;
 
     # cleaning the modules directory
-#    $oldpath = hefesto.sys.pwd();
-#    hefesto.sys.cd("../../module");
-#    clean_directory(lsdir());
-#    hefesto.sys.cd($oldpath);
+    $oldpath = hefesto.sys.pwd();
+    hefesto.sys.cd("../../module");
+    clean_directory(lsdir());
+    hefesto.sys.cd($oldpath);
 
     var platform type list;
     var modname type list;
@@ -154,7 +167,8 @@ local function publisher() : result type int {
     result $publishing_exit_code;
 }
 
-local function publish_modules(platform type list, modname type list, target_subdir type list) : result type int {
+local function publish_modules(platform type list, modname type list,
+                               target_subdir type list) : result type int {
     var i type int;
     var platform_it type string;
     var modname_it type string;
@@ -179,7 +193,9 @@ local function publish_modules(platform type list, modname type list, target_sub
             if (isdir($dest_path) == 0) {
                 hefesto.sys.mkdir($dest_path);
             }
-            hefesto.sys.echo("-- Copying from " + hefesto.sys.make_path($src_path, "*") + " to " + $dest_path + "...\n");
+            hefesto.sys.echo("-- Copying from " +
+                             hefesto.sys.make_path($src_path, "*") + " to " +
+                             $dest_path + "...\n");
             $res = hefesto.sys.cp($src_path, $dest_path);
             if ($res == 0) {
                 hefesto.sys.echo("-- Failure...\n\n");

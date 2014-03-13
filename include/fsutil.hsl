@@ -110,19 +110,8 @@ function filenamefrompath(fullpath type string) : result type string {
 function isdir(path type string) : result type int {
     var old_cwd type string;
     var exists type int;
-    $exists = 0;
     $old_cwd = hefesto.sys.pwd();
-    hefesto.sys.cd($path);
-    if (hefesto.sys.os_name() != "windows") {
-        if (hefesto.sys.pwd() == $path) {
-            $exists = 1;
-        }
-    } else {
-        if (hefesto.sys.pwd() == $path ||
-            hefesto.sys.pwd() == ($path + "\\")) {
-            $exists = 1;
-        }
-    }
+    $exists = hefesto.sys.cd($path);
     hefesto.sys.cd($old_cwd);
     result $exists;
 }
