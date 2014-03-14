@@ -11,17 +11,29 @@ toolset "hefesto-self-installer" # Dummie toolset
  forge function "hfst_install" :
 $
 
+function lsdir() : result type list {
+    var retval type list;
+    var temp type list;
+    var path type string;
+    $temp.ls(".*");
+    var t type int;
+    $t = 0;
+    while ($t < $temp.count()) {
+        $path = $temp.item($t);
+        if (is_dir($path) == 1) {
+            $retval.add_item($path);
+        }
+        $t = $t + 1;
+    }
+    result $retval;
+}
+
 function is_dir(path type string) : result type int {
     var old_cwd type string;
     var is_dir type int;
     $old_cwd = hefesto.sys.pwd();
-    hefesto.sys.cd($path);
-    $is_dir = 0;
-    if (hefesto.sys.pwd() == $path ||
-        hefesto.sys.pwd() == ($path + "\\")) {
-        $is_dir = 1;
-        hefesto.sys.cd($old_cwd);
-    }
+    $is_dir = hefesto.sys.cd($path);
+    hefesto.sys.cd($old_cwd);
     result $is_dir;
 }
 
@@ -400,7 +412,7 @@ function unexport_env_hefesto_var() : result type int {
     result $unexported;
 }
 
-function brk_test() : result type int {
+function brk_test() : result type int { # WTF???! I don't know....
     var i type int;
     $i = 0;
     while ($i < 100) {
@@ -674,6 +686,108 @@ function is_already_installed(install_dir type string) : result type int {
     result $is_installed;
 }
 
+function shorten_path(path type string, from_dir type string) : result type string {
+    var p type int;
+    var pp type int;
+    var end_at type int;
+    var atom type string;
+    $p = 0;
+    $end_at = 0;
+    while ($p < $path.len() && $atom != $from_dir) {
+        $pp = $p;
+        $end_at = $pp;
+        $atom = "";
+        while ($atom.len() < $from_dir.len()) {
+            $atom = $atom + $path.at($pp);
+            $pp = $pp + 1;
+        }
+        $p = $p + 1;
+    }
+    $p = 0;
+    $atom = "";
+    while ($p < $end_at) {
+        $atom = $atom + $path.at($p);
+        if ($path.at($p) == "\\") {
+            $atom = $atom + "\\";
+        }
+        $p = $p + 1;
+    }
+    if (hefesto.sys.os_name() != "windows") {
+        $path.replace($atom, "../");
+    } else {
+        $path.replace($atom, "..\\");
+    }
+    result $path;
+}
+
+function prep_mod_src_paths_aux(subdirs type list) : result type list {
+    var retval type list;
+    var s type int;
+    var f type int;
+    var files type list;
+    var path type string;
+    $files.ls(".*");
+    $f = 0;
+    while ($f < $files.count()) {
+        $path = $files.item($f);
+        if (is_dir($path) == 0) {
+            $retval.add_item(shorten_path($path, "module"));
+        }
+        $f = $f + 1;
+    }
+    $s = 0;
+    while ($s < $subdirs.count()) {
+        $path = $subdirs.item($s);
+        hefesto.sys.cd($path);
+        $files.clear();
+        $files = prep_mod_src_paths_aux(lsdir());
+        $f = 0;
+        while ($f < $files.count()) {
+            $path = $files.item($f);
+            if ($retval.index_of($path) == -1) {
+                $retval.add_item($path);
+            }
+            $f = $f + 1;
+        }
+        $s = $s + 1;
+    }
+    result $retval;
+}
+
+function prepare_modules_src_paths(sources type list) : result type none {
+    var modfiles type list;
+    var m type int;
+    var oldpath type string;
+    $oldpath = hefesto.sys.pwd();
+    hefesto.sys.cd("../module");
+    $modfiles = prep_mod_src_paths_aux(lsdir());
+    hefesto.sys.cd($oldpath);
+    $m = 0;
+    while ($m < $modfiles.count()) {
+        $oldpath = $modfiles.item($m);
+        $sources.add_item($oldpath);
+        $m = $m + 1;
+    }
+    hefesto.sys.byref($sources);
+}
+
+function prepare_modules_dest_paths(dests type list, install_dir type string) : result type none {
+    var stage_list type list;
+    var s type int;
+    var dest_path type string;
+    var module_dir type string;
+    prepare_modules_src_paths($stage_list);
+    $module_dir = hefesto.sys.make_path($install_dir, "module");
+    $s = 0;
+    while ($s < $stage_list.count()) {
+        $dest_path = $stage_list.item($s);
+        $dest_path.replace("\\.\\.[/\\\\]module", $module_dir);
+        $dests.add_item($dest_path);
+        $s = $s + 1;
+    }
+    hefesto.sys.byref($dests);
+}
+
 var install_dir type string;
 var source_files type list;
 var dest_files type list;
@@ -690,9 +804,9 @@ hefesto-install.prologue() {
     var os_name type string;
     var prompt_str type string;
     var install_dir_opt type list;
-    
+
     $cancel = 0;
-    
+
     $uninst_opt = hefesto.sys.get_option("uninstall");
 
     $os_name = hefesto.sys.os_name();
@@ -760,7 +874,7 @@ hefesto-install.prologue() {
 
     # The modules
 
-    $source_files.add_item("../module/README");
+    prepare_modules_src_paths($source_files);
 
     # The standard hls scripts
 
@@ -818,7 +932,7 @@ hefesto-install.prologue() {
         # Binaries
         $dest_files.add_item("/usr/local/bin/hefesto");
         # The modules
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "module/README"));
+        prepare_modules_dest_paths($dest_files, $install_dir);
         # The standard hls scripts
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hls"));
