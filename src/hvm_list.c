@@ -495,7 +495,7 @@ static void *hvm_list_del_index(const char *method,
     char *arg;
     size_t offset = 0, outsz;
     void *data;
-    hefesto_type_t etype;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
     hefesto_var_list_ctx *vp;
     hefesto_common_list_ctx *item;
 
