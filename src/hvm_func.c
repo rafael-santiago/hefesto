@@ -192,7 +192,7 @@ void hvm_init_function_args(const char *args,
     void *expr_result;
     hefesto_type_t etype;
     size_t sz;
-    hefesto_var_list_ctx *vp = (*function)->vars, *ap = (*function)->args;
+    hefesto_var_list_ctx *vp = (*function)->vars, *ap = (*function)->args, *vlp;
     size_t offset = 0;
     hefesto_instruction_code_t c_intr = hvm_get_current_executed_instruction();
     char *temp = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
@@ -234,6 +234,12 @@ void hvm_init_function_args(const char *args,
                                 (hvm_get_last_executed_function() == *function) ? 
                                            &(*function)->vars : lo_vars, gl_vars,
                                 functions, &etype, &sz);
+        if (*expr_pfix == '$') {
+            vlp = get_hefesto_var_list_ctx_name(expr_pfix + 1, *lo_vars);
+            if (vlp == NULL) {
+                vlp = get_hefesto_var_list_ctx_name(expr_pfix + 1, *gl_vars);
+            }
+        }
         free(expr_pfix);
 #ifdef HEFESTO_DEBUG
         if (etype == HEFESTO_VAR_TYPE_STRING) {
@@ -258,6 +264,17 @@ void hvm_init_function_args(const char *args,
                                             strlen((char*)expr_result) : sizeof(int));
             free(expr_result);
         } else {
+            if (vlp != NULL) {
+                vp->subtype = vlp->subtype;
+            } else {
+                if (((hefesto_common_list_ctx *)expr_result)->data &&
+                     is_hefesto_numeric_constant(((hefesto_common_list_ctx *)
+                                                    expr_result)->data)) {
+                    vp->subtype = HEFESTO_VAR_TYPE_INT;
+                } else {
+                    vp->subtype = HEFESTO_VAR_TYPE_STRING;
+                }
+            }
             vp->contents =
               cp_hefesto_common_list_ctx((hefesto_common_list_ctx *)expr_result);
             del_hefesto_common_list_ctx((hefesto_common_list_ctx *)expr_result);

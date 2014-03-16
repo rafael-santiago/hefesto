@@ -980,7 +980,7 @@ hefesto-install.prologue() {
         # Binaries
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "bin\\hefesto.exe"));
         # The modules
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "module\\README"));
+        prepare_modules_dest_paths($dest_files, $install_dir);
         # The standard hls scripts
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hls"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hls"));

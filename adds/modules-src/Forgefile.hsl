@@ -167,6 +167,104 @@ local function publisher() : result type int {
     result $publishing_exit_code;
 }
 
+local function get_dest_path(filepath type string,
+                            src_root type string,
+                            dest_root type string) :
+                    result type string {
+    var regex type string;
+    var s type int;
+    $s = 0;
+    while ($s < $src_root.len()) {
+        $regex = $regex + $src_root.at($s);
+        if ($src_root.at($s) == "\\") {
+            $regex = $regex + "\\";
+        }
+        $s = $s + 1;
+    }
+    $regex = ".*" + $regex;
+    $filepath.replace($regex, $dest_root);
+    result $filepath;
+}
+
+local function mk_dest_path(dest_filepath type string) : result type int {
+    var end_at type int;
+    $end_at = $dest_filepath.len() - 1;
+    while (1) {
+        if (hefesto.sys.os_name() == "windows") {
+            if ($dest_filepath.at($end_at) == "\\" ||
+                $dest_filepath.at($end_at) == "/") {
+                break;
+            }
+        } else {
+            if ($dest_filepath.at($end_at) == "/") {
+                break;
+            }
+        }
+        $end_at = $end_at - 1;
+    }
+    var e type int;
+    var path type string;
+    $e = 0;
+    while ($e < $end_at) {
+        $path = $path + $dest_filepath.at($e);
+        $e = $e + 1;
+    }
+    result mktree($path);
+}
+
+local function mirror_files(files type list,
+                            src_root type string,
+                            dest_root type string,
+                            base_dir type string) :
+                    result type int {
+    var f type int;
+    var filepath type string;
+    var subfiles type list;
+    var dest_filepath type string;
+    var all_okay type int;
+    $f = 0;
+    $all_okay = 1;
+    while ($f < $files.count() && $all_okay == 1) {
+        $filepath = $files.item($f);
+        if (isdir($filepath)) {
+            hefesto.sys.cd($filepath);
+            $subfiles.ls(".*");
+            mirror_files($subfiles, $src_root, $dest_root, $base_dir);
+        } else {
+            $dest_filepath = get_dest_path($filepath, $src_root, $dest_root);
+            hefesto.sys.echo("-- Copying " + $filepath + " to " + $dest_filepath + "\n");
+            $all_okay = hefesto.sys.cd($base_dir);
+            if ($all_okay == 1) {
+                $all_okay = mk_dest_path($dest_filepath);
+            }
+            if ($all_okay == 1) {
+                hefesto.sys.cp($filepath, $dest_filepath);
+            }
+            if ($all_okay == 1) {
+                hefesto.sys.echo("-- Done.\n");
+            } else {
+                hefesto.sys.echo("-- Failure.\n");
+            }
+        }
+        $f = $f + 1;
+    }
+    result $all_okay;
+}
+
+local function mirror_hsl_directory_struct(hsl_src_path type string,
+                                           hsl_dest_path type string) :
+                                           result type int {
+    var retval type int;
+    var oldcwd type string;
+    var files type list;
+    $oldcwd = hefesto.sys.pwd();
+    hefesto.sys.cd($hsl_src_path);
+    $files.ls(".*");
+    $retval = mirror_files($files, $hsl_src_path, $hsl_dest_path, $oldcwd);
+    hefesto.sys.cd($oldcwd);
+    result $retval;
+}
+
 local function publish_modules(platform type list, modname type list,
                                target_subdir type list) : result type int {
     var i type int;
@@ -189,7 +287,11 @@ local function publish_modules(platform type list, modname type list,
             $target_subdir_it = $target_subdir.item($i);
             $src_path = hefesto.sys.make_path("src", $modname_it);
             $src_path = hefesto.sys.make_path($src_path, "bin");
-            $dest_path = hefesto.sys.make_path("../../module", $modname_it);
+            if ($target_subdir_it != "") {
+                $dest_path = hefesto.sys.make_path("../../module", $target_subdir_it);
+            } else {
+                $dest_path = "../../module";
+            }
             if (isdir($dest_path) == 0) {
                 hefesto.sys.mkdir($dest_path);
             }
@@ -201,6 +303,19 @@ local function publish_modules(platform type list, modname type list,
                 hefesto.sys.echo("-- Failure...\n\n");
             } else {
                 hefesto.sys.echo("-- Done.\n\n");
+            }
+            hefesto.sys.echo("-- Now mirroring " + $modname_it + "'s hsl stuff...\n\n");
+            $src_path = hefesto.sys.make_path("src", $modname_it);
+            $src_path = hefesto.sys.make_path($src_path, "hsl");
+            if ($target_subdir_it != "") {
+                $dest_path = hefesto.sys.make_path("../../module", $target_subdir_it);
+            } else {
+                $dest_path = "../../module";
+            }
+            if (mirror_hsl_directory_struct($src_path, $dest_path) == 1) {
+                hefesto.sys.echo("\n-- Mirroring success!\n\n");
+            } else {
+                hefesto.sys.echo("\n-- Mirroring failure...\n\n");
             }
         }
         $i = $i + 1;
