@@ -11,7 +11,7 @@ toolset "hefesto-self-installer" # Dummie toolset
  forge function "hfst_install" :
 $
 
-function lsdir() : result type list {
+local function lsdir() : result type list {
     var retval type list;
     var temp type list;
     var path type string;
@@ -28,7 +28,38 @@ function lsdir() : result type list {
     result $retval;
 }
 
-function is_dir(path type string) : result type int {
+local function rmtree(subdir type list) : result type int {
+    var files type list;
+    var f type int;
+    var filepath type string;
+    var rm type int;
+    var oldcwd type string;
+    $oldcwd = hefesto.sys.pwd();
+    $files.clear();
+    $files.ls(".*");
+    $f = 0;
+    $rm = 0;
+    while ($f < $files.count() && $rm == 0) {
+        $filepath = $files.item($f);
+        if (is_dir($filepath) == 0) {
+            $rm = hefesto.sys.rm($filepath);
+        }
+        $f = $f + 1;
+    }
+    $f = 0;
+    while ($f < $subdir.count() && $rm == 0) {
+        $filepath = $subdir.item($f);
+        hefesto.sys.cd($filepath);
+        $rm = rmtree(lsdir());
+        $f = $f + 1;
+    }
+    if ($rm == 0) {
+        $rm = hefesto.sys.rmdir($oldcwd);
+    }
+    result $rm;
+}
+
+local function is_dir(path type string) : result type int {
     var old_cwd type string;
     var is_dir type int;
     $old_cwd = hefesto.sys.pwd();
@@ -37,7 +68,7 @@ function is_dir(path type string) : result type int {
     result $is_dir;
 }
 
-function path_exists(path type string) : result type int {
+local function path_exists(path type string) : result type int {
     var old_cwd type string;
     var exists type int;
     $exists = 0;
@@ -57,7 +88,7 @@ function path_exists(path type string) : result type int {
     result $exists;
 }
 
-function create_dir_tree(path type string) : result type int {
+local function create_dir_tree(path type string) : result type int {
     var path_elements type list;
     var p type int;
     var p_sz type int;
@@ -119,7 +150,7 @@ function create_dir_tree(path type string) : result type int {
     result $res;
 }
 
-function get_path_from_filepath(filepath type string) : result type string {
+local function get_path_from_filepath(filepath type string) : result type string {
 
     var filepath_sz type int;
     var f type int;
@@ -152,7 +183,7 @@ function get_path_from_filepath(filepath type string) : result type string {
 
 }
 
-function tolwrcase(str type string) : result type string {
+local function tolwrcase(str type string) : result type string {
     var lwr_str type string;
     var s type int;
     $s = 0;
@@ -217,7 +248,7 @@ function tolwrcase(str type string) : result type string {
     result $lwr_str;
 }
 
-function export_env_hefesto_var(install_dir type string) : result type int {
+local function export_env_hefesto_var(install_dir type string) : result type int {
 
     var os_name type string;
     var exported type int;
@@ -293,13 +324,13 @@ function export_env_hefesto_var(install_dir type string) : result type int {
 
 }
 
-function get_windows_path_env_var_content() : result type string {
+local function get_windows_path_env_var_content() : result type string {
     var path type string;
     $path = hefesto.sys.env("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\PATH");
     result $path;
 }
 
-function serialize_env_path(path type string) : result type list {
+local function serialize_env_path(path type string) : result type list {
     var item type string;
     var p type int;
     var path_lst type list;
@@ -319,7 +350,7 @@ function serialize_env_path(path type string) : result type list {
     result $path_lst;
 }
 
-function serialize_profile_file() : result type list {
+local function serialize_profile_file() : result type list {
     var profd type file;
     var line type string;
     var byte type string;
@@ -345,7 +376,7 @@ function serialize_profile_file() : result type list {
     result $lst;
 }
 
-function flush_profile_file(content type list) : result type int {
+local function flush_profile_file(content type list) : result type int {
     var ret type int;
     var c type int;
     var profd type file;
@@ -368,7 +399,7 @@ function flush_profile_file(content type list) : result type int {
     result $ret;
 }
 
-function unexport_env_hefesto_var() : result type int {
+local function unexport_env_hefesto_var() : result type int {
     var os_name type string;
     var unexported type int;
     $unexported = 0;
@@ -412,7 +443,7 @@ function unexport_env_hefesto_var() : result type int {
     result $unexported;
 }
 
-function brk_test() : result type int { # WTF???! I don't know....
+local function brk_test() : result type int { # WTF???! I don't know....
     var i type int;
     $i = 0;
     while ($i < 100) {
@@ -433,7 +464,7 @@ function brk_test() : result type int { # WTF???! I don't know....
     result 0;
 }
 
-function hfst_install(install_dir type string, source_files type list, dest_files type list) : result type int {
+local function hfst_install(install_dir type string, source_files type list, dest_files type list) : result type int {
 
     var paths_to_create type list;
     var temp type string;
@@ -520,7 +551,7 @@ function hfst_install(install_dir type string, source_files type list, dest_file
 
 }
 
-function windows_rm_paths_on_reboot(paths type list) : result type none {
+local function windows_rm_paths_on_reboot(paths type list) : result type none {
     var p type int;
     var reg_cmd type string;
     var rm_cmd type string;
@@ -542,7 +573,7 @@ function windows_rm_paths_on_reboot(paths type list) : result type none {
     hefesto.sys.setenv("WINREG:HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\hfstbootrm", $rm_cmd);
 }
 
-function hfst_uninstall(install_dir type string, source_files type list) : result type int {
+local function hfst_uninstall(install_dir type string, source_files type list) : result type int {
     var subdirs type list;
     var hhh type list;
     var sz type int;
@@ -638,6 +669,18 @@ function hfst_uninstall(install_dir type string, source_files type list) : resul
         $i = $i + 1;
     }
 
+    # modules directory
+    hefesto.sys.echo("\tRemoving modules directory... ");
+    $temp = hefesto.sys.pwd();
+    $regex = hefesto.sys.make_path($install_dir, "module");
+    hefesto.sys.cd($regex);
+    if (rmtree(lsdir()) == 0) {
+        hefesto.sys.echo("ok!\n");
+    } else {
+        hefesto.sys.echo("error...\n");
+    }
+    hefesto.sys.cd($temp);
+
     hefesto.sys.echo("\tRemoving directory " + $install_dir + "... ");
     if (hefesto.sys.rmdir($install_dir) == 0) {
         hefesto.sys.echo("ok!\n");
@@ -672,21 +715,21 @@ function hfst_uninstall(install_dir type string, source_files type list) : resul
     result 0;
 }
 
-function is_already_installed(install_dir type string) : result type int {
+local function is_already_installed(install_dir type string) : result type int {
     var filename type string;
     var old_cwd type string;
     var is_installed type int;
     $is_installed = 0;
     $old_cwd = hefesto.sys.pwd();
     $filename = hefesto.sys.make_path($install_dir, "setup");
-    if (hefesto.sys.cd($filename) == 1) {    
-        $is_installed = (hefesto.sys.ls("hfst\\-inst.hls") == 1);
+    if (hefesto.sys.cd($filename) == 1) {
+        $is_installed = (hefesto.sys.ls("hfst\\-inst.hsl") == 1);
         hefesto.sys.cd($old_cwd);
     }
     result $is_installed;
 }
 
-function shorten_path(path type string, from_dir type string) : result type string {
+local function shorten_path(path type string, from_dir type string) : result type string {
     var p type int;
     var pp type int;
     var end_at type int;
@@ -720,7 +763,7 @@ function shorten_path(path type string, from_dir type string) : result type stri
     result $path;
 }
 
-function prep_mod_src_paths_aux(subdirs type list) : result type list {
+local function prep_mod_src_paths_aux(subdirs type list) : result type list {
     var retval type list;
     var s type int;
     var f type int;
@@ -754,7 +797,7 @@ function prep_mod_src_paths_aux(subdirs type list) : result type list {
     result $retval;
 }
 
-function prepare_modules_src_paths(sources type list) : result type none {
+local function prepare_modules_src_paths(sources type list) : result type none {
     var modfiles type list;
     var m type int;
     var oldpath type string;
@@ -771,7 +814,7 @@ function prepare_modules_src_paths(sources type list) : result type none {
     hefesto.sys.byref($sources);
 }
 
-function prepare_modules_dest_paths(dests type list, install_dir type string) : result type none {
+local function prepare_modules_dest_paths(dests type list, install_dir type string) : result type none {
     var stage_list type list;
     var s type int;
     var dest_path type string;
@@ -873,48 +916,49 @@ hefesto-install.prologue() {
     }
 
     # The modules
-
-    prepare_modules_src_paths($source_files);
+    if ($uninst_opt.count() == 0) {
+        prepare_modules_src_paths($source_files);
+    }
 
     # The standard hls scripts
 
-    $source_files.add_item("../include/toolsets/common/utils/lang/c/dependency_scanner.hls");
-    $source_files.add_item("../include/toolsets/gcc/forges/common.hls");
-    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_app_forge.hls");
-    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_lib_forge.hls");
-    $source_files.add_item("../include/toolsets/gcc/gcc-app.hls");
-    $source_files.add_item("../include/toolsets/gcc/gcc-lib.hls");
+    $source_files.add_item("../include/toolsets/common/utils/lang/c/dependency_scanner.hsl");
+    $source_files.add_item("../include/toolsets/gcc/forges/common.hsl");
+    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_app_forge.hsl");
+    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_lib_forge.hsl");
+    $source_files.add_item("../include/toolsets/gcc/gcc-app.hsl");
+    $source_files.add_item("../include/toolsets/gcc/gcc-lib.hsl");
     $source_files.add_item("../include/toolsets/gcc/README");
-    $source_files.add_item("../include/toolsets/latex/forges/latex_forge_stuff.hls");
-    $source_files.add_item("../include/toolsets/latex/latex.hls");
+    $source_files.add_item("../include/toolsets/latex/forges/latex_forge_stuff.hsl");
+    $source_files.add_item("../include/toolsets/latex/latex.hsl");
     $source_files.add_item("../include/toolsets/latex/README");
-    $source_files.add_item("../include/toolsets/null/null.hls");
-    $source_files.add_item("../include/toolsets/java/forges/java_forge.hls");
-    $source_files.add_item("../include/toolsets/java/java.hls");
+    $source_files.add_item("../include/toolsets/null/null.hsl");
+    $source_files.add_item("../include/toolsets/java/forges/java_forge.hsl");
+    $source_files.add_item("../include/toolsets/java/java.hsl");
     $source_files.add_item("../include/toolsets/java/README");
-    $source_files.add_item("../include/toolsets/vc/common/vssetupenv.hls");
-    $source_files.add_item("../include/toolsets/vc/forges/common/vcutils.hls");
-    $source_files.add_item("../include/toolsets/vc/forges/vc110_app_forge.hls");
-    $source_files.add_item("../include/toolsets/vc/forges/vc110_lib_forge.hls");
-    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_110.hls");
-    $source_files.add_item("../include/toolsets/vc/forges/vc100_app_forge.hls");
-    $source_files.add_item("../include/toolsets/vc/forges/vc100_lib_forge.hls");
-    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_100.hls");
+    $source_files.add_item("../include/toolsets/vc/common/vssetupenv.hsl");
+    $source_files.add_item("../include/toolsets/vc/forges/common/vcutils.hsl");
+    $source_files.add_item("../include/toolsets/vc/forges/vc110_app_forge.hsl");
+    $source_files.add_item("../include/toolsets/vc/forges/vc110_lib_forge.hsl");
+    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_110.hsl");
+    $source_files.add_item("../include/toolsets/vc/forges/vc100_app_forge.hsl");
+    $source_files.add_item("../include/toolsets/vc/forges/vc100_lib_forge.hsl");
+    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_100.hsl");
     $source_files.add_item("../include/toolsets/vc/README");
-    $source_files.add_item("../include/toolsets/vc/vc110-app.hls");
-    $source_files.add_item("../include/toolsets/vc/vc110-lib.hls");
-    $source_files.add_item("../include/toolsets/vc/vc100-app.hls");
-    $source_files.add_item("../include/toolsets/vc/vc100-lib.hls");
-    $source_files.add_item("../include/conv.hls");
-    $source_files.add_item("../include/fsutil.hls");
-    $source_files.add_item("../include/optutil.hls");
-    $source_files.add_item("../include/string.hls");
+    $source_files.add_item("../include/toolsets/vc/vc110-app.hsl");
+    $source_files.add_item("../include/toolsets/vc/vc110-lib.hsl");
+    $source_files.add_item("../include/toolsets/vc/vc100-app.hsl");
+    $source_files.add_item("../include/toolsets/vc/vc100-lib.hsl");
+    $source_files.add_item("../include/conv.hsl");
+    $source_files.add_item("../include/fsutil.hsl");
+    $source_files.add_item("../include/optutil.hsl");
+    $source_files.add_item("../include/string.hsl");
 
     # The setup files
 
     $source_files.add_item("../setup/README");
     $source_files.add_item("../setup/LEIAME");
-    $source_files.add_item("../setup/hfst-inst.hls");
+    $source_files.add_item("../setup/hfst-inst.hsl");
 
     #
     # Destinations
@@ -932,43 +976,45 @@ hefesto-install.prologue() {
         # Binaries
         $dest_files.add_item("/usr/local/bin/hefesto");
         # The modules
-        prepare_modules_dest_paths($dest_files, $install_dir);
+        if ($uninst_opt.count() == 0) {
+            prepare_modules_dest_paths($dest_files, $install_dir);
+        }
         # The standard hls scripts
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-lib.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/forges/latex_forge_stuff.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/latex.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/forges/latex_forge_stuff.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/latex.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/null/null.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/forges/java_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/java.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/null/null.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/forges/java_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/java.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/java/README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/common/vssetupenv.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/common/vcutils.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_110.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_100.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/common/vssetupenv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/common/vcutils.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_110.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc100_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vcvarsall/vcvarsall_100.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-lib.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-lib.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/conv.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/fsutil.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/optutil.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/string.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc110-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/vc100-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/conv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/fsutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/optutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/string.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/LEIAME"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/hfst-inst.hsl"));
     } else if ($os_name == "windows") {
         # Doc files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\200712080908-3531.jpg"));
@@ -980,43 +1026,45 @@ hefesto-install.prologue() {
         # Binaries
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "bin\\hefesto.exe"));
         # The modules
-        prepare_modules_dest_paths($dest_files, $install_dir);
+        if ($uninst_opt.count() == 0) {
+            prepare_modules_dest_paths($dest_files, $install_dir);
+        }
         # The standard hls scripts
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-lib.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-lib.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\forges\\latex_forge_stuff.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\latex.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\forges\\latex_forge_stuff.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\latex.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\null\\null.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\forges\\java_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\java.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\null\\null.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\forges\\java_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\java.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\java\\README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\common\\vssetupenv.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\common\\vcutils.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_110.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_app_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_lib_forge.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_100.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\common\\vssetupenv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\common\\vcutils.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_110.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc100_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vcvarsall\\vcvarsall_100.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\README"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-lib.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-app.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-lib.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\conv.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\fsutil.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\optutil.hls"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\string.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc110-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\vc100-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\conv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\fsutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\optutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\string.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\LEIAME"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\hfst-inst.hls"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\hfst-inst.hsl"));
     }
 
     if ($uninst_opt.count() == 0) {
@@ -1025,7 +1073,7 @@ hefesto-install.prologue() {
             hefesto.sys.echo("\n==================== Hefesto is already installed, uninstalling the older version to install the newest...");
             hefesto.sys.echo("\n====================\n\n");
             var uninstall_cmd type string;
-            $uninstall_cmd = "hefesto --forgefiles=" + hefesto.sys.make_path($install_dir, "setup/hfst-inst.hls") + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;
+            $uninstall_cmd = "hefesto --forgefiles=" + hefesto.sys.make_path($install_dir, "setup/hfst-inst.hsl") + " --hfst-inst-projects=hefesto-install --uninstall --install-dir=" + $install_dir;
             if (hefesto.sys.os_name() == "windows") {
                 var u type int;
                 var temp type string;
