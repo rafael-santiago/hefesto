@@ -349,7 +349,7 @@ int hefesto_rmdir(const char *dir) {
     char *full_src;
     int result = 0;
 
-    if (dir == NULL) return 0;
+    if (dir == NULL || *dir == 0) return 0;
 
     full_src = hefesto_make_path(hefesto_is_relative_path(dir) ?
                                     HEFESTO_FS_CWD : "",

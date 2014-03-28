@@ -8,7 +8,7 @@ include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include ~/generators/devcpp_project_generator.hsl
 include ~/generators/codeblocks_project_generator.hsl
 include ~/generators/visualstudio_project_generator.hsl
-include ~/accacia.hsl
+include ~/accacia/accacia.hsl
 include ~/not.hsl
 
 project mylab : toolset "no-tool-any-set" : 1 ;
@@ -83,6 +83,7 @@ mylab.prologue() {
     hefesto.sys.echo("HEX2INT = " + hex2int("7f000001") + "\n");
     hefesto.sys.echo("GETUSRSTROPT = " + get_usr_str_opt("forgefiles") + "\n");
     hefesto.sys.echo("ISDIR = " + isdir("lab-one") + "\n");
+    hefesto.sys.echo("--------------------- FOI -----------------------------\n");
     hefesto.sys.echo("ISFILE = " + isfile("hls-test.hls") + "\n");
     hefesto.sys.echo("MKTREE = " + mktree("a/b/c/d") + "\n");
     hefesto.sys.echo("RMTREE = " + rmtree("a/b/c/d") + "\n");
@@ -185,17 +186,17 @@ mylab.prologue() {
     hefesto.sys.echo("green\n");
     accacia_textcolor("blue");
     hefesto.sys.echo("blue\n");
-#    accacia_screennormalize();
-#    accacia_drawbox(10, 10, 5, 10, "BLUE");
     accacia_screennormalize();
-#    var buf type string;
-#    hefesto.sys.echo("Type something: ");
-#    accacia_gets($buf);
-#    accacia_textbackground("magenta");
-#    accacia_textcolor("yellow");
-#    hefesto.sys.echo($buf + "\n");
+#    accacia_drawbox(10, 10, 5, 10, "BLUE");
 #    accacia_screennormalize();
-#    accacia_delline();
+    var buf type string;
+    hefesto.sys.echo("Type something: ");
+    accacia_gets($buf);
+    accacia_textbackground("magenta");
+    accacia_textcolor("yellow");
+    hefesto.sys.echo($buf + "\n");
+    accacia_screennormalize();
+    accacia_delline();
 #    while (accacia_kbhit() == 0) {
 #        hefesto.sys.echo(".\n");
 #    }
@@ -206,6 +207,24 @@ mylab.prologue() {
     } else {
         hefesto.sys.echo("It's a dir!\n");
     }
+    var lst0 type list;
+    recurssion_issue($lst0, 10);
+}
+
+function recurssion_issue(x type list, r_nr type int) : result type int {
+    if ($r_nr == 0) result 0;
+    var l type list;
+    $l.add_item("wrong!");
+    var r type int;
+    var s type string;
+    $r = 0;
+    hefesto.sys.echo("RECURSSION NUMBER " + $r_nr + "\n");
+    while ($r < $l.count()) {
+        hefesto.sys.echo("ITEM " + $r + " = " + $l.item($r) + "\n");
+        $r = $r + 1;
+    }
+    hefesto.sys.echo("--\n");
+    result recurssion_issue($l, $r_nr - 1);
 }
 
 function mk_output_filename(filename type string, task type string) : result type string {

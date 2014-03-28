@@ -87,9 +87,9 @@
                                       }
 
 #define del_hefesto_file_handle(f, c) {\
-                                        if ((c) && (f)->fp != NULL)\
+                                        if ((c) && (f) && (f)->fp != NULL)\
                                          fclose((f)->fp);\
-                                        if ((f)->path != NULL)\
+                                        if ((f) && (f)->path != NULL)\
                                          free((f)->path);\
                                         free((f));\
                                     }

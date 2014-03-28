@@ -588,6 +588,8 @@ hefesto_common_list_ctx *get_hefesto_common_list_ctx_content(const void *data,
 
     hefesto_common_list_ctx *p;
 
+    if (list != NULL && list->is_dummy_item) return NULL;
+
     for (p = list; p; p = p->next) {
 
         switch (type) {

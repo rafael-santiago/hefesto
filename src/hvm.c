@@ -536,7 +536,6 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
 
     if (var == NULL) var = get_hefesto_var_list_ctx_name(cmd->params->data,
                                                          *gl_vars);
-
     if (var) {
 
         etype = var->type;

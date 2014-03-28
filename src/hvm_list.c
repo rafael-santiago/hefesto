@@ -400,7 +400,7 @@ static void *hvm_list_ls(const char *method,
                     if (get_hefesto_common_list_ctx_content(arg,
                                         HEFESTO_VAR_TYPE_STRING,
                                                       *list_var) == NULL) {
-                        (*list_var) = 
+                        (*list_var) =
                             add_data_to_hefesto_common_list_ctx(*list_var,
                                                                 arg,
                                                                 strlen(arg));
@@ -522,6 +522,7 @@ static void *hvm_list_del_index(const char *method,
             *list_var = del_item_from_hefesto_common_list_ctx(*list_var,
                                                               item);
         }
+
         /*
         if (item != NULL && vp->subtype != HEFESTO_VAR_TYPE_UNTYPED) {
             HEFESTO_DEBUG_INFO(0, "hvm_list/del_item, etype = %d\n", etype);
@@ -538,6 +539,7 @@ static void *hvm_list_del_index(const char *method,
     }
 
     free(data);
+
     return NULL;
 
 

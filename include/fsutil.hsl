@@ -246,9 +246,7 @@ function rmtree(dtree type string) : result type int {
             $d = $d + 1;
         }
         $all_removed = (hefesto.sys.rmdir($dtemp) == 0);
-        $d = $d_elements.count()-1;
-        $dtemp = $d_elements.item($d);
-        $d_elements.del_item($dtemp);
+        $d_elements.del_index($d_elements.count() - 1);
     }
     result $all_removed;
 }

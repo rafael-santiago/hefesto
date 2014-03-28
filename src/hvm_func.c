@@ -286,4 +286,18 @@ void hvm_init_function_args(const char *args,
 
     free(expr);
 
+    // we must to clear local stack initializing all with null or zero.
+    for (; vp != NULL; vp = vp->next) {
+        if (vp->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR && vp->contents) {
+            del_hefesto_file_handle((hefesto_file_handle *) vp->contents->data,
+                                    1);
+        }
+        del_hefesto_common_list_ctx(vp->contents);
+        new_hefesto_common_list_ctx(vp->contents);
+        if (vp->type == HEFESTO_VAR_TYPE_LIST) {
+            vp->subtype = HEFESTO_VAR_TYPE_NONE;
+            vp->contents->is_dummy_item = 1;
+        }
+    }
+
 }

@@ -2515,6 +2515,7 @@ static char *expand_include_file_name(const char *file_path,
 
     char *expanded_file_path = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     char *hefesto_includes_home;
+    char *hefesto_modules_home;
     hefesto_options_ctx *hefesto_includes_home_list = NULL;
     hefesto_common_list_ctx *d;
     char temp_option[HEFESTO_MAX_BUFFER_SIZE];
@@ -2524,11 +2525,21 @@ static char *expand_include_file_name(const char *file_path,
     } else {
         *expanded_file_path = 0;
         hefesto_includes_home = getenv("HEFESTO_INCLUDES_HOME");
+        hefesto_modules_home = getenv("HEFESTO_MODULES_HOME");
 
-        if (hefesto_includes_home) {
+        if (hefesto_includes_home != NULL || hefesto_modules_home != NULL) {
             strncpy(temp_option, "--sys-hefesto-includes-home=",
                     sizeof(temp_option)-1);
-            strcat(temp_option, hefesto_includes_home);
+            if (hefesto_includes_home) {
+                strcat(temp_option, hefesto_includes_home);
+                if (hefesto_modules_home != NULL &&
+                    *hefesto_modules_home != 0) {
+                    strcat(temp_option, ",");
+                }
+            }
+            if (hefesto_modules_home) {
+                strcat(temp_option, hefesto_modules_home);
+            }
             hefesto_includes_home_list =
                add_option_to_hefesto_options_ctx(hefesto_includes_home_list,
                                                  temp_option);
