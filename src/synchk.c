@@ -217,6 +217,16 @@ static int synchk_hefesto_sys_call_from_module(const char *usr_calling,
                                                hefesto_var_list_ctx *gl_vars,
                                                hefesto_func_list_ctx *functions);
 
+static int synchk_hefesto_sys_get_func_addr(const char *usr_calling,
+                                            hefesto_var_list_ctx *lo_vars,
+                                            hefesto_var_list_ctx *gl_vars,
+                                            hefesto_func_list_ctx *functions);
+
+static int synchk_hefesto_sys_call_func_addr(const char *usr_calling,
+                                             hefesto_var_list_ctx *lo_vars,
+                                             hefesto_var_list_ctx *gl_vars,
+                                             hefesto_func_list_ctx *functions);
+
 hefesto_type_t get_hefesto_var_type_by_usr_code(const char *var,
                                                 hefesto_var_list_ctx *lo_vars,
                                                 hefesto_var_list_ctx *gl_vars);
@@ -294,7 +304,9 @@ static struct hefesto_syscall_syntax_checker_ctx
     set_hefesto_synchk_slot(synchk_hefesto_sys_setenv),
     set_hefesto_synchk_slot(synchk_hefesto_sys_unsetenv),
     set_hefesto_synchk_slot(synchk_hefesto_sys_lines_from_file),
-    set_hefesto_synchk_slot(synchk_hefesto_sys_call_from_module)
+    set_hefesto_synchk_slot(synchk_hefesto_sys_call_from_module),
+    set_hefesto_synchk_slot(synchk_hefesto_sys_get_func_addr),
+    set_hefesto_synchk_slot(synchk_hefesto_sys_call_func_addr)
 
 };
 
@@ -3132,3 +3144,81 @@ int synchk_project_method_statement(const char *statement,
 
 }
 
+static int synchk_hefesto_sys_get_func_addr(const char *usr_calling,
+                                            hefesto_var_list_ctx *lo_vars,
+                                            hefesto_var_list_ctx *gl_vars,
+                                            hefesto_func_list_ctx *functions) {
+    int result = 1;
+    size_t offset = 0;
+    char *arg = NULL;
+    if (!is_expected_args_total(usr_calling, 1)) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+    arg = get_arg_from_call(usr_calling, &offset);
+    if (arg != NULL) {
+        result = is_hefesto_string(arg) ||
+                 is_valid_expression(arg, lo_vars, gl_vars, functions);
+        if (result == 0) {
+            hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_EXPR,
+                      arg);
+        }
+        free(arg);
+    }
+    return result;
+}
+
+static int synchk_hefesto_sys_call_func_addr(const char *usr_calling,
+                                             hefesto_var_list_ctx *lo_vars,
+                                             hefesto_var_list_ctx *gl_vars,
+                                             hefesto_func_list_ctx *functions) {
+    char *arg = NULL;
+    int result = 1;
+    size_t offset = 0;
+    if (is_expected_args_total(usr_calling, 0)) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+    arg = get_arg_from_call(usr_calling, &offset);
+    while (result && *arg != 0) {
+        result = is_hefesto_string(arg) ||
+                 is_valid_expression(arg, lo_vars, gl_vars, functions);
+        if (result == 0) {
+            hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_EXPR,
+                      arg);
+        }
+        free(arg);
+        arg = get_arg_from_call(usr_calling, &offset);
+    }
+    free(arg);
+    return result;
+}
+
+int synchk_indirect_runtime_func_call_arg_count(const char *call,
+                                                hefesto_func_list_ctx *function) {
+    int result = 1;
+    hefesto_var_list_ctx *ap;
+    char *arg;
+    const char *s;
+    size_t offset = 0, arg_count = 0, farg_count = 0;
+    for (ap = function->args; ap; ap = ap->next) {
+        farg_count++;
+    }
+    for (s = call; *s != '(' && *s != 0; s++);
+    arg = get_arg_from_call(s + 1, &offset);
+    while (*arg != 0) {
+        arg_count++;
+        free(arg);
+        arg = get_arg_from_call(s + 1, &offset);
+    }
+    free(arg);
+    result = (arg_count == farg_count);
+    if (result == 0) {
+        hlsc_info(HLSCM_MTYPE_RUNTIME,
+                  HLSCM_RUNTIME_WRONG_ARG_NR_IN_FN_CALL, function->name, farg_count,
+                  arg_count);
+    }
+    return result;
+}

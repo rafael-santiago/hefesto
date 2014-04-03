@@ -206,10 +206,18 @@ void del_hefesto_func_list_ctx(hefesto_func_list_ctx *list);
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_name(const char *name,
                                             hefesto_func_list_ctx *list);
 
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_addr(
+                                            hefesto_func_list_ctx *addr,
+                                            hefesto_func_list_ctx *list);
+
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_name(const char *name,
                                                       const char *curr_module,
                                                   hefesto_func_list_ctx *list);
 
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_addr(
+                                                  hefesto_func_list_ctx *addr,
+                                                      const char *curr_module,
+                                                  hefesto_func_list_ctx *list);
 
 hefesto_var_list_ctx *add_arg_list_to_hefesto_func_list_ctx(const char *argl);
 

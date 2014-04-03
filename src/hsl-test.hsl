@@ -208,7 +208,11 @@ mylab.prologue() {
         hefesto.sys.echo("It's a dir!\n");
     }
     var lst0 type list;
+    var addr type int;
     recurssion_issue($lst0, 10);
+    $addr = hefesto.sys.get_func_addr("reverse_string");
+    hefesto.sys.echo("[FUNCTION DEFINED AT ADDRESS = 0x" + int2hex($addr) + "]\n");
+    hefesto.sys.echo("THE RESULT IS " + hefesto.sys.call_func_addr($addr, "socorram-me subi no onibus em marrocos\"") + "\n");
 }
 
 function recurssion_issue(x type list, r_nr type int) : result type int {

@@ -298,8 +298,16 @@ static char *hlsc_messages[HLSCM_NR] = {
     "unable to find symbol \"%s\" in loaded module.\n",
 
     // HLSCM_RUNTINE_LINE_IS_TOO_LONG
-    "line is too long: %s \n"
+    "line is too long: %s \n",
 
+    //HLSCM_RUNTIME_CALLED_ADDR_IS_NOT_A_FUNCTION
+    "the called address [0x%x] seems not to be a function or at least not accessible in this context.\n",
+
+    //HLSCM_RUNTIME_NULL_EXECUTION_POINT
+    "hey Larry, say to Moe that Curly said that there's no execution point from here and probably no return (eg: you have a null execution point).\n",
+
+    //HLSCM_RUNTIME_WRONG_ARG_NR_IN_FN_CALL
+    "wrong number of arguments in call to \"%s\" function: expecting %d argument(s) instead of %d.\n"
 };
 
 void hlsc_info(const int mtype_details, const hlscm_code_t mcode, ...) {
@@ -351,6 +359,11 @@ void hlsc_info(const int mtype_details, const hlscm_code_t mcode, ...) {
                 case 'c':
                     c_arg = (char) va_arg(vl, int);
                     fprintf(stdout, "%c", c_arg);
+                    break;
+
+                case 'x':
+                    int_arg = va_arg(vl, int);
+                    fprintf(stdout, "%.8x", int_arg);
                     break;
 
             }

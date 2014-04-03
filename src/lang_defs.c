@@ -77,6 +77,8 @@ static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.unsetenv",
   "hefesto.sys.lines_from_file",
   "hefesto.sys.call_from_module",
+  "hefesto.sys.get_func_addr",
+  "hefesto.sys.call_func_addr",
   "\0"
 };
 

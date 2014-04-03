@@ -211,13 +211,13 @@ void hvm_init_function_args(const char *args,
         }
         ap->contents = add_data_to_hefesto_common_list_ctx(ap->contents, expr,
                                                            strlen(expr));
-        if (c_intr != HEFESTO_ATTRIB && c_intr != HEFESTO_RET &&
-            c_intr != HEFESTO_IF && c_intr != HEFESTO_WHILE) {
-            expr_pfix = infix2postfix(expr, strlen(expr), 1);
-            free(expr);
-        } else {
-            expr_pfix = expr;
-        }
+//        if (c_intr != HEFESTO_ATTRIB && c_intr != HEFESTO_RET &&
+//            c_intr != HEFESTO_IF && c_intr != HEFESTO_WHILE) {
+//            expr_pfix = infix2postfix(expr, strlen(expr), 1);
+//            free(expr);
+//        } else {
+          expr_pfix = expr;
+//        }
         etype = vp->type;
         //printf("\tF-ARG: %s\n", expr_pfix);
         // INFO(Santiago):
@@ -234,6 +234,7 @@ void hvm_init_function_args(const char *args,
                                 (hvm_get_last_executed_function() == *function) ? 
                                            &(*function)->vars : lo_vars, gl_vars,
                                 functions, &etype, &sz);
+
         if (*expr_pfix == '$') {
             vlp = get_hefesto_var_list_ctx_name(expr_pfix + 1, *lo_vars);
             if (vlp == NULL) {

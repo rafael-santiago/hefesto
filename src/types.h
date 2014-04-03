@@ -122,6 +122,8 @@ typedef enum _hefesto_instruction_code_t {
 #define HEFESTO_SYS_UNSETENV                                    0x20000000
 #define HEFESTO_SYS_LINES_FROM_FILE                             0x21000000
 #define HEFESTO_SYS_CALL_FROM_MODULE                            0x22000000
+#define HEFESTO_SYS_GET_FUNC_ADDR                               0x23000000
+#define HEFESTO_SYS_CALL_FUNC_ADDR                              0x24000000
 
 typedef struct _hefesto_command_list_ctx {
   hefesto_instruction_code_t instruction;

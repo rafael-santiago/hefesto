@@ -25,6 +25,7 @@
 #include "hlsc_msg.h"
 #include "file_io.h"
 #include "hvm_mod.h"
+#include "hvm_func.h"
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
@@ -246,6 +247,18 @@ static void *hefesto_sys_call_from_module(const char *syscall,
                                           hefesto_func_list_ctx *functions,
                                           hefesto_type_t **otype);
 
+static void *hefesto_sys_get_func_addr(const char *syscall,
+                                       hefesto_var_list_ctx **lo_vars,
+                                       hefesto_var_list_ctx **gl_vars,
+                                       hefesto_func_list_ctx *functions,
+                                       hefesto_type_t **otype);
+
+static void *hefesto_sys_call_func_addr(const char *syscall,
+                                        hefesto_var_list_ctx **lo_vars,
+                                        hefesto_var_list_ctx **gl_vars,
+                                        hefesto_func_list_ctx *functions,
+                                        hefesto_type_t **otype);
+
 struct hefesto_hvm_syscall {
     void *(*syscall)(const char *syscall,
                      hefesto_var_list_ctx **lo_vars,
@@ -257,7 +270,6 @@ struct hefesto_hvm_syscall {
 
 static struct hefesto_hvm_syscall
     HEFESTO_HVM_SYSCALL[HEFESTO_SYS_CALLS_NR] = {
-
     set_method(hefesto_sys_replace_in_file),
     set_method(hefesto_sys_ls),
     set_method(hefesto_sys_pwd),
@@ -291,7 +303,9 @@ static struct hefesto_hvm_syscall
     set_method(hefesto_sys_setenv),
     set_method(hefesto_sys_unsetenv),
     set_method(hefesto_sys_lines_from_file),
-    set_method(hefesto_sys_call_from_module)
+    set_method(hefesto_sys_call_from_module),
+    set_method(hefesto_sys_get_func_addr),
+    set_method(hefesto_sys_call_func_addr)
 };
 
 #undef set_method
@@ -440,6 +454,14 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
 
         case HEFESTO_SYS_CALL_FROM_MODULE:
             label = "hefesto.sys.call_from_module(";
+            break;
+
+        case HEFESTO_SYS_GET_FUNC_ADDR:
+            label = "hefesto.sys.get_func_addr(";
+            break;
+
+        case HEFESTO_SYS_CALL_FUNC_ADDR:
+            label = "hefesto.sys.call_func_addr(";
             break;
 
         default:
@@ -1850,4 +1872,99 @@ static void *hefesto_sys_call_from_module(const char *syscall,
                                           hefesto_func_list_ctx *functions,
                                           hefesto_type_t **otype) {
     return hvm_mod_call(syscall, lo_vars, gl_vars, functions, otype);
+}
+
+static void *hefesto_sys_get_func_addr(const char *syscall,
+                                       hefesto_var_list_ctx **lo_vars,
+                                       hefesto_var_list_ctx **gl_vars,
+                                       hefesto_func_list_ctx *functions,
+                                       hefesto_type_t **otype) {
+    size_t offset, osz;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
+    const char *s;
+    char *arg_func;
+    void *func, *retval;
+    hefesto_func_list_ctx *curr_func_p = NULL, *func_p;
+    **otype = HEFESTO_VAR_TYPE_INT;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+
+    arg_func = get_arg_from_call(syscall, &offset);
+    func = expr_eval(arg_func, lo_vars, gl_vars, functions, &etype, &osz);
+    free(arg_func);
+    curr_func_p = hvm_get_current_executed_function();
+    retval = (int *) hefesto_mloc(sizeof(int));
+    if (curr_func_p != NULL) {
+        func_p = get_hefesto_func_list_ctx_scoped_name((char *)func,
+                                                       curr_func_p->decl_at,
+                                                       functions);
+        if (func_p != NULL) {
+            memcpy(retval, func_p, sizeof(int));
+        } else {
+            *(int *)retval = 0;
+        }
+    } else {
+        *(int *)retval = 0;
+    }
+    free(func);
+    return retval;
+}
+
+static void *hefesto_sys_call_func_addr(const char *syscall,
+                                        hefesto_var_list_ctx **lo_vars,
+                                        hefesto_var_list_ctx **gl_vars,
+                                        hefesto_func_list_ctx *functions,
+                                        hefesto_type_t **otype) {
+    size_t offset, osz;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_NONE;
+    const char *s;
+    char *arg_func;
+    void *func, *retval = NULL;
+    hefesto_func_list_ctx *func_p, *curr_func_p;
+
+    **otype = HEFESTO_VAR_TYPE_NONE;
+
+    s = get_arg_list_start_from_call(syscall);
+    offset = s - syscall + 1;
+    arg_func = get_arg_from_call(syscall, &offset);
+    etype = HEFESTO_VAR_TYPE_INT;
+    func = expr_eval(arg_func, lo_vars, gl_vars, functions, &etype, &osz);
+    free(arg_func);
+    curr_func_p = hvm_get_current_executed_function();
+    if (curr_func_p != NULL) {
+        func_p = get_hefesto_func_list_ctx_scoped_addr(
+                                              (hefesto_func_list_ctx *)func,
+                                                       curr_func_p->decl_at,
+                                                       functions);
+        if (func_p != NULL) {
+            **otype = func_p->result_type;
+            osz = strlen(func_p->name);
+            if (syscall + offset != 0) {
+                osz += strlen(syscall + offset) + 1;
+            }
+            arg_func = (char *) hefesto_mloc(osz + 1);
+            memset(arg_func, 0, osz + 1);
+            strncpy(arg_func, func_p->name, osz);
+            strcat(arg_func, "(");
+            strcat(arg_func, syscall + offset);
+            if (synchk_indirect_runtime_func_call_arg_count(arg_func,
+                                                            func_p)) {
+                retval = hvm_call_function(arg_func,
+                                           lo_vars,
+                                           gl_vars,
+                                           functions);
+            }
+            free(arg_func);
+        } else {
+            hlsc_info(HLSCM_MTYPE_RUNTIME,
+                      HLSCM_RUNTIME_CALLED_ADDR_IS_NOT_A_FUNCTION,
+                      *(size_t *)func);
+        }
+    } else {
+        hlsc_info(HLSCM_MTYPE_F_CKD_BUG,
+                  HLSCM_RUNTIME_NULL_EXECUTION_POINT);
+    }
+    free(func);
+    return retval;
 }

@@ -96,6 +96,8 @@ context default
     keyword .sys.unsetenv yellow
     keyword .sys.lines_from_file yellow
     keyword .sys.call_from_module yellow
+    keyword .sys.get_func_addr yellow
+    keyword .sys.call_func_addr yellow
     keyword .toolset.base_refresh yellow
     keyword .toolset.file_has_change yellow
     keyword .project.name yellow

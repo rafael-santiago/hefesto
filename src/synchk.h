@@ -57,4 +57,7 @@ int synchk_project_method_statement(const char *statement,
                                     hefesto_var_list_ctx *gl_vars,
                                     hefesto_func_list_ctx *fn);
 
+int synchk_indirect_runtime_func_call_arg_count(const char *call,
+                                                hefesto_func_list_ctx *function);
+
 #endif

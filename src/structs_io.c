@@ -349,6 +349,19 @@ hefesto_func_list_ctx *get_hefesto_func_list_ctx_name(const char *name,
 
 }
 
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_addr(
+                                           hefesto_func_list_ctx *addr,
+                                           hefesto_func_list_ctx *list) {
+
+    hefesto_func_list_ctx *p;
+
+    for (p = list; p; p = p->next)
+        if (*((size_t *)addr) == *((size_t *)p)) return p;
+
+    return NULL;
+
+}
+
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_name(const char *name,
                                                              const char *curr_module,
                                                              hefesto_func_list_ctx *list) {
@@ -364,6 +377,27 @@ hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_name(const char *name,
 
     if (p == NULL) {
         p = get_hefesto_func_list_ctx_name(name, list);
+        if (p && !p->is_local) return p; // this is a non local function
+    }
+
+    return NULL;
+}
+
+hefesto_func_list_ctx *get_hefesto_func_list_ctx_scoped_addr(hefesto_func_list_ctx *addr,
+                                                             const char *curr_module,
+                                                             hefesto_func_list_ctx *list) {
+    hefesto_func_list_ctx *p = NULL;
+    if (curr_module != NULL) {
+        for (p = list; p; p = p->next) {
+            if (*((size_t *)addr) == *((size_t *)p) &&
+                strcmp(curr_module, p->decl_at) == 0) {
+                return p;
+            }
+        }
+    }
+
+    if (p == NULL) {
+        p = get_hefesto_func_list_ctx_addr(addr, list);
         if (p && !p->is_local) return p; // this is a non local function
     }
 
