@@ -99,7 +99,7 @@ static void refresh_sum_base_rec(hefesto_sum_base_ctx **rec) {
     }
 
 }
-
+/*
 int refresh_hefesto_src_chsum_base(const char *directory,
                                    hefesto_common_list_ctx *sources) {
 
@@ -130,6 +130,48 @@ int refresh_hefesto_src_chsum_base(const char *directory,
             if (get_hefesto_common_list_ctx_content(bp->file_path,
                                                     HEFESTO_VAR_TYPE_STRING,
                                                     sources) == NULL) {
+                ok = write_sum_rec_to_base(sum_base, bp);
+            }
+        }
+        fclose(sum_base);
+    }
+
+    del_hefesto_sum_base_ctx(pre_base);
+
+    return ok;
+
+}
+*/
+
+int refresh_hefesto_src_chsum_base(const char *directory,
+                                   hefesto_base_refresh_ctx *sources) {
+
+    FILE *sum_base;
+    char *temp;
+    int ok = 1;
+    hefesto_base_refresh_ctx *s;
+    hefesto_sum_base_ctx *pre_base = get_src_sum_base(directory), *bp;
+
+    temp = hefesto_make_path(directory, ".hefesto-src-chsum-base",
+                             HEFESTO_MAX_BUFFER_SIZE);
+    sum_base = fopen(temp, "wb");
+    free(temp);
+
+    if (sum_base != NULL) {
+        for (s = sources; s && ok; s = s->next) {
+            bp = get_hefesto_sum_base_ctx_file(s->path, pre_base);
+            if (bp == NULL) {
+                pre_base = add_file_to_hefesto_sum_base_ctx(pre_base, s->path,
+                                                    get_src_chsum(s->path, 0));
+                bp = get_hefesto_sum_base_ctx_tail(pre_base);
+            } else if (s->refresh) {
+                refresh_sum_base_rec(&bp);
+            }
+            ok = write_sum_rec_to_base(sum_base, bp);
+        }
+        for (bp = pre_base; bp && ok; bp = bp->next) {
+            if (get_hefesto_base_refresh_ctx_path(bp->file_path,
+                                                  sources) == NULL) {
                 ok = write_sum_rec_to_base(sum_base, bp);
             }
         }

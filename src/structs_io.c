@@ -1734,3 +1734,47 @@ hefesto_var_list_ctx
     }
     return NULL;
 }
+
+hefesto_base_refresh_ctx *add_path_to_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base,
+                                                              const char *path,
+                                                              const size_t psize) {
+    hefesto_base_refresh_ctx *head = base, *p;
+    if (base == NULL) {
+        new_hefesto_base_refresh_ctx(head);
+        p = head;
+    } else {
+        p = get_hefesto_base_refresh_ctx_tail(base);
+        new_hefesto_base_refresh_ctx(p->next);
+        p = p->next;
+    }
+    p->path = (char *) hefesto_mloc(psize + 1);
+    memset(p->path, 0, psize + 1);
+    p->psize = psize;
+    strncpy(p->path, path, psize);
+    return head;
+}
+
+hefesto_base_refresh_ctx *get_hefesto_base_refresh_ctx_tail(hefesto_base_refresh_ctx *base) {
+    hefesto_base_refresh_ctx *p;
+    for (p = base; p->next != NULL; p = p->next);
+    return p;
+}
+
+hefesto_base_refresh_ctx *get_hefesto_base_refresh_ctx_path(const char *path,
+                                                            hefesto_base_refresh_ctx *base) {
+    hefesto_base_refresh_ctx *p;
+    for (p = base; p != NULL; p = p->next) {
+        if (strcmp(path, p->path) == 0) {
+            return p;
+        }
+    }
+    return NULL;
+}
+
+void del_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base) {
+    hefesto_base_refresh_ctx *p, *t;
+    for (t = p = base; t; p = t) {
+        t = p->next;
+        if (p->path != NULL) free(p->path);
+    }
+}

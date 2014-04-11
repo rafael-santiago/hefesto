@@ -2635,8 +2635,9 @@ int synchk_toolset_command(const char *command, hefesto_var_list_ctx *lo_vars,
     size_t args_nr, str_offset;
     hefesto_options_ctx *forge_function_p;
     hefesto_var_list_ctx *vp;
+    int state = 0;
 
-    if ((forge_function_p = 
+    if ((forge_function_p =
             get_hefesto_options_ctx_option(current_function_ptr->name,
                                            forge_functions_name_list)) == NULL) {
         hlsc_info(HLSCM_MTYPE_SYNTAX,
@@ -2694,6 +2695,8 @@ int synchk_toolset_command(const char *command, hefesto_var_list_ctx *lo_vars,
                           HLSCM_SYN_ERROR_WRONG_ARG_NR_ON_TOOLSET_FACILITY,
                           command);
                     } else {
+                        result = 1;
+                        //for (state = 0; state < 1 && result == 1; state++) {
                         temp = get_arg_from_call(command, &str_offset);
                         if ((vp = get_hefesto_var_list_ctx_name(temp+1, lo_vars)) == NULL) {
                             vp = get_hefesto_var_list_ctx_name(temp+1, gl_vars);
@@ -2705,6 +2708,7 @@ int synchk_toolset_command(const char *command, hefesto_var_list_ctx *lo_vars,
                                       HLSCM_SYN_ERROR_LIST_TYPE_REQUIRED,
                                       command);
                         }
+                        //}
                     }
                 } else if (strcmp(cmd_label, "file_has_change") == 0) {
                     if (!is_expected_args_total(c, 1)) {

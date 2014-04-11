@@ -1,0 +1,3 @@
+function lsdup(lst type list) : result type list {
+    result $lst;
+}

@@ -6,6 +6,7 @@ include ~/toolsets/vc/vc100-lib.hsl
 include ~/toolsets/vc/forges/common/vcutils.hsl
 include ~/toolsets/vc/vcvarsall/vcvarsall_100.hsl
 include ~/fsutil.hsl
+include ~/lsutil.hsl
 
 function vc100_lib_forge(sources type list, includepaths type list,
                          cflags type list, libpaths type list,
@@ -133,10 +134,11 @@ function vc100_lib_forge(sources type list, includepaths type list,
     }
 
     var curr_src_file type string;
-    var compiled type list;
+    var not_compiled type list;
     var compilation_nr type int;
 
     $compilation_nr = 0;
+    $not_compiled = lsdup($sources);
 
     if ($qsize_nr == 1) {
         while ($s < $sources.count() && $exit_code == 0) {
@@ -149,7 +151,7 @@ function vc100_lib_forge(sources type list, includepaths type list,
                                                  $isrelease,
                                                  $isstatic);
                 if ($exit_code == 0) {
-                    $compiled.add_item($curr_src_file);
+                    $not_compiled.del_item($curr_src_file);
                     $compilation_nr = $compilation_nr + 1;
                     hefesto.sys.echo("\t" + $sources.item($s) + " is ok.\n");
                 } else {
@@ -161,7 +163,7 @@ function vc100_lib_forge(sources type list, includepaths type list,
             $s = $s + 1;
         }
         if ($compilation_nr > 0) {
-            hefesto.toolset.base_refresh($compiled);
+            hefesto.toolset.base_refresh($not_compiled);
         }
     } else {
         $exit_code = vc_async_compile_srcs($sources,

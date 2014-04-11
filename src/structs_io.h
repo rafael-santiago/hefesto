@@ -136,6 +136,9 @@ void del_hefesto_common_stack_ctx(hefesto_common_stack_ctx *stack);
 
 #define hefesto_common_stack_ctx_empty(s) ( ( s ) == NULL )
 
+#define new_hefesto_base_refresh_ctx(b) ( (b) = (hefesto_base_refresh_ctx *) hefesto_mloc(sizeof(hefesto_base_refresh_ctx)),\
+                                          (b)->next = NULL, (b)->psize = 0, (b)->path = NULL, (b)->refresh = 0 )
+
 hefesto_common_list_ctx *add_data_to_hefesto_common_list_ctx(
         hefesto_common_list_ctx *list, const void *data, const size_t dsize);
 
@@ -297,6 +300,17 @@ void del_hefesto_sum_base_ctx(hefesto_sum_base_ctx *sum_base);
 
 hefesto_sum_base_ctx *get_hefesto_sum_base_ctx_file(const char *file_path,
                                           hefesto_sum_base_ctx *sum_base);
+
+hefesto_base_refresh_ctx *add_path_to_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base,
+                                                              const char *path,
+                                                              const size_t psize);
+
+hefesto_base_refresh_ctx *get_hefesto_base_refresh_ctx_tail(hefesto_base_refresh_ctx *base);
+
+hefesto_base_refresh_ctx *get_hefesto_base_refresh_ctx_path(const char *path,
+                                                            hefesto_base_refresh_ctx *base);
+
+void del_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base);
 
 
 #endif

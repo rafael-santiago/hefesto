@@ -212,6 +212,13 @@ typedef struct _hefesto_sum_base_ctx {
     struct _hefesto_sum_base_ctx *next;
 }hefesto_sum_base_ctx;
 
+typedef struct _hefesto_base_refresh_ctx {
+    char *path;
+    size_t psize;
+    int refresh;
+    struct _hefesto_base_refresh_ctx *next;
+}hefesto_base_refresh_ctx;
+
 extern int HEFESTO_EXIT_CODE;
 extern int HEFESTO_EXIT;
 extern int HEFESTO_EXIT_FORGE;

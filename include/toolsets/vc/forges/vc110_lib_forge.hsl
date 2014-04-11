@@ -6,6 +6,7 @@ include ~/toolsets/vc/vc110-lib.hsl
 include ~/toolsets/vc/forges/common/vcutils.hsl
 include ~/toolsets/vc/vcvarsall/vcvarsall_110.hsl
 include ~/fsutil.hsl
+include ~/lsutil.hsl
 
 function vc110_lib_forge(sources type list, includepaths type list,
                          cflags type list, libpaths type list,
@@ -133,10 +134,11 @@ function vc110_lib_forge(sources type list, includepaths type list,
     }
 
     var curr_src_file type string;
-    var compiled type list;
+    var not_compiled type list;
     var compilation_nr type int;
 
     $compilation_nr = 0;
+    $not_compiled =lsdup($sources);
 
     if ($qsize_nr == 1) {
         while ($s < $sources.count() && $exit_code == 0) {
@@ -149,7 +151,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
                                                  $isrelease,
                                                  $isstatic);
                 if ($exit_code == 0) {
-                    $compiled.add_item($curr_src_file);
+                    $not_compiled.del_item($curr_src_file);
                     $compilation_nr = $compilation_nr + 1;
                     hefesto.sys.echo("\t" + $sources.item($s) + " is ok.\n");
                 } else {
@@ -161,7 +163,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
             $s = $s + 1;
         }
         if ($compilation_nr > 0) {
-            hefesto.toolset.base_refresh($compiled);
+            hefesto.toolset.base_refresh($not_compiled);
         }
     } else {
         $exit_code = vc_async_compile_srcs($sources,
@@ -191,7 +193,7 @@ function vc110_lib_forge(sources type list, includepaths type list,
                                              $ldflags_str,
                                              $binary,
                                              $isrelease,
-                                             $isstatic);            
+                                             $isstatic);
             if ($exit_code == 0) {
                 hefesto.sys.echo("*** Link success (output:" + $binary + ")\n");
             } else {
@@ -213,20 +215,20 @@ function vc_link_objects2lib(sources type list,
     var cmd type string;
     var objects type string;
     var retcode type int;
-    $objects = vc_objs_from_srcs($sources, $obj_dir);    
+    $objects = vc_objs_from_srcs($sources, $obj_dir);
     $retcode = 1;
     if ($isstatic == 1) {
-        $cmd = hefesto.toolset.lib($libname, $objects, $libs, $ldflags);        
-        $retcode = hefesto.sys.run($cmd);        
-        if ($isrelease == 0 && $retcode == 0) {            
-            $retcode = vc110_postprocess_pdb($libname);            
+        $cmd = hefesto.toolset.lib($libname, $objects, $libs, $ldflags);
+        $retcode = hefesto.sys.run($cmd);
+        if ($isrelease == 0 && $retcode == 0) {
+            $retcode = vc110_postprocess_pdb($libname);
         }
     } else {
         if ($isrelease == 1) {
             $cmd = hefesto.toolset.dll_release($libname, $objects, $libs, $ldflags);
         } else {
             $cmd = hefesto.toolset.dll_debug($libname, $objects, $libs, $ldflags);
-        }        
+        }
         $retcode = hefesto.sys.run($cmd);
     }
     result $retcode;
@@ -257,10 +259,10 @@ function vc110_postprocess_pdb(filename type string) : result type int {
     var retcode type int;   
     if (hefesto.sys.ls("vc110\\.pdb") == 0) {
         result 1;
-    }    
+    }
     var pdbfile type string;
     $retcode = 1;
-    $pdbfile = vc110_get_libname($filename) + ".pdb";    
+    $pdbfile = vc110_get_libname($filename) + ".pdb";
     if (hefesto.sys.cp("vc110.pdb", $pdbfile) == 1) {
         if (hefesto.sys.rm("vc110.pdb") == 0) {
             $retcode = 0;

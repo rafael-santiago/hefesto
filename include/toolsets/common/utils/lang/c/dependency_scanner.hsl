@@ -43,6 +43,7 @@ function get_c_cpp_deps() : result type string { # A faster dependency scanner.
     var exts type list;
     var e type int;
     var dep_nr type int;
+    var related_files type list;
 
     $e = 0;
 
@@ -53,6 +54,7 @@ function get_c_cpp_deps() : result type string { # A faster dependency scanner.
     $exts.add_item("CC");
     $exts.add_item("cc");
     $exts.add_item("cpp");
+    $exts.add_item("CPP");
 
     while ($e < $exts.count()) {
         $str = ".*\\." + $exts.item($e) + "$";
@@ -79,6 +81,25 @@ function get_c_cpp_deps() : result type string { # A faster dependency scanner.
                     $dep_nr = $dep_nr + 1;
                 }
                 $i = $i + 1;
+            }
+            if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
+                $str = $files.item($f);
+                $str = filenamefrompath($str);
+                $str.replace("\\.(h|hpp)$", "");
+#                hefesto.sys.echo("REGEX: " + ".*" + $str + "\\.(c|C|CC|cc|cpp)$\n");
+                $related_files.clear();
+                $related_files.ls(".*" + filenamefrompath($str) + "\\.(c|C|CC|cc|cpp|CPP)$");
+                if ($related_files.count() > 0) {
+                    $i = 0;
+                    while ($i < $related_files.count()) {
+                        if ($dep_nr > 0) {
+                            $dep_chain = $dep_chain + "& ";
+                        }
+                        $dep_chain = $dep_chain + $related_files.item($i) + " ";
+                        $dep_nr = $dep_nr + 1;
+                        $i = $i + 1;
+                    }
+                }
             }
             $dep_chain = $dep_chain + ";\n";
             $f = $f + 1;

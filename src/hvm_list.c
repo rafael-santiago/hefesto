@@ -283,7 +283,8 @@ static void *hvm_list_add_item(const char *method,
     }
 
     // INFO(Santiago): The first item added in the list defines de subtype.
-    if (vp && vp->subtype == HEFESTO_VAR_TYPE_UNTYPED) {
+    if (vp && (vp->subtype == HEFESTO_VAR_TYPE_UNTYPED ||
+               vp->subtype == HEFESTO_VAR_TYPE_NONE)) {
         vp->subtype = etype;
     }
 
@@ -340,15 +341,19 @@ static void *hvm_list_del_item(const char *method,
 
         // INFO(Santiago): handling undefined subtype case (a function returned
         //                                                that list for example)
-        if (vp->subtype == HEFESTO_VAR_TYPE_UNTYPED) {
+        if (vp->subtype == HEFESTO_VAR_TYPE_UNTYPED ||
+            vp->subtype == HEFESTO_VAR_TYPE_NONE) {
             vp->subtype = etype;
         }
 
         HEFESTO_DEBUG_INFO(0, "hvm_list/del_item, etype = %d\n", etype);
-
         *list_var = del_data_from_hefesto_common_list_ctx(*list_var,
                                                           data,
                                                           vp->subtype);
+        if (*list_var == NULL) {
+            new_hefesto_common_list_ctx((*list_var));
+            (*list_var)->is_dummy_item = 1;
+        }
 
     }
 
@@ -521,6 +526,10 @@ static void *hvm_list_del_index(const char *method,
         if (item != NULL) {
             *list_var = del_item_from_hefesto_common_list_ctx(*list_var,
                                                               item);
+            if (*list_var == NULL) {
+                new_hefesto_common_list_ctx((*list_var));
+                (*list_var)->is_dummy_item = 1;
+            }
         }
 
         /*
@@ -541,7 +550,6 @@ static void *hvm_list_del_index(const char *method,
     free(data);
 
     return NULL;
-
 
 }
 

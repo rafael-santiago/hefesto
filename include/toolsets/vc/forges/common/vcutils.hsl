@@ -6,6 +6,7 @@
 #
 
 include ~/fsutil.hsl
+include ~/lsutil.hsl
 
 function vc_get_filename(artifact type string) : result type string {
     var al type int;
@@ -97,11 +98,12 @@ function vc_async_compile_srcs(sources type list, incs type string,
 
     $s = 0;
 
-    var compiled type list;
+    var not_compiled type list;
     var aux_compiled type list;
     var compilation_nr type int;
 
     $compilation_nr = 0;
+    $not_compiled = lsdup($sources);
 
     while ($s < $sources.count() && $exit_code == 0) {
         $cmds.clear();
@@ -125,7 +127,7 @@ function vc_async_compile_srcs(sources type list, incs type string,
                 $compilation_nr = $compilation_nr + $aux_compiled.count();
                 while ($q < $aux_compiled.count()) {
                     $curr_src_file = $aux_compiled.item($q);
-                    $compiled.add_item($curr_src_file);
+                    $not_compiled.del_item($curr_src_file);
                     $q = $q + 1;
                 }
             }
@@ -133,7 +135,7 @@ function vc_async_compile_srcs(sources type list, incs type string,
     }
 
     if ($compilation_nr > 0) {
-        hefesto.toolset.base_refresh($compiled);
+        hefesto.toolset.base_refresh($not_compiled);
     }
 
     result $exit_code;
