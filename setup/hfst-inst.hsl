@@ -907,6 +907,7 @@ hefesto-install.prologue() {
     $source_files.add_item("../doc/html/imgs/windows_icon.jpg");
     $source_files.add_item("../doc/html/index_pt.html");
     $source_files.add_item("../doc/html/index_en.html");
+    $source_files.add_item("../doc/html/module-writing-guidelines.html");
 
     # The binaries
     if ($os_name == "linux" || $os_name == "freebsd") {
@@ -973,6 +974,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/windows_icon.jpg"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/index_pt.html"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/index_en.html"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/module-writing-guidelines.html"));
         # Binaries
         $dest_files.add_item("/usr/local/bin/hefesto");
         # The modules
@@ -1023,6 +1025,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\imgs\\windows_icon.jpg"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\index_pt.html"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\index_en.html"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc\\html\\module-writing-guidelines.html"));
         # Binaries
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "bin\\hefesto.exe"));
         # The modules
