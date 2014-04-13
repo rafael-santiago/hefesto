@@ -96,12 +96,6 @@ static char *get_next_word_or_string_from_file(FILE *fp,
 static char *expand_include_file_name(const char *file_path,
                                       hefesto_options_ctx *hefesto_usr_inc_dir);
 
-hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
-                                                 int *errors,
-                                                 hefesto_var_list_ctx **gl_vars,
-                                      hefesto_options_ctx *forge_functions_name,
-                                   hefesto_options_ctx *usr_include_directories);
-
 static char *strip_comment_lines_from_command_block(const char *command);
 
 static void add_function_header(hefesto_func_list_ctx **functions,
@@ -2750,7 +2744,7 @@ static hefesto_include_list_ctx *get_all_includes(
 
 }
 
-hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
+hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
                                                  int *errors,
                                                  hefesto_var_list_ctx **gl_vars,
                                       hefesto_options_ctx *forge_functions_name,

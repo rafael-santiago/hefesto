@@ -57,8 +57,8 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                              hefesto_func_list_ctx *functions,
                                  hefesto_options_ctx *usr_include_directories);
 
-hefesto_func_list_ctx *compile_and_load_hls_code(const char *hls_main,
-                                                 int *errors, 
+hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
+                                                 int *errors,
                                                  hefesto_var_list_ctx **gl_vars,
                                       hefesto_options_ctx *forge_functions_name,
                                    hefesto_options_ctx *usr_include_directories);

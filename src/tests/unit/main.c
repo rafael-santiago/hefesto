@@ -641,7 +641,7 @@ unsigned char hmod_img[] = {
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static unsigned char hmod_img[] = {
-        '\x4d', '\x5a', '\x90', '\x00', '\x03', '\x00', '\x00', '\x00', '\x04', '\x00', '\x00', '\x00', '\xff', '\xff', '\x00', '\x00',
+    '\x4d', '\x5a', '\x90', '\x00', '\x03', '\x00', '\x00', '\x00', '\x04', '\x00', '\x00', '\x00', '\xff', '\xff', '\x00', '\x00',
     '\xb8', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x40', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00',
     '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x80', '\x00', '\x00', '\x00',
@@ -1568,11 +1568,11 @@ char *hefesto_func_list_ctx_tests() {
     hefesto_func_list_ctx *flist = NULL;
     printf("-- running hefesto_func_list_ctx_tests\n");
     flist = add_func_to_hefesto_func_list_ctx(flist,
-                                              "hls_int_type_function",
+                                              "hsl_int_type_function",
                                               NULL, 0,
                                               HEFESTO_VAR_TYPE_INT);
     HTEST_CHECK("hls_int_type_function not found",
-                get_hefesto_func_list_ctx_name("hls_int_type_function",
+                get_hefesto_func_list_ctx_name("hsl_int_type_function",
                                                flist) != NULL);
     HTEST_CHECK("function result type != int",
                 flist->result_type == HEFESTO_VAR_TYPE_INT);
@@ -1679,10 +1679,10 @@ char *hvm_function_recurssion_tests() {
                  "\tresult fatorial($value - 1) * $value;\n}\n";
     void *result;
     int errors = 0;
-    create_test_code("ftest.hls", code);
-    function = compile_and_load_hls_code("ftest.hls", &errors,
+    create_test_code("ftest.hsl", code);
+    function = compile_and_load_hsl_code("ftest.hsl", &errors,
                                          &gl_vars, NULL, NULL);
-    remove("ftest.hls");
+    remove("ftest.hsl");
     printf("-- running function_execution_tests\n");
     HTEST_CHECK("function == NULL", function != NULL);
     HTEST_CHECK("function->code == NULL", function->code != NULL);
@@ -1715,13 +1715,13 @@ char *hvm_if_tests() {
                  "\telse result 0;\n}\n";
     void *result;
     int errors = 0;
-    create_test_code("ftest.hls", code);
-    function = compile_and_load_hls_code("ftest.hls",
+    create_test_code("ftest.hsl", code);
+    function = compile_and_load_hsl_code("ftest.hsl",
                                          &errors,
                                          &gl_vars,
                                          NULL,
                                          NULL);
-    remove("ftest.hls");
+    remove("ftest.hsl");
     result = hvm_call_function("if_zero_results_one(10)",
                                &lo_vars, &gl_vars, function);
     HTEST_CHECK("result == NULL",
@@ -1753,12 +1753,12 @@ char *hvm_while_tests() {
                  " {\n\t\t$i = $i + 1;\n\t}\n\tresult $i;\n}\n";
     void *result;
     int errors = 0;
-    create_test_code("ftest.hls", code);
-    function = compile_and_load_hls_code("ftest.hls",
+    create_test_code("ftest.hsl", code);
+    function = compile_and_load_hsl_code("ftest.hsl",
                                          &errors,
                                          &gl_vars,
                                          NULL, NULL);
-    remove("ftest.hls");
+    remove("ftest.hsl");
     result = hvm_call_function("while_test(1000)",
                                &lo_vars,
                                &gl_vars, function);
@@ -1776,7 +1776,7 @@ char *hvm_while_tests() {
     return NULL;
 }
 
-char *hvm_syscalls_file_io_tests() { 
+char *hvm_syscalls_file_io_tests() {
 
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL;
     hefesto_type_t otype;
@@ -2343,12 +2343,12 @@ char *hvm_byref_syscall_test() {
     struct tm *tmp;
     char out[255];
 
-    create_test_code("byref_test.hls", code);
-    function = compile_and_load_hls_code("byref_test.hls",
+    create_test_code("byref_test.hsl", code);
+    function = compile_and_load_hsl_code("byref_test.hsl",
                                          &errors,
                                          &gl_vars, NULL, NULL);
     if (function == NULL) exit(1);
-    remove("byref_test.hls");
+    remove("byref_test.hsl");
     printf("-- hvm_byref_syscall_test\n");
     gl_vars = add_var_to_hefesto_var_list_ctx(gl_vars, "byref_works",
                                               HEFESTO_VAR_TYPE_INT);
@@ -2380,14 +2380,14 @@ char *hvm_byref_syscall_test() {
 }
 
 char *hvm_call_from_module_syscall_test() {
-    char *hls_code = "function call_from_module_test() : result type int {\n"
+    char *hsl_code = "function call_from_module_test() : result type int {\n"
                      "var retval type int;\n"
                      "var foo type string;\n"
                      "$foo = \"foo\";"
                      "$retval = hefesto.sys.call_from_module(\"./libhmodtest.so\", \"hmodfunctest\", $foo);"
                      "result ($foo == \"foobar!\" && $retval == 1);"
                      "}";
-    char *hls_code_no_ext = "function call_from_module_test() : result type int {\n"
+    char *hsl_code_no_ext = "function call_from_module_test() : result type int {\n"
                      "var retval type int;\n"
                      "var foo type string;\n"
                      "$foo = \"foo\";"
@@ -2408,11 +2408,11 @@ char *hvm_call_from_module_syscall_test() {
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     vp = get_hefesto_var_list_ctx_tail(lo_vars);
     assign_data_to_hefesto_var(vp, &errors, sizeof(errors));
-    create_test_code("call_from_module_test.hls", hls_code);
-    function = compile_and_load_hls_code("call_from_module_test.hls",
+    create_test_code("call_from_module_test.hsl", hsl_code);
+    function = compile_and_load_hsl_code("call_from_module_test.hsl",
                                          &errors,
                                          &gl_vars, NULL, NULL);
-    remove("call_from_module_test.hls");
+    remove("call_from_module_test.hsl");
     HTEST_CHECK("function == NULL", function != NULL);
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
     HTEST_CHECK("extraction_result != 1", errors == 1);
@@ -2441,11 +2441,11 @@ char *hvm_call_from_module_syscall_test() {
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     vp = get_hefesto_var_list_ctx_tail(lo_vars);
     assign_data_to_hefesto_var(vp, &errors, sizeof(errors));
-    create_test_code("call_from_module_test.hls", hls_code_no_ext);
-    function = compile_and_load_hls_code("call_from_module_test.hls",
+    create_test_code("call_from_module_test.hsl", hsl_code_no_ext);
+    function = compile_and_load_hsl_code("call_from_module_test.hsl",
                                          &errors,
                                          &gl_vars, NULL, NULL);
-    remove("call_from_module_test.hls");
+    remove("call_from_module_test.hsl");
     HTEST_CHECK("function == NULL", function != NULL);
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
@@ -2466,6 +2466,42 @@ char *hvm_call_from_module_syscall_test() {
     remove("libhmodtest.dll");
 #endif
 
+    printf("-- passed.\n");
+    return NULL;
+}
+
+char *hvm_get_func_addr_call_func_addr_test() {
+    char *hsl_code = "function max(x type int, y type int) : result type int {\n"
+                     "\tif ($x > $y) result $x;\n"
+                     "\tresult $y;\n"
+                     "}\n"
+                     "function run_test() : result type string {\n"
+                     "\tvar max_p type int;\n"
+                     "\t$max_p = hefesto.sys.get_func_addr(\"max\");\n"
+                     "\tvar retval type int;\n"
+                     "\t$retval = hefesto.sys.call_func_addr($max_p, 2, 1);\n"
+                     "\tif ($retval != 2) result \"f_ck!\";\n"
+                     "\tresult \"yes!!\";\n"
+                     "}\n";
+    hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
+    hefesto_func_list_ctx *functions = NULL;
+    void *retval;
+    int errors = 0;
+    printf("-- hvm_get_func_addr_call_func_addr_test()\n");
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "max_p", HEFESTO_VAR_TYPE_INT);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
+    create_test_code("func_addr-101.hsl", hsl_code);
+    functions = compile_and_load_hsl_code("func_addr-101.hsl",
+                                         &errors,
+                                         &gl_vars, NULL, NULL);
+    remove("func_addr-101.hsl");
+    HTEST_CHECK("functions == NULL", functions != NULL);
+    retval = hvm_call_function("run_test()",
+                                &lo_vars, &gl_vars, functions);
+    HTEST_CHECK("retval != \"yes!!\"", strcmp((char *)retval, "yes!!") == 0);
+    free(retval);
+    del_hefesto_var_list_ctx(lo_vars);
+    del_hefesto_func_list_ctx(functions);
     printf("-- passed.\n");
     return NULL;
 }
@@ -2541,6 +2577,10 @@ char *hvm_syscalls_tests() {
     if (result == NULL) {
         result = hvm_call_from_module_syscall_test();
     }
+    if (result == NULL) {
+        result = hvm_get_func_addr_call_func_addr_test();
+    }
+
     if (result == NULL) printf("-- passed.\n");
 
     return result;
@@ -2632,7 +2672,7 @@ char *regex_tests() {
     return NULL;
 }
 
-char *hls_with_redeclared_var_test() {
+char *hsl_with_redeclared_var_test() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2641,11 +2681,11 @@ char *hls_with_redeclared_var_test() {
                  "\n\tvar foovar type int;\n\tvar foovar type list;\n}\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_with_redeclared_var_test\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_with_redeclared_var_test\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2653,7 +2693,7 @@ char *hls_with_redeclared_var_test() {
     return NULL;
 }
 
-char *hls_accessing_var_without_dollar_prefix() {
+char *hsl_accessing_var_without_dollar_prefix() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2662,10 +2702,10 @@ char *hls_accessing_var_without_dollar_prefix() {
                  "\n\tvar foovar type int;\n\tfoovar = 1;\n}\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_accessing_var_without_dollar_prefix\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls", &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    printf("-- running hsl_accessing_var_without_dollar_prefix\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2673,7 +2713,7 @@ char *hls_accessing_var_without_dollar_prefix() {
     return NULL;
 }
 
-char *hls_wrong_function_argument_list_decl() {
+char *hsl_wrong_function_argument_list_decl() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2683,11 +2723,11 @@ char *hls_wrong_function_argument_list_decl() {
                  "\t$foovar = 1;\n}\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_wrong_function_argument_list_decl\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_wrong_function_argument_list_decl\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     del_hefesto_var_list_ctx(gl_vars);
     HTEST_CHECK("errors != 1", errors == 1);
@@ -2697,10 +2737,10 @@ char *hls_wrong_function_argument_list_decl() {
     code = "function foolction(again type string, again type int) :"
            "result type int {\n\tvar foovar type int;\n\t$foovar = 1;\n}\n";
     function = NULL;
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2708,7 +2748,7 @@ char *hls_wrong_function_argument_list_decl() {
     return NULL;
 }
 
-char *hls_unknown_function_result_type() {
+char *hsl_unknown_function_result_type() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2718,11 +2758,11 @@ char *hls_unknown_function_result_type() {
                  "\tvar foovar type int;\n\t$foovar = 1;\n}\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_unknown_function_result_type\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_unknown_function_result_type\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &lo_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2730,7 +2770,7 @@ char *hls_unknown_function_result_type() {
     return NULL;
 }
 
-char *hls_uncommented_comment() {
+char *hsl_uncommented_comment() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2741,11 +2781,11 @@ char *hls_uncommented_comment() {
                  "\t$foovar = 1;\n}\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_uncommented_comment\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_uncommented_comment\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2753,7 +2793,7 @@ char *hls_uncommented_comment() {
     return NULL;
 }
 
-char *hls_function_with_undeterminated_code_section() {
+char *hsl_function_with_undeterminated_code_section() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2762,21 +2802,21 @@ char *hls_function_with_undeterminated_code_section() {
                  "\t$v = 1;\n\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_function_with_undeterminated_code_section\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_function_with_undeterminated_code_section\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
 
     function = NULL;
     errors = 0;
     code = "function foolction(v type int) : result type int \n\t$v = 1;\n}\n";
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2785,7 +2825,7 @@ char *hls_function_with_undeterminated_code_section() {
 
 }
 
-char *hls_else_without_if() {
+char *hsl_else_without_if() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2794,11 +2834,11 @@ char *hls_else_without_if() {
                  "\telse\n\t{\n\t$v = 1;\n\t}\n}\n\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_else_without_if\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_else_without_if\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2806,7 +2846,7 @@ char *hls_else_without_if() {
     return NULL;
 }
 
-char *hls_if_else_else() {
+char *hsl_if_else_else() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2817,11 +2857,11 @@ char *hls_if_else_else() {
                  "\n\t}\n}\n\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_if_else_else\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_if_else_else\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2829,7 +2869,7 @@ char *hls_if_else_else() {
     return NULL;
 }
 
-char *hls_wrong_while_statement() {
+char *hsl_wrong_while_statement() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2840,11 +2880,11 @@ char *hls_wrong_while_statement() {
                  "Huh-huh!\");\n\t}\n}\n\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_wrong_while_statement\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_wrong_while_statement\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
     printf("-- passed.\n");
@@ -2852,7 +2892,7 @@ char *hls_wrong_while_statement() {
     return NULL;
 }
 
-char *hls_unterminated_code_lines() {
+char *hsl_unterminated_code_lines() {
 
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
@@ -2861,11 +2901,11 @@ char *hls_unterminated_code_lines() {
                  "\t$v = 1\n\t}\n\n";
     void *result;
     int errors = 0;
-    printf("-- running hls_unterminated_code_lines\n");
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    printf("-- running hsl_unterminated_code_lines\n");
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
 
@@ -2874,10 +2914,10 @@ char *hls_unterminated_code_lines() {
 
     errors = 0;
     function = NULL;
-    create_test_code("broken_hls.hls", code);
-    function = compile_and_load_hls_code("broken_hls.hls",
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
-    remove("broken_hls.hls");
+    remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     HTEST_CHECK("errors != 1", errors == 1);
 
@@ -2887,29 +2927,29 @@ char *hls_unterminated_code_lines() {
 
 }
 
-char *hls_compilation_tests() {
+char *hsl_compilation_tests() {
 
     char *result;
     printf("-- running compilation_tests\n");
-    result = hls_with_redeclared_var_test();
+    result = hsl_with_redeclared_var_test();
     if (result != NULL) return result;
-    result = hls_accessing_var_without_dollar_prefix();
+    result = hsl_accessing_var_without_dollar_prefix();
     if (result != NULL) return result;
-    result = hls_wrong_function_argument_list_decl();
+    result = hsl_wrong_function_argument_list_decl();
     if (result != NULL) return result;
-    result = hls_unknown_function_result_type();
+    result = hsl_unknown_function_result_type();
     if (result != NULL) return result;
-    result = hls_uncommented_comment();
+    result = hsl_uncommented_comment();
     if (result != NULL) return result;
-    result = hls_function_with_undeterminated_code_section();
+    result = hsl_function_with_undeterminated_code_section();
     if (result != NULL) return result;
-    result = hls_else_without_if();
+    result = hsl_else_without_if();
     if (result != NULL) return result;
-    result = hls_if_else_else();
+    result = hsl_if_else_else();
     if (result != NULL) return result;
-    result = hls_wrong_while_statement();
+    result = hsl_wrong_while_statement();
     if (result != NULL) return result;
-    result = hls_unterminated_code_lines();
+    result = hsl_unterminated_code_lines();
     if (result != NULL) return result;
     printf("-- passed.\n");
 
@@ -3019,7 +3059,7 @@ char *run_tests() {
     HTEST_RUN(hefesto_var_list_ctx_tests);
     HTEST_RUN(hefesto_func_list_ctx_tests);
     HTEST_RUN(options_tests);
-    HTEST_RUN(hls_compilation_tests);
+    HTEST_RUN(hsl_compilation_tests);
     HTEST_RUN(hvm_str_conversion_tests);
     HTEST_RUN(hvm_str_format_tests);
     HTEST_RUN(hvm_function_recurssion_tests);

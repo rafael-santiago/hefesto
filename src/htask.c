@@ -56,7 +56,7 @@ int boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
             return 1;
         }
 
-        functions = compile_and_load_hls_code(hls_main, &errors, &gl_vars,
+        functions = compile_and_load_hsl_code(hls_main, &errors, &gl_vars,
                                               forge_functions_name,
                                               user_includes);
 
