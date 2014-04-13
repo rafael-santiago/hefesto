@@ -128,6 +128,8 @@
                 <TR><TD>setenv()</TD><TD>creates an environment variable</TD></TR>
                 <TR><TD>unsetenv()</TD><TD>removes an environment variable</TD></TR>
                 <TR><TD>call_from_module()</TD><TD>calls functions coded into a shared library</TD></TR>
+                <TR><TD>get_func_addr()</TD><TD>returns the function address of a supplied function name</TD></TR>
+                <TR><TD>call_func_addr()</TD><TD>tries to perform a function call from supplied address</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -675,7 +677,30 @@
 		</OL>
 
                 In this shown example, the library "my_killer_mod.so" will searched in configurated paths in environment variable <I>HEFESTO_MODULES_HOME</I>.
+
+        <H5><B><U>get_func_addr()</U></B></H5>
         
+		Returns the function address of a supplied name function.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function get_func_addr_sample() : result type int {</CODE></LI>
+			<LI><CODE>&nbsp;result hefesto.sys.get_func_addr("dummy_clbk");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+
+
+        <H5><B><U>call_func_addr()</U></B></H5>
+        
+		Tries to do a raw function call from supplied address. If any error occurs in this process a runtime error is raised.<BR><BR>
+        
+        <OL CLASS="code">
+			<LI><CODE>function get_call_func_addr_sample() : result type int {</CODE></LI>
+			<LI><CODE>&nbsp;var clbk_p type int;</CODE></LI>
+                        <LI><CODE>&nbsp;$clbk_p = hefesto.sys.get_func_addr("abc_one_two_three");</CODE></LI>
+                        <LI><CODE>&nbsp;result hefesto.sys.call_func_addr($clbk_p, "abc", 1, "two", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+		</OL>
+
 		<BR><BR><A HREF = "#topics">Back</A>
 		
 		<!-- hsl toolset dialect -->

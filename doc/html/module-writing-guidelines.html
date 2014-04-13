@@ -26,7 +26,7 @@
             <LI><CODE>&nbsp;int dtype;                       // data type from data</LI></CODE>
             <LI><CODE>&nbsp;size_t dsize;                    // data size (in bytes)</LI></CODE>
             <LI><CODE>&nbsp;int byref_on_return;             // when 1 on return to hvm this data will copied to correspondent argument used on call_from_module() syscall</LI></CODE>
-            <LI><CODE>&nbsp;struct hefesto_modio_args *next; // pointer to next argument from call</LI></CODE>
+            <LI><CODE>&nbsp;struct hefesto_modio_args *next; // pointer to next argument</LI></CODE>
             <LI><CODE>};</LI></CODE>
         </OL><BR><BR>
         All function that you will write and export in a ".so" or ".dll" must have the following prototype:<BR><BR>

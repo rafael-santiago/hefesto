@@ -145,6 +145,8 @@
                 <TR><TD>setenv()</TD><TD>cria uma variável de ambiente</TD></TR>
                 <TR><TD>unsetenv()</TD><TD>remove uma variável de ambiente</TD></TR>
                 <TR><TD>call_from_module()</TD><TD>chama uma função implementada em uma biblioteca dinâmica</TD></TR>
+                <TR><TD>get_func_addr()</TD><TD>obtém o endereço de um nome de função passado</TD></TR>
+                <TR><TD>call_func_addr()</TD><TD>tenta fazer uma chamada de função à partir do endereço passado</TD></TR>
             </TABLE>
         </CENTER><BR>
         
@@ -694,11 +696,33 @@
 
         <OL CLASS="code">
 			<LI><CODE>function call_from_module_sample() : result type none {</CODE></LI>
-			<LI><CODE>&nbsp;hefesto.sys.call_from_moduke("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);</CODE></LI>
+			<LI><CODE>&nbsp;hefesto.sys.call_from_module("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);</CODE></LI>
 			<LI><CODE>}</CODE></LI>
 	</OL>
 
                 Nesse exemplo apresentado, a biblioteca "my_killer_mod.so" será procurada nos paths configurados na variável de ambiente <I>HEFESTO_MODULES_HOME</I>.
+
+        <H5><B><U>get_func_addr()</U></B></H5>
+		
+		Obtém o endereço de um nome de função informado.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function get_func_addr_sample() : result type int {</CODE></LI>
+			<LI><CODE>&nbsp;result hefesto.sys.get_func_addr("dummy_clbk");</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+	</OL>
+
+        <H5><B><U>call_func_addr()</U></B></H5>
+		
+		Tenta fazer uma chamada de função à partir de um endereço específico. Se qualquer erro ocorrer no processo um erro de tempo de execução é disparado.<BR><BR>
+
+        <OL CLASS="code">
+			<LI><CODE>function call_func_addr_sample() : result type int {</CODE></LI>
+                        <LI><CODE>&nbsp;var clbk_p type int;</CODE></LI>
+			<LI><CODE>&nbsp;$clbk_p = hefesto.sys.get_func_addr("abc_one_two_three");</CODE></LI>
+                        <LI><CODE>&nbsp;result hefesto.sys.call_from_addr($clbk_p, "abc", 1, "two", 3);</CODE></LI>
+			<LI><CODE>}</CODE></LI>
+	</OL>
 
 		<BR><BR><A HREF = "#topics">Voltar</A>
 		
