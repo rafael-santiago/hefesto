@@ -2470,7 +2470,7 @@ char *hvm_call_from_module_syscall_test() {
     return NULL;
 }
 
-char *hvm_get_func_addr_call_func_addr_test() {
+char *hvm_get_func_addr_call_func_addr_syscall_test() {
     char *hsl_code = "function max(x type int, y type int) : result type int {\n"
                      "\tif ($x > $y) result $x;\n"
                      "\tresult $y;\n"
@@ -2487,7 +2487,7 @@ char *hvm_get_func_addr_call_func_addr_test() {
     hefesto_func_list_ctx *functions = NULL;
     void *retval;
     int errors = 0;
-    printf("-- hvm_get_func_addr_call_func_addr_test()\n");
+    printf("-- hvm_get_func_addr_call_func_addr_syscall_test()\n");
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "max_p", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     create_test_code("func_addr-101.hsl", hsl_code);
@@ -2578,7 +2578,7 @@ char *hvm_syscalls_tests() {
         result = hvm_call_from_module_syscall_test();
     }
     if (result == NULL) {
-        result = hvm_get_func_addr_call_func_addr_test();
+        result = hvm_get_func_addr_call_func_addr_syscall_test();
     }
 
     if (result == NULL) printf("-- passed.\n");
