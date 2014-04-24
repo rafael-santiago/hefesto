@@ -13,7 +13,7 @@ Seeking with it:
     * Organization
     * Expansibility
     
-This application wasn't thought to help only a small amount of programmers which use some specific languagens and toolsets, Hefesto helps on automation of several tasks that go beyond just compling and linking programs. Depending on your necessity and disposition to extend the Hefesto.
+This application wasn't thought to help only a small amount of programmers which use some specific languages and toolsets, Hefesto helps on automation of several tasks that go beyond just compling and linking programs. Depending on your necessity and disposition to extend the Hefesto.
 
 When you extend Hefesto this don't mean that you need to recompile the application, all is done via Hsl, the specific domain language that Hefesto implements.
 
