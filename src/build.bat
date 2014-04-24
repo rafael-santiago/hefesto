@@ -8,9 +8,9 @@
 
 @SET ADVAPI32LIB=-ladvapi32
 
-@SET LINKER_OPTS=-o../bin/hefesto.exe dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o here/libhere.a %ADVAPI32LIB%
+@SET LINKER_OPTS=-o../bin/hefesto.exe dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/libhere.a %ADVAPI32LIB%
 
-@SET UNIT_TEST=-omain.exe ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../here/libhere.a %ADVAPI32LIB%
+@SET UNIT_TEST=-omain.exe ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o ../../here/libhere.a %ADVAPI32LIB%
 
 @SET LIBHERE_OBJS=here.o here_ctx.o here_mmachine.o here_mem.o
 
@@ -108,6 +108,9 @@
 @%COMPILER% %COMPILER_OPTS% hvm_winreg.c
 @IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
 
+@%COMPILER% %COMPILER_OPTS% hvm_mod.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
+
 @echo ### Compiled.
 
 @cd here
@@ -147,7 +150,9 @@
 
 @cd tests\unit
 @%COMPILER% -c main.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO UNIT_TEST_COMPILATION_FAIL )
 @%COMPILER% -c htest.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO UNIT_TEST_COMPILATION_FAIL )
 @%LINKER% %UNIT_TEST%
 @main.exe
 @cd ..\..\

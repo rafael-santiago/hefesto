@@ -13,6 +13,7 @@
 #include "../../vfs.h"
 #include "../../hvm_toolset.h"
 #include "../../here/here.h"
+#include "../../init.h"
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
@@ -1970,7 +1971,7 @@ char *hvm_syscalls_filesystem_tests() {
                               &lo_vars, &gl_vars, func, &otype);
     sprintf(test_dir, "%s", result);
 
-    hefesto_init();
+    hefesto_init(NULL);
 
     //  removing previous occurrence of "test_directory" subdir
 

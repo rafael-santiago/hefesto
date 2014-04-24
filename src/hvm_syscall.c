@@ -35,6 +35,10 @@
 
 #include <sys/wait.h>
 
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
+#define WEXITSTATUS(s) (s)
+
 #endif
 
 static void *hefesto_sys_replace_in_file(const char *syscall,

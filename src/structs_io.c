@@ -1013,7 +1013,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 //printf("tok: %s\n", temp);
                 p->params = add_data_to_hefesto_common_list_ctx(p->params,
                                                                 temp,
-                                                                strlen(cmd_buf));
+                                                                strlen(temp));
                 free(temp);
             } else {
                 printf("command not found: '%s'\n", cmd_buf);
