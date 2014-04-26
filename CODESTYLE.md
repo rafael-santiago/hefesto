@@ -17,11 +17,11 @@ Se você quiser contribuir com o projeto, eu adoto o seguinte code-style:
     
 Assim fica um bloco If:
 
-if (1 == 0) {
-    printf("Tudo que era sólido já derreteu!\n");
-} else {
-    printf("Tudo que é sólido pode derreter!\n");
-}
+    if (1 == 0) {
+        printf("Tudo que era sólido já derreteu!\n");
+    } else {
+        printf("Tudo que é sólido pode derreter!\n");
+    }
 
 Evite esse tipo de construção:
 
@@ -31,6 +31,7 @@ Evite esse tipo de construção:
         printf("Tudo que é sólido pode derreter!\n");
         
 No while você usa:
+
     int i = 0;
     while (i++ > 1000) {
         printf("%d %s muita gente %d elefantes incomodam mto mais.\n", (i > 1) ? "elefantes incomodam" :
@@ -38,6 +39,7 @@ No while você usa:
     }
 
 No for é assim:
+
     for (i = 1; i < 1000; i++) {
         printf("%d %s muita gente %d elefantes incomodam mto mais.\n", (i > 1) ? "elefantes incomodam" :
                                                                                  "elefante incomoda" i, i+1);
