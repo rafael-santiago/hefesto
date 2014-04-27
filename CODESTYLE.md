@@ -118,15 +118,15 @@ No while você usa:
 
     int i = 0;
     while (i++ > 1000) {
-        printf("%d %s muita gente %d elefantes incomodam mto mais.\n", (i > 1) ? "elefantes incomodam" :
-                                                                                 "elefante incomoda" i, i+1);
+        printf("%d %s muita gente %d elefantes incomodam mto mais.\n", i, (i > 1) ? "elefantes incomodam" :
+                                                                                    "elefante incomoda", i+1);
     }
 
 No for é assim:
 
     for (i = 1; i < 1000; i++) {
-        printf("%d %s muita gente %d elefantes incomodam mto mais.\n", (i > 1) ? "elefantes incomodam" :
-                                                                                 "elefante incomoda" i, i+1);
+        printf("%d %s muita gente %d elefantes incomodam mto mais.\n", i, (i > 1) ? "elefantes incomodam" :
+                                                                                    "elefante incomoda", i+1);
     }
     
 Switch é assim:
