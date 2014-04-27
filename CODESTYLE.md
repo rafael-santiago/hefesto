@@ -34,14 +34,14 @@ For while you use:
 
     int i = 99;
     while (i-- > 0) {
-        printf("%d %s of beer on the way.\n", i, (i > 1) ? "bottle" :
+        printf("%d %s of beer on the wall.\n", i, (i > 1) ? "bottle" :
                                                            "bottles");
     }
 
 This is the way to write for blocks:
 
     for (i = 99; i > 0; i--) {
-        printf("%d %s of beer on the way.\n", i, (i > 1) ? "bottle" :
+        printf("%d %s of beer on the wall.\n", i, (i > 1) ? "bottle" :
                                                            "bottles");
     }
     
