@@ -3,7 +3,9 @@ Building Hefesto
   
 In order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"  
   
-If you're on Linux/FreeBSD use: ./build.shIf you're on Windows use: build.bat  
+If you're on Linux/FreeBSD use: ./build.sh
+
+If you're on Windows use: build.bat  
   
 The both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)  
   
