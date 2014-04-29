@@ -7,19 +7,26 @@ COMPILER_OPTS="-c -Wall " # Options too
 LINKER="gcc" # Linker too
 LIB="ar"
 
-###################################################
-# FreeBSD users: swap -ldl flag for -lexecinfo ;) #
-###################################################
+LINKERFLAGS=""
+
+PLATFORM=$(uname -o)
+
+if test "$PLATFORM" = "FreeBSD"
+then
+    LINKERFLAGS="-lexecinfo"
+else
+    LINKERFLAGS="-ldl"
+fi
 
 LINKER_OPTS="-o../bin/hefesto dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
-                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/libhere.a -lpthread -ldl"
+                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/libhere.a -lpthread $LINKERFLAGS"
 
 UNIT_TEST="-omain ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o ../../here/libhere.a -lpthread -ldl"
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o ../../here/libhere.a -lpthread $LINKERFLAGS"
 
 ALL_OK=1
 
@@ -238,24 +245,24 @@ fi
 
 if test $ALL_OK -eq 1
 then
-#echo "### Compiled."
+echo "### Compiled."
 
-#echo "### Now running unit tests"
+echo "### Now running unit tests"
 
 # Running unit tests
 
-#cd tests/unit
-#$COMPILER -c main.c
-#$COMPILER -c htest.c
-#$LINKER $UNIT_TEST
-#./main
+cd tests/unit
+$COMPILER -c main.c
+$COMPILER -c htest.c
+$LINKER $UNIT_TEST
+./main
 
-#if test $? -gt 0
-#then
-#    ALL_OK=0
-#fi
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
 
-#cd ../../
+cd ../../
 
 if test $ALL_OK -eq 1
 then
@@ -270,7 +277,7 @@ then
 
         # If tests are ok, use the hefesto to install hefesto ;)
 
-#        ../bin/hefesto --forgefiles=../setup/hfst-inst.hls --hfst-inst-projects=hefesto-install
+        ../bin/hefesto --forgefiles=../setup/hfst-inst.hsl --hfst-inst-projects=hefesto-install
 
     fi
     # Done!
