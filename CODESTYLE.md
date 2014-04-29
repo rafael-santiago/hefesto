@@ -63,7 +63,7 @@ The way for switches is:
             
     }
 
-Good practices
+Best practices
 --------------
 
     * Give credit to yourself and keep the credit of others
