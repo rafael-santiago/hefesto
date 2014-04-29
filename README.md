@@ -5,7 +5,7 @@ Hefesto is a multiplatform build system which currently runs on Linux, FreeBSD a
 
 The main Hefesto's characteristic is give a more programatic aspect for a build.
 
-For it, Hefesto adopts his own language with a more procedural aspect than declarative.
+In order to do it Hefesto adopts his own language with a more procedural aspect than declarative.
 
 Seeking with it:
 
