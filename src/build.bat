@@ -168,7 +168,7 @@
 
 @echo ### Linked.
 
-@..\bin\hefesto.exe --forgefiles=..\\setup\\hfst-inst.hls --hfst-inst-projects=hefesto-install
+@..\bin\hefesto.exe --forgefiles=..\\setup\\hfst-inst.hsl --hfst-inst-projects=hefesto-install
 @GOTO ALL_DONE
 
 :COMPILATION_FAIL

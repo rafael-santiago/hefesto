@@ -192,7 +192,7 @@ void hvm_init_function_args(const char *args,
     void *expr_result;
     hefesto_type_t etype;
     size_t sz;
-    hefesto_var_list_ctx *vp = (*function)->vars, *ap = (*function)->args, *vlp;
+    hefesto_var_list_ctx *vp = (*function)->vars, *ap = (*function)->args, *vlp = NULL;
     size_t offset = 0;
     hefesto_instruction_code_t c_intr = hvm_get_current_executed_instruction();
     char *temp = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);

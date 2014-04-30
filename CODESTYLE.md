@@ -6,12 +6,12 @@ If you wish to contribute with the project, I adopt the following codestyle:
     * Codes with columns limited in 80-120 bytes
     * White spaces are used to separate the code in logical blocks, save your disorder for the next ioccc
     * #pragmas are forbidden
-    * include guards need to be defined with 1 -> #deine _EXAMPLE_H 1
+    * include guards need to be defined with 1 -> #define _EXAMPLE_H 1
     * if/else, while and for blocks are K&R based
     * Indentation: 8 spaces
     * Use 0 as string delimitator instead of '\0'
     * Use NULL to represent null pointers
-    * Do not use ultraExplainedBoringNames, you programme in C, honor it or do a harakiri ;D
+    * Do not use ultraExplainedBoringNames, you're an C programmer, honor it or do a harakiri ;D
     * Static functions need to be prototyped at the module beginning
     * Pointers declaration: "void *vptr = NULL;" and not: "void* vptr = NULL;"
     
@@ -76,7 +76,7 @@ Best practices
       in impossible situations
     * Learn with musicians that reads transcriptions from other musicians, create the habit of code reading
       seeking learning and not only for refactory issues
-    * I'm brazilian and I write comments in portugues, if you speak portuguese and wish to comment with this language,
+    * I'm brazilian and I write comments in portuguese, if you speak portuguese and wish to comment with this language,
       include if possible an english version of your comment    
     * Your ideas and specialities in some subject is what are welcome in this project, these things need to
       stay even you get away, be abducted or go to program in BASIC, never retain information.   
