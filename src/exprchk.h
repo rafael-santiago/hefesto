@@ -26,6 +26,6 @@ char *get_next_call_args(const char *expression, size_t *offset);
 
 char *get_next_string(const char *expression, size_t *offset);
 
-int balanced_parentesis(const char *expression);
+int balanced_round_brackets(const char *expression);
 
 #endif

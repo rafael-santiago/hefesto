@@ -400,7 +400,7 @@ int synchk_check_language_production(const char *command,
         }
     }
 
-    if (!balanced_parentesis(cmd_p)) {
+    if (!balanced_round_brackets(cmd_p)) {
         hlsc_info(HLSCM_MTYPE_SYNTAX,
                   HLSCM_SYN_ERROR_INCOMPLETE_EXPR_OR_STMT, cmd_p);
         return 0;

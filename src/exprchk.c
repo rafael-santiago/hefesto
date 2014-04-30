@@ -58,7 +58,7 @@ static int balanced_square_brackets(const char *expression) {
 
 }
 
-int balanced_parentesis(const char *expression) {
+int balanced_round_brackets(const char *expression) {
 
     hefesto_common_stack_ctx *sp = NULL, *del = NULL;
     const char *e;
@@ -150,7 +150,7 @@ int is_valid_expression(const char *expression, hefesto_var_list_ctx *lo_vars,
     hefesto_func_list_ctx *fp;
     int o;
 
-    if (!balanced_parentesis(expression)) {
+    if (!balanced_round_brackets(expression)) {
         return 0;
     }
 
@@ -317,7 +317,7 @@ int is_valid_expression(const char *expression, hefesto_var_list_ctx *lo_vars,
                                 e++;
                                 offset++;
                                 *t = 0;
-                                while (!balanced_parentesis(temp) && *e != 0) {
+                                while (!balanced_round_brackets(temp) && *e != 0) {
                                     *t = *e;
                                     t++;
                                     *t = 0;
