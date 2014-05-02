@@ -1,4 +1,10 @@
 #
+#                              Copyright (C) 2014 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
 # "ffmpeg.hsl"
 #  Description: The ffmpeg toolset
 #
@@ -9,24 +15,25 @@ toolset "ffmpeg-toolset" forge function "ffmpeg_forge": forge helpers "mk_ffmpeg
     command "mp4conversor": INPUT_FILE, OUTPUT_FILE <
         ffmpeg.exe -i $INPUT_FILE -ss 60 -t 10 -crf 19 -preset slow -c:v copy -c:a aac -strict -2 $OUTPUT_FILE
     >
-    
+
     command "ipodencoder": INPUT_FILE, OUTPUT_FILE <
         ffmpeg -i $INPUT_FILE input -acodec aac -ab 128kb -vcodec mpeg4 -b 1200kb -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 320x180 -title X $OUTPUT_FILE
     >
-    
+
     command "avi2gif": INPUT_FILE, OUTPUT_FILE <
         ffmpeg -i $INPUT_FILE $OUTPUT_FILE
     >
-    
+
     command "mp3fromvid": INPUT_FILE, OUTPUT_FILE <
         ffmpeg -i $INPUT_FILE -vn -ar 44100 -ac 2 -ab 192 -f mp3 $OUTPUT_FILE
-    > 
-	
-	command "flv2mp4": INPUT_FILE, OUTPUT_FILE <
-		ffmpeg -i $INPUT_FILE -c:v libx264 -copyts $OUTPUT_FILE
-	>
-	
-	command "flv2mp4wcrf": INPUT_FILE, OUTPUT_FILE, CRF_VALUE <
-		ffmpeg -i $INPUT_FILE -c:v libx264 -crf $CRF_VALUE -q:a 100 $OUTPUT_FILE
-	>
+    >
+
+    command "flv2mp4": INPUT_FILE, OUTPUT_FILE <
+        ffmpeg -i $INPUT_FILE -c:v libx264 -copyts $OUTPUT_FILE
+    >
+
+    command "flv2mp4wcrf": INPUT_FILE, OUTPUT_FILE, CRF_VALUE <
+        ffmpeg -i $INPUT_FILE -c:v libx264 -crf $CRF_VALUE -q:a 100 $OUTPUT_FILE
+    >
 $
+

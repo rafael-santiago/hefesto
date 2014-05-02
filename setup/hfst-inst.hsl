@@ -955,6 +955,9 @@ hefesto-install.prologue() {
     $source_files.add_item("../include/optutil.hsl");
     $source_files.add_item("../include/string.hsl");
     $source_files.add_item("../include/lsutil.hsl");
+    $source_files.add_item("../include/generators/codeblocks_project_generator.hsl");
+    $source_files.add_item("../include/generators/devcpp_project_generator.hsl");
+    $source_files.add_item("../include/visualstudio_project_generator.hsl");
 
     # The setup files
 
@@ -1015,6 +1018,9 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/optutil.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/string.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/lsutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/codeblocks_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/devcpp_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/visualstudio_project_generator.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/LEIAME"));
@@ -1067,6 +1073,9 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\optutil.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\string.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\lsutil.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\codeblocks_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\devcpp_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\visualstudio_project_generator.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\LEIAME"));

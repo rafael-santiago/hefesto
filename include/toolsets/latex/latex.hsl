@@ -4,7 +4,9 @@
 # This is free software. You can redistribute it and/or modify under
 # the terms of the GNU General Public License version 2.
 #
+# "latex.hsl"
 #
+
 include ~/toolsets/latex/forges/latex_forge_stuff.hsl
 
 toolset "latex-htool" forge function "latex_src_forge" :

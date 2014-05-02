@@ -1,3 +1,12 @@
+#
+#                              Copyright (C) 2014 by Rafael Santiago
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+# "vssetuputils.hsl"
+#
+
 function vspath_exists(path type string) : result type int
 {
     var old_pwd type string;
@@ -5,7 +14,7 @@ function vspath_exists(path type string) : result type int
     hefesto.sys.cd($path);
     var exists type int;
     $exists = (hefesto.sys.pwd() == $path ||
-               hefesto.sys.pwd() == ($path + "\\"));    
+               hefesto.sys.pwd() == ($path + "\\"));
     hefesto.sys.cd($old_pwd);
     result $exists;
 }
