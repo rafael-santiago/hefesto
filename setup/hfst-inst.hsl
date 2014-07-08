@@ -263,7 +263,7 @@ local function export_env_hefesto_var(install_dir type string) : result type int
         if ($hefesto_sh_fd != 0) {
             var data_buf type string;
             $data_buf = "#!/bin/sh\n\nexport HEFESTO_INCLUDES_HOME=" + hefesto.sys.make_path($install_dir, "include") + "\n";
-            $data_buf = "export HEFESTO_MODULES_HOME=" + hefesto.sys.make_path($install_dir, "module") + "\n\n";
+            $data_buf = $data_buf + "export HEFESTO_MODULES_HOME=" + hefesto.sys.make_path($install_dir, "module") + "\n\n";
             $exported = hefesto.sys.fwrite($data_buf, $data_buf.len(), $hefesto_sh_fd);
             if ($exported == $data_buf.len()) {
                 $exported = (hefesto.sys.run("chmod +x /etc/profile.d/hefesto.sh") == 0);
@@ -957,7 +957,7 @@ hefesto-install.prologue() {
     $source_files.add_item("../include/lsutil.hsl");
     $source_files.add_item("../include/generators/codeblocks_project_generator.hsl");
     $source_files.add_item("../include/generators/devcpp_project_generator.hsl");
-    $source_files.add_item("../include/visualstudio_project_generator.hsl");
+    $source_files.add_item("../include/generators/visualstudio_project_generator.hsl");
 
     # The setup files
 
@@ -1020,7 +1020,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/lsutil.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/codeblocks_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/devcpp_project_generator.hsl"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/visualstudio_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/visualstudio_project_generator.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/LEIAME"));
@@ -1075,7 +1075,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\lsutil.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\codeblocks_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\devcpp_project_generator.hsl"));
-        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\visualstudio_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\visualstudio_project_generator.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\LEIAME"));
