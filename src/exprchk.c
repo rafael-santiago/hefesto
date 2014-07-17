@@ -6,17 +6,17 @@
 #include "synchk.h"
 #include <string.h>
 
-static int balanced_square_brackets(const char *expression);
+static hefesto_int_t balanced_square_brackets(const char *expression);
 
 static char *get_next_operand(const char *expression, size_t *offset);
 
 static char *get_next_operator(const char *expression, size_t *offset);
 
-static int balanced_square_brackets(const char *expression) {
+static hefesto_int_t balanced_square_brackets(const char *expression) {
 
     hefesto_common_stack_ctx *sp = NULL, *del;
     const char *e;
-    int is_empty = 0;
+    hefesto_int_t is_empty = 0;
 
     for (e = expression; *e != 0; e++) {
 
@@ -58,11 +58,11 @@ static int balanced_square_brackets(const char *expression) {
 
 }
 
-int balanced_round_brackets(const char *expression) {
+hefesto_int_t balanced_round_brackets(const char *expression) {
 
     hefesto_common_stack_ctx *sp = NULL, *del = NULL;
     const char *e;
-    int is_empty = 0;
+    hefesto_int_t is_empty = 0;
 
     for (e = expression; *e != 0; e++) {
 
@@ -110,13 +110,13 @@ int balanced_round_brackets(const char *expression) {
 
 }
 
-int is_valid_array_indexing(const char *indexing, hefesto_var_list_ctx *lo_vars,
-                            hefesto_var_list_ctx *gl_vars,
-                            hefesto_func_list_ctx *functions) {
+hefesto_int_t is_valid_array_indexing(const char *indexing, hefesto_var_list_ctx *lo_vars,
+                                      hefesto_var_list_ctx *gl_vars,
+                                      hefesto_func_list_ctx *functions) {
 
     size_t i_sz;
     char *temp;
-    int result;
+    hefesto_int_t result;
     size_t of = 0;
 
     if(!balanced_square_brackets(indexing)) return 0;
@@ -138,17 +138,17 @@ int is_valid_array_indexing(const char *indexing, hefesto_var_list_ctx *lo_vars,
 
 }
 
-int is_valid_expression(const char *expression, hefesto_var_list_ctx *lo_vars,
-                        hefesto_var_list_ctx *gl_vars,
-                        hefesto_func_list_ctx *functions) {
+hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *lo_vars,
+                                  hefesto_var_list_ctx *gl_vars,
+                                  hefesto_func_list_ctx *functions) {
 
     const char *e;
-    int state;
+    hefesto_int_t state;
     size_t offset = 0, offset_aux;
     char *t, *temp = NULL, *next_token;
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
-    int o;
+    hefesto_int_t o;
 
     if (!balanced_round_brackets(expression)) {
         return 0;
@@ -390,7 +390,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
 
     char *operand = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *o;
     const char *e = expression + (*offset);
-    int b;
+    hefesto_int_t b;
 
     memset(operand, 0, HEFESTO_MAX_BUFFER_SIZE);
 
@@ -548,7 +548,7 @@ char *get_next_indexing(const char *expression, size_t *offset) {
 
     char *indexing = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *i;
     const char *e = expression + (*offset);
-    int sq_brackets = 0;
+    hefesto_int_t sq_brackets = 0;
 
     memset(indexing, 0, HEFESTO_MAX_BUFFER_SIZE);
 
@@ -617,7 +617,7 @@ char *get_next_method_call(const char *expression, size_t *offset) {
 
     char *method = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *m;
     const char *e = expression + (*offset);
-    int parentesis = 0;
+    hefesto_int_t parentesis = 0;
 
     memset(method, 0, HEFESTO_MAX_BUFFER_SIZE);
 
@@ -691,7 +691,7 @@ char *get_next_call_args(const char *expression, size_t *offset) {
 
     char *method = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *m;
     const char *e = expression + (*offset), *t;
-    int parentesis = 0;
+    hefesto_int_t parentesis = 0;
 
     memset(method, 0, HEFESTO_MAX_BUFFER_SIZE);
 
@@ -807,4 +807,3 @@ char *get_next_string(const char *expression, size_t *offset) {
 
     return string;
 }
-

@@ -15,7 +15,7 @@
 char *get_next_line_from_file(FILE *fp) {
     char *line = NULL, *lp;
     char l;
-    int line_start, line_end;
+    hefesto_int_t line_start, line_end;
     if (!feof(fp)) {
         line_start = ftell(fp);
         l = fgetc(fp);

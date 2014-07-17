@@ -16,22 +16,22 @@ hefesto_instruction_code_t get_instruction_code(const char *usr_instruction,
                                                 hefesto_var_list_ctx *global_vars,
                                                 hefesto_func_list_ctx *functions);
 
-static int is_list_indexing_method_invoke(const char *usr_instruction,
-                                          hefesto_var_list_ctx *local_vars,
-                                          hefesto_var_list_ctx *global_vars);
+static hefesto_int_t is_list_indexing_method_invoke(const char *usr_instruction,
+                                                    hefesto_var_list_ctx *local_vars,
+                                                    hefesto_var_list_ctx *global_vars);
 
-static int is_array_indexing_attrib_statement(const char *usr_instruction,
-                                              hefesto_var_list_ctx *local_vars,
-                                              hefesto_var_list_ctx *global_vars);
+static hefesto_int_t is_array_indexing_attrib_statement(const char *usr_instruction,
+                                                        hefesto_var_list_ctx *local_vars,
+                                                        hefesto_var_list_ctx *global_vars);
 
-static int is_attrib_statement(const char *usr_instruction,
-                               hefesto_var_list_ctx *local_vars,
-                               hefesto_var_list_ctx *global_vars);
+static hefesto_int_t is_attrib_statement(const char *usr_instruction,
+                                         hefesto_var_list_ctx *local_vars,
+                                         hefesto_var_list_ctx *global_vars);
 
 static
     hefesto_var_list_ctx *get_var_from_method_invocation(const char *invocation,
-                                                  hefesto_var_list_ctx *lo_vars,
-                                                  hefesto_var_list_ctx *gl_vars);
+                                                         hefesto_var_list_ctx *lo_vars,
+                                                         hefesto_var_list_ctx *gl_vars);
 
 static char *HEFESTO_TYPES[] = {
   "string",
@@ -112,7 +112,7 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     "\0"
 };
 
-int is_hefesto_type(const char *type) {
+hefesto_int_t is_hefesto_type(const char *type) {
 
     size_t t;
 
@@ -137,7 +137,7 @@ hefesto_type_t get_var_type(const char *type) {
 
 }
 
-int is_valid_hefesto_user_defined_symbol(const char *symbol) {
+hefesto_int_t is_valid_hefesto_user_defined_symbol(const char *symbol) {
 
     const char *s;
 
@@ -209,13 +209,13 @@ ssize_t get_hefesto_sys_call_index(const char *syscall_name) {
 
 }
 
-static int is_attrib_statement(const char *usr_instruction,
-                               hefesto_var_list_ctx *local_vars,
-                               hefesto_var_list_ctx *global_vars) {
+static hefesto_int_t is_attrib_statement(const char *usr_instruction,
+                                         hefesto_var_list_ctx *local_vars,
+                                         hefesto_var_list_ctx *global_vars) {
 
     char *v = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *vp;
     const char *up;
-    int exists = 0;
+    hefesto_int_t exists = 0;
 
     for (vp = v, up = usr_instruction;
          *up != 0 && *up != '=' && !is_hefesto_blank(*up); up++, vp++) {
@@ -235,13 +235,13 @@ static int is_attrib_statement(const char *usr_instruction,
     return exists;
 }
 
-static int is_array_indexing_attrib_statement(const char *usr_instruction,
-                                              hefesto_var_list_ctx *local_vars,
-                                              hefesto_var_list_ctx *global_vars) {
+static hefesto_int_t is_array_indexing_attrib_statement(const char *usr_instruction,
+                                                        hefesto_var_list_ctx *local_vars,
+                                                        hefesto_var_list_ctx *global_vars) {
 
     char *v = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *vp;
     const char *up;
-    int exists = 0;
+    hefesto_int_t exists = 0;
 
     for (vp = v, up = usr_instruction;
          *up != 0 && *up != '[' && !is_hefesto_blank(*up); up++, vp++) {
@@ -269,11 +269,11 @@ static int is_array_indexing_attrib_statement(const char *usr_instruction,
 
 }
 
-int is_list_method_invoke(const char *usr_instruction,
-                          hefesto_var_list_ctx *local_vars,
-                          hefesto_var_list_ctx *global_vars) {
+hefesto_int_t is_list_method_invoke(const char *usr_instruction,
+                                    hefesto_var_list_ctx *local_vars,
+                                    hefesto_var_list_ctx *global_vars) {
 
-    int is_method = 0;
+    hefesto_int_t is_method = 0;
     const char *u;
     hefesto_var_list_ctx *vp =
         get_var_from_method_invocation(usr_instruction, local_vars,
@@ -288,14 +288,14 @@ int is_list_method_invoke(const char *usr_instruction,
 
 }
 
-static int is_list_indexing_method_invoke(const char *usr_instruction,
-                                          hefesto_var_list_ctx *local_vars,
-                                          hefesto_var_list_ctx *global_vars) {
+static hefesto_int_t is_list_indexing_method_invoke(const char *usr_instruction,
+                                                    hefesto_var_list_ctx *local_vars,
+                                                    hefesto_var_list_ctx *global_vars) {
 
     char *v = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *vp, *vpp;
     const char *up;
     hefesto_var_list_ctx  *var = 0;
-    int is_method = 0;
+    hefesto_int_t is_method = 0;
 
     for (vp = v, up = usr_instruction;
          *up != 0 && *up != '(' && !is_hefesto_blank(*up); up++, vp++) {
@@ -327,7 +327,7 @@ static int is_list_indexing_method_invoke(const char *usr_instruction,
 
 }
 
-int is_hefesto_list_method(const char *method) {
+hefesto_int_t is_hefesto_list_method(const char *method) {
 
     size_t m;
 
@@ -338,7 +338,7 @@ int is_hefesto_list_method(const char *method) {
 
 }
 
-int is_hefesto_string_method(const char *method) {
+hefesto_int_t is_hefesto_string_method(const char *method) {
 
     size_t m;
 
@@ -371,11 +371,11 @@ ssize_t get_hefesto_string_method_index(const char *method) {
 
 }
 
-int is_string_method_invoke(const char *usr_instruction,
-                            hefesto_var_list_ctx *local_vars,
-                            hefesto_var_list_ctx *global_vars) {
+hefesto_int_t is_string_method_invoke(const char *usr_instruction,
+                                      hefesto_var_list_ctx *local_vars,
+                                      hefesto_var_list_ctx *global_vars) {
 
-    int is_method = 0;
+    hefesto_int_t is_method = 0;
     const char *u;
     hefesto_var_list_ctx *vp = get_var_from_method_invocation(usr_instruction,
                                                               local_vars,
@@ -391,8 +391,8 @@ int is_string_method_invoke(const char *usr_instruction,
 
 static
   hefesto_var_list_ctx *get_var_from_method_invocation(const char *invocation,
-                                                hefesto_var_list_ctx *lo_vars, 
-                                                hefesto_var_list_ctx *gl_vars) {
+                                                       hefesto_var_list_ctx *lo_vars, 
+                                                       hefesto_var_list_ctx *gl_vars) {
 
     char *v = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *vp;
     const char *up;

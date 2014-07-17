@@ -6,17 +6,17 @@
  *
  */
 #include "dbg.h"
-#include "types.h"
-#include <stdarg.h>
-#include <stdio.h>
 
 #ifdef HEFESTO_DEBUG
 
-void HEFESTO_DEBUG_INFO(int wait, char *fmt, ...) {
+#include <stdarg.h>
+#include <stdio.h>
+
+void HEFESTO_DEBUG_INFO(hefesto_int_t wait, char *fmt, ...) {
 
     va_list args;
     char *f;
-    int d;
+    hefesto_int_t d;
     char c, *s;
 
     printf("*** HEFESTO DEBUG INFO: %s: %d: ", __FILE__, __LINE__);

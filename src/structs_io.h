@@ -198,7 +198,7 @@ hefesto_func_list_ctx *add_func_to_hefesto_func_list_ctx(
                                         hefesto_func_list_ctx *list,
                                                    const char *name,
                                     const char *decl_at,
-                                    const int is_local,
+                                    const hefesto_int_t is_local,
                                     const hefesto_type_t result_type);
 
 hefesto_func_list_ctx *get_hefesto_func_list_ctx_tail(

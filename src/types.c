@@ -9,16 +9,16 @@
 
 hefesto_toolset_ctx *HEFESTO_CURRENT_TOOLSET = NULL;
 
-int HEFESTO_EXIT_CODE = 0;
+hefesto_int_t HEFESTO_EXIT_CODE = 0;
 
-int HEFESTO_EXIT = 0;
+hefesto_int_t HEFESTO_EXIT = 0;
 
-int HEFESTO_EXIT_FORGE = 0;
+hefesto_int_t HEFESTO_EXIT_FORGE = 0;
 
 hefesto_dep_chain_ctx *HEFESTO_CURRENT_DEP_CHAIN = NULL;
 
 hefesto_options_ctx *HEFESTO_OPTIONS = NULL;
 
-int HEFESTO_LAST_FORGE_RESULT = 1;
+hefesto_int_t HEFESTO_LAST_FORGE_RESULT = 1;
 
 hefesto_project_ctx *HEFESTO_CURRENT_PROJECT = NULL;

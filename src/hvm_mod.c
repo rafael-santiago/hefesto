@@ -25,15 +25,15 @@ static hefesto_options_ctx *HEFESTO_MODULES_HOME = NULL;
 
 struct hefesto_modio_args {
     void *data;
-    int dtype;
+    hefesto_int_t dtype;
     size_t dsize;
-    int byref_on_return;
+    hefesto_int_t byref_on_return;
     struct hefesto_modio_args *next;
 };
 
 struct hefesto_modio {
     struct hefesto_modio_args *args;
-    int rtype;
+    hefesto_int_t rtype;
     size_t rsize;
     void *ret;
 };
@@ -43,7 +43,7 @@ typedef void (*hefesto_modfunc)(struct hefesto_modio **);
 struct hefesto_ldmod_table {
     char module_path[HEFESTO_MAX_BUFFER_SIZE];
     hefesto_mod_handle handle;
-    int ref_count;
+    hefesto_int_t ref_count;
     char last_called_sym[HEFESTO_MAX_BUFFER_SIZE];
     hefesto_modfunc sym;
 };
@@ -83,7 +83,7 @@ static struct hefesto_ldmod_table HEFESTO_LDMOD_TABLE[HEFESTO_LDMOD_TABLE_SIZE] 
 
 static hefesto_mod_handle hvm_mod_load(const char *module_filepath);
 
-static int hvm_mod_close(hefesto_mod_handle mod_handle);
+static hefesto_int_t hvm_mod_close(hefesto_mod_handle mod_handle);
 
 static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle mod_handle,
                                        const char *function);
@@ -121,7 +121,7 @@ static void del_hefesto_modio(struct hefesto_modio *modio) {
 }
 
 static char *module_extension_completion(const char *module_filepath) {
-    int has_ext = 0;
+    hefesto_int_t has_ext = 0;
     const char *m;
     char *retval = NULL;
     for (m = module_filepath; *m != 0; m++);
@@ -147,7 +147,7 @@ static char *module_extension_completion(const char *module_filepath) {
 
 static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     size_t l = 0;
-    int slot = -1;
+    hefesto_int_t slot = -1;
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     LPSTR err_msg = NULL;
 #endif
@@ -208,9 +208,9 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     return hp;
 }
 
-static int hvm_mod_close(hefesto_mod_handle mod_handle) {
+static hefesto_int_t hvm_mod_close(hefesto_mod_handle mod_handle) {
     size_t l;
-    int retval = 0;
+    hefesto_int_t retval = 0;
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     if (mod_handle != NULL) {
         retval = dlclose(mod_handle);
@@ -366,8 +366,8 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
                         memset(res, 0, modio->rsize + 1);
                         memcpy(res, modio->ret, modio->rsize);
                     } else {
-                        res = (int *) hefesto_mloc(sizeof(int));
-                        *(int *)res = *(int *)modio->ret;
+                        res = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+                        *(hefesto_int_t *)res = *(hefesto_int_t *)modio->ret;
                     }
                 }
                 del_hefesto_modio(modio);
@@ -446,7 +446,7 @@ static void handle_byref(struct hefesto_modio *modio,
                                 {
                                     osz = map->dsize;
                                 } else {
-                                    osz = sizeof(int);
+                                    osz = sizeof(hefesto_int_t);
                                 }
                                 vp->contents = NULL;
                                 vp->contents =

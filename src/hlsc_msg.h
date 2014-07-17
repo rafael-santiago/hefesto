@@ -8,6 +8,8 @@
 #ifndef _HEFESTO_HLSC_MSG_H
 #define _HEFESTO_HLSC_MSG_H 1
 
+#include "types.h"
+
 #define HLSCM_MTYPE_PARSING     0x1
 #define HLSCM_MTYPE_SYNTAX      0x2
 #define HLSCM_MTYPE_GENERAL     0x3
@@ -111,6 +113,6 @@ typedef enum _hlscm_code {
     HLSCM_NR
 }hlscm_code_t;
 
-void hlsc_info(const int mtype_details, const hlscm_code_t mcode, ...);
+void hlsc_info(const hefesto_int_t mtype_details, const hlscm_code_t mcode, ...);
 
 #endif

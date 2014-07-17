@@ -10,9 +10,9 @@
 
 #include "types.h"
 
-int refresh_hefesto_src_chsum_base(const char *directory,
-                                   hefesto_base_refresh_ctx *sources);
+hefesto_int_t refresh_hefesto_src_chsum_base(const char *directory,
+                                             hefesto_base_refresh_ctx *sources);
 
-int src_file_has_change(const char *directory, const char *src_path);
+hefesto_int_t src_file_has_change(const char *directory, const char *src_path);
 
 #endif

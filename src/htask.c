@@ -15,8 +15,8 @@
 #include "hvm_toolset.h"
 #include <stdio.h>
 
-int boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
-               hefesto_options_ctx *options) {
+hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
+                         hefesto_options_ctx *options) {
 
     hefesto_options_ctx *qsize, *user_includes = NULL;
     hefesto_options_ctx *forge_functions_name;
@@ -25,7 +25,7 @@ int boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
     hefesto_func_list_ctx *functions = NULL, *curr_func;
     hefesto_toolset_ctx *toolsets = NULL;
     hefesto_project_ctx *projects = NULL;
-    int qsize_value, errors = 0;
+    hefesto_int_t qsize_value, errors = 0;
     FILE *code;
 
     if (HEFESTO_OPTIONS == NULL) {

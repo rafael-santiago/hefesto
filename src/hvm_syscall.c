@@ -538,7 +538,7 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
     char *buffer = NULL, *replaced_buffer = NULL;
     here_search_program_ctx *search_program;
 
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
 
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/replace_in_file\n");
 
@@ -561,7 +561,7 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
         replace_text_size = strlen((char *)replace_text);
 
         if (!(fp = fopen((char *)file_path, "rb"))) {
-            *(int *)result = -1;
+            *(hefesto_int_t *)result = -1;
             free(arg_file_path);
             free(arg_regex);
             free(regex);
@@ -578,7 +578,7 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
         fseek(fp, 0L, SEEK_SET);
         fread(buffer, 1, file_size, fp);
 
-        *(int *)result = here_replace_string(buffer, search_program,
+        *(hefesto_int_t *)result = here_replace_string(buffer, search_program,
                                              replace_text, &replaced_buffer,
                                              &osz);
         fclose(fp);
@@ -589,7 +589,7 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
                 fclose(fp);
             }
         } else {
-            *(int *)result = 0;
+            *(hefesto_int_t *)result = 0;
         }
 
         del_here_search_program_ctx(search_program);
@@ -620,7 +620,7 @@ static void *hefesto_sys_ls(const char *syscall, hefesto_var_list_ctx **lo_vars,
     const char *s;
     char *str_regex_mask;
     char *str_regex_mask_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -630,7 +630,7 @@ static void *hefesto_sys_ls(const char *syscall, hefesto_var_list_ctx **lo_vars,
                                         lo_vars, gl_vars, functions);
     free(str_regex_mask);
 
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_ls(str_regex_mask_fmt);
     free(str_regex_mask_fmt);
     **otype = HEFESTO_VAR_TYPE_INT;
@@ -659,7 +659,7 @@ static void *hefesto_sys_cd(const char *syscall, hefesto_var_list_ctx **lo_vars,
     const char *s;
     char *str_dir;
     char *str_dir_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -668,7 +668,7 @@ static void *hefesto_sys_cd(const char *syscall, hefesto_var_list_ctx **lo_vars,
     str_dir_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
     free(str_dir);
 
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_fs_cd(str_dir_fmt);
     free(str_dir_fmt);
 
@@ -687,7 +687,7 @@ static void *hefesto_sys_rm(const char *syscall, hefesto_var_list_ctx **lo_vars,
     const char *s;
     char *str_file;
     char *str_file_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -696,7 +696,7 @@ static void *hefesto_sys_rm(const char *syscall, hefesto_var_list_ctx **lo_vars,
     str_file_fmt = hvm_str_format(str_file, lo_vars, gl_vars, functions);
     free(str_file);
 
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_rm(str_file_fmt);
     free(str_file_fmt);
 
@@ -778,10 +778,10 @@ static void *hefesto_sys_fwrite(const char *syscall,
     etype = HEFESTO_VAR_TYPE_STRING;
     buf = expr_eval(arg_buf, lo_vars, gl_vars, functions, &etype,
                     &offset);
-    result = (void *) hefesto_mloc(sizeof(int));
-    *(int *)result = hefesto_fwrite((char *)buf, *((size_t *) size), fd);
+    result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)result = hefesto_fwrite((char *)buf, *((size_t *) size), fd);
     HEFESTO_DEBUG_INFO(0,
-        "hvm_syscall/hefesto_fwrite result: %d\n", *(int *)result);
+        "hvm_syscall/hefesto_fwrite result: %d\n", *(hefesto_int_t *)result);
 
     free(arg_fd);
     free(arg_size);
@@ -822,21 +822,21 @@ static void *hefesto_sys_fread(const char *syscall,
     size = expr_eval(arg_size, lo_vars, gl_vars, functions,
                      &etype, &offset);
     etype = HEFESTO_VAR_TYPE_STRING;
-    result = (void *) hefesto_mloc(sizeof(int));
+    result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     buf = get_hefesto_var_list_ctx_name(arg_buf+1, *lo_vars);
     if (buf == NULL) {
         buf = get_hefesto_var_list_ctx_name(arg_buf+1, *gl_vars);
     }
     if (buf != NULL) {
         tmp = (char *) hefesto_mloc(*((size_t *)size)+1);
-        *(int *)result = hefesto_fread(tmp, *((size_t *) size), fd);
-        if (*(int *)result > -1)
+        *(hefesto_int_t *)result = hefesto_fread(tmp, *((size_t *) size), fd);
+        if (*(hefesto_int_t *)result > -1)
             assign_data_to_hefesto_var(buf, tmp, *((size_t *)result));
         free(tmp);
     } else {
-        *(int *)result = -1;
+        *(hefesto_int_t *)result = -1;
     }
-    HEFESTO_DEBUG_INFO(0, "hvm_syscall/fread result: %d %d\n", *(int *)result,
+    HEFESTO_DEBUG_INFO(0, "hvm_syscall/fread result: %d %d\n", *(hefesto_int_t *)result,
                                                                buf->type);
     free(arg_fd);
     free(arg_size);
@@ -856,7 +856,7 @@ static void *hefesto_sys_fclose(const char *syscall,
     size_t offset = 0;
     char *arg;
     const char *s;
-    void *result = (int *) hefesto_mloc(sizeof(int));
+    void *result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
     s = get_arg_list_start_from_call(syscall);
@@ -868,7 +868,7 @@ static void *hefesto_sys_fclose(const char *syscall,
     hefesto_fclose(&fp_handle);
     free(arg);
 
-    *(int *)result = 1;
+    *(hefesto_int_t *)result = 1;
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/hefesto_fclose done.\n");
 
     return result;
@@ -883,7 +883,7 @@ static void *hefesto_sys_cp(const char *syscall, hefesto_var_list_ctx **lo_vars,
     const char *s;
     char *str_src, *str_dest;
     char *str_src_fmt, *str_dest_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -896,7 +896,7 @@ static void *hefesto_sys_cp(const char *syscall, hefesto_var_list_ctx **lo_vars,
     str_dest_fmt = hvm_str_format(str_dest, lo_vars, gl_vars, functions);
     free(str_dest);
 
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_cp(str_src_fmt, str_dest_fmt);
     free(str_src_fmt);
     free(str_dest_fmt);
@@ -916,7 +916,7 @@ static void *hefesto_sys_run(const char *syscall,
     const char *s;
     char *str_run, *sr, *srp;
     char *str_fmt;
-    int *ret;
+    hefesto_int_t *ret;
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
 
@@ -926,7 +926,7 @@ static void *hefesto_sys_run(const char *syscall,
     s = s + 1;
 
     str_run = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-    for (sr = str_run; s != str_fmt; s++, sr++) *sr = *s;    
+    for (sr = str_run; s != str_fmt; s++, sr++) *sr = *s;
     *sr = 0;
     HEFESTO_DEBUG_INFO(0, "hvm_syscall/run: %s\n", str_run);
     vp = get_hefesto_var_list_ctx_name(str_run+1, *lo_vars);
@@ -947,7 +947,7 @@ static void *hefesto_sys_run(const char *syscall,
         ret = hefesto_nrun(syscall, lo_vars, gl_vars, functions, otype);
     } else {
         str_fmt = hvm_str_format(str_run, lo_vars, gl_vars, functions);
-        ret = (int *) hefesto_mloc(sizeof(int));
+        ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
         HEFESTO_DEBUG_INFO(0, "hvm_syscall/run: %s\n", str_fmt);
         *ret = system(str_fmt);
         if (*ret != -1) {
@@ -991,10 +991,10 @@ static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
 
     if (plist != NULL) {
         if (etype == HEFESTO_VAR_TYPE_LIST) {
-            ret = (int *) hefesto_mloc(sizeof(int));
-            *(int *)ret = hvm_rqueue_run(plist);
-            if (*(int *)ret != EXIT_SUCCESS) {
-                *(int *)ret = EXIT_FAILURE;
+            ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+            *(hefesto_int_t *)ret = hvm_rqueue_run(plist);
+            if (*(hefesto_int_t *)ret != EXIT_SUCCESS) {
+                *(hefesto_int_t *)ret = EXIT_FAILURE;
             }
         }
         del_hefesto_common_list_ctx((hefesto_common_list_ctx *)plist);
@@ -1016,7 +1016,7 @@ static void *hefesto_sys_mkdir(const char *syscall,
     const char *s;
     char *str_dir;
     char *str_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -1026,7 +1026,7 @@ static void *hefesto_sys_mkdir(const char *syscall,
     str_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
 
     free(str_dir);
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_mkdir(str_fmt);
     free(str_fmt);
 
@@ -1046,7 +1046,7 @@ static void *hefesto_sys_rmdir(const char *syscall,
     const char *s;
     char *str_dir;
     char *str_fmt;
-    int *ret;
+    hefesto_int_t *ret;
 
     s = get_arg_list_start_from_call(syscall);
     sz = s - syscall + 1;
@@ -1056,7 +1056,7 @@ static void *hefesto_sys_rmdir(const char *syscall,
     str_fmt = hvm_str_format(str_dir, lo_vars, gl_vars, functions);
 
     free(str_dir);
-    ret = (int *) hefesto_mloc(sizeof(int));
+    ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *ret = hefesto_rmdir(str_fmt);
     free(str_fmt);
 
@@ -1164,8 +1164,8 @@ static void *hefesto_sys_feof(const char *syscall,
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
     arg = get_next_call_args(syscall, &offset);
-    void *result = (int *) hefesto_mloc(sizeof(int));
-    *(int *)result = hefesto_feof(get_file_descriptor_by_var_name(arg+1, 
+    void *result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)result = hefesto_feof(get_file_descriptor_by_var_name(arg+1, 
                                                                   *lo_vars,
                                                                   *gl_vars,
                                                                   functions));
@@ -1219,7 +1219,7 @@ static void *hefesto_sys_fseek(const char *syscall,
     size_t offset;
     char *arg_fd_name;
     char *arg_pos;
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
     hefesto_type_t etype;
     void *pos;
@@ -1232,7 +1232,7 @@ static void *hefesto_sys_fseek(const char *syscall,
     pos = expr_eval(arg_pos, lo_vars, gl_vars, functions, &etype, &offset);
     fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1, *lo_vars,
                                                 *gl_vars, functions);
-    *(int *)result = hefesto_fseek(fp_handle, *(long *)pos);
+    *(hefesto_int_t *)result = hefesto_fseek(fp_handle, *(long *)pos);
 
     free(pos);
     free(arg_pos);
@@ -1251,7 +1251,7 @@ static void *hefesto_sys_fseek_to_begin(const char *syscall,
     const char *s;
     size_t offset;
     char *arg_fd_name;
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
     s = get_arg_list_start_from_call(syscall);
@@ -1261,7 +1261,7 @@ static void *hefesto_sys_fseek_to_begin(const char *syscall,
                                                 *lo_vars,
                                                 *gl_vars, functions);
 
-    *(int *)result = hefesto_fseek_to_begin(fp_handle);
+    *(hefesto_int_t *)result = hefesto_fseek_to_begin(fp_handle);
 
     free(arg_fd_name);
 
@@ -1278,7 +1278,7 @@ static void *hefesto_sys_fseek_to_end(const char *syscall,
     const char *s;
     size_t offset;
     char *arg_fd_name;
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
     s = get_arg_list_start_from_call(syscall);
@@ -1287,7 +1287,7 @@ static void *hefesto_sys_fseek_to_end(const char *syscall,
     fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
                                                 *lo_vars, *gl_vars,
                                                 functions);
-    *(int *)result = hefesto_fseek_to_end(fp_handle);
+    *(hefesto_int_t *)result = hefesto_fseek_to_end(fp_handle);
 
     free(arg_fd_name);
 
@@ -1304,7 +1304,7 @@ static void *hefesto_sys_fsize(const char *syscall,
     const char *s;
     size_t offset;
     char *arg_fd_name;
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
     s = get_arg_list_start_from_call(syscall);
@@ -1313,7 +1313,7 @@ static void *hefesto_sys_fsize(const char *syscall,
     fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
                                                 *lo_vars, *gl_vars,
                                                 functions);
-    *(int *)result = hefesto_fsize(fp_handle);
+    *(hefesto_int_t *)result = hefesto_fsize(fp_handle);
 
     free(arg_fd_name);
 
@@ -1329,7 +1329,7 @@ static void *hefesto_sys_ftell(const char *syscall,
     const char *s;
     size_t offset;
     char *arg_fd_name;
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
     s = get_arg_list_start_from_call(syscall);
@@ -1337,7 +1337,7 @@ static void *hefesto_sys_ftell(const char *syscall,
     arg_fd_name = get_arg_from_call(syscall, &offset);
     fp_handle = get_file_descriptor_by_var_name(arg_fd_name + 1,
                                                 *lo_vars, *gl_vars, functions);
-    *(int *)result = hefesto_ftell(fp_handle);
+    *(hefesto_int_t *)result = hefesto_ftell(fp_handle);
 
     free(arg_fd_name);
 
@@ -1362,7 +1362,7 @@ static void *hefesto_sys_exit(const char *syscall,
     arg_code = get_arg_from_call(syscall, &offset);
     code = expr_eval(arg_code, lo_vars, gl_vars, functions,
                      &etype, &offset);
-    HEFESTO_EXIT_CODE = *(int *)code;
+    HEFESTO_EXIT_CODE = *(hefesto_int_t *)code;
     HEFESTO_LAST_FORGE_RESULT = HEFESTO_EXIT_CODE;
 
     free(arg_code);
@@ -1490,7 +1490,7 @@ static void *hefesto_sys_last_forge_result(const char *syscall,
 
     **otype = HEFESTO_VAR_TYPE_INT;
 
-    *(int *)result = HEFESTO_LAST_FORGE_RESULT;
+    *(hefesto_int_t *)result = HEFESTO_LAST_FORGE_RESULT;
 
     return result;
 
@@ -1510,7 +1510,7 @@ static void *hefesto_sys_forge(const char *syscall,
     void *result;
     hefesto_options_ctx *prjs = NULL;
     char prj_opt[1024];
-    int r;
+    hefesto_int_t r;
     hefesto_options_ctx *curr_opts = NULL, *swp_opts = NULL;
     hefesto_dep_chain_ctx *swp_dep_chain = NULL;
 
@@ -1543,7 +1543,7 @@ static void *hefesto_sys_forge(const char *syscall,
     curr_opts = add_option_buf_to_hefesto_options_ctx(curr_opts,
                                                       expd_opt);
 
-    result = (void *) hefesto_mloc(sizeof(int));
+    result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     sprintf(prj_opt, "--foo=%s", (char *)expd_prj);
     prjs = add_option_to_hefesto_options_ctx(prjs, prj_opt);
 
@@ -1567,7 +1567,7 @@ static void *hefesto_sys_forge(const char *syscall,
 
     del_hefesto_options_ctx(curr_opts);
 
-    *(int *)result = r;
+    *(hefesto_int_t *)result = r;
 
     free(prj);
     free(hls);
@@ -1765,14 +1765,14 @@ static void *hefesto_sys_setenv(const char *syscall,
     val = expr_eval(arg_val,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
-    result = (int *) hefesto_mloc(sizeof(int));
+    result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-    *(int *)result = setenv(var, val, 1);
+    *(hefesto_int_t *)result = setenv(var, val, 1);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     if (strstr(var, "WINREG:") != var) {
-        *(int *)result = (SetEnvironmentVariable(var, val) != 1);
+        *(hefesto_int_t *)result = (SetEnvironmentVariable(var, val) != 1);
     } else {
-        *(int *)result = set_value_from_winreg(var + 7, val);
+        *(hefesto_int_t *)result = set_value_from_winreg(var + 7, val);
     }
 #endif
 
@@ -1808,15 +1808,15 @@ static void *hefesto_sys_unsetenv(const char *syscall,
     var = expr_eval(arg_var,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
-    result = (int *) hefesto_mloc(sizeof(int));
+    result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-    *(int *)result = unsetenv(var);
+    *(hefesto_int_t *)result = unsetenv(var);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     if (strstr(var, "WINREG:") != var) {
-        *(int *)result = (SetEnvironmentVariable(var, NULL) != 1);
+        *(hefesto_int_t *)result = (SetEnvironmentVariable(var, NULL) != 1);
     } else {
-        *(int *)result = del_value_from_winreg(var + 7);
+        *(hefesto_int_t *)result = del_value_from_winreg(var + 7);
     }
 #endif
 
@@ -1898,18 +1898,18 @@ static void *hefesto_sys_get_func_addr(const char *syscall,
     func = expr_eval(arg_func, lo_vars, gl_vars, functions, &etype, &osz);
     free(arg_func);
     curr_func_p = hvm_get_current_executed_function();
-    retval = (int *) hefesto_mloc(sizeof(int));
+    retval = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     if (curr_func_p != NULL) {
         func_p = get_hefesto_func_list_ctx_scoped_name((char *)func,
                                                        curr_func_p->decl_at,
                                                        functions);
         if (func_p != NULL) {
-            memcpy(retval, func_p, sizeof(int));
+            memcpy(retval, func_p, sizeof(hefesto_int_t));
         } else {
-            *(int *)retval = 0;
+            *(hefesto_int_t *)retval = 0;
         }
     } else {
-        *(int *)retval = 0;
+        *(hefesto_int_t *)retval = 0;
     }
     free(func);
     return retval;

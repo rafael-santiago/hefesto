@@ -12,7 +12,9 @@
 
 #ifdef HEFESTO_DEBUG
 
-void HEFESTO_DEBUG_INFO(int wait, char *fmt, ...);
+#include "types.h"
+
+void HEFESTO_DEBUG_INFO(hefesto_int_t wait, char *fmt, ...);
 
 #else
 

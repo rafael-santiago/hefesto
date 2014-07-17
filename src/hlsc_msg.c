@@ -310,10 +310,10 @@ static char *hlsc_messages[HLSCM_NR] = {
     "wrong number of arguments in call to \"%s\" function: expecting %d argument(s) instead of %d.\n"
 };
 
-void hlsc_info(const int mtype_details, const hlscm_code_t mcode, ...) {
+void hlsc_info(const hefesto_int_t mtype_details, const hlscm_code_t mcode, ...) {
     va_list vl;
     char *m, *msg, *str_arg, c_arg;
-    int int_arg;
+    hefesto_int_t int_arg;
 
     va_start(vl, mcode);
 
@@ -352,17 +352,17 @@ void hlsc_info(const int mtype_details, const hlscm_code_t mcode, ...) {
                     break;
 
                 case 'd':
-                    int_arg = va_arg(vl, int);
+                    int_arg = va_arg(vl, hefesto_int_t);
                     fprintf(stdout, "%d", int_arg);
                     break;
 
                 case 'c':
-                    c_arg = (char) va_arg(vl, int);
+                    c_arg = (char) va_arg(vl, hefesto_int_t);
                     fprintf(stdout, "%c", c_arg);
                     break;
 
                 case 'x':
-                    int_arg = va_arg(vl, int);
+                    int_arg = va_arg(vl, hefesto_int_t);
                     fprintf(stdout, "%.8x", int_arg);
                     break;
 

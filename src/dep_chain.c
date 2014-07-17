@@ -123,7 +123,7 @@ void find_dep_chain_updates(hefesto_dep_chain_ctx **dep_chain) {
     hefesto_dep_chain_ctx *d, *dd;
     hefesto_common_list_ctx *dep;
     char *cwd;
-    int new_dirty = 1;
+    hefesto_int_t new_dirty = 1;
 
     for (d = *dep_chain; d; d = d->next) {
         cwd = hefesto_pwd();

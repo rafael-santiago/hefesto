@@ -10,8 +10,8 @@
 
 #include "types.h"
 
-int hvm_rqueue_run(hefesto_common_list_ctx *plist);
+hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist);
 
-void hvm_rqueue_set_queue_size(const unsigned int new_size);
+void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size);
 
 #endif

@@ -30,7 +30,7 @@ char *get_next_expression_from_buffer(const char *buf, size_t *next_pos);
 
 char *strip_quotes_from_string(const char *string);
 
-int get_current_line_number();
+hefesto_int_t get_current_line_number();
 
 void inc_current_line_number();
 
@@ -58,7 +58,7 @@ hefesto_toolset_ctx *ld_toolsets_configurations(hefesto_toolset_ctx *toolsets,
                                  hefesto_options_ctx *usr_include_directories);
 
 hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
-                                                 int *errors,
+                                                 hefesto_int_t *errors,
                                                  hefesto_var_list_ctx **gl_vars,
                                       hefesto_options_ctx *forge_functions_name,
                                    hefesto_options_ctx *usr_include_directories);

@@ -132,7 +132,7 @@ hefesto_options_ctx *merge_usr_options_with_ivk(hefesto_options_ctx *usr_opts,
 int main(int argc, char **argv) {
     hefesto_options_ctx *o = NULL, *forgefiles, *projects, *ivk_o = NULL;
     hefesto_common_list_ctx *fp;
-    int o_idx, exit_code = 1;
+    hefesto_int_t o_idx, exit_code = 1;
     char *temp;
 
     for (o_idx = 1; o_idx < argc; o_idx++) {

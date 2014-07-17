@@ -18,7 +18,7 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory);
 
 static void refresh_sum_base_rec(hefesto_sum_base_ctx **rec);
 
-static int write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec);
+static hefesto_int_t write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec);
 
 struct chsum_rec {
     char path[HEFESTO_MAX_BUFFER_SIZE];
@@ -56,10 +56,10 @@ static unsigned short get_src_chsum(const char *src_path,
 
 }
 
-static int write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec) {
+static hefesto_int_t write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec) {
 
     unsigned long sz;
-    int total;
+    hefesto_int_t total;
     hefesto_sum_base_ctx *r;
 
     sz = strlen(rec->file_path);
@@ -100,12 +100,12 @@ static void refresh_sum_base_rec(hefesto_sum_base_ctx **rec) {
 
 }
 /*
-int refresh_hefesto_src_chsum_base(const char *directory,
+hefesto_int_t refresh_hefesto_src_chsum_base(const char *directory,
                                    hefesto_common_list_ctx *sources) {
 
     FILE *sum_base;
     char *temp;
-    int ok = 1;
+    hefesto_int_t ok = 1;
     hefesto_common_list_ctx *s;
     hefesto_sum_base_ctx *pre_base = get_src_sum_base(directory), *bp;
 
@@ -143,12 +143,12 @@ int refresh_hefesto_src_chsum_base(const char *directory,
 }
 */
 
-int refresh_hefesto_src_chsum_base(const char *directory,
-                                   hefesto_base_refresh_ctx *sources) {
+hefesto_int_t refresh_hefesto_src_chsum_base(const char *directory,
+                                             hefesto_base_refresh_ctx *sources) {
 
     FILE *sum_base;
     char *temp;
-    int ok = 1;
+    hefesto_int_t ok = 1;
     hefesto_base_refresh_ctx *s;
     hefesto_sum_base_ctx *pre_base = get_src_sum_base(directory), *bp;
 
@@ -202,7 +202,7 @@ static unsigned short get_src_chsum_from_base(const char *directory,
 
 }
 
-int src_file_has_change(const char *directory, const char *src_path) {
+hefesto_int_t src_file_has_change(const char *directory, const char *src_path) {
 
     unsigned short base_chsum = get_src_chsum_from_base(directory, src_path);
 

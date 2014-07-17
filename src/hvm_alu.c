@@ -23,7 +23,7 @@
 struct hvm_alu_evaluate_return {
     char *e;
     char *b;
-    int *state;
+    hefesto_int_t *state;
 };
 
 static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
@@ -236,13 +236,13 @@ static void *eval_string_constant(char *s, size_t *osize) {
 
 static void *eval_numeric_constant(char *n, size_t *osize) {
 
-    int *result;
+    hefesto_int_t *result;
 
     if (n == NULL || *n == 0) return NULL;
 
-    *osize = sizeof(int);
+    *osize = sizeof(hefesto_int_t);
 
-    result = (int *) hefesto_mloc(sizeof(int));
+    result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
 
     if (*n == '0' && n+1 && *(n+1) == 'x' && n+2) {
         *result = strtol(n+2, NULL, 16);
@@ -263,7 +263,7 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
     char *var_name = NULL, *v, *o, *sub_expr = NULL;
     void *result = NULL;
     void *index = NULL;
-    int *integer_result, foo;
+    hefesto_int_t *integer_result, foo;
     size_t offset, osize;
     hefesto_type_t etype;
 
@@ -336,9 +336,9 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
                     } else {
                         result = 
                          (void *) hefesto_mloc((vp->type == HEFESTO_VAR_TYPE_INT) ?
-                                                  sizeof(int) : 1);
+                                                  sizeof(hefesto_int_t) : 1);
                         memset(result, 0, (vp->type == HEFESTO_VAR_TYPE_INT) ?
-                                                  sizeof(int) : 1);
+                                                  sizeof(hefesto_int_t) : 1);
                     }
 
                 }
@@ -389,8 +389,8 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
             etype = HEFESTO_VAR_TYPE_INT;
             result = expr_eval(var_name, lo_vars, gl_vars, functions, &etype,
                                &osize);
-            integer_result = (int *) hefesto_mloc(sizeof(int));
-            *integer_result = !(*(int *)result);
+            integer_result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+            *integer_result = !(*(hefesto_int_t *)result);
             free(result);
             free(var_name);
             result = (void *) integer_result;
@@ -505,7 +505,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
     ssize_t op_idx;
     void *result = NULL;
     size_t dsize, osize;
-    int state = *eval_ret->state;
+    hefesto_int_t state = *eval_ret->state;
 
     if (*buf != '(' && !is_op(*expression)) {
 
@@ -515,7 +515,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
              vp->type == HEFESTO_VAR_TYPE_INT) {
 
             operand = hvm_int_to_str(vp->contents != NULL ?
-                            *(int *)vp->contents->data : 0);
+                            *(hefesto_int_t *)vp->contents->data : 0);
             *vtype = HEFESTO_VAR_TYPE_STRING;
 
         } else {
@@ -531,7 +531,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                 *vtype != HEFESTO_VAR_TYPE_STRING &&
                 *vtype != HEFESTO_VAR_TYPE_LIST && operand_aux != NULL) {
 
-                operand = hvm_int_to_str(*(int *)operand_aux);
+                operand = hvm_int_to_str(*(hefesto_int_t *)operand_aux);
                 free(operand_aux);
                 *vtype = HEFESTO_VAR_TYPE_STRING;
 
@@ -552,7 +552,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
             switch (*letype) {
 
                 case HEFESTO_VAR_TYPE_INT:
-                    operand = (int *) hefesto_mloc(sizeof(int));
+                    operand = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
                     break;
 
                 case HEFESTO_VAR_TYPE_STRING:
@@ -581,7 +581,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
             }
 
             if (*vtype == HEFESTO_VAR_TYPE_INT) {
-                dsize = sizeof(int);
+                dsize = sizeof(hefesto_int_t);
             } else if (*vtype == HEFESTO_VAR_TYPE_STRING) {
                 dsize = strlen((char *)operand);
             } else if (*vtype == HEFESTO_VAR_TYPE_LIST) {
@@ -700,7 +700,7 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
     char *indexing;
     size_t offset;
     hefesto_type_t vtype = HEFESTO_VAR_TYPE_INT, letype = 0xff;
-    int state = 0;
+    hefesto_int_t state = 0;
     struct hvm_alu_evaluate_return eval_ret;
 
     HEFESTO_DEBUG_INFO(0, "hvm_alu/evaluating expression = %s\n", expr);
@@ -809,7 +809,7 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
     del_hefesto_common_stack_ctx(sp);
 
     if (*etype == HEFESTO_VAR_TYPE_STRING) *outsz = strlen(result);
-    else if (*etype == HEFESTO_VAR_TYPE_INT) *outsz = sizeof(int);
+    else if (*etype == HEFESTO_VAR_TYPE_INT) *outsz = sizeof(hefesto_int_t);
     else if (*etype == HEFESTO_VAR_TYPE_LIST) {
         *outsz =
           get_hefesto_common_list_ctx_count((hefesto_common_list_ctx *)result);
@@ -825,28 +825,28 @@ static void *eval_add(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
+    hefesto_int_t *r_int;
     char *r_string;
-    int *va, *vb;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
     switch (*type) {
 
         case HEFESTO_VAR_TYPE_INT:
-            *osize = sizeof(int);
-            r_int = (int *) hefesto_mloc(sizeof(int));
+            *osize = sizeof(hefesto_int_t);
+            r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT && 
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va + *vb);
                 if (va != a->data) free(va);
@@ -873,15 +873,15 @@ static void *eval_add(hefesto_common_stack_ctx *a,
             break;
 
         default:
-            *osize = sizeof(int);
-            r_int = (int *) hefesto_mloc(sizeof(int));
+            *osize = sizeof(hefesto_int_t);
+            r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
             *r_int = 0;
             if (a->data && b->data) {
-                *r_int = (unsigned int) a->data + (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) a->data + (hefesto_uint_t) b->data;
             } else if (a->data) {
-                *r_int = (unsigned int) a->data;
+                *r_int = (hefesto_uint_t) a->data;
             } else if (b->data) {
-                *r_int = (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) b->data;
             }
             result = r_int;
             *type = HEFESTO_VAR_TYPE_INT;
@@ -897,12 +897,12 @@ static void *eval_sub(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -912,15 +912,15 @@ static void *eval_sub(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va - *vb);
                 if (va != a->data) free(va);
@@ -930,11 +930,11 @@ static void *eval_sub(hefesto_common_stack_ctx *a,
 
         default:
             if (a->data && b->data) {
-                *r_int = (unsigned int) a->data - (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) a->data - (hefesto_uint_t) b->data;
             } else if (a->data) {
-                *r_int = (unsigned int) a->data;
+                *r_int = (hefesto_uint_t) a->data;
             } else if (b->data) {
-                *r_int = (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) b->data;
             }
             break;
 
@@ -950,12 +950,12 @@ static void *eval_mul(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -965,15 +965,15 @@ static void *eval_mul(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va * *vb);
                 if (va != a->data) free(va);
@@ -983,11 +983,11 @@ static void *eval_mul(hefesto_common_stack_ctx *a,
 
         default:
             if (a->data && b->data) {
-                *r_int = (unsigned int) a->data *  (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) a->data *  (hefesto_uint_t) b->data;
             } else if (a->data) {
-                *r_int = (unsigned int) a->data;
+                *r_int = (hefesto_uint_t) a->data;
             } else if (b->data) {
-                *r_int = (unsigned int) b->data;
+                *r_int = (hefesto_uint_t) b->data;
             }
             result = r_int;
             break;
@@ -1004,28 +1004,28 @@ static void *eval_div(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
+    hefesto_int_t *r_int;
     char *r_string;
-    int *va, *vb;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
     switch (*type) {
 
         case HEFESTO_VAR_TYPE_INT:
-            *osize = sizeof(int);
-            r_int = (int *) hefesto_mloc(sizeof(int));
+            *osize = sizeof(hefesto_int_t);
+            r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 if (*vb > 0) {
                     *r_int = (*va / *vb);
@@ -1060,8 +1060,8 @@ static void *eval_div(hefesto_common_stack_ctx *a,
             break;
 
         default:
-            *osize = sizeof(int);
-            r_int = (int *) hefesto_mloc(sizeof(int));
+            *osize = sizeof(hefesto_int_t);
+            r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
             *r_int = 0;
             result = r_int;
             *type = HEFESTO_VAR_TYPE_INT;
@@ -1077,13 +1077,13 @@ static void *eval_eq(hefesto_common_stack_ctx *a,
                      hefesto_common_stack_ctx *b,
                      hefesto_type_t *type, size_t *osize) {
     void *result = NULL;
-    int *r_int;
+    hefesto_int_t *r_int;
     char *a_byte, *b_byte, *str_end;
-    int *va, *vb;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1093,15 +1093,15 @@ static void *eval_eq(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va == *vb);
                 if (va != a->data) free(va);
@@ -1135,12 +1135,12 @@ static void *eval_rsh(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1150,15 +1150,15 @@ static void *eval_rsh(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va >> *vb);
                 if (va != a->data) free(va);
@@ -1179,12 +1179,12 @@ static void *eval_lsh(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1194,15 +1194,15 @@ static void *eval_lsh(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va << *vb);
                 if (va != a->data) free(va);
@@ -1223,12 +1223,12 @@ static void *eval_logical_and(hefesto_common_stack_ctx *a,
                               hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1238,15 +1238,15 @@ static void *eval_logical_and(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va && *vb);
                 if (va != a->data) free(va);
@@ -1267,12 +1267,12 @@ static void *eval_logical_or(hefesto_common_stack_ctx *a,
                              hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1282,15 +1282,15 @@ static void *eval_logical_or(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va || *vb);
                 if (va != a->data) free(va);
@@ -1310,12 +1310,12 @@ static void *eval_and(hefesto_common_stack_ctx *a,
                       hefesto_common_stack_ctx *b,
                       hefesto_type_t *type, size_t *osize) {
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1325,15 +1325,15 @@ static void *eval_and(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va & *vb);
                 if (va != a->data) free(va);
@@ -1353,12 +1353,12 @@ static void *eval_or(hefesto_common_stack_ctx *a,
                      hefesto_common_stack_ctx *b,
                      hefesto_type_t *type, size_t *osize) {
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1367,15 +1367,15 @@ static void *eval_or(hefesto_common_stack_ctx *a,
         case HEFESTO_VAR_TYPE_INT:
             if (a->data && a->dtype != HEFESTO_VAR_TYPE_INT &&
                 a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                va = (int *) eval_numeric_constant(a->data, &dlen);
+                va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
             } else {
-                va = (int *) a->data;
+                va = (hefesto_int_t *) a->data;
             }
             if (b->data && b->dtype != HEFESTO_VAR_TYPE_INT &&
                 b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                vb = (int *) eval_numeric_constant(b->data, &dlen);
+                vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
             } else {
-                vb = (int *) b->data;
+                vb = (hefesto_int_t *) b->data;
             }
             if (va && vb) {
                 *r_int = (*va | *vb);
@@ -1398,12 +1398,12 @@ static void *eval_xor(hefesto_common_stack_ctx *a,
                       hefesto_common_stack_ctx *b,
                       hefesto_type_t *type, size_t *osize) {
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1412,15 +1412,15 @@ static void *eval_xor(hefesto_common_stack_ctx *a,
         case HEFESTO_VAR_TYPE_INT:
             if (a->data && a->dtype != HEFESTO_VAR_TYPE_INT &&
                 a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                va = (int *) eval_numeric_constant(a->data, &dlen);
+                va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
             } else {
-                va = (int *) a->data;
+                va = (hefesto_int_t *) a->data;
             }
             if (b->data && b->dtype != HEFESTO_VAR_TYPE_INT &&
                 b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                vb = (int *) eval_numeric_constant(b->data, &dlen);
+                vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
             } else {
-                vb = (int *) b->data;
+                vb = (hefesto_int_t *) b->data;
             }
             if (va && vb) {
                 *r_int = (*va ^ *vb);
@@ -1444,12 +1444,12 @@ static void *eval_mod(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1458,15 +1458,15 @@ static void *eval_mod(hefesto_common_stack_ctx *a,
         case HEFESTO_VAR_TYPE_INT:
             if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                 a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                va = (int *) eval_numeric_constant(a->data, &dlen);
+                va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
             } else {
-                va = (int *) a->data;
+                va = (hefesto_int_t *) a->data;
             }
             if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                 b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                vb = (int *) eval_numeric_constant(b->data, &dlen);
+                vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
             } else {
-                vb = (int *) b->data;
+                vb = (hefesto_int_t *) b->data;
             }
             if (*vb > 0) {
                 *r_int = (*va % *vb);
@@ -1488,12 +1488,12 @@ static void *eval_leq(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1503,15 +1503,15 @@ static void *eval_leq(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va <= *vb);
                 if (va != a->data) free(va);
@@ -1538,12 +1538,12 @@ static void *eval_ged(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1553,15 +1553,15 @@ static void *eval_ged(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va >= *vb);
                 if (va != a->data) free(va);
@@ -1588,12 +1588,12 @@ static void *eval_less(hefesto_common_stack_ctx *a,
                        hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1603,15 +1603,15 @@ static void *eval_less(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va < *vb);
                 if (va != a->data) free(va);
@@ -1639,12 +1639,12 @@ static void *eval_greater(hefesto_common_stack_ctx *a,
                           hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
-    int *va, *vb;
+    hefesto_int_t *r_int;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 0;
     result = r_int;
 
@@ -1654,15 +1654,15 @@ static void *eval_greater(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va > *vb);
                 if (va != a->data) free(va);
@@ -1689,13 +1689,13 @@ static void *eval_neq(hefesto_common_stack_ctx *a,
                       hefesto_type_t *type, size_t *osize) {
 
     void *result = NULL;
-    int *r_int;
+    hefesto_int_t *r_int;
     char *a_byte, *b_byte, *str_end;
-    int *va, *vb;
+    hefesto_int_t *va, *vb;
     size_t dlen;
 
-    *osize = sizeof(int);
-    r_int = (int *) hefesto_mloc(sizeof(int));
+    *osize = sizeof(hefesto_int_t);
+    r_int = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     *r_int = 1;
     result = r_int;
 
@@ -1706,15 +1706,15 @@ static void *eval_neq(hefesto_common_stack_ctx *a,
             if (a->data && b->data) {
                 if (a->dtype != HEFESTO_VAR_TYPE_INT &&
                     a->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    va = (int *) eval_numeric_constant(a->data, &dlen);
+                    va = (hefesto_int_t *) eval_numeric_constant(a->data, &dlen);
                 } else {
-                    va = (int *) a->data;
+                    va = (hefesto_int_t *) a->data;
                 }
                 if (b->dtype != HEFESTO_VAR_TYPE_INT &&
                     b->dtype != HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                    vb = (int *) eval_numeric_constant(b->data, &dlen);
+                    vb = (hefesto_int_t *) eval_numeric_constant(b->data, &dlen);
                 } else {
-                    vb = (int *) b->data;
+                    vb = (hefesto_int_t *) b->data;
                 }
                 *r_int = (*va != *vb);
                 if (va != a->data) free(va);
@@ -1754,9 +1754,9 @@ static void *eval_attrib(hefesto_common_stack_ctx *a,
             memcpy(result, b->data, b->dsize);
             *osize = b->dsize;
         } else {
-            result = (void *) hefesto_mloc(sizeof(int));
-            *osize = sizeof(int);
-            memset(result, 0, sizeof(int));
+            result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+            *osize = sizeof(hefesto_int_t);
+            memset(result, 0, sizeof(hefesto_int_t));
         }
     }
 

@@ -129,8 +129,8 @@ hefesto_common_list_ctx *add_data_to_hefesto_common_list_ctx(hefesto_common_list
     }
 
     // INFO(Santiago): pois dependendo, o script pode forcar a leitura de
-    // uma string menor que sizeof(int) para dentro de um int, isso eh perigoso.
-    sz = (dsize) >= sizeof(int) ? dsize + 1 : sizeof(int);
+    // uma string menor que sizeof(hefesto_int_t) para dentro de um hefesto_int_t, isso eh perigoso.
+    sz = (dsize) >= sizeof(hefesto_int_t) ? dsize + 1 : sizeof(hefesto_int_t);
     p->data = (void *) hefesto_mloc(sz);
     memset(p->data, 0, sz);
     p->dsize = sz;
@@ -277,7 +277,7 @@ void del_hefesto_var_list_ctx_contents(hefesto_var_list_ctx **list) {
 hefesto_func_list_ctx *add_func_to_hefesto_func_list_ctx(
                       hefesto_func_list_ctx *list, const char *name,
                       const char *decl_at,
-                      const int is_local,
+                      const hefesto_int_t is_local,
                       const hefesto_type_t result_type) {
 
     hefesto_func_list_ctx *p, *h;
@@ -409,7 +409,7 @@ hefesto_var_list_ctx *add_arg_list_to_hefesto_func_list_ctx(const char *argl) {
     const char *a;
     hefesto_var_list_ctx *argl_p = NULL;
     char *var, *v, *type;
-    int state = 0;
+    hefesto_int_t state = 0;
 
     for (a = argl; *a != 0 && is_hefesto_blank(*a); a++);
 
@@ -477,7 +477,7 @@ hefesto_common_list_ctx *indexing_hefesto_common_list_ctx(
     if (list == NULL) hp = add_data_to_hefesto_common_list_ctx(list, "\0", 1);
     else hp = list;
 
-    if ((int)index < 0) return hp;
+    if ((hefesto_int_t)index < 0) return hp;
 
     for (i = 0, p = hp; p && i != index; i++) p = p->next;
 
@@ -629,7 +629,7 @@ hefesto_common_list_ctx *get_hefesto_common_list_ctx_content(const void *data,
         switch (type) {
 
             case HEFESTO_VAR_TYPE_INT:
-                if (*((int *) p->data) == *((int *) data)) return p;
+                if (*((hefesto_int_t *) p->data) == *((hefesto_int_t *) data)) return p;
                 break;
 
             case HEFESTO_VAR_TYPE_STRING:

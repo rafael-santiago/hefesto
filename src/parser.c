@@ -26,8 +26,8 @@ typedef struct _hefesto_include_list_ctx {
 }hefesto_include_list_ctx;
 
 static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
-                                      int *errors,
-                                      const int global_scope);
+                                      hefesto_int_t *errors,
+                                      const hefesto_int_t global_scope);
 
 static char skip_blank(FILE *fp);
 
@@ -41,28 +41,28 @@ static char skip_string(FILE *fp);
 static void skip_next_section(FILE *fp, long stop_at);
 
 static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
-                                              int *errors,
+                                              hefesto_int_t *errors,
                                               hefesto_var_list_ctx *gl_vars,
                                   hefesto_options_ctx *forge_functions_name,
                                   hefesto_func_list_ctx *function_collection,
                                   hefesto_include_list_ctx *local_includes);
 
 static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
-                                            int *errors,
+                                            hefesto_int_t *errors,
                                    hefesto_func_list_ctx *functions_decl,
                                    hefesto_var_list_ctx *gl_vars,
                                    hefesto_options_ctx *forge_functions_name,
-                                   int only_prototypes);
+                                   hefesto_int_t only_prototypes);
 
-static int is_valid_function_arg_list(const char *argl);
+static hefesto_int_t is_valid_function_arg_list(const char *argl);
 
 static char *get_next_command(FILE *fp, const long stop_at);
 
-static int compile_code(hefesto_func_list_ctx *function,
-                        hefesto_func_list_ctx *functions,
-                        hefesto_var_list_ctx *gl_vars,
-                        hefesto_options_ctx *forge_functions_name,
-                        FILE *fp, long stop_at);
+static hefesto_int_t compile_code(hefesto_func_list_ctx *function,
+                                  hefesto_func_list_ctx *functions,
+                                  hefesto_var_list_ctx *gl_vars,
+                                  hefesto_options_ctx *forge_functions_name,
+                                  FILE *fp, long stop_at);
 
 static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
                                           hefesto_func_list_ctx *functions,
@@ -72,7 +72,7 @@ static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
 static long get_section_end_offset(FILE *fp, const long stop_at);
 
 
-static void set_current_line_number(const int line_nr);
+static void set_current_line_number(const hefesto_int_t line_nr);
 
 static void set_current_compile_input(const char *file_path);
 
@@ -83,10 +83,10 @@ static void set_current_compiled_function(hefesto_func_list_ctx *function);
 static hefesto_toolset_command_ctx *ld_toolset_commands(FILE *fp,
                                                         const long file_size);
 
-static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
-                                 const long file_size,
-                                 hefesto_var_list_ctx *gl_vars,
-                                 hefesto_func_list_ctx *functions);
+static hefesto_int_t get_project_functions(hefesto_project_ctx *project, FILE *fp,
+                                           const long file_size,
+                                           hefesto_var_list_ctx *gl_vars,
+                                           hefesto_func_list_ctx *functions);
 
 static char *parse_toolset_command(FILE *fp);
 
@@ -100,16 +100,16 @@ static char *strip_comment_lines_from_command_block(const char *command);
 
 static void add_function_header(hefesto_func_list_ctx **functions,
                                 const char *name,
-                                const int is_local,
+                                const hefesto_int_t is_local,
                                 const hefesto_type_t type,
                                 const char *argl);
 
-static int compile_and_load_function(hefesto_func_list_ctx **fn,
-                                     hefesto_func_list_ctx *functions,
-                                     hefesto_var_list_ctx *gl_vars,
-                                     hefesto_options_ctx *forge_functions_name,
-                                     FILE *fp,
-                                     long end_offset);
+static hefesto_int_t compile_and_load_function(hefesto_func_list_ctx **fn,
+                                               hefesto_func_list_ctx *functions,
+                                               hefesto_var_list_ctx *gl_vars,
+                                               hefesto_options_ctx *forge_functions_name,
+                                               FILE *fp,
+                                               long end_offset);
 
 static void mkcmd_prototypes(hefesto_options_ctx **cmd_prototypes,
                              const char *forge_function,
@@ -120,13 +120,13 @@ static void mkcmd_helpers_prototypes(hefesto_options_ctx **cmd_prototypes,
                                      hefesto_toolset_command_ctx *cmds,
                                      FILE *fp, long file_size);
 
-static int check_helpers_decl_section(FILE *fp, long file_size, 
-                                      const char *toolset_name);
+static hefesto_int_t check_helpers_decl_section(FILE *fp, long file_size, 
+                                                const char *toolset_name);
 
-static int check_forge_helpers(char *tok, FILE *fp, const long file_size,
-                               const char *toolset_name);
+static hefesto_int_t check_forge_helpers(char *tok, FILE *fp, const long file_size,
+                                         const char *toolset_name);
 
-static int should_include_file(const char *inc_on_list);
+static hefesto_int_t should_include_file(const char *inc_on_list);
 
 
 #define new_hefesto_include_list_ctx(i) ((i) = (hefesto_include_list_ctx *)\
@@ -157,10 +157,10 @@ static hefesto_include_list_ctx
 
 static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
                                         hefesto_include_list_ctx *incl_list,
-                                                     int *error,
+                                                     hefesto_int_t *error,
                                   hefesto_options_ctx *hefesto_usr_inc_dir);
 
-static int current_line_nr = 1;
+static hefesto_int_t current_line_nr = 1;
 static char current_compile_input[HEFESTO_MAX_BUFFER_SIZE] = "";
 hefesto_func_list_ctx *current_compiled_function = NULL;
 
@@ -216,8 +216,8 @@ static hefesto_include_list_ctx *get_hefesto_include_list_ctx_filepath(
 }
 
 static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
-                                      int *errors,
-                                      const int global_scope) {
+                                      hefesto_int_t *errors,
+                                      const hefesto_int_t global_scope) {
 
     hefesto_var_list_ctx *vars = NULL;
     char c, *buffer = NULL, *var = NULL, *type = NULL;
@@ -409,7 +409,7 @@ static char skip_string(FILE *fp) {
 static void skip_next_section(FILE *fp, long stop_at) {
 
     char c;
-    int o;
+    hefesto_int_t o;
 
     if (fp == NULL) return;
 
@@ -454,7 +454,7 @@ static void skip_next_section(FILE *fp, long stop_at) {
 }
 
 static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
-                                              int *errors,
+                                              hefesto_int_t *errors,
                                               hefesto_var_list_ctx *gl_vars,
                                   hefesto_options_ctx *forge_functions_name,
                                  hefesto_func_list_ctx *function_collection,
@@ -467,7 +467,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
     hefesto_include_list_ctx *ip = NULL;
     FILE *inc_fp;
     long inc_fp_size;
-    int inc_errors;
+    hefesto_int_t inc_errors;
 
     char *parent_filepath;
     size_t parent_filepath_size = strlen(get_current_compile_input());
@@ -488,7 +488,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
 
     if (functions_decl != NULL) {
         // (INFO: Santiago): === WARNING nasty trick area                        ===
-        // acquiring the external (but local :Z) prototypes... it'll be freed below,
+        // acquiring the external (but local :Z) prototypes... it'll be free below,
         // don't worry about. YES, I know... this is an ugly thing.
         //                                                                       ===
         proto_funcs = get_hefesto_func_list_ctx_tail(functions_decl);
@@ -524,7 +524,7 @@ static hefesto_func_list_ctx *parse_functions(FILE *fp, const long stop_at,
 
 static void add_function_header(hefesto_func_list_ctx **functions,
                                 const char *name,
-                                const int is_local,
+                                const hefesto_int_t is_local,
                                 const hefesto_type_t type,
                                 const char *argl) {
 
@@ -542,17 +542,17 @@ static void add_function_header(hefesto_func_list_ctx **functions,
 
 }
 
-static int compile_and_load_function(hefesto_func_list_ctx **fn,
-                                     hefesto_func_list_ctx *functions,
-                                     hefesto_var_list_ctx *gl_vars,
-                                     hefesto_options_ctx *forge_functions_name,
-                                     FILE *fp,
-                                     long end_offset) {
+static hefesto_int_t compile_and_load_function(hefesto_func_list_ctx **fn,
+                                               hefesto_func_list_ctx *functions,
+                                               hefesto_var_list_ctx *gl_vars,
+                                               hefesto_options_ctx *forge_functions_name,
+                                               FILE *fp,
+                                               long end_offset) {
 
-    int continue_line_nr;
-    int result;
+    hefesto_int_t continue_line_nr;
+    hefesto_int_t result;
     long offset = ftell(fp);
-    int tmp_line_nr = get_current_line_number();
+    hefesto_int_t tmp_line_nr = get_current_line_number();
 
     if ((result = compile_code((*fn), functions, gl_vars, forge_functions_name,
                                fp, end_offset))) {
@@ -568,19 +568,19 @@ static int compile_and_load_function(hefesto_func_list_ctx **fn,
 }
 
 static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
-                                            int *errors,
+                                            hefesto_int_t *errors,
                                     hefesto_func_list_ctx *functions_decl,
                                     hefesto_var_list_ctx *gl_vars,
                                     hefesto_options_ctx *forge_functions_name,
-                                    int only_prototypes) {
+                                    hefesto_int_t only_prototypes) {
 
     hefesto_func_list_ctx *functions, *f, *ff;
     char *buffer = NULL, *name = NULL, c, *section = NULL;
     char argl[HEFESTO_MAX_BUFFER_SIZE];
     size_t a, o;
     long offset, end_offset, curr_offset;
-    int tmp_line_nr;
-    int is_local = 0;
+    hefesto_int_t tmp_line_nr;
+    hefesto_int_t is_local = 0;
 
     functions = functions_decl;
 
@@ -792,10 +792,10 @@ ___free_buffers:
 
 }
 
-static int is_valid_function_arg_list(const char *argl) {
+static hefesto_int_t is_valid_function_arg_list(const char *argl) {
 
     const char *a;
-    int state = 0;
+    hefesto_int_t state = 0;
     size_t ai;
     char atom[HEFESTO_MAX_BUFFER_SIZE];
     HEFESTO_DEBUG_INFO(0, "parser/list: %s\n", argl);
@@ -899,7 +899,7 @@ static char *get_next_command(FILE *fp, const long stop_at) {
 
     char *command, *p, *first_non_blank;
     char c;
-    int str = 0, bracket = 0, ln = -1;
+    hefesto_int_t str = 0, bracket = 0, ln = -1;
 
     c = fgetc(fp);
 
@@ -985,13 +985,13 @@ static char *get_next_command(FILE *fp, const long stop_at) {
 
 }
 
-static int compile_code(hefesto_func_list_ctx *function,
-                        hefesto_func_list_ctx *functions,
-                        hefesto_var_list_ctx *gl_vars,
-                        hefesto_options_ctx *forge_functions_name,
-                        FILE *fp, const long stop_at) {
+static hefesto_int_t compile_code(hefesto_func_list_ctx *function,
+                                  hefesto_func_list_ctx *functions,
+                                  hefesto_var_list_ctx *gl_vars,
+                                  hefesto_options_ctx *forge_functions_name,
+                                  FILE *fp, const long stop_at) {
 
-    int syntax_is_ok = 1;
+    hefesto_int_t syntax_is_ok = 1;
     char *command;
     hefesto_var_list_ctx *tail = get_hefesto_var_list_ctx_tail(function->vars);
 
@@ -1107,10 +1107,10 @@ static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
 
 }
 
-static int is_really_section_end(FILE *fp, const long stop_at) {
+static hefesto_int_t is_really_section_end(FILE *fp, const long stop_at) {
     long curr_offset = ftell(fp);
     char *reserv_word = get_next_word_or_string_from_file(fp, stop_at);
-    int end = 1;
+    hefesto_int_t end = 1;
     while (reserv_word != NULL &&
            (*reserv_word == '#' || strcmp(reserv_word, "var") == 0)) {
         if (strcmp(reserv_word, "var") == 0) {
@@ -1151,7 +1151,7 @@ static int is_really_section_end(FILE *fp, const long stop_at) {
 
 static long get_section_end_offset(FILE *fp, const long stop_at) {
 
-    int bracket = 1;
+    hefesto_int_t bracket = 1;
     char c;
 
     c = fgetc(fp);
@@ -1184,7 +1184,7 @@ char *get_next_expression_from_buffer(const char *buf, size_t *next_pos) {
     char *r = result;
     const char *b;
     size_t o = 0;
-    int can_parse = 1;
+    hefesto_int_t can_parse = 1;
 
     *r = 0;
     b = buf + *next_pos;
@@ -1300,10 +1300,10 @@ char *get_next_expression_from_buffer(const char *buf, size_t *next_pos) {
 
 }
 
-static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
-                                 const long file_size,
-                                 hefesto_var_list_ctx *gl_vars,
-                                 hefesto_func_list_ctx *functions) {
+static hefesto_int_t get_project_functions(hefesto_project_ctx *project, FILE *fp,
+                                           const long file_size,
+                                           hefesto_var_list_ctx *gl_vars,
+                                           hefesto_func_list_ctx *functions) {
 
     hefesto_func_list_ctx *fn_ptr;
     struct prj_functions_ctx {
@@ -1319,7 +1319,7 @@ static int get_project_functions(hefesto_project_ctx *project, FILE *fp,
     char decl_label[HEFESTO_MAX_BUFFER_SIZE];
     char *tok = NULL, c;
     long end_offset, offset;
-    int tmp_line_nr, result = 1;
+    hefesto_int_t tmp_line_nr, result = 1;
 
     for (p = 0; p < 3 && result; p++) {
         set_current_line_number(1);
@@ -1372,7 +1372,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                               hefesto_var_list_ctx *gl_vars,
                                               hefesto_func_list_ctx *functions) {
 
-    int state = 0;
+    hefesto_int_t state = 0;
     long file_size;
     char *tok = NULL, *dep_chain_expr = NULL;
     hefesto_toolset_ctx *toolset;
@@ -2017,11 +2017,11 @@ hefesto_options_ctx *get_forge_functions_name(const char *file_path,
 
 }
 
-static int check_helpers_decl_section(FILE *fp, long file_size, 
-                                      const char *toolset_name) {
+static hefesto_int_t check_helpers_decl_section(FILE *fp, long file_size, 
+                                                const char *toolset_name) {
 
     char *tok;
-    int result = 0;
+    hefesto_int_t result = 0;
 
     tok = get_next_word_or_string_from_file(fp, file_size);
     while (strcmp(tok, ":") != 0 && strcmp(tok, "command") != 0 && 
@@ -2065,7 +2065,7 @@ static int check_helpers_decl_section(FILE *fp, long file_size,
     return result;
 }
 
-static int check_forge_helpers(char *tok, FILE *fp, const long file_size,
+static hefesto_int_t check_forge_helpers(char *tok, FILE *fp, const long file_size,
                                const char *toolset_name) {
 
     if (strcmp(tok, "helpers") == 0) {
@@ -2488,7 +2488,7 @@ char *strip_quotes_from_string(const char *string) {
 
 }
 
-int get_current_line_number() {
+hefesto_int_t get_current_line_number() {
     return current_line_nr;
 }
 
@@ -2496,7 +2496,7 @@ void inc_current_line_number() {
     current_line_nr++;
 }
 
-static void set_current_line_number(int line_nr) {
+static void set_current_line_number(hefesto_int_t line_nr) {
     current_line_nr = line_nr;
 }
 
@@ -2571,11 +2571,11 @@ static char *expand_include_file_name(const char *file_path,
 
 }
 
-static int should_include_file(const char *inc_on_list) {
+static hefesto_int_t should_include_file(const char *inc_on_list) {
     char os_name[HEFESTO_MAX_BUFFER_SIZE];
     char *cur_os_name = get_os_name();
     const char *i;
-    int should_inc = 0;
+    hefesto_int_t should_inc = 0;
     size_t o;
     o = 0;
     for (i = inc_on_list; *i != 0 && !should_inc; i++) {
@@ -2598,13 +2598,13 @@ static int should_include_file(const char *inc_on_list) {
 
 static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
                                         hefesto_include_list_ctx *incl_list,
-                                                                int *error,
+                                                                hefesto_int_t *error,
                                   hefesto_options_ctx *hefesto_usr_inc_dir) {
 
     FILE *fp;
     char *tok, *t, *include_file;
     long stop_at, temp_offset;
-    int should_include = 1;
+    hefesto_int_t should_include = 1;
     hefesto_include_list_ctx *ip;
 
     if (!(fp = fopen(file_path, "rb"))) {
@@ -2714,8 +2714,8 @@ static hefesto_include_list_ctx *get_all_includes(
     hefesto_include_list_ctx *ip, *lip, *curr_tail = NULL, *last_tail = NULL;
     hefesto_include_list_ctx *temp_copy;
     hefesto_include_list_ctx *incl_order = NULL;
-    int error = 0;
-    int has_add = 0;
+    hefesto_int_t error = 0;
+    hefesto_int_t has_add = 0;
 
     includes = add_include_to_hefesto_include_list_ctx(includes, file_path);
     last_tail = get_hefesto_include_list_ctx_tail(includes);
@@ -2745,7 +2745,7 @@ static hefesto_include_list_ctx *get_all_includes(
 }
 
 hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
-                                                 int *errors,
+                                                 hefesto_int_t *errors,
                                                  hefesto_var_list_ctx **gl_vars,
                                       hefesto_options_ctx *forge_functions_name,
                                   hefesto_options_ctx *usr_include_directories) {
@@ -2757,7 +2757,7 @@ hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
     hefesto_var_list_ctx *curr_src_gl_vars, *gl_p;
     FILE *fp;
     long stop_at;
-    int load_later = 0;
+    hefesto_int_t load_later = 0;
 
     includes = get_all_includes(includes, hls_main,
                                 usr_include_directories);

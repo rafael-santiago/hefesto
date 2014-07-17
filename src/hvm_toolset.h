@@ -18,6 +18,6 @@ void *hvm_toolset_call_command(const char *raw_command,
 
 ssize_t is_hvm_toolset_builtin_facility(const char *command);
 
-void set_hvm_toolset_src_changes_check_flag(const int checked);
+void set_hvm_toolset_src_changes_check_flag(const hefesto_int_t checked);
 
 #endif

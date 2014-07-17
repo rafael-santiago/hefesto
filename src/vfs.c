@@ -34,9 +34,9 @@ struct hefesto_file_ptr_pool {
 
 static struct hefesto_file_ptr_pool *HEFESTO_FILE_PTR_POOL = NULL;
 
-static int hefesto_is_dir(const char *path);
+static hefesto_int_t hefesto_is_dir(const char *path);
 
-static int copy_single_file(const char *src, const char *dest);
+static hefesto_int_t copy_single_file(const char *src, const char *dest);
 
 static void add_file_ptr_to_hefesto_file_ptr_pool(FILE *p);
 
@@ -48,7 +48,7 @@ char HEFESTO_FS_CWD[HEFESTO_MAX_BUFFER_SIZE];
 
 char HEFESTO_APP_PATH[HEFESTO_MAX_BUFFER_SIZE];
 
-int hefesto_fs_cd(const char *dir) {
+hefesto_int_t hefesto_fs_cd(const char *dir) {
 
     DIR *d = opendir(dir);
     char *cwd;
@@ -142,7 +142,7 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
 
 }
 
-static int copy_single_file(const char *src, const char *dest) {
+static hefesto_int_t copy_single_file(const char *src, const char *dest) {
 
     unsigned char buf[HEFESTO_MAX_BUFFER_SIZE];
     size_t rd;
@@ -182,13 +182,13 @@ static int copy_single_file(const char *src, const char *dest) {
 
 }
 
-int hefesto_cp(const char *src, const char *dest) {
+hefesto_int_t hefesto_cp(const char *src, const char *dest) {
 
     char *full_src, *full_dest;
     char *file_src, *file_dest;
     DIR *dir;
     struct dirent *de;
-    int result = 0;
+    hefesto_int_t result = 0;
     //char *regex;
     char errors[HEFESTO_MAX_BUFFER_SIZE];
     here_search_program_ctx *search_program;
@@ -305,10 +305,10 @@ int hefesto_cp(const char *src, const char *dest) {
 
 }
 
-int hefesto_rm(const char *src) {
+hefesto_int_t hefesto_rm(const char *src) {
 
     char *full_src;
-    int result = 0;
+    hefesto_int_t result = 0;
 
     if (src == NULL) return 0;
 
@@ -323,10 +323,10 @@ int hefesto_rm(const char *src) {
 
 }
 
-int hefesto_mkdir(const char *dir) {
+hefesto_int_t hefesto_mkdir(const char *dir) {
 
     char *full_src;
-    int result = 0;
+    hefesto_int_t result = 0;
 
     if (dir == NULL) return 0;
 
@@ -344,10 +344,10 @@ int hefesto_mkdir(const char *dir) {
 
 }
 
-int hefesto_rmdir(const char *dir) {
+hefesto_int_t hefesto_rmdir(const char *dir) {
 
     char *full_src;
-    int result = 0;
+    hefesto_int_t result = 0;
 
     if (dir == NULL || *dir == 0) return 0;
 
@@ -362,7 +362,7 @@ int hefesto_rmdir(const char *dir) {
 
 }
 
-int hefesto_is_file(const char *path) {
+hefesto_int_t hefesto_is_file(const char *path) {
 
     DIR *dir = opendir(path);
     FILE *fp;
@@ -383,7 +383,7 @@ int hefesto_is_file(const char *path) {
 
 }
 
-static int hefesto_is_dir(const char *path) {
+static hefesto_int_t hefesto_is_dir(const char *path) {
 
     DIR *dir = opendir(path);
 
@@ -396,12 +396,12 @@ static int hefesto_is_dir(const char *path) {
 
 }
 
-int hefesto_ls(const char *mask) {
+hefesto_int_t hefesto_ls(const char *mask) {
 
     DIR *dir;
     char *cwd = hefesto_pwd();
     struct dirent *de;
-    int total = 0;
+    hefesto_int_t total = 0;
     char errors[HEFESTO_MAX_BUFFER_SIZE];
     char *full_path;
     here_search_program_ctx *search_program;
@@ -489,8 +489,8 @@ void hefesto_fclose(hefesto_file_handle **fp_handle) {
 
 }
 
-int hefesto_fwrite(const char *buffer, const size_t size,
-                   hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_fwrite(const char *buffer, const size_t size,
+                             hefesto_file_handle *fp_handle) {
     HEFESTO_DEBUG_INFO(0,
         "vfs/buffer: %s, size: %d, fp_handle: %x\n", buffer,
             size, fp_handle->fp);
@@ -501,8 +501,8 @@ int hefesto_fwrite(const char *buffer, const size_t size,
 
 }
 
-int hefesto_fread(char *buffer, const size_t size,
-                  hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_fread(char *buffer, const size_t size,
+                            hefesto_file_handle *fp_handle) {
 
     HEFESTO_DEBUG_INFO(0,
         "vfs/buffer: size: %d, fp_handle: %x\n",
@@ -519,7 +519,7 @@ int hefesto_fread(char *buffer, const size_t size,
 hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
                                             hefesto_var_list_ctx *lo_vars,
                                             hefesto_var_list_ctx *gl_vars,
-                                            hefesto_func_list_ctx *functions) {
+                                         hefesto_func_list_ctx *functions) {
     hefesto_var_list_ctx *vp;
     char *vname, *v, *vn, *expr;
 
@@ -548,7 +548,7 @@ hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
 
 }
 
-int hefesto_feof(hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_feof(hefesto_file_handle *fp_handle) {
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return 1;
 
@@ -556,7 +556,7 @@ int hefesto_feof(hefesto_file_handle *fp_handle) {
 
 }
 
-int hefesto_fseek(hefesto_file_handle *fp_handle, const long offset) {
+hefesto_int_t hefesto_fseek(hefesto_file_handle *fp_handle, const long offset) {
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -564,7 +564,7 @@ int hefesto_fseek(hefesto_file_handle *fp_handle, const long offset) {
 
 }
 
-int hefesto_fseek_to_begin(hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_fseek_to_begin(hefesto_file_handle *fp_handle) {
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -572,7 +572,7 @@ int hefesto_fseek_to_begin(hefesto_file_handle *fp_handle) {
 
 }
 
-int hefesto_fseek_to_end(hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_fseek_to_end(hefesto_file_handle *fp_handle) {
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -580,10 +580,10 @@ int hefesto_fseek_to_end(hefesto_file_handle *fp_handle) {
 
 }
 
-int hefesto_fsize(hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_fsize(hefesto_file_handle *fp_handle) {
 
     long temp;
-    int fsz;
+    hefesto_int_t fsz;
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -596,7 +596,7 @@ int hefesto_fsize(hefesto_file_handle *fp_handle) {
 
 }
 
-int hefesto_ftell(hefesto_file_handle *fp_handle) {
+hefesto_int_t hefesto_ftell(hefesto_file_handle *fp_handle) {
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -611,9 +611,9 @@ void set_hefesto_app_directory(const char *directory) {
     strncpy(HEFESTO_APP_PATH, directory, sizeof(HEFESTO_APP_PATH)-1);
 }
 
-int hefesto_is_relative_path(const char *path) {
+hefesto_int_t hefesto_is_relative_path(const char *path) {
 
-    int is_relative = 0;
+    hefesto_int_t is_relative = 0;
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];

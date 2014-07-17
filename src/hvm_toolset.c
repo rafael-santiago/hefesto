@@ -56,7 +56,7 @@ static struct hvm_toolset_builtin_facility_ctx
 
 };
 
-int hvm_toolset_src_changes_already_checked = 0;
+hefesto_int_t hvm_toolset_src_changes_already_checked = 0;
 
 static char *hvm_toolset_command_fmt(hefesto_toolset_command_ctx *command) {
 
@@ -278,7 +278,7 @@ static void *hvm_toolset_base_refresh(const char *command,
     hefesto_base_refresh_ctx *bref = NULL, *brp;
     char *arg;
     size_t offset = 0;
-    int should_refresh = 0;
+    hefesto_int_t should_refresh = 0;
 
     arg = get_arg_from_call(command, &offset);
 
@@ -346,7 +346,7 @@ static void *hvm_toolset_file_has_change(const char *command,
                                          hefesto_var_list_ctx **gl_vars,
                                          hefesto_func_list_ctx *functions) {
 
-    void *result = (void *) hefesto_mloc(sizeof(int));
+    void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_dep_chain_ctx *d;
     char *arg;
     char *expr;
@@ -354,7 +354,7 @@ static void *hvm_toolset_file_has_change(const char *command,
     hefesto_type_t etype;
     size_t offset = 0;
 
-    *(int *)result = 1;
+    *(hefesto_int_t *)result = 1;
 
     if (HEFESTO_CURRENT_DEP_CHAIN != NULL) {
         if (!hvm_toolset_src_changes_already_checked) {
@@ -370,7 +370,7 @@ static void *hvm_toolset_file_has_change(const char *command,
         free(expr);
         if ((d = get_hefesto_dep_chain_ctx_file_path(expr_result,
                                       HEFESTO_CURRENT_DEP_CHAIN)) != NULL) {
-            *(int *)result = d->dirty;
+            *(hefesto_int_t *)result = d->dirty;
         }
         free(expr_result);
 
@@ -380,6 +380,6 @@ static void *hvm_toolset_file_has_change(const char *command,
 
 }
 
-void set_hvm_toolset_src_changes_check_flag(const int checked) {
+void set_hvm_toolset_src_changes_check_flag(const hefesto_int_t checked) {
     hvm_toolset_src_changes_already_checked = 0;
 }

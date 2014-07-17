@@ -108,17 +108,17 @@ static void *hvm_str_len(const char *method,
                          hefesto_func_list_ctx *functions) {
 
     void *result;
-    result = (void *) hefesto_mloc(sizeof(int));
-    int len;
+    result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+    hefesto_int_t len;
 
-    memset(result, 0, sizeof(int));
+    memset(result, 0, sizeof(hefesto_int_t));
     *otype = HEFESTO_VAR_TYPE_INT;
 
     if (string_var == NULL || (*string_var) == NULL ||
         (*string_var)->data == NULL) return result;
     len = strlen((char *)(*string_var)->data);
 
-    *(int *)result = len;
+    *(hefesto_int_t *)result = len;
 
     return result;
 
@@ -189,7 +189,7 @@ char *hvm_str_format(const char *str, hefesto_var_list_ctx **lo_vars,
 
 }
 
-char *hvm_int_to_str(const int value) {
+char *hvm_int_to_str(const hefesto_int_t value) {
 
     char *result = (char *) hefesto_mloc(1024);
 
@@ -199,10 +199,10 @@ char *hvm_int_to_str(const int value) {
 
 }
 
-int hvm_str_to_int(const char *str) {
+hefesto_int_t hvm_str_to_int(const char *str) {
 
     const char *sp;
-    int base = 10;
+    hefesto_int_t base = 10;
 
     if (str == NULL) return 0;
     sp = str;
@@ -235,8 +235,8 @@ static void *hvm_str_match(const char *method,
 
     hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
     *otype = HEFESTO_VAR_TYPE_INT;
-    result = hefesto_mloc(sizeof(int));
-    *(int *)result = 0;
+    result = hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)result = 0;
 
     if (string_var == NULL || (*string_var) == NULL ||
         (*string_var)->data == NULL) return result;
@@ -250,7 +250,7 @@ static void *hvm_str_match(const char *method,
     if ((search_program = here_compile(usr_regex, errors)) != NULL) {
         search_result = here_match_string((*string_var)->data,
                                           search_program);
-        *(int *)result = here_matches(search_result);
+        *(hefesto_int_t *)result = here_matches(search_result);
         del_here_search_program_ctx(search_program);
         del_here_search_result_ctx(search_result);
     } else {
@@ -280,8 +280,8 @@ static void *hvm_str_replace(const char *method,
     here_search_program_ctx *search_program;
 
     *otype = HEFESTO_VAR_TYPE_INT;
-    result = hefesto_mloc(sizeof(int));
-    *(int *)result = 0;
+    result = hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)result = 0;
 
     if (string_var == NULL || (*string_var) == NULL ||
         (*string_var)->data == NULL) return result;
@@ -299,7 +299,7 @@ static void *hvm_str_replace(const char *method,
         usr_pattern = expr_eval(pattern_arg, lo_vars, gl_vars, functions,
                                 &etype, &outsz);
 
-        *(int *)result = here_replace_string((*string_var)->data,
+        *(hefesto_int_t *)result = here_replace_string((*string_var)->data,
                                              search_program,
                                              usr_pattern,
                                              &replaced_buffer,

@@ -5,14 +5,13 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#include "types.h"
 #include "hvm_thread.h"
 
-int hvm_thread_create(hefesto_thread_t *thread_id,
+hefesto_int_t hvm_thread_create(hefesto_thread_t *thread_id,
                       hefesto_thread_routine_t start_routine(void *),
                       void *args) {
 
-   int result = 0;
+   hefesto_int_t result = 0;
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 

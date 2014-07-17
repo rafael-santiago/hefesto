@@ -20,8 +20,8 @@ char *hvm_str_format(const char *str, hefesto_var_list_ctx **lo_vars,
                      hefesto_var_list_ctx **gl_vars,
                      hefesto_func_list_ctx *functions);
 
-char *hvm_int_to_str(const int value);
+char *hvm_int_to_str(const hefesto_int_t value);
 
-int hvm_str_to_int(const char *str);
+hefesto_int_t hvm_str_to_int(const char *str);
 
 #endif

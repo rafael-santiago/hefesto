@@ -28,9 +28,9 @@ struct hefesto_expr_ops_ctx {
                    ( o ) == '&' || ( o ) == '^' || ( o ) == '<' ||\
                    ( o ) == '>' || ( o ) == '%' || ( o ) == '!' )
 
-char *infix2postfix(const char *expr, const size_t esize, const int main_call);
+char *infix2postfix(const char *expr, const size_t esize, const hefesto_int_t main_call);
 
-int get_op_precedence(const char *op);
+hefesto_int_t get_op_precedence(const char *op);
 
 ssize_t get_op_index(const char *op);
 

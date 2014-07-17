@@ -24,10 +24,10 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                             hefesto_var_list_ctx **lo_vars,
                             hefesto_var_list_ctx **gl_vars,
                             hefesto_func_list_ctx *functions,
-                            int *should_return);
+                            hefesto_int_t *should_return);
 
-int hvm_forge_project(hefesto_project_ctx *project,
-                      hefesto_var_list_ctx **gl_vars,
-                      hefesto_func_list_ctx *functions);
+hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions);
 
 #endif

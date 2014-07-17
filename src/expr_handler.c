@@ -46,7 +46,7 @@ static struct hefesto_expr_ops_ctx HEFESTO_EXPR_OPS[HEFESTO_EXPR_OPS_NR] = {
 static char *infix2postfix_function_args(const char *expr_args,
                                          const size_t esize);
 
-static int is_postfixed(const char *expr);
+static hefesto_int_t is_postfixed(const char *expr);
 
 static char *infix2postfix_function_args(const char *expr_args,
                                          const size_t esize) {
@@ -90,20 +90,20 @@ static char *infix2postfix_function_args(const char *expr_args,
 
 }
 
-char *infix2postfix(const char *expr, const size_t esize, const int main_call) {
+char *infix2postfix(const char *expr, const size_t esize, const hefesto_int_t main_call) {
 
     const char *efinis = expr + esize, *e;
     char *t, *term, *tt;
     hefesto_common_stack_ctx *sp = NULL, *dp = NULL;
     hefesto_common_list_ctx *lp = NULL, *l;
-    int p, tp;
+    hefesto_int_t p, tp;
     size_t sz;
-    int bracket = 0;
+    hefesto_int_t bracket = 0;
     char *indexing;
     char *iexpr;
     char *args;
     size_t offset, count;
-    int state = 0;
+    hefesto_int_t state = 0;
 
     term = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     memset(term, 0, HEFESTO_MAX_BUFFER_SIZE);
@@ -276,9 +276,9 @@ char *infix2postfix(const char *expr, const size_t esize, const int main_call) {
 
 }
 
-int get_op_precedence(const char *op) {
+hefesto_int_t get_op_precedence(const char *op) {
 
-    int o;
+    hefesto_int_t o;
 
     if (op == NULL) return -1;
 
@@ -301,13 +301,13 @@ ssize_t get_op_index(const char *op) {
 
 }
 
-static int is_postfixed(const char *expr) { // deprecated
+static hefesto_int_t is_postfixed(const char *expr) { // deprecated
     const char *ep;
-    int state = 0;
+    hefesto_int_t state = 0;
     char *buffer = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     char *b_end = buffer + HEFESTO_MAX_BUFFER_SIZE;
     char *bp = buffer;
-    int retval = 0;
+    hefesto_int_t retval = 0;
     for (ep = expr; *ep != 0 && !retval && state < 3; ep++) {
         if (!is_hefesto_blank(*ep) && !is_hefesto_op(*ep)) {
             if (bp < b_end) {

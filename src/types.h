@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include "arch.h"
 #include "dbg.h"
 #include "version_no.h"
 
@@ -37,6 +39,18 @@
 #define HEFESTO_MAX_BUFFER_SIZE 1024
 
 typedef unsigned long hefesto_type_t;
+
+#ifdef HEFESTO_ARCH_X86
+typedef int32_t hefesto_int_t;
+typedef uint32_t hefesto_uint_t;
+#else
+#ifdef HEFESTO_ARCH_X64
+typedef int64_t hefesto_int_t;
+typedef uint64_t hefesto_uint_t;
+#else
+#error "ERROR: no hefesto architecture found."
+#endif
+#endif
 
 #define HEFESTO_VAR_TYPE_UNTYPED                                0x0
 #define HEFESTO_VAR_TYPE_STRING                                 0x1
@@ -130,7 +144,7 @@ typedef struct _hefesto_command_list_ctx {
   hefesto_var_list_ctx *working_var;
   hefesto_common_list_ctx *params;
   char *expr;
-  int expr_logical_result;
+  hefesto_int_t expr_logical_result;
   struct _hefesto_command_list_ctx *sub;
   //struct _hefesto_func_list_ctx *last;
   struct _hefesto_func_list_ctx *func;
@@ -140,7 +154,7 @@ typedef struct _hefesto_command_list_ctx {
 
 typedef struct _hefesto_file_descriptors_ctx { // obsoleto
   char *var_name;
-  int is_array;
+  hefesto_int_t is_array;
   FILE *fp;
   struct _hefesto_file_descriptors_ctx *array;
   struct _hefesto_file_descriptors_ctx *next;
@@ -149,7 +163,7 @@ typedef struct _hefesto_file_descriptors_ctx { // obsoleto
 typedef struct _hefesto_func_list_ctx {
   char *name;
   char *decl_at;
-  int is_local;
+  hefesto_int_t is_local;
   hefesto_type_t result_type;
   hefesto_var_list_ctx *args;
   hefesto_var_list_ctx *vars;
@@ -188,7 +202,7 @@ typedef struct _hefesto_options_ctx {
 
 typedef struct _hefesto_dep_chain_ctx {
     char *file_path;
-    int dirty;
+    hefesto_int_t dirty;
     hefesto_common_list_ctx *deps;
     struct _hefesto_dep_chain_ctx *next;
 }hefesto_dep_chain_ctx;
@@ -215,16 +229,16 @@ typedef struct _hefesto_sum_base_ctx {
 typedef struct _hefesto_base_refresh_ctx {
     char *path;
     size_t psize;
-    int refresh;
+    hefesto_int_t refresh;
     struct _hefesto_base_refresh_ctx *next;
 }hefesto_base_refresh_ctx;
 
-extern int HEFESTO_EXIT_CODE;
-extern int HEFESTO_EXIT;
-extern int HEFESTO_EXIT_FORGE;
+extern hefesto_int_t HEFESTO_EXIT_CODE;
+extern hefesto_int_t HEFESTO_EXIT;
+extern hefesto_int_t HEFESTO_EXIT_FORGE;
 extern hefesto_dep_chain_ctx *HEFESTO_CURRENT_DEP_CHAIN;
 extern hefesto_options_ctx *HEFESTO_OPTIONS;
-extern int HEFESTO_LAST_FORGE_RESULT;
+extern hefesto_int_t HEFESTO_LAST_FORGE_RESULT;
 extern hefesto_project_ctx *HEFESTO_CURRENT_PROJECT;
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
@@ -241,8 +255,8 @@ typedef HANDLE hefesto_thread_t;
 
 typedef struct _hefesto_rqueue_ctx {
     char *path_to_run;
-    int exit_code;
-    int idle;
+    hefesto_int_t exit_code;
+    hefesto_int_t idle;
     size_t max_path_size;
     hefesto_thread_t id;
     struct _hefesto_rqueue_ctx *next;

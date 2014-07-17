@@ -171,8 +171,8 @@ static void *hefesto_project_abort(const char *method,
         }
         HEFESTO_EXIT_FORGE = 1;
     }
-    retval = (int *) hefesto_mloc(sizeof(int));
-    *(int *)retval = HEFESTO_EXIT_CODE;
+    retval = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)retval = HEFESTO_EXIT_CODE;
     return retval;
 }
 

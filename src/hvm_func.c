@@ -27,7 +27,7 @@ struct stacked_function_execution_point_ctx *hvm_save_execution_point(
 
     struct stacked_function_execution_point_ctx *exec_point_p;
     hefesto_var_list_ctx *vp, *vp_tail_p, *curr_vlist_from_p, *curr_vlist_to_p;
-    int state;
+    hefesto_int_t state;
 
     new_stacked_function_execution_point_ctx(exec_point_p);
     for (state = 0; state < 2; state++) {
@@ -78,7 +78,7 @@ void hvm_restore_execution_point(hefesto_func_list_ctx **function,
         struct stacked_function_execution_point_ctx *execution_point) {
 
     hefesto_var_list_ctx *vp, *vp_to, *curr_vlist_from_p, *curr_vlist_to_p;
-    int state;
+    hefesto_int_t state;
 
     for (state = 0; state < 2; state++) {
 
@@ -251,7 +251,7 @@ void hvm_init_function_args(const char *args,
         else {
             HEFESTO_DEBUG_INFO(0,
                 "hvm_func/hvm_init_function_args/result = %d\n",
-                    *(int *)expr_result);
+                    *(hefesto_int_t *)expr_result);
         }
 #endif
         if (vp->contents != NULL) {
@@ -262,7 +262,7 @@ void hvm_init_function_args(const char *args,
             vp->contents = add_data_to_hefesto_common_list_ctx(vp->contents,
                                                                expr_result,
                                         (etype == HEFESTO_VAR_TYPE_STRING) ?
-                                            strlen((char*)expr_result) : sizeof(int));
+                                            strlen((char*)expr_result) : sizeof(hefesto_int_t));
             free(expr_result);
         } else {
             if (vlp != NULL) {

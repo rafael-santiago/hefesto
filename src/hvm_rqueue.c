@@ -14,7 +14,7 @@
 
 static hefesto_thread_routine_t hefesto_async_run(void *args);
 
-int hefesto_current_rqueue_size = 1;
+hefesto_int_t hefesto_current_rqueue_size = 1;
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
@@ -28,14 +28,14 @@ HANDLE run_mutex;
 
 struct hvm_rqueue_ctx {
     char *path_to_run;
-    int exit_code, idle;
+    hefesto_int_t exit_code, idle;
     hefesto_thread_t id;
 };
 
-int hvm_rqueue_run(hefesto_common_list_ctx *plist) {
+hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
-    int exit_codes = 0, all_done = 0, sched_proc_nr;
+    hefesto_int_t exit_codes = 0, all_done = 0, sched_proc_nr;
     hefesto_common_list_ctx *pp;
     hefesto_rqueue_ctx *rqueue = NULL, *rqp;
 
@@ -89,7 +89,7 @@ int hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
-    int exit_codes = 0, all_done = 0, sched_proc_nr;
+    hefesto_int_t exit_codes = 0, all_done = 0, sched_proc_nr;
     hefesto_common_list_ctx *pp;
     hefesto_rqueue_ctx *rqueue = NULL, *rqp;
 
@@ -149,7 +149,7 @@ int hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
 }
 
-void hvm_rqueue_set_queue_size(const unsigned int new_size) {
+void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size) {
     hefesto_current_rqueue_size = new_size;
 }
 

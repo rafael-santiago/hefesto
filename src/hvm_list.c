@@ -159,7 +159,7 @@ static void *hvm_list_item(const char *method,
     hefesto_type_t etype;
     hefesto_common_list_ctx *p;
     void *result = NULL;
-    int is_int = 0;
+    hefesto_int_t is_int = 0;
     hefesto_var_list_ctx *vp = NULL;
 
     etype = HEFESTO_VAR_TYPE_INT;
@@ -178,8 +178,8 @@ static void *hvm_list_item(const char *method,
         memset(result, 0, p->dsize+1);
         memcpy(result, p->data, p->dsize);
     } else {
-        result = (void *) hefesto_mloc(sizeof(int));
-        memset(result, 0, sizeof(int));
+        result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+        memset(result, 0, sizeof(hefesto_int_t));
     }
 
     if (lo_vars != NULL) {
@@ -210,10 +210,10 @@ static void *hvm_list_item(const char *method,
             ((*list_var)->dsize == 1 || (*list_var)->is_dummy_item)) &&*/
         is_int) {
 
-        if (p && p->dsize != sizeof(int)) {
+        if (p && p->dsize != sizeof(hefesto_int_t)) {
             free(result);
-            result = (void *) hefesto_mloc(sizeof(int));
-            *(int *)result = hvm_str_to_int(p->data);
+            result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+            *(hefesto_int_t *)result = hvm_str_to_int(p->data);
         }
 
         *otype = HEFESTO_VAR_TYPE_INT;
@@ -267,7 +267,7 @@ static void *hvm_list_add_item(const char *method,
     *otype = HEFESTO_VAR_TYPE_INT;
 
     if (is_hefesto_numeric_constant((char *)arg)) {
-        outsz = sizeof(int);
+        outsz = sizeof(hefesto_int_t);
         etype = HEFESTO_VAR_TYPE_INT;
     } else {
         for (d = (char *) data, outsz = 0; *d != 0; d++) outsz++;
@@ -296,8 +296,8 @@ static void *hvm_list_add_item(const char *method,
     free(data);
     free(arg);
 
-    result = (void *) hefesto_mloc(sizeof(int));
-    *(int *)result = 1;
+    result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+    *(hefesto_int_t *)result = 1;
 
     return result;
 
@@ -451,7 +451,7 @@ static void *hvm_list_index_of(const char *method,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions) {
 
-    void *result = hefesto_mloc(sizeof(int));
+    void *result = hefesto_mloc(sizeof(hefesto_int_t));
     char *arg;
     void *data;
     hefesto_common_list_ctx *lp, *lpp;
@@ -460,7 +460,7 @@ static void *hvm_list_index_of(const char *method,
 
     *otype = HEFESTO_VAR_TYPE_INT;
     etype = HEFESTO_VAR_TYPE_INT;
-    *(int *)result = -1;
+    *(hefesto_int_t *)result = -1;
 
     arg = get_arg_from_call(method, &offset);
 
@@ -480,7 +480,7 @@ static void *hvm_list_index_of(const char *method,
         }
 
         if (lpp != NULL) {
-            *(int *)result = offset;
+            *(hefesto_int_t *)result = offset;
         }
     }
 
@@ -574,9 +574,9 @@ static void *hvm_list_swap(const char *method,
     free(arg1);
     free(arg2);
 
-    if (*((int *)index1) != *((int *)index2)) {
-        item1 = get_hefesto_common_list_ctx_index((size_t)*((int *)index1), *list_var);
-        item2 = get_hefesto_common_list_ctx_index((size_t)*((int *)index2), *list_var);
+    if (*((hefesto_int_t *)index1) != *((hefesto_int_t *)index2)) {
+        item1 = get_hefesto_common_list_ctx_index((size_t)*((hefesto_int_t *)index1), *list_var);
+        item2 = get_hefesto_common_list_ctx_index((size_t)*((hefesto_int_t *)index2), *list_var);
         if (item1 != NULL && item2 != NULL) {
             free(index1);
             index1 = hefesto_mloc(item1->dsize + 1);

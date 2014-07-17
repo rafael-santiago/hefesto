@@ -25,17 +25,17 @@ static void hvm_set_current_executed_instruction(
 static void *hvm_if(hefesto_command_list_ctx *cmd,
                     hefesto_var_list_ctx **lo_vars,
                     hefesto_var_list_ctx **gl_vars,
-                    hefesto_func_list_ctx *functions, int *should_return);
+                    hefesto_func_list_ctx *functions, hefesto_int_t *should_return);
 
 static void *hvm_else(hefesto_command_list_ctx *cmd,
                       hefesto_var_list_ctx **lo_vars,
                       hefesto_var_list_ctx **gl_vars,
-                      hefesto_func_list_ctx *functions, int *should_return);
+                      hefesto_func_list_ctx *functions, hefesto_int_t *should_return);
 
 static void *hvm_while(hefesto_command_list_ctx *cmd,
                        hefesto_var_list_ctx **lo_vars,
                        hefesto_var_list_ctx **gl_vars,
-                       hefesto_func_list_ctx *functions, int *should_return);
+                       hefesto_func_list_ctx *functions, hefesto_int_t *should_return);
 
 static void *hvm_call(hefesto_command_list_ctx *cmd,
                       hefesto_var_list_ctx **lo_vars,
@@ -50,15 +50,15 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
 static hefesto_command_list_ctx
         *get_last_cmd_to_exec(hefesto_command_list_ctx *cmd);
 
-int hvm_current_executed_instruction = HEFESTO_UNK;
+hefesto_int_t hvm_current_executed_instruction = HEFESTO_UNK;
 
-int hvm_break_loop = 0;
+hefesto_int_t hvm_break_loop = 0;
 
-int hvm_continue_loop = 0;
+hefesto_int_t hvm_continue_loop = 0;
 
-int hvm_is_inside_a_loop = 0;
+hefesto_int_t hvm_is_inside_a_loop = 0;
 
-int hvm_last_if_test = 0;
+hefesto_int_t hvm_last_if_test = 0;
 
 hefesto_func_list_ctx *hvm_current_executed_function = NULL;
 
@@ -94,13 +94,13 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                             hefesto_var_list_ctx **lo_vars,
                             hefesto_var_list_ctx **gl_vars,
                             hefesto_func_list_ctx *functions,
-                            int *should_return) {
+                            hefesto_int_t *should_return) {
 
     char *buf;
     void *result;
     hefesto_type_t out_type;
     size_t out_size;
-    int ret;
+    hefesto_int_t ret;
 
     while (cmd && hvm_continue_loop == 0 && !HEFESTO_EXIT) {
 
@@ -315,7 +315,7 @@ static hefesto_command_list_ctx *get_last_cmd_to_exec(hefesto_command_list_ctx *
 static void *hvm_else(hefesto_command_list_ctx *cmd,
                       hefesto_var_list_ctx **lo_vars,
                       hefesto_var_list_ctx **gl_vars,
-                      hefesto_func_list_ctx *functions, int *should_return) {
+                      hefesto_func_list_ctx *functions, hefesto_int_t *should_return) {
 
     hefesto_command_list_ctx *cmd_p = (cmd->sub == NULL) ? cmd->next : cmd->sub;
     hefesto_command_list_ctx *lst_cmd_p;
@@ -368,7 +368,7 @@ static void *hvm_else(hefesto_command_list_ctx *cmd,
 static void *hvm_if(hefesto_command_list_ctx *cmd,
                     hefesto_var_list_ctx **lo_vars,
                     hefesto_var_list_ctx **gl_vars,
-                    hefesto_func_list_ctx *functions, int *should_return) {
+                    hefesto_func_list_ctx *functions, hefesto_int_t *should_return) {
 
     void *test, *result = NULL;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
@@ -393,10 +393,10 @@ static void *hvm_if(hefesto_command_list_ctx *cmd,
 
     test = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype, &osize);
 
-    if (test && *(int *)test) {
+    if (test && *(hefesto_int_t *)test) {
         result = hvm_exec_command_list(cmd_p, lo_vars, gl_vars, functions,
                                        should_return);
-        hvm_last_if_test = *(int *)test;
+        hvm_last_if_test = *(hefesto_int_t *)test;
     } else {
         hvm_last_if_test = 0;
     }
@@ -428,7 +428,7 @@ static void *hvm_if(hefesto_command_list_ctx *cmd,
 static void *hvm_while(hefesto_command_list_ctx *cmd,
                        hefesto_var_list_ctx **lo_vars,
                        hefesto_var_list_ctx **gl_vars,
-                       hefesto_func_list_ctx *functions, int *should_return) {
+                       hefesto_func_list_ctx *functions, hefesto_int_t *should_return) {
 
     void *test;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
@@ -452,7 +452,7 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
     hvm_break_loop = 0;
     hvm_is_inside_a_loop++;
 
-    while (test && *(int *)test && !HEFESTO_EXIT) {
+    while (test && *(hefesto_int_t *)test && !HEFESTO_EXIT) {
 
         free(test);
         test = NULL;
@@ -466,8 +466,8 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
         } else if (hvm_continue_loop) {
             if (result != NULL) free(result);
             hvm_continue_loop = 0;
-            test = (void *) hefesto_mloc(sizeof(int));
-            *(int *)test = 1;
+            test = (void *) hefesto_mloc(sizeof(hefesto_int_t));
+            *(hefesto_int_t *)test = 1;
             continue;
         }
 
@@ -475,7 +475,7 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
 
         test = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype, &osize);
 
-        if (test && *(int *)test) {
+        if (test && *(hefesto_int_t *)test) {
             if (result != NULL) free(result);
         }
 
@@ -590,11 +590,11 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
 
 }
 
-int hvm_forge_project(hefesto_project_ctx *project,
-                      hefesto_var_list_ctx **gl_vars,
-                      hefesto_func_list_ctx *functions) {
+hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
+                                hefesto_var_list_ctx **gl_vars,
+                                hefesto_func_list_ctx *functions) {
 
-    //int build_result = 0;
+    //hefesto_int_t build_result = 0;
     void *result;
     char *expr_pfix;
     char forge_invocation[HEFESTO_MAX_BUFFER_SIZE] = "";
@@ -676,7 +676,7 @@ int hvm_forge_project(hefesto_project_ctx *project,
         del_stacked_function_execution_point_ctx(sv_p);
 
         if (result != NULL) {
-            HEFESTO_LAST_FORGE_RESULT = *(int *)result;
+            HEFESTO_LAST_FORGE_RESULT = *(hefesto_int_t *)result;
             free(result);
         }
 
