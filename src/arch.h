@@ -3,29 +3,23 @@
 
 #ifdef __GNUC__
 
-#ifdef i386
+#include <limits.h>
+
+#if __WORDSIZE == 32
 
 #define HEFESTO_ARCH_X86 1
 
 #else
 
-#ifdef __amd64_
+#if __WORDSIZE == 64
 
 #define HEFESTO_ARCH_X64 1
 
-#else
+#endif
 
-#ifdef __ia64__
+#endif
 
-#define HEFESTO_ARCH_X64 1
-
-#endif // __ia64__
-
-#endif // __amd64__
-
-#endif // i386
-
-#endif // __GNUC__
+#endif
 
 #endif
 

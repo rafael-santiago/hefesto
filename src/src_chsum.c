@@ -58,7 +58,7 @@ static unsigned short get_src_chsum(const char *src_path,
 
 static hefesto_int_t write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec) {
 
-    unsigned long sz;
+    hefesto_int_t sz;
     hefesto_int_t total;
     hefesto_sum_base_ctx *r;
 
@@ -214,7 +214,7 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
 
     FILE *sb;
     hefesto_sum_base_ctx *sum_base = NULL, *sb_tail;
-    unsigned long sz, deps_nr;
+    hefesto_int_t sz, deps_nr;
     char *temp, *file_path;
     unsigned short chsum;
     hefesto_sum_base_ctx *deps = NULL;
