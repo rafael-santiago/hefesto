@@ -1374,7 +1374,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
 
     hefesto_int_t state = 0;
     long file_size;
-    char *tok = NULL, *dep_chain_expr = NULL;
+    char *tok = NULL, *dep_chain_expr = NULL, tc;
     hefesto_toolset_ctx *toolset;
     hefesto_project_ctx *project_curr = NULL;
     FILE *fp;
@@ -1643,10 +1643,17 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
             // a dependency chain was defined
             if (strcmp(tok, "dependencies") == 0) {
                 free(tok);
+                tok = NULL;
                 dep_chain_expr = get_next_word_or_string_from_file(fp,
                                                             file_size);
                 if (*dep_chain_expr == '$') {
-                    if ((vp = get_hefesto_var_list_ctx_name(dep_chain_expr+1, 
+                    if (dep_chain_expr[strlen(dep_chain_expr)-1] == ':') {
+                        tc = ':';
+                        dep_chain_expr[strlen(dep_chain_expr)-1] = 0;
+                    } else {
+                        tc = 0;
+                    }
+                    if ((vp = get_hefesto_var_list_ctx_name(dep_chain_expr+1,
                                                             gl_vars)) == NULL) {
                         hlsc_info(HLSCM_MTYPE_GENERAL,
                                   HLSCM_DEPCHAIN_LD_ERROR_UNK_VAR,
@@ -1656,7 +1663,6 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                         del_hefesto_func_list_ctx(preloading_p);
                         del_hefesto_func_list_ctx(prologue_p);
                         del_hefesto_func_list_ctx(epilogue_p);
-                        free(tok);
                         return NULL;
                     }
                 } else {
@@ -1669,8 +1675,13 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                         free(dep_chain_expr);
                     }
                 }
-
-                tok = get_next_word_or_string_from_file(fp, file_size);
+                if (tc != ':') {
+                    tok = get_next_word_or_string_from_file(fp, file_size);
+                } else {
+                    tok = (char *) hefesto_mloc(8);
+                    *tok = tc;
+                    *(tok+1) = 0;
+                }
                 if (strcmp(tok, ":") != 0) {
                     hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_PROJ_WRONG_DEP_DECL,
                               tok);
