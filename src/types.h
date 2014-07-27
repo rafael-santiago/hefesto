@@ -48,7 +48,7 @@ typedef uint32_t hefesto_uint_t;
 typedef int64_t hefesto_int_t;
 typedef uint64_t hefesto_uint_t;
 #else
-#error "ERROR: no hefesto architecture found."
+#error "ERROR: alien cpu architecture found... or at least the assumptions inside arch.h header file must be improved."
 #endif
 #endif
 
