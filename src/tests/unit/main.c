@@ -1679,7 +1679,7 @@ char *hvm_function_recurssion_tests() {
                  "\tif ($value == 0) result 1;\n"
                  "\tresult fatorial($value - 1) * $value;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     create_test_code("ftest.hsl", code);
     function = compile_and_load_hsl_code("ftest.hsl", &errors,
                                          &gl_vars, NULL, NULL);
@@ -1715,7 +1715,7 @@ char *hvm_if_tests() {
                  "\tif ($value == 0) result 1;\n"
                  "\telse result 0;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     create_test_code("ftest.hsl", code);
     function = compile_and_load_hsl_code("ftest.hsl",
                                          &errors,
@@ -1753,7 +1753,7 @@ char *hvm_while_tests() {
                  "{\n\tvar i type int;\n\t$i = 0;\n\twhile ($i < $limit)"
                  " {\n\t\t$i = $i + 1;\n\t}\n\tresult $i;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     create_test_code("ftest.hsl", code);
     function = compile_and_load_hsl_code("ftest.hsl",
                                          &errors,
@@ -2338,7 +2338,7 @@ char *hvm_byref_syscall_test() {
     int works = 0;
     char *code = "function byref_test(value type int) : result type none {\n"
                  "\t$value = 1;\n\thefesto.sys.byref($value);\n}\n";
-    int errors = 0;
+    hefesto_int_t errors = 0;
     void *result;
     time_t t;
     struct tm *tmp;
@@ -2398,7 +2398,7 @@ char *hvm_call_from_module_syscall_test() {
     hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL, *vp;
     hefesto_func_list_ctx *function = NULL;
     void *res;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- hvm_call_from_module_syscall_test\n");
 
     // module loading with extension
@@ -2487,7 +2487,7 @@ char *hvm_get_func_addr_call_func_addr_syscall_test() {
     hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
     hefesto_func_list_ctx *functions = NULL;
     void *retval;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- hvm_get_func_addr_call_func_addr_syscall_test()\n");
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "max_p", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
@@ -2681,7 +2681,7 @@ char *hsl_with_redeclared_var_test() {
     char *code = "function foolction(value type string) : result type none {"
                  "\n\tvar foovar type int;\n\tvar foovar type list;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_with_redeclared_var_test\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2702,7 +2702,7 @@ char *hsl_accessing_var_without_dollar_prefix() {
     char *code = "function foolction(value type string) : result type none {"
                  "\n\tvar foovar type int;\n\tfoovar = 1;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_accessing_var_without_dollar_prefix\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
@@ -2723,7 +2723,7 @@ char *hsl_wrong_function_argument_list_decl() {
                  " : result type int {\n\tvar foovar type int;\n"
                  "\t$foovar = 1;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_wrong_function_argument_list_decl\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2758,7 +2758,7 @@ char *hsl_unknown_function_result_type() {
                  "int_arg type int) : result type superunknown {\n"
                  "\tvar foovar type int;\n\t$foovar = 1;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_unknown_function_result_type\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2781,7 +2781,7 @@ char *hsl_uncommented_comment() {
                  "compilation just because next line:\n\ta uncommented comment\n"
                  "\t$foovar = 1;\n}\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_uncommented_comment\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2802,7 +2802,7 @@ char *hsl_function_with_undeterminated_code_section() {
     char *code = "function foolction(v type int) : result type int {\n"
                  "\t$v = 1;\n\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_function_with_undeterminated_code_section\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2834,7 +2834,7 @@ char *hsl_else_without_if() {
     char *code = "function foolction(v type int) : result type int {\n"
                  "\telse\n\t{\n\t$v = 1;\n\t}\n}\n\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_else_without_if\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2857,7 +2857,7 @@ char *hsl_if_else_else() {
                  "\t}\n\telse\n\t{\n\thefesto.sys.echo(\"not expected else\\n\");"
                  "\n\t}\n}\n\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_if_else_else\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2880,7 +2880,7 @@ char *hsl_wrong_while_statement() {
                  "\t\thefesto.sys.echo(\"Hey Beavis, we got a hang..."
                  "Huh-huh!\");\n\t}\n}\n\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_wrong_while_statement\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
@@ -2901,7 +2901,7 @@ char *hsl_unterminated_code_lines() {
     char *code = "function foolction(v type int) : result type int {\n"
                  "\t$v = 1\n\t}\n\n";
     void *result;
-    int errors = 0;
+    hefesto_int_t errors = 0;
     printf("-- running hsl_unterminated_code_lines\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
