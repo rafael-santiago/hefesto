@@ -2381,6 +2381,7 @@ char *hvm_byref_syscall_test() {
 }
 
 char *hvm_call_from_module_syscall_test() {
+#ifdef HEFESTO_ARCH_X86
     char *hsl_code = "function call_from_module_test() : result type int {\n"
                      "var retval type int;\n"
                      "var foo type string;\n"
@@ -2468,6 +2469,7 @@ char *hvm_call_from_module_syscall_test() {
 #endif
 
     printf("-- passed.\n");
+#endif
     return NULL;
 }
 

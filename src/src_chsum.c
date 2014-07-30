@@ -58,7 +58,7 @@ static unsigned short get_src_chsum(const char *src_path,
 
 static hefesto_int_t write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx *rec) {
 
-    unsigned long sz;
+    size_t sz;
     hefesto_int_t total;
     hefesto_sum_base_ctx *r;
 
@@ -214,7 +214,7 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
 
     FILE *sb;
     hefesto_sum_base_ctx *sum_base = NULL, *sb_tail;
-    unsigned long sz, deps_nr;
+    size_t sz, deps_nr;
     char *temp, *file_path;
     unsigned short chsum;
     hefesto_sum_base_ctx *deps = NULL;
@@ -228,8 +228,8 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
         fread(&sz, 1, sizeof(sz), sb);
         while (!feof(sb)) {
             // <file_path><chsum><deps nr>[<file_path_len><file_path><chsum>]
-            file_path = (char *) hefesto_mloc(sz+1);
-            memset(file_path, 0, sz+1);
+            file_path = (char *) hefesto_mloc(sz + 1);
+            memset(file_path, 0, sz + 1);
             fread(file_path, 1, sz, sb);
             fread(&chsum, 1, sizeof(chsum), sb);
 
@@ -242,7 +242,7 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
             while (deps_nr > 0) {
                 fread(&sz, 1, sizeof(sz), sb);
                 file_path = (char *) hefesto_mloc(sz+1);
-                memset(file_path, 0, sz+1);
+                memset(file_path, 0, sz + 1);
                 fread(file_path, 1, sz, sb);
                 fread(&chsum, 1, sizeof(chsum), sb);
                 deps = add_file_to_hefesto_sum_base_ctx(deps, file_path, chsum);
