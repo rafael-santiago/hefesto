@@ -30,7 +30,7 @@ static unsigned short get_src_chsum(const char *src_path,
 
     FILE *src_fp = fopen(src_path, "rb");
     size_t total;
-    unsigned long sum = chsum;
+    unsigned int sum = chsum;
     unsigned char cur_byte[2];
 
     if (src_fp == NULL) return 0;
