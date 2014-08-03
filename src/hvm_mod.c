@@ -288,7 +288,6 @@ void *hvm_mod_call(const char *call, hefesto_var_list_ctx **lo_vars,
     hefesto_modfunc modfunc;
     struct hefesto_modio *modio;
     struct hefesto_modio_args *map, *mio_next;
-    hefesto_var_list_ctx *vp;
 
     **otype = HEFESTO_VAR_TYPE_NONE;
 

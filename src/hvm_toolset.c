@@ -278,7 +278,6 @@ static void *hvm_toolset_base_refresh(const char *command,
     hefesto_base_refresh_ctx *bref = NULL, *brp;
     char *arg;
     size_t offset = 0;
-    hefesto_int_t should_refresh = 0;
 
     arg = get_arg_from_call(command, &offset);
 

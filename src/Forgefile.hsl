@@ -66,6 +66,7 @@ hefesto.prologue() {
             $libraries = hefesto.sys.get_option("libraries");
             $ldflags = hefesto.sys.get_option("ldflags");
             $cflags = hefesto.sys.get_option("cflags");
+            $cflags.add_item("-Wall");
             # Setting some basic dependencies needed for a successful linking
             config_basic_ld_deps();
             hefesto.sys.echo("--\n");

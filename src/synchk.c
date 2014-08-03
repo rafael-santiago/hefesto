@@ -2635,7 +2635,6 @@ hefesto_int_t synchk_toolset_command(const char *command, hefesto_var_list_ctx *
     size_t args_nr, str_offset;
     hefesto_options_ctx *forge_function_p;
     hefesto_var_list_ctx *vp;
-    hefesto_int_t state = 0;
 
     if ((forge_function_p =
             get_hefesto_options_ctx_option(current_function_ptr->name,

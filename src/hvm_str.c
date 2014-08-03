@@ -167,7 +167,7 @@ char *hvm_str_format(const char *str, hefesto_var_list_ctx **lo_vars,
                      hefesto_func_list_ctx *functions) {
 
     hefesto_type_t etype = HEFESTO_VAR_TYPE_STRING;
-    char *str_pfix;
+    //char *str_pfix;
     char *str_fmt;
     size_t sz;
 

@@ -2722,11 +2722,8 @@ static hefesto_include_list_ctx *get_all_includes(
                                                       const char *file_path,
                                  hefesto_options_ctx *hefesto_usr_inc_dir) {
 
-    hefesto_include_list_ctx *ip, *lip, *curr_tail = NULL, *last_tail = NULL;
-    hefesto_include_list_ctx *temp_copy;
-    hefesto_include_list_ctx *incl_order = NULL;
+    hefesto_include_list_ctx *ip, *lip, *last_tail = NULL;
     hefesto_int_t error = 0;
-    hefesto_int_t has_add = 0;
 
     includes = add_include_to_hefesto_include_list_ctx(includes, file_path);
     last_tail = get_hefesto_include_list_ctx_tail(includes);
@@ -2762,13 +2759,12 @@ hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
                                   hefesto_options_ctx *usr_include_directories) {
 
     hefesto_include_list_ctx *includes = NULL, *includes_tail, *ip;
-    hefesto_include_list_ctx *incls_in_file = NULL, *inp;
+    hefesto_include_list_ctx *incls_in_file = NULL;
     hefesto_common_list_ctx *parsed_files = NULL;
     hefesto_func_list_ctx *code = NULL;
     hefesto_var_list_ctx *curr_src_gl_vars, *gl_p;
     FILE *fp;
     long stop_at;
-    hefesto_int_t load_later = 0;
 
     includes = get_all_includes(includes, hls_main,
                                 usr_include_directories);
