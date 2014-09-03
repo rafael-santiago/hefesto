@@ -64,7 +64,8 @@ function get_c_cpp_deps() : result type string { # A faster dependency scanner.
         while ($f < $files.count()) {
 #            hefesto.sys.echo("NOW SCANNING = " + $files.item($f) + "\n");
             $str = $files.item($f);
-            $dep_chain = $dep_chain + filenamefrompath($str) + ": ";
+#            $dep_chain = $dep_chain + filenamefrompath($str) + ": ";
+            $dep_chain = $dep_chain + $str + ": ";
             $includes = hefesto.sys.lines_from_file($str, "#include.*$");
             $i = 0;
             $dep_nr = 0;
