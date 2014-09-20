@@ -1038,6 +1038,10 @@ hefesto_int_t synchk_function_call(const char *call, hefesto_var_list_ctx *lo_va
                                 result = is_hefesto_numeric_constant(arg);
                                 break;
 
+                            default:
+                                result = 0;
+                                break;
+
                         }
                         if (result == 0) {
                             result = is_valid_expression(arg, lo_vars,

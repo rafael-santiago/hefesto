@@ -2930,6 +2930,60 @@ char *hsl_unterminated_code_lines() {
 
 }
 
+char *hsl_list_variable_without_dollar_prefix() {
+    char *code = "function f1(lst type list) : result type int {\n"
+                 "\tvar s type string;"
+                 "\tf2(lst);result 1;\n"
+                 "}\n"
+                 "function f2(lst type list) : result type string {\n"
+                 "\tresult \"\";\n"
+                 "}";
+    hefesto_func_list_ctx *function = NULL;
+    hefesto_var_list_ctx *lo_vars = NULL;
+    hefesto_var_list_ctx *gl_vars = NULL;
+    hefesto_int_t errors = 0;
+
+    printf("-- running hsl_list_variable_without_dollar_prefix\n");
+
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
+    remove("broken_hsl.hsl");
+
+    del_hefesto_func_list_ctx(function);
+    del_hefesto_var_list_ctx(gl_vars);
+
+    gl_vars = NULL;
+    function = NULL;
+
+    HTEST_CHECK("errors != 1", errors == 1);
+
+    errors = 0;
+
+    code = "function f1(lst type list) : result type int {\n"
+           "\tvar s type string;"
+           "\tf2(get_list());result 1;\n"
+           "}\n"
+           "function f2(lst type list) : result type string {\n"
+           "\tresult \"\";\n"
+           "}\n"
+           "function get_list() : result type list {\n"
+           "\tvar lst type list;\n"
+           "\tresult $lst;\n"
+           "}\n";
+
+    create_test_code("broken_hsl.hsl", code);
+    function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
+    remove("broken_hsl.hsl");
+    del_hefesto_func_list_ctx(function);
+    function = NULL;
+
+    HTEST_CHECK("errors != 0", errors == 0);
+
+    printf("-- passed.\n");
+
+    return NULL;
+}
+
 char *hsl_compilation_tests() {
 
     char *result;
@@ -2953,6 +3007,8 @@ char *hsl_compilation_tests() {
     result = hsl_wrong_while_statement();
     if (result != NULL) return result;
     result = hsl_unterminated_code_lines();
+    if (result != NULL) return result;
+    result = hsl_list_variable_without_dollar_prefix();
     if (result != NULL) return result;
     printf("-- passed.\n");
 
