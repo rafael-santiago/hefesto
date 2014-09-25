@@ -147,31 +147,31 @@ static void *hefesto_sys_fseek(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe);
+                               hefesto_type_t **otype);
 
 static void *hefesto_sys_fseek_to_begin(const char *syscall,
                                         hefesto_var_list_ctx **lo_vars,
                                         hefesto_var_list_ctx **gl_vars,
                                         hefesto_func_list_ctx *functions,
-                                        hefesto_type_t **otyoe);
+                                        hefesto_type_t **otype);
 
 static void *hefesto_sys_fseek_to_end(const char *syscall,
                                       hefesto_var_list_ctx **lo_vars,
                                       hefesto_var_list_ctx **gl_vars,
                                       hefesto_func_list_ctx *functions,
-                                      hefesto_type_t **otyoe);
+                                      hefesto_type_t **otype);
 
 static void *hefesto_sys_fsize(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe);
+                               hefesto_type_t **otype);
 
 static void *hefesto_sys_ftell(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe);
+                               hefesto_type_t **otype);
 
 static void *hefesto_sys_exit(const char *syscall,
                               hefesto_var_list_ctx **lo_vars,
@@ -1213,7 +1213,7 @@ static void *hefesto_sys_fseek(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe) {
+                               hefesto_type_t **otype) {
 
     const char *s;
     size_t offset;
@@ -1238,6 +1238,8 @@ static void *hefesto_sys_fseek(const char *syscall,
     free(arg_pos);
     free(arg_fd_name);
 
+    **otype = (hefesto_type_t) HEFESTO_VAR_TYPE_INT;
+
     return result;
 
 }
@@ -1246,7 +1248,7 @@ static void *hefesto_sys_fseek_to_begin(const char *syscall,
                                         hefesto_var_list_ctx **lo_vars,
                                         hefesto_var_list_ctx **gl_vars,
                                         hefesto_func_list_ctx *functions,
-                                        hefesto_type_t **otyoe) {
+                                        hefesto_type_t **otype) {
 
     const char *s;
     size_t offset;
@@ -1265,6 +1267,8 @@ static void *hefesto_sys_fseek_to_begin(const char *syscall,
 
     free(arg_fd_name);
 
+    **otype = HEFESTO_VAR_TYPE_INT;
+
     return result;
 
 }
@@ -1273,7 +1277,7 @@ static void *hefesto_sys_fseek_to_end(const char *syscall,
                                       hefesto_var_list_ctx **lo_vars,
                                       hefesto_var_list_ctx **gl_vars,
                                       hefesto_func_list_ctx *functions,
-                                      hefesto_type_t **otyoe) {
+                                      hefesto_type_t **otype) {
 
     const char *s;
     size_t offset;
@@ -1291,6 +1295,8 @@ static void *hefesto_sys_fseek_to_end(const char *syscall,
 
     free(arg_fd_name);
 
+    **otype = HEFESTO_VAR_TYPE_INT;
+
     return result;
 
 }
@@ -1299,7 +1305,7 @@ static void *hefesto_sys_fsize(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe) {
+                               hefesto_type_t **otype) {
 
     const char *s;
     size_t offset;
@@ -1314,9 +1320,8 @@ static void *hefesto_sys_fsize(const char *syscall,
                                                 *lo_vars, *gl_vars,
                                                 functions);
     *(hefesto_int_t *)result = hefesto_fsize(fp_handle);
-
+    **otype = HEFESTO_VAR_TYPE_INT;
     free(arg_fd_name);
-
     return result;
 
 }
@@ -1325,7 +1330,7 @@ static void *hefesto_sys_ftell(const char *syscall,
                                hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
-                               hefesto_type_t **otyoe) {
+                               hefesto_type_t **otype) {
     const char *s;
     size_t offset;
     char *arg_fd_name;
