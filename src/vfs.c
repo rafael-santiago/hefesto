@@ -11,6 +11,7 @@
 #include "structs_io.h"
 #include "parser.h"
 #include "hlsc_msg.h"
+#include "structs_io.h"
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -483,8 +484,9 @@ void hefesto_fclose(hefesto_file_handle **fp_handle) {
 
     if (fp_handle != NULL && (*fp_handle) != NULL && (*fp_handle)->fp != NULL) {
         del_file_ptr_from_hefesto_file_ptr_pool((*fp_handle)->fp);
-        fclose((*fp_handle)->fp);
-        (*fp_handle)->fp = NULL;
+        close_hefesto_file_handle((*fp_handle));
+        //fclose((*fp_handle)->fp);
+        //(*fp_handle)->fp = NULL;
     }
 
 }
@@ -521,11 +523,11 @@ hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
                                             hefesto_var_list_ctx *gl_vars,
                                          hefesto_func_list_ctx *functions) {
     hefesto_var_list_ctx *vp;
-    char *vname, *v, *vn, *expr;
+    char *vname;
 
     if (strstr(var_name, "[") == NULL) {
         vname = (char *) var_name;
-    } else {
+    } /*else {
         vname = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
         for (vn = (char *) vname, v = vname; *vn != 0 && *vn != '['; vn++, v++)
             *vn = *v;
@@ -535,17 +537,39 @@ hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
         for (vn = expr; *v != 0; v++, vn++)
             *vn = *v;
         *vn = 0;
-    }
+    }*/
     vp = get_hefesto_var_list_ctx_name(vname, lo_vars);
     if (!vp) vp = get_hefesto_var_list_ctx_name(vname, gl_vars);
     HEFESTO_DEBUG_INFO(0, "vfs/vp = %x\n", vp);
-    if (vname != var_name) free(vname);
+    //if (vname != var_name) free(vname);
     if (vp && vp->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR)
         return (hefesto_file_handle *) vp->contents->data;
     HEFESTO_DEBUG_INFO(0, "vfs/retornei nulo!\n");
 
     return NULL;
 
+}
+
+void reset_var_by_file_descriptor(hefesto_file_handle *desc,  hefesto_var_list_ctx **lo_vars,
+                                  hefesto_var_list_ctx **gl_vars) {
+    hefesto_var_list_ctx *vp;
+    if (desc == NULL) return;
+    for (vp = *lo_vars; vp; vp = vp->next) {
+        if (vp->contents->data == (void *)desc) {
+            del_hefesto_common_list_ctx(vp->contents);
+            new_hefesto_common_list_ctx(vp->contents);
+            //vp->contents = NULL;
+            return;
+        }
+    }
+    for (vp = *gl_vars; vp; vp = vp->next) {
+        if (vp->contents->data == (void *)desc) {
+            del_hefesto_common_list_ctx(vp->contents);
+            new_hefesto_common_list_ctx(vp->contents);
+            //vp->contents = NULL;
+            return;
+        }
+    }
 }
 
 hefesto_int_t hefesto_feof(hefesto_file_handle *fp_handle) {

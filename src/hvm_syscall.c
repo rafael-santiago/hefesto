@@ -866,6 +866,7 @@ static void *hefesto_sys_fclose(const char *syscall,
     fp_handle = get_file_descriptor_by_var_name(arg+1, *lo_vars,
                                                 *gl_vars, functions);
     hefesto_fclose(&fp_handle);
+    reset_var_by_file_descriptor(fp_handle, lo_vars, gl_vars);
     free(arg);
 
     *(hefesto_int_t *)result = 1;

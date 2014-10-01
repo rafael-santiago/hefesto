@@ -1927,7 +1927,7 @@ char *hvm_syscalls_file_io_tests() {
     gl_vars = get_hefesto_var_list_ctx_name("fhandle", lo_vars);
     gl_vars = assign_data_to_hefesto_var_file_type(gl_vars, fhandle);
     gl_vars = NULL;
-    del_hefesto_file_handle(fhandle, 0);
+    //close_hefesto_file_handle(fhandle);
 
     result = hefesto_sys_call("hefesto.sys.fread($fbuffer, 20, $fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);

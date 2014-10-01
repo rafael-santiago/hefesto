@@ -191,7 +191,7 @@ extern hefesto_toolset_ctx *HEFESTO_CURRENT_TOOLSET;
 
 typedef struct _hefesto_file_handle {
     FILE *fp;
-    char *path;
+    char path[4096];
 }hefesto_file_handle;
 
 typedef struct _hefesto_options_ctx {

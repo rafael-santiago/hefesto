@@ -236,7 +236,7 @@ void del_hefesto_var_list_ctx(hefesto_var_list_ctx *list) {
         t = p->next;
         if (p->contents) {
             if (p->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-                del_hefesto_file_handle((hefesto_file_handle *)p->contents->data, 0);
+                //close_hefesto_file_handle((hefesto_file_handle *)p->contents->data, 0);
                 p->contents->data = NULL;
             }
             del_hefesto_common_list_ctx(p->contents);
@@ -264,7 +264,7 @@ void del_hefesto_var_list_ctx_contents(hefesto_var_list_ctx **list) {
 */
     if ((*list)->contents != NULL) {
         if ((*list)->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR) {
-            del_hefesto_file_handle((hefesto_file_handle *)(*list)->contents->data, 0);
+            //close_hefesto_file_handle((hefesto_file_handle *)(*list)->contents->data, 0);
             (*list)->contents->data = NULL;
             free((*list)->contents);
         } else {
@@ -1109,8 +1109,7 @@ hefesto_var_list_ctx *assign_data_to_hefesto_var_file_type(
 
     if (var) {
         if (var->contents) {
-            del_hefesto_file_handle((hefesto_file_handle *) var->contents->data,
-                                    1);
+            close_hefesto_file_handle((hefesto_file_handle *) var->contents->data);
             var->contents->data = NULL;
             del_hefesto_common_list_ctx(var->contents);
             var->contents = NULL;

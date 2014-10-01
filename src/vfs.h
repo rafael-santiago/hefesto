@@ -42,6 +42,9 @@ hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
              hefesto_var_list_ctx *lo_vars, hefesto_var_list_ctx *gl_vars,
                                          hefesto_func_list_ctx *functions);
 
+void reset_var_by_file_descriptor(hefesto_file_handle *desc,  hefesto_var_list_ctx **lo_vars,
+                                  hefesto_var_list_ctx **gl_vars);
+
 hefesto_int_t hefesto_feof(hefesto_file_handle *fp_handle);
 
 hefesto_int_t hefesto_fseek(hefesto_file_handle *fp_handle, const long offset);

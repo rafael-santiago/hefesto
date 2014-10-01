@@ -78,21 +78,17 @@
                             hefesto_mloc(sizeof(hefesto_file_handle));\
                                          (f)->fp = NULL;\
                                          if ((p) != NULL && strlen(p) > 0) {\
-                                            (f)->path = (char *) hefesto_mloc(strlen((p))+1);\
-                                            memset((f)->path, 0, strlen((p))+1);\
-                                            strncpy((f)->path, (p), strlen((p)));\
+                                            memset((f)->path, 0, sizeof((f)->path));\
+                                            strncpy((f)->path, (p), strlen((p)) % (sizeof((f)->path) - 1));\
                                         } else {\
-                                            (f)->path = NULL;\
+                                            memset((f)->path, 0, sizeof((f)->path));\
                                         }\
                                       }
 
-#define del_hefesto_file_handle(f, c) {\
-                                        if ((c) && (f) && (f)->fp != NULL)\
-                                         fclose((f)->fp);\
-                                        if ((f) && (f)->path != NULL)\
-                                         free((f)->path);\
-                                        free((f));\
-                                    }
+#define close_hefesto_file_handle(f) {\
+                                    if ((f) && (f)->fp != NULL)\
+                                     fclose((f)->fp);\
+                                }
 
 #define new_hefesto_options_ctx(o) ( (o) = (hefesto_options_ctx *)\
                         hefesto_mloc(sizeof(hefesto_options_ctx)),\
