@@ -387,12 +387,13 @@ static void *hvm_list_ls(const char *method,
         free(data);
 
         data = hefesto_pwd();
+        if (data == NULL) {
+            del_here_search_program_ctx(search_program);
+            return NULL;
+        }
         dir = opendir(data);
 
-        free(data);
-
         if (dir) {
-            data = hefesto_pwd();
             while ((de = readdir(dir))) {
                 if ((strcmp(de->d_name, ".") == 0) ||
                     (strcmp(de->d_name, "..") == 0)) continue;
@@ -417,9 +418,8 @@ static void *hvm_list_ls(const char *method,
 
             }
             free(data);
+            closedir(dir);
         }
-
-        closedir(dir);
 
         del_here_search_program_ctx(search_program);
 

@@ -673,11 +673,14 @@ local function hfst_uninstall(install_dir type string, source_files type list) :
     hefesto.sys.echo("\tRemoving modules directory... ");
     $temp = hefesto.sys.pwd();
     $regex = hefesto.sys.make_path($install_dir, "module");
-    hefesto.sys.cd($regex);
-    if (rmtree(lsdir()) == 0) {
-        hefesto.sys.echo("ok!\n");
+    if (hefesto.sys.cd($regex) == 1) {
+        if (rmtree(lsdir()) == 0) {
+            hefesto.sys.echo("ok!\n");
+        } else {
+            hefesto.sys.echo("error...\n");
+        }
     } else {
-        hefesto.sys.echo("error...\n");
+        hefesto.sys.echo("not found...\n");
     }
     hefesto.sys.cd($temp);
 
