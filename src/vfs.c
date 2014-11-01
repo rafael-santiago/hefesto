@@ -408,7 +408,7 @@ hefesto_int_t hefesto_ls(const char *mask) {
     here_search_program_ctx *search_program;
     here_search_result_ctx *search_result;
 
-    if (!(dir = opendir(cwd))) {
+    if (cwd != NULL && !(dir = opendir(cwd))) {
         free(cwd);
         return 0;
     }
