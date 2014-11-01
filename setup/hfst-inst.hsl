@@ -868,9 +868,9 @@ hefesto-install.prologue() {
     }
 
     if ($os_name == "linux") {
-        $prompt_str = $prompt_str + "[/usr/local/share/hefesto-temp]: ";
+        $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
     } else if ($os_name == "freebsd") {
-        $prompt_str = $prompt_str + "[/usr/local/share/hefesto-temp]: ";
+        $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
     } else if ($os_name == "windows") {
         $prompt_str = $prompt_str +"[C:\\hefesto]: ";
     }
@@ -888,9 +888,9 @@ hefesto-install.prologue() {
         hefesto.sys.exit(1);
     } else if ($install_dir == "") {
         if ($os_name == "linux") {
-            $install_dir = "/usr/local/share/hefesto-temp";
+            $install_dir = "/usr/local/share/hefesto";
         } else if ($os_name == "freebsd") {
-            $install_dir = "/usr/local/share/hefesto-temp";
+            $install_dir = "/usr/local/share/hefesto";
         } else if ($os_name == "windows") {
             $install_dir = "C:\\hefesto";
         }
