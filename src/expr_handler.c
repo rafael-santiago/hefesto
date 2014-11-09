@@ -299,3 +299,38 @@ ssize_t get_op_index(const char *op) {
 
 }
 
+char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
+    char *e = NULL;
+    const char *ap = arg_list;
+    char *arg_pf = NULL;
+    size_t offset = 0;
+    char *retval = NULL;
+    while (*ap != '(' && *ap != 0) {
+        ap++;
+    }
+    if (*ap == 0) {
+        return NULL;
+    }
+    ap++;
+    retval = (char *) hefesto_mloc(arg_list_size * 2);
+    memset(retval, 0, arg_list_size * 2);
+    *retval = '(';
+    e = get_arg_from_call(ap, &offset);
+    while (*e) {
+        arg_pf = infix2postfix(e, strlen(e), 1);
+        strcat(retval, arg_pf);
+        free(arg_pf);
+        free(e);
+        if (*(arg_list + offset) == ',') {
+            offset++;
+        }
+        e = get_arg_from_call(arg_list, &offset);
+        if (*e) {
+            strcat(retval, ",");
+        } else {
+            strcat(retval, ")");
+        }
+    }
+    free(e);
+    return retval;
+}
