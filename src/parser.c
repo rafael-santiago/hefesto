@@ -160,6 +160,11 @@ static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
                                                      hefesto_int_t *error,
                                   hefesto_options_ctx *hefesto_usr_inc_dir);
 
+static void readdress_function_calls(hefesto_func_list_ctx **functions);
+
+static void apply_function_readdressing(hefesto_command_list_ctx **commands,
+                                        hefesto_func_list_ctx *functions);
+
 static hefesto_int_t current_line_nr = 1;
 static char current_compile_input[HEFESTO_MAX_BUFFER_SIZE] = "";
 hefesto_func_list_ctx *current_compiled_function = NULL;
@@ -2845,6 +2850,10 @@ for (ip = includes; ip != NULL; ip = ip->next) {
         del_hefesto_include_list_ctx(includes);
     } else printf("none!\n");
 
+    //  Ok, why?
+    //  Why don't you try to remove it?? >:)
+    readdress_function_calls(&code);
+
     return code;
 
 }
@@ -2873,3 +2882,29 @@ const char *get_arg_list_start_from_call(const char *call_buf) {
 
     return c;
 }
+
+static void readdress_function_calls(hefesto_func_list_ctx **functions) {
+    hefesto_func_list_ctx *fp;
+    for (fp = *functions; fp; fp = fp->next) {
+        if (fp->code != NULL) {
+            apply_function_readdressing(&fp->code, *functions);
+        }
+    }
+}
+
+static void apply_function_readdressing(hefesto_command_list_ctx **commands,
+                                        hefesto_func_list_ctx *functions) {
+    hefesto_command_list_ctx *cp;
+    for (cp = *commands; cp != NULL; cp = cp->next) {
+        if (cp->instruction == HEFESTO_CALL && cp->func == NULL) {
+            if (cp->params != NULL && cp->params->data != NULL) {
+                cp->func = get_hefesto_func_list_ctx_name(cp->params->data, functions);
+                del_hefesto_common_list_ctx(cp->params);
+                cp->params = NULL;
+            }
+        } else if (cp->sub != NULL) {
+            apply_function_readdressing(&cp->sub, functions);
+        }
+    }
+}
+

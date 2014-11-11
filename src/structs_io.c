@@ -951,7 +951,12 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             if ((fp = get_hefesto_func_list_ctx_scoped_name(tok,
                                     get_current_compile_input(), functions))) {
                 p->instruction = HEFESTO_CALL;
-                p->func = fp;
+                if (fp->code == NULL) { //  there's only a prototype loaded... fp will be free soon!
+                    p->func = NULL;
+                    p->params = add_data_to_hefesto_common_list_ctx(p->params, tok, strlen(tok));
+                } else {
+                    p->func = fp;
+                }
                 HEFESTO_DEBUG_INFO(0, "structs_io/call: %s\n",
                                    p->func->name);
                 for (buf_p = b; *buf_p != ')' && *buf_p != 0; buf_p++);
