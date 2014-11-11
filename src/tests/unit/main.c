@@ -14,6 +14,7 @@
 #include "../../hvm_toolset.h"
 #include "../../here/here.h"
 #include "../../init.h"
+#include "../../expr_handler.h"
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
@@ -3111,6 +3112,27 @@ char *dep_chain_tests() {
     return NULL;
 }
 
+char *infix2postfix_tests() {
+    char *expected_result = "(\">\" \"=\" +,1,2,$a,$x $y + $z +)";
+    char *expr = "(\">\" + \"=\",   1, 2, $a ,  $x + $y + $z)";
+    char *pfixd_args = infix2postfix_args(expr, strlen(expr));
+    printf("-- running infix2postfix_tests\n");
+    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
+    expected_result = "(\">\" \"=\" + f($a $b +,$z) +,1,2,$a,$x $y + $z +)";
+    expr = "(\">\" + \"=\" + f($a + $b, $z),   1, 2, $a ,  $x + $y + $z)";
+    pfixd_args = infix2postfix_args(expr, strlen(expr));
+    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
+    expected_result = "(\">\" \"=\" + f($a $b +,ff($z $u +)) +,1,2,$a,$x $y + $z +)";
+    expr = "(\">\" + \"=\" + f($a + $b, ff($z + $u)),   1, 2, $a ,  $x + $y + $z)";
+    pfixd_args = infix2postfix_args(expr, strlen(expr));
+    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
+    printf("-- passed.\n");
+    return NULL;
+}
+
 char *run_tests() {
     printf("* running tests...\n");
     HTEST_RUN(hefesto_common_stack_ctx_tests);
@@ -3127,6 +3149,7 @@ char *run_tests() {
     HTEST_RUN(regex_tests);
     HTEST_RUN(hvm_syscalls_tests);
     HTEST_RUN(dep_chain_tests);
+    HTEST_RUN(infix2postfix_tests);
     return NULL;
 }
 
