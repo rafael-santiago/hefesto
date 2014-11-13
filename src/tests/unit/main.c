@@ -3133,6 +3133,22 @@ char *infix2postfix_tests() {
     return NULL;
 }
 
+char *get_expression_buffer_size_tests() {
+    char *expression = "(\">\" + get_equal_symbol(), \"1_42\", \"\", \"error message!\", \"success message.\")";
+    size_t expected_buffer_size = strlen(expression);
+    printf("-- get_expression_buffer_size_tests()\n");
+    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    expression = "(((((\">\" + get_equal_symbol())))), ((((\"1_42\")))), \"\", (\"(((error message!\"),(   \"(success message.))\"))";
+    expected_buffer_size = strlen(expression);
+    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    expression = "\n\t\t\t\t\n\r\r\r\n\n\n\n\">\" + get_equal_symbol())))), ((((\"1_42\")))), \"\", (\"(((error message!\"),(   \"(success message.))\"))";
+    expected_buffer_size = strlen(expression);
+    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    HTEST_CHECK("result != 0", get_expression_buffer_size(NULL) == 0);
+    printf("-- passed.\n");
+    return NULL;
+}
+
 char *run_tests() {
     printf("* running tests...\n");
     HTEST_RUN(hefesto_common_stack_ctx_tests);
@@ -3150,6 +3166,7 @@ char *run_tests() {
     HTEST_RUN(hvm_syscalls_tests);
     HTEST_RUN(dep_chain_tests);
     HTEST_RUN(infix2postfix_tests);
+    HTEST_RUN(get_expression_buffer_size_tests);
     return NULL;
 }
 

@@ -959,8 +959,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 }
                 HEFESTO_DEBUG_INFO(0, "structs_io/call: %s\n",
                                    p->func->name);
-                for (buf_p = b; *buf_p != ')' && *buf_p != 0; buf_p++);
-                sz = buf_p - b + 1;
+                sz = get_expression_buffer_size(b);
                 p->expr = infix2postfix_args(b, sz);
                 HEFESTO_DEBUG_INFO(0, "structs_io/FUNCTION CALL --\n");
             } else if (is_list_method_invoke(tok, (*function)->vars, gl_vars) ||

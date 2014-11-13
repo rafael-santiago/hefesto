@@ -36,4 +36,6 @@ ssize_t get_op_index(const char *op);
 
 char *infix2postfix_args(const char *arg_list, const size_t arg_list_size);
 
+size_t get_expression_buffer_size(const char *expr);
+
 #endif

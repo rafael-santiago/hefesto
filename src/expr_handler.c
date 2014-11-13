@@ -334,3 +334,34 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
     free(e);
     return retval;
 }
+
+size_t get_expression_buffer_size(const char *expr) {
+    const char *ep = expr;
+    int o = 0;
+    if (expr == NULL) {
+        return 0;
+    }
+    o = (*ep == '(');
+    if (o == 0) {
+        return strlen(expr);
+    }
+    while (o > 0 && *ep != 0) {
+        if (is_hefesto_string_tok(*ep)) {
+            ep++;
+            while (!is_hefesto_string_tok(*ep) && *ep != 0) {
+                if (*ep == '\\') {
+                    ep++;
+                }
+                ep++;
+            }
+        } else {
+            if (*ep == '(') {
+                o++;
+            } else if (*ep == ')') {
+                o--;
+            }
+            ep++;
+        }
+    }
+    return (ep - expr);
+}
