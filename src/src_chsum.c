@@ -19,6 +19,9 @@
 static unsigned short get_src_chsum(const char *src_path,
                                     const unsigned short chsum);
 
+static unsigned short get_buffer_chsum(const char *buffer, size_t buffer_size,
+                                       const unsigned short chsum);
+
 static hefesto_sum_base_ctx *get_src_sum_base(const char *directory);
 
 static void refresh_sum_base_rec(hefesto_sum_base_ctx **rec);
@@ -29,10 +32,37 @@ static void write_header_to_base(FILE *sum_base);
 
 static hefesto_int_t validate_sum_base_header(FILE *sum_base, const char *sumbase_path);
 
+static char *hefesto_options_to_string();
+
 struct chsum_rec {
     char path[HEFESTO_MAX_BUFFER_SIZE];
     unsigned short chsum;
 };
+
+static unsigned short get_buffer_chsum(const char *buffer, size_t buffer_size,
+                                       const unsigned short chsum) {
+    unsigned int sum = chsum;
+    const char *buffer_end = buffer + buffer_size, *bp;
+    unsigned short add = 0;
+    if (buffer == NULL) {
+        return 1;
+    }
+    bp = buffer;
+    while (bp < buffer_end) {
+        add = *bp;
+        add <<= 8;
+        bp++;
+        if (bp != buffer_end) {
+            add |= *bp;
+            bp++;
+        }
+        sum += add;
+    }
+    while (sum >> 16) {
+        sum = (sum >> 16) + (sum & 0x0000ffff);
+    }
+    return ( (unsigned short) (~sum) );
+}
 
 static unsigned short get_src_chsum(const char *src_path,
                                     const unsigned short chsum) {
@@ -91,7 +121,38 @@ static hefesto_int_t write_sum_rec_to_base(FILE *sum_base, hefesto_sum_base_ctx 
 
 static void write_header_to_base(FILE *sum_base) {
     char *header = SUMBASE_HEADER_INFO;
+    char *forge_options = hefesto_options_to_string();
+    unsigned short fopts_chsum = 0;
     fwrite(header, 1, strlen(header) + 1, sum_base);
+    fopts_chsum = get_buffer_chsum(forge_options, strlen(forge_options), 0);
+    fwrite(&fopts_chsum, 1, sizeof(fopts_chsum), sum_base);
+    free(forge_options);
+}
+
+hefesto_int_t current_forge_options_differs_from_last(const char *directory) {
+    char *current_options = NULL;
+    char *temp = NULL;
+    unsigned short fopts_chsum = 0;
+    char c;
+    hefesto_int_t retval = 1;
+    FILE *sum_base = NULL;
+    temp = hefesto_make_path(directory, ".hefesto-src-chsum-base",
+                             HEFESTO_MAX_BUFFER_SIZE);
+    sum_base = fopen(temp, "rb");
+    free(temp);
+    if (sum_base != NULL) {
+        fseek(sum_base, strlen(SUMBASE_HEADER), SEEK_SET);
+        c = fgetc(sum_base);
+        while (c != 0) {
+            c = fgetc(sum_base);
+        }
+        fread(&fopts_chsum, 1, sizeof(fopts_chsum), sum_base);
+        current_options = hefesto_options_to_string();
+        retval = (get_buffer_chsum(current_options, strlen(current_options), fopts_chsum) != 0);
+        free(current_options);
+        fclose(sum_base);
+    }
+    return retval;
 }
 
 static void refresh_sum_base_rec(hefesto_sum_base_ctx **rec) {
@@ -184,6 +245,7 @@ hefesto_int_t src_file_has_change(const char *directory, const char *src_path) {
 
 static hefesto_int_t validate_sum_base_header(FILE *sum_base, const char *sumbase_path) {
     char buf[5] = "";
+    unsigned short fopts_chsum = 0;
     if (sum_base == NULL) {
         return 0;
     }
@@ -195,6 +257,7 @@ static hefesto_int_t validate_sum_base_header(FILE *sum_base, const char *sumbas
     while (!feof(sum_base) && buf[0] != 0) {
         buf[0] = fgetc(sum_base);
     }
+    fread(&fopts_chsum, 1, sizeof(fopts_chsum), sum_base);
     return 1;
 }
 
@@ -258,4 +321,27 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
 
     return sum_base;
 
+}
+
+static char *hefesto_options_to_string() {
+    char *str = NULL;
+    size_t str_sz = 0;
+    hefesto_options_ctx *o;
+    hefesto_common_list_ctx *d;
+    bubble_hefesto_options_ctx(&HEFESTO_OPTIONS);
+    for (o = HEFESTO_OPTIONS; o != NULL; o = o->next) {
+        str_sz += strlen(o->option);
+        for (d = o->data; d != NULL; d = d->next) {
+            str_sz += d->dsize;
+        }
+    }
+    str = (char *) hefesto_mloc(str_sz + 1);
+    memset(str, 0, str_sz + 1);
+    for (o = HEFESTO_OPTIONS; o != NULL; o = o->next) {
+        strcat(str, o->option);
+        for (d = o->data; d != NULL; d = d->next) {
+            strcat(str, d->data);
+        }
+    }
+    return str;
 }

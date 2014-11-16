@@ -123,17 +123,25 @@ void find_dep_chain_updates(hefesto_dep_chain_ctx **dep_chain) {
     hefesto_dep_chain_ctx *d, *dd;
     char *cwd;
     hefesto_int_t new_dirty = 1;
+    hefesto_int_t config_changed = 0;
+
+    cwd = hefesto_pwd();
 
     for (d = *dep_chain; d; d = d->next) {
-        cwd = hefesto_pwd();
         d->dirty = src_file_has_change(cwd, d->file_path);
-        free(cwd);
     }
+
+    if (get_hefesto_options_ctx_option("--forge-anyway", HEFESTO_OPTIONS) == NULL) {
+        config_changed = current_forge_options_differs_from_last(cwd);
+    }
+
+    free(cwd);
 
     while (new_dirty) {
         new_dirty = 0;
         for (d = *dep_chain; d && !new_dirty; d = d->next) {
-            if (get_hefesto_options_ctx_option(HEFESTO_FORGE_ANYWAY_OPTION_LABEL,
+            if (config_changed ||
+                get_hefesto_options_ctx_option(HEFESTO_FORGE_ANYWAY_OPTION_LABEL,
                                                HEFESTO_OPTIONS) != NULL) {
                 d->dirty = 1;
             }

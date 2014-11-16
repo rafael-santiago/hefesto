@@ -1778,3 +1778,26 @@ void del_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base) {
         if (p->path != NULL) free(p->path);
     }
 }
+
+void bubble_hefesto_options_ctx(hefesto_options_ctx **options) {
+    hefesto_options_ctx aux_opt;
+    hefesto_options_ctx *o;
+    int swap = 1;
+    while (swap) {
+        swap = 0;
+        for (o = *options; o->next != NULL && !swap; o = o->next) {
+            if (strcmp(o->option, o->next->option) > 0) {
+                aux_opt.option = o->option;
+                aux_opt.data = o->data;
+
+                o->option = o->next->option;
+                o->data = o->next->data;
+
+                o->next->option = aux_opt.option;
+                o->next->data = aux_opt.data;
+
+                swap = 1;
+            }
+        }
+    }
+}

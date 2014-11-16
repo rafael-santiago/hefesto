@@ -266,6 +266,8 @@ void del_hefesto_options_ctx(hefesto_options_ctx *options);
 hefesto_options_ctx *get_hefesto_options_ctx_option(const char *option,
                                           hefesto_options_ctx *options);
 
+void bubble_hefesto_options_ctx(hefesto_options_ctx **options);
+
 hefesto_dep_chain_ctx *add_dep_to_hefesto_dep_chain_ctx(
         hefesto_dep_chain_ctx *dependency_chain, const char *file_path,
         const char *dep);
