@@ -328,7 +328,9 @@ static char *hefesto_options_to_string() {
     size_t str_sz = 0;
     hefesto_options_ctx *o;
     hefesto_common_list_ctx *d;
-    bubble_hefesto_options_ctx(&HEFESTO_OPTIONS);
+    if (HEFESTO_OPTIONS != NULL) {
+        bubble_hefesto_options_ctx(&HEFESTO_OPTIONS);
+    }
     for (o = HEFESTO_OPTIONS; o != NULL; o = o->next) {
         str_sz += strlen(o->option);
         for (d = o->data; d != NULL; d = d->next) {

@@ -116,7 +116,18 @@ static void *eval_greater(hefesto_common_stack_ctx *a,
 
 static void *eval_neq(hefesto_common_stack_ctx *a,
                       hefesto_common_stack_ctx *b,
-                      hefesto_type_t *type, size_t *osize);
+              hefesto_type_t *type, size_t *osize);
+
+#ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
+
+static hefesto_int_t is_short_circuit_op(const char *expr);
+
+static hefesto_int_t can_apply_short_circuit(char *expression,
+  hefesto_common_stack_ctx **alu_stack, hefesto_type_t *vtype,
+                                           char *buf, char *b,
+                     struct hvm_alu_evaluate_return *eval_ret);
+
+#endif
 
 struct hefesto_evaluator_ctx {
     void *(*evaluator)(hefesto_common_stack_ctx *a,
@@ -160,7 +171,6 @@ static struct hefesto_evaluator_ctx
                                          lo_vars, gl_vars, functions,\
                                          etype, &vtype, &letype,\
                                          outsz, &eval_ret, &sp);\
-                        state = *eval_ret.state;\
                         b = eval_ret.b;\
                         e = eval_ret.e;\
 }
@@ -488,6 +498,80 @@ static char *get_function_args(char *buf, char *expression, size_t *offset) {
     return b;
 }
 
+#ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
+
+static hefesto_int_t is_short_circuit_op(const char *expr) {
+    const char *ep;
+    hefesto_int_t retval = -1;
+    for (ep = expr; *ep != 0; ep++) {
+        if (is_op(*ep)) {
+            if (*ep == '&' || *ep == '|') {
+                if (*(ep + 1) != 0) {
+                    retval = (*ep == '&') ? (*(ep + 1) == '&') : (*(ep + 1) == '|');
+                    if (retval == 1) {
+                        retval = get_op_index((*ep == '&') ? "&&" : "||");
+                    }
+                }
+                if (retval != -1) {
+                    break;
+                }
+            }
+        }
+    }
+    return retval;
+}
+
+static hefesto_int_t can_apply_short_circuit(char *expression,
+                                             hefesto_common_stack_ctx **alu_stack, hefesto_type_t *vtype,
+                                             char *buf, char *b,
+                                             struct hvm_alu_evaluate_return *eval_ret) {
+    hefesto_int_t op_index = 0;
+    hefesto_int_t *va = NULL;
+    size_t dsize = 0;
+    char *e = expression;
+    //  INFO(Santiago): this function verifies if a short-circuit diversion can be applied
+    //                  considering the current state of evaluation process besides the stack and the next
+    //                  short-circuit operator ahead which is connecting the last and the next sub-expression...
+    //                  and yes, "is not expected that you understand it.".
+    while (*e != 0 && !is_op(*e)) {
+        e++;
+        if (*e == '&' || *e == '|') {
+            e++;
+        }
+    }
+    if (*eval_ret->state == 0 || (*eval_ret->state == 1 && (*e == '&' || *e == '|'))) {
+        if ((op_index = is_short_circuit_op(expression)) > -1 &&
+            !hefesto_common_stack_ctx_empty(*alu_stack)) {
+            //  INFO(Santiago): (dtype == HEFESTO_VAR_TYPE_INT) indicates that we have at least "a"
+            //                  evaluation from a short-circuit expression (a S b).
+            if ((*alu_stack)->dtype == HEFESTO_VAR_TYPE_INT) {
+                va = (hefesto_int_t *)(*alu_stack)->data;
+                dsize = sizeof(hefesto_int_t);
+                if (*va == (op_index == 7) ? 0 : 1) {  //  && = 7 -> (0); || = 8 -> (1)
+                    (*alu_stack) = hefesto_common_stack_ctx_push((*alu_stack), va, dsize, *vtype);
+                    *eval_ret->state = (*eval_ret->state) + 1;
+                    while (*expression != 0) {
+                        if (op_index == 7 && *expression == '&') {
+                            break;
+                        } else if (op_index == 8 && *expression == '|') {
+                            break;
+                        } else {
+                            expression++;
+                        }
+                    }
+                    eval_ret->e = expression;
+                    *buf = 0;
+                    eval_ret->b = buf;
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+#endif
+
 static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                               hefesto_var_list_ctx **lo_vars,
                               hefesto_var_list_ctx **gl_vars,
@@ -507,11 +591,16 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
     size_t dsize, osize;
     hefesto_int_t state = *eval_ret->state;
 
+#ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
+    if (can_apply_short_circuit(expression, alu_stack, vtype, buf, b, eval_ret)) {
+        return;
+    }
+#endif
     if (*buf != '(' && !is_op(*expression)) {
 
         if (*buf == '$' && *etype == HEFESTO_VAR_TYPE_STRING &&
-            ((vp = get_hefesto_var_list_ctx_name(buf+1, *lo_vars)) || 
-             (vp = get_hefesto_var_list_ctx_name(buf+1, *gl_vars))) && 
+            ((vp = get_hefesto_var_list_ctx_name(buf+1, *lo_vars)) ||
+             (vp = get_hefesto_var_list_ctx_name(buf+1, *gl_vars))) &&
              vp->type == HEFESTO_VAR_TYPE_INT) {
 
             operand = hvm_int_to_str(vp->contents != NULL ?
@@ -685,7 +774,6 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
     if (*expression) eval_ret->e = expression + 1;
 
     *eval_ret->state = state;
-
 }
 
 void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
@@ -1622,7 +1710,6 @@ static void *eval_less(hefesto_common_stack_ctx *a,
         case HEFESTO_VAR_TYPE_STRING:
             if (a->data && b->data) {
                 *r_int = (strcmp(a->data, b->data) < 0);
-
             }
             break;
 

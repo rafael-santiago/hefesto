@@ -2491,7 +2491,7 @@ char *hvm_get_func_addr_call_func_addr_syscall_test() {
     hefesto_func_list_ctx *functions = NULL;
     void *retval;
     hefesto_int_t errors = 0;
-    printf("-- hvm_get_func_addr_call_func_addr_syscall_test()\n");
+    printf("-- hvm_get_func_addr_call_func_addr_syscall_test\n");
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "max_p", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     create_test_code("func_addr-101.hsl", hsl_code);
@@ -3136,7 +3136,7 @@ char *infix2postfix_tests() {
 char *get_expression_buffer_size_tests() {
     char *expression = "(\">\" + get_equal_symbol(), \"1_42\", \"\", \"error message!\", \"success message.\")";
     size_t expected_buffer_size = strlen(expression);
-    printf("-- get_expression_buffer_size_tests()\n");
+    printf("-- get_expression_buffer_size_tests\n");
     HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
     expression = "(((((\">\" + get_equal_symbol())))), ((((\"1_42\")))), \"\", (\"(((error message!\"),(   \"(success message.))\"))";
     expected_buffer_size = strlen(expression);
@@ -3148,6 +3148,89 @@ char *get_expression_buffer_size_tests() {
     printf("-- passed.\n");
     return NULL;
 }
+
+#if HVM_ALU_ENABLE_SHORT_CIRCUIT
+
+char *hvm_short_circuit_mode_tests() {
+    char *hsl_code = "function get_false(called type int) : result type int {\n"
+                     "\t$called = 1;\n"
+                     "\thefesto.sys.byref($called);\n"
+                     "\tresult 0;\n"
+                     "}\n"
+                     "function get_true(called type int) : result type int {\n"
+                     "\t$called = 1;\n"
+                     "\thefesto.sys.byref($called);\n"
+                     "\tresult 1;\n"
+                     "}\n" //  <-- Sem enter aqui parser reporta undeterminated code section.
+                     "function test_or() : result type int {\n"
+                     "\tvar retval type int;\n"
+                     "\tvar cf type int;\n"
+                     "\tvar ct type int;\n"
+                     "\t$cf = 0;\n"
+                     "\t$ct = 0;\n"
+                     "\t$retval = (get_true($ct) || get_false($cf));\n"
+                     "\tif($retval == 1) {\n"
+                     "\t\tif ($ct == 1) {\n"
+                     "\t\t\tif ($cf == 0) {\n"
+                     "\t\t\t\tresult 1;\n"
+                     "\t\t\t}\n"
+                     "\t\t}\n"
+                     "\t}\n"
+                     "\tresult 0;\n"
+                     "}\n"
+                     "function test_and() : result type int {\n"
+                     "\tvar retval type int;\n"
+                     "\tvar cf type int;\n"
+                     "\tvar ct type int;\n"
+                     "\t$cf = 0;\n"
+                     "\t$ct = 0;\n"
+                     "\t$retval = (get_false($cf) && get_true($ct));\n"
+                     "\tif ($retval == 0) {\n"
+                     "\t\tif ($cf == 1) {\n"
+                     "\t\t\tif ($ct == 0) {\n"
+                     "\t\t\t\tresult 1;\n"
+                     "\t\t\t}\n"
+                     "\t\t}\n"
+                     "\t}\n"
+                     "\tresult 0;\n"
+                     "}\n";
+    hefesto_func_list_ctx *functions = NULL;
+    hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
+    hefesto_int_t errors = 0;
+    void *retval;
+    printf("-- running hvm_short_circuit_mode_tests\n");
+    create_test_code("sc_hsl.hsl", hsl_code);
+    functions = compile_and_load_hsl_code("sc_hsl.hsl",
+                                          &errors,
+                                          &gl_vars, NULL, NULL);
+    remove("sc_hsl.hsl");
+    HTEST_CHECK("functions == NULL", functions != NULL);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "cf", HEFESTO_VAR_TYPE_INT);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "ct", HEFESTO_VAR_TYPE_INT);
+    retval = hvm_call_function("test_or()",
+                                &lo_vars, &gl_vars, functions);
+    HTEST_CHECK("retval == NULL", retval != NULL);
+    HTEST_CHECK("retval != 1", *(int *)retval == 1);
+    del_hefesto_var_list_ctx(lo_vars);
+    free(retval);
+    lo_vars = NULL;
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "cf", HEFESTO_VAR_TYPE_INT);
+    lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "ct", HEFESTO_VAR_TYPE_INT);
+    retval = hvm_call_function("test_and()",
+                                &lo_vars, &gl_vars, functions);
+    HTEST_CHECK("retval == NULL", retval != NULL);
+    HTEST_CHECK("retval != 1", *(int *)retval == 1);
+    del_hefesto_func_list_ctx(functions);
+    del_hefesto_var_list_ctx(gl_vars);
+    del_hefesto_var_list_ctx(lo_vars);
+    free(retval);
+    printf("-- passed.\n");
+    return NULL;
+}
+
+#endif
 
 char *run_tests() {
     printf("* running tests...\n");
@@ -3167,6 +3250,9 @@ char *run_tests() {
     HTEST_RUN(dep_chain_tests);
     HTEST_RUN(infix2postfix_tests);
     HTEST_RUN(get_expression_buffer_size_tests);
+#ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
+    HTEST_RUN(hvm_short_circuit_mode_tests);
+#endif
     return NULL;
 }
 
