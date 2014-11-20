@@ -2985,6 +2985,72 @@ char *hsl_list_variable_without_dollar_prefix() {
     return NULL;
 }
 
+char *hsl_function_declaration_just_after_close_bracket() {
+    char *hsl_code = "function get_false(called type int) : result type int {\n"
+                     "\t$called = 1;\n"
+                     "\thefesto.sys.byref($called);\n"
+                     "\tresult 0;\n"
+                     "}\n"
+                     "function get_true(called type int) : result type int {\n"
+                     "\t$called = 1;\n"
+                     "\thefesto.sys.byref($called);\n"
+                     "\tresult 1;\n"
+                     "}" //  <---- INFO(Santiago): the lack of one or more blank symbols mustn't break the compilation.
+                     "function test_or() : result type int {\n"
+                     "\tvar retval type int;\n"
+                     "\tvar cf type int;\n"
+                     "\tvar ct type int;\n"
+                     "\t$cf = 0;\n"
+                     "\t$ct = 0;\n"
+                     "\t$retval = (get_true($ct) || get_false($cf));\n"
+                     "\tif($retval == 1) {\n"
+                     "\t\tif ($ct == 1) {\n"
+                     "\t\t\tif ($cf == 0) {\n"
+                     "\t\t\t\tresult 1;\n"
+                     "\t\t\t}\n"
+                     "\t\t}\n"
+                     "\t}\n"
+                     "\tresult 0;\n"
+                     "}\n"
+                     "function test_and() : result type int {\n"
+                     "\tvar retval type int;\n"
+                     "\tvar cf type int;\n"
+                     "\tvar ct type int;\n"
+                     "\t$cf = 0;\n"
+                     "\t$ct = 0;\n"
+                     "\t$retval = (get_false($cf) && get_true($ct));\n"
+                     "\tif ($retval == 0) {\n"
+                     "\t\tif ($cf == 1) {\n"
+                     "\t\t\tif ($ct == 0) {\n"
+                     "\t\t\t\tresult 1;\n"
+                     "\t\t\t}\n"
+                     "\t\t}\n"
+                     "\t}\n"
+                     "\tresult 0;\n"
+                     "}\n";
+    hefesto_func_list_ctx *functions = NULL;
+    hefesto_var_list_ctx *gl_vars = NULL;
+    hefesto_int_t errors = 0;
+
+    printf("-- running hsl_function_declaration_just_after_close_bracket\n");
+
+    create_test_code("correct_hsl.hsl", hsl_code);
+    functions = compile_and_load_hsl_code("correct_hsl.hsl", &errors, &gl_vars, NULL, NULL);
+    remove("correct_hsl.hsl");
+
+    HTEST_CHECK("function == NULL", functions != NULL);
+
+    HTEST_CHECK("errors != 0", errors == 0);
+
+    del_hefesto_func_list_ctx(functions);
+    del_hefesto_var_list_ctx(gl_vars);
+
+    printf("-- passed.\n");
+
+    return NULL;
+
+}
+
 char *hsl_compilation_tests() {
 
     char *result;
@@ -3010,6 +3076,8 @@ char *hsl_compilation_tests() {
     result = hsl_unterminated_code_lines();
     if (result != NULL) return result;
     result = hsl_list_variable_without_dollar_prefix();
+    if (result != NULL) return result;
+    result = hsl_function_declaration_just_after_close_bracket();
     if (result != NULL) return result;
     printf("-- passed.\n");
 
@@ -3161,7 +3229,7 @@ char *hvm_short_circuit_mode_tests() {
                      "\t$called = 1;\n"
                      "\thefesto.sys.byref($called);\n"
                      "\tresult 1;\n"
-                     "}\n" //  <-- Sem enter aqui parser reporta undeterminated code section.
+                     "}"
                      "function test_or() : result type int {\n"
                      "\tvar retval type int;\n"
                      "\tvar cf type int;\n"

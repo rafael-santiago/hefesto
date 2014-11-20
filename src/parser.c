@@ -1171,7 +1171,11 @@ static long get_section_end_offset(FILE *fp, const long stop_at) {
 
         if (is_hefesto_section_end(c)) bracket--;
 
-        c = fgetc(fp);
+        if (bracket > 0) {
+            c = fgetc(fp);
+        } else {
+            c = 0;
+        }
 
         if (c == '\n') inc_current_line_number();
 
