@@ -304,13 +304,18 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
     const char *ap = arg_list;
     char *arg_pf = NULL;
     size_t offset = 0;
+    size_t real_arg_list_size = 0;
     char *retval = NULL;
+    if (arg_list == NULL) {
+        return NULL;
+    }
     while (*ap != '(' && *ap != 0) {
         ap++;
     }
     if (*ap == 0) {
         return NULL;
     }
+    real_arg_list_size = strlen(arg_list);
     ap++;
     retval = (char *) hefesto_mloc(arg_list_size * 2);
     memset(retval, 0, arg_list_size * 2);
@@ -325,10 +330,19 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
             offset++;
         }
         e = get_arg_from_call(arg_list, &offset);
-        if (*e) {
-            strcat(retval, ",");
+        if (arg_list_size == real_arg_list_size) {
+            if (*e) {
+                strcat(retval, ",");
+            } else {
+                strcat(retval, ")");
+            }
         } else {
-            strcat(retval, ")");
+            if (*e && offset < arg_list_size + 2) {
+                strcat(retval, ",");
+            } else {
+                strcat(retval, ")");
+                break;
+            }
         }
     }
     free(e);
@@ -345,6 +359,7 @@ size_t get_expression_buffer_size(const char *expr) {
     if (o == 0) {
         return strlen(expr);
     }
+    ep++;
     while (o > 0 && *ep != 0) {
         if (is_hefesto_string_tok(*ep)) {
             ep++;

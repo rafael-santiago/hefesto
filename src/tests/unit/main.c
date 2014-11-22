@@ -3197,6 +3197,11 @@ char *infix2postfix_tests() {
     pfixd_args = infix2postfix_args(expr, strlen(expr));
     HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
+    expr = "($option_item, $extensions, $extensions_root_dir);\n\t\t\t$o = $o + 1;\n\t\t}\n\t}";
+    pfixd_args = infix2postfix_args(expr, get_expression_buffer_size(expr));
+    expected_result = "($option_item,$extensions,$extensions_root_dir)";
+    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
     printf("-- passed.\n");
     return NULL;
 }
@@ -3213,6 +3218,9 @@ char *get_expression_buffer_size_tests() {
     expected_buffer_size = strlen(expression);
     HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
     HTEST_CHECK("result != 0", get_expression_buffer_size(NULL) == 0);
+    expression = "($option_item, $extensions, $extensions_root_dir);\n\t\t\t$o = $o + 1;\n\t\t}\n\t}";
+    expected_buffer_size = strlen("($option_item, $extensions, $extensions_root_dir)");
+    HTEST_CHECK("result != expected_buffer_size", expected_buffer_size == get_expression_buffer_size(expression));
     printf("-- passed.\n");
     return NULL;
 }
