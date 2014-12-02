@@ -104,7 +104,6 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
 
     while (cmd && hvm_continue_loop == 0 && !HEFESTO_EXIT) {
 
-        HEFESTO_DEBUG_INFO(1, "instruction: %x\n", cmd->instruction);
         hvm_set_current_executed_instruction(cmd->instruction);
 
         switch(cmd->instruction) {
@@ -246,12 +245,10 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                 break;
 
             case HEFESTO_RET: //ret (here) an expression can be used
-                HEFESTO_DEBUG_INFO(0, "hvm/PRE-RET!\n");
                 //buf = infix2postfix(cmd->expr, strlen(cmd->expr), 1);
                 out_type = HEFESTO_VAR_TYPE_UNTYPED;
                 result = expr_eval(cmd->expr, lo_vars, gl_vars, functions,
                                    &out_type, &out_size);
-                HEFESTO_DEBUG_INFO(0, "hvm/RET address: %d\n", result);
                 //free(buf);
                 if (should_return) *should_return = 1;
                 return result;
@@ -543,9 +540,6 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
         expr_result = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype,
                                 &out_sz);
 
-        HEFESTO_DEBUG_INFO(0,
-             "hvm/attrib expr: %s etype: %d vtype: %d dest: %s\n",
-                 cmd->expr, etype, var->type, cmd->params->data);
         switch (var->type) {
 
             case HEFESTO_VAR_TYPE_STRING:
@@ -558,13 +552,10 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
                 break;
 
             case HEFESTO_VAR_TYPE_FILE_DESCRIPTOR:
-                HEFESTO_DEBUG_INFO(0, "hvm/vou fazer o assignment de file\n");
                 var = assign_data_to_hefesto_var_file_type(var, expr_result);
-                HEFESTO_DEBUG_INFO(0, "hvm/ok, feito o assignment de file\n");
                 // don't close the (FILE *) it were pointed by the assignment
                 // above.
                 //close_hefesto_file_handle((hefesto_file_handle *)expr_result, 0);
-                HEFESTO_DEBUG_INFO(0, "hvm/ok, liberei o expr_result\n");
                 expr_result = NULL;
                 break;
 
@@ -603,10 +594,6 @@ hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
     struct stacked_function_execution_point_ctx *sv_p;
     hefesto_project_ctx *last_project;
     size_t t_sz;
-
-    HEFESTO_DEBUG_INFO(0,
-       "hvm/hvm_forge_project = name:%s toolset:%x\n", project->name,
-                                                       project->toolset);
 
     last_project = HEFESTO_CURRENT_PROJECT;
     HEFESTO_CURRENT_PROJECT = project;
@@ -655,9 +642,6 @@ hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
             }
         }
         strcat(forge_invocation, ");");
-
-        HEFESTO_DEBUG_INFO(0, "hvm/hvm_forge_project forge invocation is %s\n",
-                           forge_invocation);
 
         HEFESTO_CURRENT_TOOLSET = project->toolset;
 

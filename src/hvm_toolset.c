@@ -132,8 +132,6 @@ void *hvm_toolset_call_command(const char *raw_command,
     size_t offset;
     ssize_t index;
 
-    HEFESTO_DEBUG_INFO(0, "toolset cmd: %s\n", raw_command);
-
     memset(command_name, 0, HEFESTO_MAX_BUFFER_SIZE);
 
     if (raw_command && strlen(raw_command) > strlen(HEFESTO_TOOLSET_COMMAND)) {
@@ -159,9 +157,6 @@ void *hvm_toolset_call_command(const char *raw_command,
             offset = 0;
             arg = get_arg_from_call(r, &offset);
             while (*arg) {
-                HEFESTO_DEBUG_INFO(0,
-                    "hvm_toolset/toolset call arg: %s toolset command: %s\n",
-                            arg, raw_command);
                 exp_arg = hvm_str_format(arg, lo_vars, gl_vars, functions);
 
                 cp->a_values = add_data_to_hefesto_common_list_ctx(cp->a_values,
@@ -173,7 +168,6 @@ void *hvm_toolset_call_command(const char *raw_command,
             }
             free(arg);
             result = hvm_toolset_command_fmt(cp);
-            HEFESTO_DEBUG_INFO(0, "hvm_toolset/toolset result = %s\n", result);
             del_hefesto_common_list_ctx(cp->a_values);
             cp->a_values = NULL;
         } else {

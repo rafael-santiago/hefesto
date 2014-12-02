@@ -68,8 +68,7 @@ struct stacked_function_execution_point_ctx *hvm_save_execution_point(
 
     exec_point_p->curr_code = hvm_get_current_executed_function();
     exec_point_p->last_code = hvm_get_last_executed_function();
-    HEFESTO_DEBUG_INFO("-- FUNCTION %s CONTEXT SAVED\n",
-                       hvm_get_current_executed_function()->name);
+
     return exec_point_p;
 
 }
@@ -113,8 +112,6 @@ void hvm_restore_execution_point(hefesto_func_list_ctx **function,
 
     hvm_set_current_executed_function(execution_point->curr_code);
     hvm_set_last_executed_function(execution_point->last_code);
-    HEFESTO_DEBUG_INFO("-- FUNCTION %s CONTEXT RESTORED\n",
-                       hvm_get_current_executed_function()->name);
 
 }
 
@@ -173,8 +170,6 @@ void *hvm_exec_function(hefesto_func_list_ctx *function,
                         hefesto_func_list_ctx *functions) {
     void *result;
 
-    HEFESTO_DEBUG_INFO(0, "hvm_func/executing: %s\n", function->name);
-
     result = hvm_exec_command_list(function->code, &function->vars,
                                    gl_vars, functions, NULL);
     return result;
@@ -203,8 +198,6 @@ void hvm_init_function_args(const char *args,
     offset = expr - args + 1;
     expr = get_arg_from_call(args, &offset);
     while (vp != NULL && *expr != 0) {
-        HEFESTO_DEBUG_INFO(0, 
-                "hvm_func/hvm_init_function_args/expr -> %s\n", expr);
         if (ap->contents != NULL) {
             del_hefesto_common_list_ctx(ap->contents);
             ap->contents = NULL;
@@ -242,18 +235,7 @@ void hvm_init_function_args(const char *args,
             }
         }
         free(expr_pfix);
-#ifdef HEFESTO_DEBUG
-        if (etype == HEFESTO_VAR_TYPE_STRING) {
-            HEFESTO_DEBUG_INFO(0,
-                "hvm_func/hvm_init_function_args/result = %s\n",
-                  expr_result);
-        }
-        else {
-            HEFESTO_DEBUG_INFO(0,
-                "hvm_func/hvm_init_function_args/result = %d\n",
-                    *(hefesto_int_t *)expr_result);
-        }
-#endif
+
         if (vp->contents != NULL) {
             del_hefesto_common_list_ctx(vp->contents);
             vp->contents = NULL;

@@ -129,8 +129,6 @@ void *hvm_list_method(const char *method, hefesto_common_list_ctx **list_var,
 
     lst_mthd_idx = get_hefesto_list_method_index(call);
 
-    HEFESTO_DEBUG_INFO(0, "hvm_list/call %s\n", method);
-
     if (lst_mthd_idx > -1) {
         for (; *m != '(' && *m != 0; m++);
         result = HVM_LIST_METHOD_CALL_VECTOR[lst_mthd_idx].method(m+1,
@@ -140,8 +138,6 @@ void *hvm_list_method(const char *method, hefesto_common_list_ctx **list_var,
                                                                   gl_vars,
                                                                   functions);
     }
-
-    HEFESTO_DEBUG_INFO(0, "hvm_list/call %s executed\n", method);
 
     return result;
 
@@ -221,10 +217,6 @@ static void *hvm_list_item(const char *method,
         *otype = HEFESTO_VAR_TYPE_STRING;
     }
 
-    HEFESTO_DEBUG_INFO(0, "hvm_list/item: %s %d %s %d\n", result, outsz,
-                                                          (*list_var)->data,
-                                                          (*list_var)->dsize);
-
     return result;
 
 }
@@ -289,9 +281,6 @@ static void *hvm_list_add_item(const char *method,
     }
 
     *list_var = add_data_to_hefesto_common_list_ctx(*list_var, data, outsz);
-    HEFESTO_DEBUG_INFO(0, "hvm_list/add: dummy:%d %s\n",
-                (*list_var)->is_dummy_item,
-                get_hefesto_common_list_ctx_tail(*list_var)->data);
 
     free(data);
     free(arg);
@@ -346,7 +335,6 @@ static void *hvm_list_del_item(const char *method,
             vp->subtype = etype;
         }
 
-        HEFESTO_DEBUG_INFO(0, "hvm_list/del_item, etype = %d\n", etype);
         *list_var = del_data_from_hefesto_common_list_ctx(*list_var,
                                                           data,
                                                           vp->subtype);
@@ -399,8 +387,6 @@ static void *hvm_list_ls(const char *method,
                     (strcmp(de->d_name, "..") == 0)) continue;
                 search_result = here_match_string(de->d_name, search_program);
                 if (here_matches(search_result)) {
-                    HEFESTO_DEBUG_INFO(0,
-                        "hvm_list/set_from_fs_by_regex %s\n", de->d_name);
                     arg = hefesto_make_path(data, de->d_name,
                                             HEFESTO_MAX_BUFFER_SIZE * 2);
                     if (get_hefesto_common_list_ctx_content(arg,
@@ -532,19 +518,6 @@ static void *hvm_list_del_index(const char *method,
             }
         }
 
-        /*
-        if (item != NULL && vp->subtype != HEFESTO_VAR_TYPE_UNTYPED) {
-            HEFESTO_DEBUG_INFO(0, "hvm_list/del_item, etype = %d\n", etype);
-
-            *list_var = del_data_from_hefesto_common_list_ctx(*list_var,
-                                                              item->data,
-                                                              vp->subtype);
-        } else {
-            *list_var = del_sized_data_from_hefesto_common_list_ctx(*list_var,
-                                                                    item->data,
-                                                                    item->dsize);
-        }
-        */
     }
 
     free(data);

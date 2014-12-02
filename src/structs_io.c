@@ -115,8 +115,6 @@ hefesto_common_list_ctx *add_data_to_hefesto_common_list_ctx(hefesto_common_list
 
     if (list == NULL || list->is_dummy_item) {
         if (list != NULL && list->is_dummy_item) {
-            HEFESTO_DEBUG_INFO(0, 
-               "vou deletar dummy item antes de fazer o add!\n");
             del_hefesto_common_list_ctx(list);
         }
         new_hefesto_common_list_ctx(p);
@@ -671,7 +669,6 @@ size_t get_hefesto_common_list_ctx_count(const hefesto_common_list_ctx *list) {
 
     for (p = list; p && p->data != NULL; p = p->next) {
         c++;
-        HEFESTO_DEBUG_INFO(0, "structs_io/item: %s %d\n", p->data, c);
     }
 
     return c;
@@ -761,10 +758,8 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
         while (is_hefesto_blank(*b)) b++;
 
         *t = 0;
-        HEFESTO_DEBUG_INFO(0, "structs_io/tok: %s\n", tok);
 
         if (p == NULL) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/null p!\n");
             new_hefesto_command_list_ctx(p);
             h = p;
         } else {
@@ -775,7 +770,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             }
         }
         if (strcmp(tok, "if") == 0) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/IF --\n");
             p->instruction = HEFESTO_IF;
             sz = 0;
             buf_p = get_next_expression_from_buffer(b, &sz);
@@ -783,7 +777,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             free(buf_p);
             b += sz;
         } else if (strcmp(tok, "while") == 0) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/WHILE --\n");
             p->instruction = HEFESTO_WHILE;
             sz = 0;
             buf_p = get_next_expression_from_buffer(b, &sz);
@@ -796,7 +789,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                                 HEFESTO_BREAK : HEFESTO_CONTINUE;
             while (b != cmd_buf && *b != ';') b--;
         } else if (strcmp(tok, "else") == 0) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/ELSE --\n");
             p->instruction = HEFESTO_ELSE;
             /*
             while (is_hefesto_blank(*b)) b++;
@@ -809,7 +801,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             }
             */
         } else if (strcmp(tok, "result") == 0) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/RESULT --\n");
             p->instruction = HEFESTO_RET;
             sz = 0;
             //p->expr = get_next_expression_from_buffer(b, &sz);
@@ -817,7 +808,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             p->expr = infix2postfix(temp, sz, 1);
             b += sz;
         } else if (tok[0] == '$' && *b == '=') {
-            HEFESTO_DEBUG_INFO(0, "structs_io/ASSINGMENT --\n");
             p->instruction = HEFESTO_ATTRIB;
             p->params = add_data_to_hefesto_common_list_ctx(p->params,
                                                             &tok[1],
@@ -830,11 +820,9 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 sz--;
             }
 */
-            HEFESTO_DEBUG_INFO(0, "structs_io/buf_p = %s\n", buf_p);
             p->expr = infix2postfix(buf_p, sz, 1);
             free(buf_p);
             b += sz;
-            HEFESTO_DEBUG_INFO(0, "structs_io/b = %s\n", p->expr);
         } else if (strstr(tok, HEFESTO_TOOLSET_COMMAND) == tok) {
             p->instruction = HEFESTO_TOOLSET_COMMAND_INVOKE;
             p->expr = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
@@ -885,7 +873,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             b += sz;
             while (*b != 0 && !is_hefesto_line_terminator(*b)) b++;
         } else if (get_hefesto_sys_call_index(tok) > -1) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/SYSCALL --\n");
             p->instruction = HEFESTO_SYS_CALL;
             intr_code = get_instruction_code(tok, NULL, NULL, NULL);
             p->params = add_data_to_hefesto_common_list_ctx(p->params,
@@ -913,7 +900,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             b += ssz;
             while (*b != 0 && !is_hefesto_line_terminator(*b)) b++;
         } else if (strcmp(tok, "var") == 0) {
-            HEFESTO_DEBUG_INFO(0, "structs_io/VAR --\n");
             // nao e gerada uma instrucao mas temos que adicionar a variavel
             // declarada a lista local de variaveis da funcao
             buf_p = &buf[0][0];
@@ -957,15 +943,11 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 } else {
                     p->func = fp;
                 }
-                HEFESTO_DEBUG_INFO(0, "structs_io/call: %s\n",
-                                   p->func->name);
                 sz = get_expression_buffer_size(b);
                 p->expr = infix2postfix_args(b, sz);
-                HEFESTO_DEBUG_INFO(0, "structs_io/FUNCTION CALL --\n");
             } else if (is_list_method_invoke(tok, (*function)->vars, gl_vars) ||
                        is_string_method_invoke(tok, (*function)->vars, 
                                                gl_vars)) {
-                HEFESTO_DEBUG_INFO(0, "structs_io/LIST METHOD INVOKE --\n");
                 p->instruction =
                       is_list_method_invoke(tok, (*function)->vars, gl_vars) ?
                                     HEFESTO_LIST_METHOD : HEFESTO_STRING_METHOD;
@@ -1054,7 +1036,6 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
         while (is_hefesto_blank(*b)) b++;
         *continue_offset = b - cmd_buf_real_start;
     }
-    HEFESTO_DEBUG_INFO(0, "************ fim.\n");
 
     return h;
 
@@ -1115,9 +1096,6 @@ hefesto_var_list_ctx *assign_data_to_hefesto_var_file_type(
             del_hefesto_common_list_ctx(var->contents);
             var->contents = NULL;
         }
-        HEFESTO_DEBUG_INFO(0, "structs_io/data: %x %s %x\n", data,
-                           ((hefesto_file_handle *)data)->path,
-                           ((hefesto_file_handle *)data)->fp);
         var->contents = add_data_to_hefesto_common_list_ctx(var->contents,
                                                                      data,
                                               sizeof(hefesto_file_handle));

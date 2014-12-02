@@ -653,8 +653,6 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                 } else {
                     buffer = get_next_word_from_file(fp, stop_at);
                     if (strcmp(HEFESTO_FUNC_RESULT_DECL_WORD_0, buffer) == 0) {
-                        HEFESTO_DEBUG_INFO(1, "FUNCTION: %s ln %d\n", name,
-                                           get_current_line_number());
                         free(buffer);
                         buffer = get_next_word_from_file(fp, stop_at);
                         if (strcmp(HEFESTO_FUNC_RESULT_DECL_WORD_1, buffer) == 0) {
@@ -692,9 +690,6 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                     (*errors)++;
                                     goto ___free_buffers;
                                 }
-                                HEFESTO_DEBUG_INFO(0,
-                                                   "parser/function = %s %s\n",
-                                                   name,argl);
                                 f = (functions_decl != NULL) ?
                                      get_hefesto_func_list_ctx_scoped_name(
                                                           name,
@@ -739,7 +734,6 @@ static hefesto_func_list_ctx *get_functions(FILE *fp, const long stop_at,
                                 buffer = NULL;
                                 free(name);
                                 name = NULL;
-                                HEFESTO_DEBUG_INFO(0, "--\n");
                                 is_local = 0;
                             } else {
                                 hlsc_info(HLSCM_MTYPE_GENERAL,
@@ -803,7 +797,6 @@ static hefesto_int_t is_valid_function_arg_list(const char *argl) {
     hefesto_int_t state = 0;
     size_t ai;
     char atom[HEFESTO_MAX_BUFFER_SIZE];
-    HEFESTO_DEBUG_INFO(0, "parser/list: %s\n", argl);
     hefesto_var_list_ctx *vp = NULL;
 
     if (*argl != '(') {
@@ -1007,19 +1000,14 @@ static hefesto_int_t compile_code(hefesto_func_list_ctx *function,
         command = get_next_command(fp, stop_at);
         if (command != NULL) {
             if (*command) {
-                HEFESTO_DEBUG_INFO(0, "command to compile = %s\n", command);
                 syntax_is_ok = synchk_check_language_production(command,
                                                                 &function->vars,
                                                                 gl_vars,
                                                                 functions);
-                HEFESTO_DEBUG_INFO(1,
-                    "parser/syntax_is_ok = %d line number: %d\n", syntax_is_ok,
-                        get_current_line_number());
             }
             free(command);
         }
     }
-    HEFESTO_DEBUG_INFO(1, "compile_code returning %d\n", syntax_is_ok);
     synchk_set_hefesto_forge_functions_name_list(NULL);
     synchk_set_current_function_ptr(NULL);
     // all variables must be added during the checking.
@@ -1094,8 +1082,6 @@ static hefesto_command_list_ctx *get_code(hefesto_func_list_ctx *function,
 
         command = get_next_command(fp, stop_at);
 
-        HEFESTO_DEBUG_INFO(0, "parsed command = %s %d %d\n", command, stop_at, 
-                              ftell(fp));
         if (command != NULL) {
             staged_command = strip_comment_lines_from_command_block(command);
             if (staged_command != NULL) {
@@ -1236,8 +1222,6 @@ char *get_next_expression_from_buffer(const char *buf, size_t *next_pos) {
                 for (; *b != 0 && !is_hefesto_line_terminator(*b); b++, r++) {
                     if (is_hefesto_line_terminator(*b)) { can_parse = 0; break; }
                     if (*b == '\n') inc_current_line_number();
-                    HEFESTO_DEBUG_INFO(0, "parser/b = %c (b+1) %c\n", *b,
-                                       *(b+1));
                     if (is_hefesto_string_tok(*b)) {
                         *r = *b;
                         b++;
@@ -1360,9 +1344,6 @@ static hefesto_int_t get_project_functions(hefesto_project_ctx *project, FILE *f
                     fseek(fp, offset, SEEK_SET);
                     fn_ptr->code = get_code(fn_ptr, functions, gl_vars, fp,
                                             end_offset);
-                    HEFESTO_DEBUG_INFO(0,
-                        "parser/tok = %s code load at: %x %d %d\n", tok,
-                        fn_ptr->code, offset, end_offset);
                 }
             }
             free(tok);
@@ -1791,12 +1772,6 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
             project_curr->prologue = prologue_p;
             project_curr->epilogue = epilogue_p;
 
-            HEFESTO_DEBUG_INFO(0, 
-              "prologue function:%s at %x / epilogue function:%s at %x "
-              "/ preloading function:%s at %x\n", project_curr->prologue->name,
-              project_curr->prologue->code, project_curr->epilogue->name,
-              project_curr->epilogue->code, project_curr->preloading->name,
-              project_curr->preloading->code);
         } else {
             if (tok != NULL) free(tok);
             del_hefesto_project_ctx(projects);

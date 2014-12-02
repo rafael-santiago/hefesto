@@ -82,8 +82,6 @@ static char *infix2postfix_function_args(const char *expr_args,
 
     *r = 0;
 
-    HEFESTO_DEBUG_INFO(0, "expr_handler/function args: %s\n", result);
-
     return result;
 
 }
@@ -237,7 +235,6 @@ char *infix2postfix(const char *expr, const size_t esize, const hefesto_int_t ma
     }
 
     if (*term) {
-        HEFESTO_DEBUG_INFO(0, "expr_handler/pushing \"%s\"\n", term);
         sp = hefesto_common_stack_ctx_push(sp, (void *) term, t - term,
                                            HEFESTO_VAR_TYPE_UNTYPED);
     }

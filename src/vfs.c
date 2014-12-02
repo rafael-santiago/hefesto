@@ -468,7 +468,6 @@ hefesto_file_handle *hefesto_fopen(const char *file_path, const char *mode) {
         }
     }
 
-    HEFESTO_DEBUG_INFO(0, "vfs/temp_mode: %s\n", temp_mode);
     new_hefesto_file_handle(fp_handle, file_path);
     fp_handle->fp = fopen(fp_handle->path, temp_mode);
 
@@ -493,9 +492,6 @@ void hefesto_fclose(hefesto_file_handle **fp_handle) {
 
 hefesto_int_t hefesto_fwrite(const char *buffer, const size_t size,
                              hefesto_file_handle *fp_handle) {
-    HEFESTO_DEBUG_INFO(0,
-        "vfs/buffer: %s, size: %d, fp_handle: %x\n", buffer,
-            size, fp_handle->fp);
 
     if (fp_handle == NULL || fp_handle->fp == NULL) return -1;
 
@@ -505,10 +501,6 @@ hefesto_int_t hefesto_fwrite(const char *buffer, const size_t size,
 
 hefesto_int_t hefesto_fread(char *buffer, const size_t size,
                             hefesto_file_handle *fp_handle) {
-
-    HEFESTO_DEBUG_INFO(0,
-        "vfs/buffer: size: %d, fp_handle: %x\n",
-            size, fp_handle->fp);
 
     memset(buffer, 0, size);
 
@@ -527,25 +519,11 @@ hefesto_file_handle *get_file_descriptor_by_var_name(const char *var_name,
 
     if (strstr(var_name, "[") == NULL) {
         vname = (char *) var_name;
-    } /*else {
-        vname = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-        for (vn = (char *) vname, v = vname; *vn != 0 && *vn != '['; vn++, v++)
-            *vn = *v;
-        *vn = 0;
-        for (; *v != 0 && is_hefesto_blank(*v); v++);
-        expr = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
-        for (vn = expr; *v != 0; v++, vn++)
-            *vn = *v;
-        *vn = 0;
-    }*/
+    }
     vp = get_hefesto_var_list_ctx_name(vname, lo_vars);
     if (!vp) vp = get_hefesto_var_list_ctx_name(vname, gl_vars);
-    HEFESTO_DEBUG_INFO(0, "vfs/vp = %x\n", vp);
-    //if (vname != var_name) free(vname);
     if (vp && vp->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR)
         return (hefesto_file_handle *) vp->contents->data;
-    HEFESTO_DEBUG_INFO(0, "vfs/retornei nulo!\n");
-
     return NULL;
 
 }

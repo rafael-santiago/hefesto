@@ -385,8 +385,6 @@ hefesto_int_t synchk_check_language_production(const char *command,
     hefesto_type_t vtype;
     hefesto_func_list_ctx *fp;
 
-    HEFESTO_DEBUG_INFO(0, "synchk/command = \"%s\"\n", command);
-
     while (is_hefesto_blank(*cmd_p) || is_hefesto_comment(*cmd_p)) {
         if (is_hefesto_blank(*cmd_p)) {
             if (*cmd_p == '\n') inc_current_line_number();
@@ -550,7 +548,6 @@ hefesto_int_t synchk_check_language_production(const char *command,
                     }
                     if (*c == ';') {
                         *v = 0;
-                        HEFESTO_DEBUG_INFO(0, "EXPRESSION = %s\n", var_name);
                         result = *var_name != 0 &&
                                  (is_valid_expression(var_name, *lo_vars,
                                                       gl_vars, fn) ||
@@ -566,8 +563,6 @@ hefesto_int_t synchk_check_language_production(const char *command,
                                   HLSCM_SYN_ERROR_LNTERM_MISSING, cmd_p);
                         result = 0;
                     }
-                    HEFESTO_DEBUG_INFO(0, "synchk/expression = %d [%s] %x\n",
-                                       result, cmd_p, vp);
                 }
             } else {
                 hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_DEST_VAR,
@@ -606,7 +601,6 @@ hefesto_int_t synchk_check_language_production(const char *command,
         *v = 0;
         if ((fp = get_hefesto_func_list_ctx_name(var_name, fn))) {
             last_production_checked_was_if = 0;
-            HEFESTO_DEBUG_INFO(0, "function = %s\n", var_name);
             if (ltok == ';') {
                 result = synchk_function_call(cmd_p, *lo_vars, gl_vars, fn);
             } else {
@@ -649,8 +643,6 @@ hefesto_int_t synchk_check_language_production(const char *command,
                       cmd_p);
             result = 0;
         }
-        HEFESTO_DEBUG_INFO(0, "synchk/command = %s [%d] %d\n", cmd_p,
-                           result, last_production_checked_was_if);
     }
 
     return result;
@@ -669,8 +661,6 @@ static hefesto_int_t synchk_command_list(const char *statement,
 
     b = &buf[0];
     memset(buf, 0, sizeof(buf));
-    HEFESTO_DEBUG_INFO(1, "BLOCK: '%s' %d\n", statement,
-                       get_current_line_number());
     for (s = statement + 1; *s != 0 && result; s++) {
         switch (*s) { 
 
@@ -725,9 +715,6 @@ static hefesto_int_t synchk_command_list(const char *statement,
                         b++;
                     }
                     *b = 0;
-                    HEFESTO_DEBUG_INFO(1,
-                       "synchk/language production = %s line: %d\n",
-                       buf, get_current_line_number());
                     if (*buf != '}') {
                         for (b = &buf[0]; *b != 0; b++) {
                             if (*b == '\n') {
@@ -776,8 +763,6 @@ static hefesto_int_t synchk_if_statement(const char *statement,
     const char *s;
     size_t offset;
 
-    HEFESTO_DEBUG_INFO(0, "synchk/IF CHECKER --\n");
-
     b = &buf[0];
     for (s = statement; *s != 0 &&
                         *s != '(' && !is_hefesto_blank(*s); s++, b++) {
@@ -805,10 +790,8 @@ static hefesto_int_t synchk_if_statement(const char *statement,
                 inc_current_line_number();
             }
             if (*s == '{') {
-                HEFESTO_DEBUG_INFO(0, "synchk/IF CHECKER command list\n");
                 result = synchk_command_list(s, lo_vars, gl_vars, fn);
             } else {
-                HEFESTO_DEBUG_INFO(0, "synchk/IF CHECKER production\n");
                 result = synchk_check_language_production(s, &lo_vars,
                                                           gl_vars, fn);
             }
@@ -818,9 +801,6 @@ static hefesto_int_t synchk_if_statement(const char *statement,
 
     }
     free(b);
-
-    HEFESTO_DEBUG_INFO(0, "-- synchk/IF CHECKER = %d %d\n", result,
-                       last_production_checked_was_if);
 
     return result;
 
@@ -852,11 +832,9 @@ static hefesto_int_t synchk_else_statement(const char *statement,
             s++;
         }
         if (*s == '{') {
-            HEFESTO_DEBUG_INFO(0, "ELSE COMMAND LIST\n");
             result = synchk_command_list(s, lo_vars, gl_vars, fn);
             last_production_checked_was_if = 0;
         } else {
-            HEFESTO_DEBUG_INFO(0, "ELSE SINGLE PRODUCTION\n");
             result = synchk_check_language_production(s, &lo_vars, gl_vars, fn);
             if (strstr(s, "if") != NULL) last_production_checked_was_if = 1;
         }
@@ -875,8 +853,6 @@ static hefesto_int_t synchk_while_statement(const char *statement,
     char buf[HEFESTO_MAX_BUFFER_SIZE], *b;
     const char *s;
     size_t offset;
-
-    HEFESTO_DEBUG_INFO(0, "synchk/WHILE CHECKER --\n");
 
     b = &buf[0];
     for (s = statement; *s != 0 &&
@@ -903,10 +879,8 @@ static hefesto_int_t synchk_while_statement(const char *statement,
                 inc_current_line_number();
             }
             if (*s == '{') {
-                HEFESTO_DEBUG_INFO(0, "synchk/WHILE CHECKER command list\n");
                 result = synchk_command_list(s, lo_vars, gl_vars, fn);
             } else {
-                HEFESTO_DEBUG_INFO(0, "synchk/WHILE CHECKER production\n");
                 result = synchk_check_language_production(s, &lo_vars,
                                                           gl_vars, fn);
             }
@@ -917,8 +891,6 @@ static hefesto_int_t synchk_while_statement(const char *statement,
         free(b);
     }
     is_inside_a_loop--;
-    HEFESTO_DEBUG_INFO(0, "-- synchk/WHILE CHECKER = %d %d\n", result,
-                       last_production_checked_was_if);
 
     return result;
 
@@ -1408,8 +1380,6 @@ static hefesto_int_t synchk_ret_statement(const char *statement,
     char buf[HEFESTO_MAX_BUFFER_SIZE], *b;
     hefesto_int_t result = 0;
     hefesto_var_list_ctx *vp;
-
-    HEFESTO_DEBUG_INFO(0, "synchk/synchk_ret_statement = %s\n", statement);
 
     b = &buf[0];
 
@@ -2492,8 +2462,6 @@ static hefesto_int_t synchk_is_file_descriptor(const char *var,
     if (!(vp = get_hefesto_var_list_ctx_name(var+1, lo_vars))) {
         vp = get_hefesto_var_list_ctx_name(var+1, gl_vars);
     }
-
-    HEFESTO_DEBUG_INFO(0, "VP = %x\n", vp);
 
     if (vp != NULL) {
         result = (vp->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR);

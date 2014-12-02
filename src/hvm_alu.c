@@ -277,8 +277,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
     size_t offset, osize;
     hefesto_type_t etype;
 
-    HEFESTO_DEBUG_INFO(0, "hvm_alu/operand: %s\n", operand);
-
     hefesto_func_list_ctx *fp;
 
     if (*vtype < HEFESTO_VAR_TYPE_UNTYPED && *vtype > HEFESTO_VAR_TYPE_NONE) {
@@ -287,7 +285,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
 
     if (*operand == '$')  {
 
-        HEFESTO_DEBUG_INFO(0, "hvm_alu/is var\n");
         var_name = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
 
         if (strstr(operand, "[") > 0) {
@@ -316,19 +313,15 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
             *v = 0;
         }
 
-        HEFESTO_DEBUG_INFO(0, "hvm_alu/var_name: %s\n", var_name);
-
         vp = get_hefesto_var_list_ctx_name(var_name+1, *lo_vars);
 
         if (vp == NULL) vp = get_hefesto_var_list_ctx_name(var_name+1, *gl_vars);
         free(var_name);
 
         var_name = operand;
-        HEFESTO_DEBUG_INFO(0, "hvm_alu/var_name: %x %x %x\n", vp, *lo_vars,
-                                                              *gl_vars);
+
         if (vp) {
             *vtype = vp->type;
-            HEFESTO_DEBUG_INFO(0, "hvm_alu/*vtype = %d\n", *vtype);
 
             if (vp->type != HEFESTO_VAR_TYPE_LIST) {
 
@@ -366,16 +359,11 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
                 if (*o == '.') {
                     result = hvm_list_method(operand, &vp->contents, &etype,
                                              lo_vars, gl_vars, functions);
-                    HEFESTO_DEBUG_INFO(0,
-                        "hvm_alu/list method otype: %d\n", etype);
                     *vtype = etype;
                 } else {
                     *vtype = HEFESTO_VAR_TYPE_LIST;
-                    HEFESTO_DEBUG_INFO(0, 
-                        "hvm_alu/copiei a lista de %x para %x\n", vp->contents,
-                                                                  result);
+
                     if (vp->contents == NULL) {
-                        HEFESTO_DEBUG_INFO(0, "hvm_alu/bogus item adding...\n");
                         foo = 0;
                         vp->contents = 
                             add_data_to_hefesto_common_list_ctx(vp->contents,
@@ -392,7 +380,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
         }
 
     } else {
-        HEFESTO_DEBUG_INFO(0, "hvm_alu/operand: '%s'\n", operand);
         if (strstr(operand, "not") == operand) {
             offset = 4;
             var_name = get_next_expression_from_buffer(operand, &offset);
@@ -423,7 +410,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
                 result = hefesto_sys_call(operand, lo_vars, gl_vars, functions,
                                           &etype);
                 *vtype = etype;
-                HEFESTO_DEBUG_INFO(0, "hvm_alu/syscall otype: %d\n", etype);
             } else if (strstr(operand, HEFESTO_TOOLSET_COMMAND) != NULL) {
                 sub_expr = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
                 v = sub_expr;
@@ -440,8 +426,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
                     result = hvm_toolset_call_command(operand,
                                         HEFESTO_CURRENT_TOOLSET->commands,
                                         lo_vars, gl_vars, functions);
-                    HEFESTO_DEBUG_INFO(0,
-                        "hvm_alu/toolset result = %s\n", result);
                 } else {
                     result = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
                     strncpy(result, "(null)", HEFESTO_MAX_BUFFER_SIZE-1);
@@ -453,7 +437,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
             } else if ((fp = get_hefesto_func_list_ctx_name(var_name,
                                                             functions))) {
                 strcat(operand, ")");
-                HEFESTO_DEBUG_INFO(0, "function call: %s\n", operand);
                 result = hvm_call_function(operand, lo_vars, gl_vars, functions);
                 *vtype = fp->result_type;
             }
@@ -483,7 +466,6 @@ static char *get_method_call(char *buf, char *expression, size_t *offset) {
         *b = *c;
     free(mcall);
     *b = 0;
-    HEFESTO_DEBUG_INFO(0, "hvm_alu/*** method: %s\n", buf);
     return b;
 }
 
@@ -625,9 +607,6 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                 *vtype = HEFESTO_VAR_TYPE_STRING;
 
             } else {
-                HEFESTO_DEBUG_INFO(0,
-                 "hvm_alu/vtype diferente de string, list e list[], etype: %d\n",
-                                                                         *etype);
                 operand = operand_aux;
             }
 
@@ -665,8 +644,6 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                 *etype = (*etype == HEFESTO_VAR_TYPE_UNTYPED) ? *vtype : *etype;
             } else {
                 *vtype = *etype;
-                HEFESTO_DEBUG_INFO(0, "hvm_alu/etype: %d operand: %d\n", vtype,
-                                                                      operand);
             }
 
             if (*vtype == HEFESTO_VAR_TYPE_INT) {
@@ -674,11 +651,6 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
             } else if (*vtype == HEFESTO_VAR_TYPE_STRING) {
                 dsize = strlen((char *)operand);
             } else if (*vtype == HEFESTO_VAR_TYPE_LIST) {
-                HEFESTO_DEBUG_INFO(0, "hvm_alu: operand var address: %d\n",
-                                                                  operand);
-                HEFESTO_DEBUG_INFO(0,
-                 "hvm_alu: is_dummy_item: %d\n", 
-                      ((hefesto_common_list_ctx *)operand)->is_dummy_item);
                 // INFO(Santiago): pus isso no lugar da linha de cima para
                 // retirar uns issues do valgrind, relacionada com
                 // "invalid read of size 1"...
@@ -705,8 +677,6 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
         state++;
 
     } else {
-
-        HEFESTO_DEBUG_INFO(0, "is op!\n");
 
         op[0] = *expression;
 
@@ -791,7 +761,6 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
     hefesto_int_t state = 0;
     struct hvm_alu_evaluate_return eval_ret;
 
-    HEFESTO_DEBUG_INFO(0, "hvm_alu/evaluating expression = %s\n", expr);
     buf = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
     b = buf;
 
@@ -890,8 +859,6 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
         result = bp->data;
         bp->data = NULL;
         del_hefesto_common_stack_ctx(bp);
-        HEFESTO_DEBUG_INFO(0, 
-          "hvm_alu/result agora tem endereco: %d e vtype: %d\n", result, vtype);
     }
 
     del_hefesto_common_stack_ctx(sp);
@@ -902,7 +869,6 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
         *outsz =
           get_hefesto_common_list_ctx_count((hefesto_common_list_ctx *)result);
     }
-    HEFESTO_DEBUG_INFO(0, "hvm_alu/expr_eval finis.\n");
 
     return result;
 
