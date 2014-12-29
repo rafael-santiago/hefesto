@@ -488,11 +488,8 @@ static hefesto_int_t is_short_circuit_op(const char *expr) {
     for (ep = expr; *ep != 0; ep++) {
         if (is_op(*ep)) {
             if (*ep == '&' || *ep == '|') {
-                if (*(ep + 1) != 0) {
-                    retval = (*ep == '&') ? (*(ep + 1) == '&') : (*(ep + 1) == '|');
-                    if (retval == 1) {
-                        retval = get_op_index((*ep == '&') ? "&&" : "||");
-                    }
+                if (*(ep + 1) != 0 && (*(ep + 1) == '&' || *(ep + 1) == '|')) {
+                    retval = get_op_index((*ep == '&') ? "&&" : "||");
                 }
                 if (retval != -1) {
                     break;
