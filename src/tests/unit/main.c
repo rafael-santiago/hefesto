@@ -3202,6 +3202,11 @@ char *infix2postfix_tests() {
     expected_result = "($option_item,$extensions,$extensions_root_dir)";
     HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
+    expr = "$sum + ((($hi_byte << 8) | $lo_byte))";
+    expected_result = "$sum $hi_byte 8 << $lo_byte | +";
+    pfixd_args = infix2postfix(expr, strlen(expr), 1);
+    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
     printf("-- passed.\n");
     return NULL;
 }

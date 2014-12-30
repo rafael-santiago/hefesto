@@ -197,7 +197,7 @@ char *infix2postfix(const char *expr, const size_t esize, const hefesto_int_t ma
         } else if(strcmp(term, ")") == 0) {
             t = (char *)hefesto_common_stack_ctx_data_on_top(sp);
             if (t && strcmp(t, "(") != 0) {
-                while (sp) {
+                while (sp && sp->data != NULL && strcmp(sp->data, "(") != 0) {
                     lp = add_data_to_hefesto_common_list_ctx(lp,
                                     hefesto_common_stack_ctx_data_on_top(sp),
                                     hefesto_common_stack_ctx_dsize_on_top(sp));
