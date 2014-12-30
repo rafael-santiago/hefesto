@@ -1511,13 +1511,15 @@ static hefesto_int_t synchk_hefesto_sys_ls(const char *usr_calling,
     }
 
     if (args) {
-        regex = hvm_str_format(args, &lo_vars, &gl_vars, functions);
-        if (is_hefesto_string(args) && (sp = here_compile(regex, NULL))) {
-            if (sp != NULL) {
-                del_here_search_program_ctx(sp);
+        if (is_hefesto_string(args)) {
+            regex = hvm_str_format(args, &lo_vars, &gl_vars, functions);
+            if ((sp = here_compile(regex, NULL))) {
+                if (sp != NULL) {
+                    del_here_search_program_ctx(sp);
+                }
+                free(args);
+                return 1;
             }
-            free(args);
-            return 1;
         } else if (*args == '$') {
             vp = get_hefesto_var_list_ctx_name(args+1, lo_vars);
             if (!vp) vp = get_hefesto_var_list_ctx_name(args+1, gl_vars);
