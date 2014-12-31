@@ -613,7 +613,9 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
         // string nas funcoes de operadores!!!
         *etype = *vtype;
         if (operand == NULL) {
-
+            if (*etype == HEFESTO_VAR_TYPE_LIST && *letype != HEFESTO_VAR_TYPE_LIST) {
+                *letype = *etype;
+            }
             switch (*letype) {
 
                 case HEFESTO_VAR_TYPE_INT:
