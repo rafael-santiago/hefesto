@@ -624,7 +624,7 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                     break;
 
                 case HEFESTO_VAR_TYPE_STRING:
-                    operand = (char *) hefesto_mloc(1);
+                    operand = (char *) hefesto_mloc(sizeof(hefesto_int_t));
                     break;
 
                 case HEFESTO_VAR_TYPE_LIST:
