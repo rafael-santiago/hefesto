@@ -13,6 +13,7 @@
 #include "options.h"
 #include "hvm_rqueue.h"
 #include "hvm_toolset.h"
+#include "conv.h"
 #include <stdio.h>
 
 hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
@@ -45,7 +46,7 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls
         qsize = get_hefesto_options_ctx_option(HEFESTO_QSIZE_OPTION_LABEL,
                                                HEFESTO_OPTIONS);
         if (qsize != NULL) {
-            qsize_value = atoi(qsize->data->data);
+            qsize_value = hefesto_atoi(qsize->data->data);
             hvm_rqueue_set_queue_size(qsize_value);
         }
 

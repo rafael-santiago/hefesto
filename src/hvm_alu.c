@@ -18,6 +18,7 @@
 #include "hvm_func.h"
 #include "synchk.h"
 #include "hvm_project.h"
+#include "conv.h"
 #include <string.h>
 
 struct hvm_alu_evaluate_return {
@@ -257,7 +258,7 @@ static void *eval_numeric_constant(char *n, size_t *osize) {
     if (*n == '0' && n+1 && *(n+1) == 'x' && n+2) {
         *result = strtol(n+2, NULL, 16);
     } else {
-        *result = atoi(n);
+        *result = hefesto_atoi(n);
     }
 
     return (void *) result;
