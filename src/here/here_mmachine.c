@@ -1,3 +1,10 @@
+/*
+ *                              Copyright (C) 2013 by Rafael Santiago
+ *
+ * This is free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include "here_mmachine.h"
 #include "here_mem.h"
 #include "here_ctx.h"
@@ -97,6 +104,12 @@ here_search_result_ctx *here_execute_search_program(const char *buffer,
                 printf("(buffer end)\n");
             }
 */
+            if (search_program->ctype == HERE_CTYPE_START &&
+                search_program->next == next_step &&
+                search_result->start_at != buffer) {
+                break;
+            }
+
             if (next_step == search_program) {
                 start_at = search_result->start_at;
             }

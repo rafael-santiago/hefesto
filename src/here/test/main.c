@@ -1,3 +1,10 @@
+/*
+ *                              Copyright (C) 2013 by Rafael Santiago
+ *
+ * This is free software. You can redistribute it and/or modify under
+ * the terms of the GNU General Public License version 2.
+ *
+ */
 #include "../here.h"
 #include "htest.h"
 #include <stdio.h>
@@ -133,6 +140,8 @@ char *here_matching_test() {
         {"file_io.c", ".*\\.(h|hpp)$", 0},
         {"hmod-freebsd-port.path", ".*\\.(c|cc|cpp|C|CC|CPP|h|H|Hpp|hpp|HPP)$", 0},
         {"hmod-freebsd-port.path", "\\..*(h|hpp)$", 1},
+        {"7202 bytes sent", "^(202|421|426|450|500|501|503|530|550|553|666|777|999) ", 0},
+        {"202 bytes sent", "^(202|421|426|450|500|501|503|530|550|553|666|777|999) ", 1},
         {NULL, NULL, 0}
     };
     int m, retval;
