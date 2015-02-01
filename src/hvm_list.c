@@ -206,7 +206,7 @@ static void *hvm_list_item(const char *method,
             ((*list_var)->dsize == 1 || (*list_var)->is_dummy_item)) &&*/
         is_int) {
 
-        if (p && p->dsize != sizeof(hefesto_int_t)) {
+        if (p && vp != NULL && vp->subtype != HEFESTO_VAR_TYPE_INT) {
             free(result);
             result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
             *(hefesto_int_t *)result = hvm_str_to_int(p->data);

@@ -1692,12 +1692,12 @@ char *hvm_function_recurssion_tests() {
     // else you f_cked something.
     result = hvm_call_function("fatorial(3)", &lo_vars, &gl_vars, function);
     HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 6", *(int *)result == 6);
+    HTEST_CHECK("result != 6", *(hefesto_int_t *)result == 6);
     free(result);
     result = hvm_call_function("fatorial(0)", &lo_vars, &gl_vars, function);
     HTEST_CHECK("result == NULL", result != NULL);
     // result must interrupts execution and go back...
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    HTEST_CHECK("result != 1", *(hefesto_int_t *)result == 1);
     free(result);
     del_hefesto_func_list_ctx(function);
     printf("-- passed.\n");
@@ -2512,7 +2512,7 @@ char *hvm_get_func_addr_call_func_addr_syscall_test() {
 
 char *hvm_syscalls_tests() {
 
-    // XXX: these are not tested syscalls:
+    // XXX: these are untested syscalls:
     //  hefesto_sys_echo, hefesto_sys_prompt, hefesto_sys_exit,
     //  hefesto_sys_get_option, hefesto_sys_last_forge_result,
     //  hefesto_sys_forge.
@@ -3313,6 +3313,67 @@ char *hvm_short_circuit_mode_tests() {
 
 #endif
 
+char *hvm_list_int_list_values_tests() {
+    char *hsl_code = "function test_cast() : result type int {\n"
+                     " var i_list type list;\n"
+                     " var e_list type list;\n"
+                     " $i_list.add_item(10);\n"
+                     " $i_list.add_item(9);\n"
+                     " $i_list.add_item(8);\n"
+                     " $i_list.add_item(7);\n"
+                     " $i_list.add_item(6);\n"
+                     " $i_list.add_item(5);\n"
+                     " $i_list.add_item(4);\n"
+                     " $i_list.add_item(3);\n"
+                     " $i_list.add_item(2);\n"
+                     " $i_list.add_item(1);\n"
+                     " $e_list.add_item(9);\n"
+                     " $e_list.add_item(8);\n"
+                     " $e_list.add_item(7);\n"
+                     " $e_list.add_item(6);\n"
+                     " $e_list.add_item(5);\n"
+                     " $e_list.add_item(4);\n"
+                     " $e_list.add_item(3);\n"
+                     " $e_list.add_item(2);\n"
+                     " $e_list.add_item(1);\n"
+                     " $e_list.add_item(0);\n"
+                     " var i type int;\n"
+                     " var pass type int;\n"
+                     " $i = 0;\n"
+                     " $pass = 1;\n"
+                     " while ($i < $i_list.count() && $pass) {\n"
+                     "  var eval type int;\n"
+                     "  var expc type int;\n"
+                     "  $eval = $i_list.item($i) - 1;\n"
+                     "  $expc = $e_list.item($i);\n"
+                     "  $pass = ($eval == $expc);\n"
+                     "  hefesto.sys.echo(\" \t [HSL exec info: eval=\" +"
+                     "                          $eval + \" expc=\" + $expc + \" pass=\" + $pass + \"]\n\");\n"
+                     "  $i = $i + 1;\n"
+                     " }\n"
+                     " result $pass;\n"
+                     "}\n";
+    hefesto_func_list_ctx *functions = NULL;
+    hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
+    hefesto_int_t errors = 0;
+    void *retval;
+    printf("-- running hvm_list_int_list_values_tests\n");
+    create_test_code("lt_hsl.hsl", hsl_code);
+    functions = compile_and_load_hsl_code("lt_hsl.hsl",
+                                          &errors,
+                                          &gl_vars, NULL, NULL);
+    remove("lt_hsl.hsl");
+    HTEST_CHECK("functions == NULL", functions != NULL);
+    retval = hvm_call_function("test_cast()",
+                                &lo_vars, &gl_vars, functions);
+    HTEST_CHECK("retval == NULL", retval != NULL);
+    HTEST_CHECK("retval != 1", *(hefesto_int_t *)retval == 1);
+    free(retval);
+    del_hefesto_func_list_ctx(functions);
+    printf("-- passed.\n");
+    return NULL;
+}
+
 char *run_tests() {
     printf("* running tests...\n");
     HTEST_RUN(hefesto_common_stack_ctx_tests);
@@ -3334,6 +3395,7 @@ char *run_tests() {
 #ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
     HTEST_RUN(hvm_short_circuit_mode_tests);
 #endif
+    HTEST_RUN(hvm_list_int_list_values_tests);
     return NULL;
 }
 

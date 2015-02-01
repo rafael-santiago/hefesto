@@ -1,7 +1,7 @@
 Codestyle
 ---------
 
-If you wish to contribute with this project, I adopt the following codestyle:
+If you want to contribute with this project, I follow this codestyle:
 
     * Codes with columns limited in 80-120 bytes
     * White spaces are used to separate the code in logical blocks, save your disorder for the next ioccc
@@ -11,7 +11,7 @@ If you wish to contribute with this project, I adopt the following codestyle:
     * Indentation deepness: 8 spaces
     * Use 0 as string delimitator instead of '\0'
     * Use NULL to represent null pointers
-    * Do not use ultraExplainedBoringNames, you're an C programmer, honor it or do a harakiri ;D
+    * Do not use ultraExplainedBoringNames, you're an C programmer, honor it or do a harakiri...
     * Static functions need to be prototyped at the module beginning
     * Pointers declaration: "void *vptr = NULL;" and not: "void* vptr = NULL;"
 
@@ -66,21 +66,22 @@ The way for switches is:
 Best practices
 --------------
 
-    * Give credit to yourself and keep the credit of others
-    * If you created a new feature be ready to include a acceptable documentation in your push request
+    * Give credit to yourself and keep the credit from others
+    * If you created a new feature be ready to include an acceptable documentation in your pull request
     * If you wish to create a new thing try to turn it possible in a straightforward way
     * Always seek to kill bugs in this way: "K.I.S.S! K.I.S.S! Bang! Bang!"
+    * What K.I.S.S does mean? Thank you, but goodbye!
     * Write tests
     * Don't trust in the unit tests only, build the application and *** always *** use it
     * Don't write crazy tests that in the future will make impossible needed fixes due to perform tests
-      in impossible situations
-    * Learn with musicians that reads transcriptions from other musicians, create the habit of code reading
+      under impossible situations
+    * Learn with musicians which read transcriptions from other musicians, create the code reading habit
       seeking to learning and not only for refactory issues
-    * I'm brazilian and I write comments in portuguese, if you speak portuguese and wish to comment with this language,
+    * I'm brazilian and I write comments in portuguese, if you speak portuguese too and wish to comment with this language,
       include if possible an english version of your comment
     * Your ideas and specialities in some subject is what are welcome in this project, these things need to
       stay even if you have gotten away, have been abducted or have gone to write code in BASIC, never retain information.
-      In this way your mind can produce more things here and in another place
+      In this way your mind can produce more things here and in other places
 
 Codestyle
 ---------
