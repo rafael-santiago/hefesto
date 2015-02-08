@@ -152,7 +152,7 @@ Boas práticas
 -------------
 
     * Se dê crédito e mantenha o crédito dos outros
-    * Se criou uma nova feature esteja pronto a incluir uma documentação aceitável no seu push request
+    * Se criou uma nova feature esteja pronto a incluir uma documentação aceitável no seu pull request
     * Se quiser criar algo novo tente possibilitar o resultado do jeito mais direto possível, o usuário
       não chama Ulisses para ter que passar um perrengue danado para alcançar o objetivo, nós
       desenvolvedores que temos que ser Ulisses o suficiente para fazer o difícil ridiculamente fácil

@@ -853,7 +853,6 @@ hefesto_type_t get_expression_out_type(const char *expression, hefesto_var_list_
         if (is_op(*ep) || *ep == '(' || *ep == ')' || is_hefesto_blank(*ep)) break;
     }
     *hp = 0;
-    printf("head-operator: %s\n", head_operator);
     if (head_operator[0] == '$') {
         vp = get_hefesto_var_list_ctx_name(&head_operator[1], lo_vars);
         if (vp == NULL) {
