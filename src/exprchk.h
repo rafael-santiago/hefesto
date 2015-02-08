@@ -28,4 +28,7 @@ char *get_next_string(const char *expression, size_t *offset);
 
 hefesto_int_t balanced_round_brackets(const char *expression);
 
+hefesto_type_t get_expression_out_type(const char *expression, hefesto_var_list_ctx *lo_vars,
+                                       hefesto_var_list_ctx *gl_vars, hefesto_func_list_ctx *functions);
+
 #endif

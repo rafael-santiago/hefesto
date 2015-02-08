@@ -1079,7 +1079,6 @@ hefesto_var_list_ctx *assign_data_to_hefesto_var(hefesto_var_list_ctx *var,
             var->contents =
                add_data_to_hefesto_common_list_ctx(var->contents, data, data_sz);
         }
-
     }
 
     return var;
@@ -1315,7 +1314,7 @@ hefesto_common_list_ctx *cp_hefesto_common_list_ctx(
     for (lp = list; lp; lp = lp->next) {
         result = add_data_to_hefesto_common_list_ctx(result, lp->data,
                                                      lp->dsize);
-        get_hefesto_common_list_ctx_tail(result)->is_dummy_item = 
+        get_hefesto_common_list_ctx_tail(result)->is_dummy_item =
                                                        lp->is_dummy_item;
     }
 

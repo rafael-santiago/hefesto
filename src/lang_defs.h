@@ -72,4 +72,6 @@ ssize_t get_hefesto_project_method_index(const char *method);
 
 const char *get_hefesto_project_method_from_index(const ssize_t index);
 
+hefesto_type_t get_hsl_list_subtype(hefesto_common_list_ctx *l_items);
+
 #endif

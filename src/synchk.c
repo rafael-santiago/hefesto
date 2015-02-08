@@ -992,6 +992,12 @@ hefesto_int_t synchk_function_call(const char *call, hefesto_var_list_ctx *lo_va
                                     HLSCM_SYN_ERROR_UNDECL_VAR_IN_FN_ARG_LIST,
                                     call, arg);
                             }
+                            if (get_expression_out_type(arg, lo_vars, gl_vars, functions) != va->type) {
+                                result = 0;
+                                hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                    HLSCM_SYN_ERROR_INCOMP_TYPE_IN_FN_ARG_LIST,
+                                    call, arg);
+                            }
                         } else if (vp->type != va->type) {
                             result = 0;
                             hlsc_info(HLSCM_MTYPE_SYNTAX,
@@ -1018,6 +1024,12 @@ hefesto_int_t synchk_function_call(const char *call, hefesto_var_list_ctx *lo_va
                         if (result == 0) {
                             result = is_valid_expression(arg, lo_vars,
                                                          gl_vars, functions);
+                            if (get_expression_out_type(arg, lo_vars, gl_vars, functions) != va->type) {
+                                result = 0;
+                                hlsc_info(HLSCM_MTYPE_SYNTAX,
+                                    HLSCM_SYN_ERROR_INCOMP_TYPE_IN_FN_ARG_LIST,
+                                    call, arg);
+                            }
                         }
                         if (result == 0) {
                             hlsc_info(HLSCM_MTYPE_SYNTAX,

@@ -9,6 +9,7 @@
 #include "parser.h"
 #include "mem.h"
 #include "structs_io.h"
+#include <ctype.h>
 #include <string.h>
 
 hefesto_instruction_code_t get_instruction_code(const char *usr_instruction,
@@ -437,4 +438,23 @@ const char *get_hefesto_project_method_from_index(const ssize_t index) {
         return HEFESTO_PROJECT_METHODS[index];
     }
     return NULL;
+}
+
+hefesto_type_t get_hsl_list_subtype(hefesto_common_list_ctx *l_items) {
+    int must_be_string = 1;
+    hefesto_common_list_ctx *li = l_items;
+    char *d, *d_end;
+    int symbol;
+    while (must_be_string && li != NULL) {
+        if (li->data != NULL) {
+            d_end = li->data + li->dsize;
+            for (d = (char *)li->data; d != d_end && must_be_string; d++) {
+                symbol = *d;
+                if (symbol == 0) continue;
+                must_be_string = isprint(symbol);
+            }
+        }
+        li = li->next;
+    }
+    return ((!must_be_string) ? HEFESTO_VAR_TYPE_INT : HEFESTO_VAR_TYPE_STRING);
 }

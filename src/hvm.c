@@ -565,6 +565,7 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
                     cp_hefesto_common_list_ctx((etype == HEFESTO_VAR_TYPE_LIST) ?
                                  (hefesto_common_list_ctx *)expr_result : NULL);
                 if (etype == HEFESTO_VAR_TYPE_LIST) {
+                    var->subtype = get_hsl_list_subtype((hefesto_common_list_ctx *)expr_result);
                     del_hefesto_common_list_ctx(
                         (hefesto_common_list_ctx *)expr_result);
                     expr_result = NULL;

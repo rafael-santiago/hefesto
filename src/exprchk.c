@@ -807,3 +807,70 @@ char *get_next_string(const char *expression, size_t *offset) {
 
     return string;
 }
+
+hefesto_type_t get_expression_out_type(const char *expression, hefesto_var_list_ctx *lo_vars,
+                                       hefesto_var_list_ctx *gl_vars, hefesto_func_list_ctx *functions) {
+    char head_operator[HEFESTO_MAX_BUFFER_SIZE];
+    char *hp = &head_operator[0];
+    char *hp_end = hp + HEFESTO_MAX_BUFFER_SIZE - 1;
+    const char  *ep = NULL, *ep_end = NULL;
+    hefesto_type_t otype = HEFESTO_VAR_TYPE_NONE;
+    hefesto_var_list_ctx *vp = NULL;
+    hefesto_func_list_ctx *fp = NULL;
+    if (expression == NULL) {
+        return HEFESTO_VAR_TYPE_NONE;
+    }
+    ep = expression;
+    ep_end = ep + strlen(expression);
+    while (ep != ep_end && (is_hefesto_blank(*ep) || *ep == '(')) {
+        ep++;
+    }
+    while (ep != ep_end && hp != hp_end) {
+        if (is_hefesto_string_tok(*ep)) {
+            *hp = *ep;
+            hp++;
+            ep++;
+            while (!is_hefesto_string_tok(*ep) && ep != ep_end && hp != hp_end) {
+                *hp = *ep;
+                if (*ep == '\\') {
+                    hp++;
+                    ep++;
+                    *hp = *ep;
+                }
+                hp++;
+                ep++;
+            }
+            if (is_hefesto_string_tok(*ep)) {
+                *hp = *ep;
+                hp++;
+                break;
+            }
+        } else {
+            *hp = *ep;
+            ep++;
+            hp++;
+        }
+        if (is_op(*ep) || *ep == '(' || *ep == ')' || is_hefesto_blank(*ep)) break;
+    }
+    *hp = 0;
+    printf("head-operator: %s\n", head_operator);
+    if (head_operator[0] == '$') {
+        vp = get_hefesto_var_list_ctx_name(&head_operator[1], lo_vars);
+        if (vp == NULL) {
+            vp = get_hefesto_var_list_ctx_name(&head_operator[1], gl_vars);
+        }
+        if (vp != NULL) {
+            otype = vp->type;
+        }
+    } else if (is_hefesto_string(head_operator)) {
+        otype = HEFESTO_VAR_TYPE_STRING;
+    } else if (is_hefesto_numeric_constant(head_operator)) {
+        otype = HEFESTO_VAR_TYPE_INT;
+    } else {
+        fp = get_hefesto_func_list_ctx_scoped_name(head_operator, get_current_compile_input(), functions);
+        if (fp != NULL) {
+            otype = fp->result_type;
+        }
+    }
+    return otype;
+}

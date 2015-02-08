@@ -250,13 +250,14 @@ void hvm_init_function_args(const char *args,
             if (vlp != NULL) {
                 vp->subtype = vlp->subtype;
             } else {
-                if (((hefesto_common_list_ctx *)expr_result)->data &&
+                vp->subtype = get_hsl_list_subtype((hefesto_common_list_ctx *)expr_result);
+                /*if (((hefesto_common_list_ctx *)expr_result)->data &&
                      is_hefesto_numeric_constant(((hefesto_common_list_ctx *)
                                                     expr_result)->data)) {
                     vp->subtype = HEFESTO_VAR_TYPE_INT;
                 } else {
                     vp->subtype = HEFESTO_VAR_TYPE_STRING;
-                }
+                }*/
             }
             vp->contents =
               cp_hefesto_common_list_ctx((hefesto_common_list_ctx *)expr_result);
