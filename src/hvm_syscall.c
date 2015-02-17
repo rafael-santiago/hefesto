@@ -15,7 +15,7 @@
 #include "synchk.h"
 #include "lang_defs.h"
 #include "structs_io.h"
-#include "here/here.h"
+#include <here.h>
 #include "os_detect.h"
 #include "hlsc_msg.h"
 #include "hvm.h"

@@ -11,7 +11,7 @@
 #include "mem.h"
 #include "structs_io.h"
 #include "synchk.h"
-#include "here/here.h"
+#include <here.h>
 #include "vfs.h"
 #include "hvm.h"
 #include "hvm_str.h"

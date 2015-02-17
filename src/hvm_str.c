@@ -10,7 +10,7 @@
 #include "structs_io.h"
 #include "hvm_alu.h"
 #include "hvm_alu.h"
-#include "here/here.h"
+#include <here.h>
 #include "synchk.h"
 #include "hvm.h"
 #include "hlsc_msg.h"

@@ -36,7 +36,7 @@ project hefesto : toolset "gcc-c-app" : dependencies $deps :
                                                      "../bin/hefesto";
 
 function config_basic_ld_deps() : result type none {
-    $ldflags.add_item("here/libhere.a");
+    $ldflags.add_item("here/src/libhere.a");
     var os type string;
     $os = hefesto.sys.os_name();
     if ($os == "linux") {
@@ -56,9 +56,9 @@ hefesto.prologue() {
     hefesto.sys.echo("-- building...\n");
     if (hfst_version_config() == 1) {
         # Now we'll invoke the libhere's forge
-        hefesto.sys.cd("here");
-        hefesto.sys.forge("here", "Forgefile.hsl", "--compile-model=debug");
-        hefesto.sys.cd("..");
+        hefesto.sys.cd("here/src");
+        hefesto.sys.forge("here", "Forgefile.hsl", "--compile-model=debug --obj-output-dir=obj --bin-output-dir=lib");
+        hefesto.sys.cd("../..");
         # If all ok, now we forge the Hefesto app...
         if (hefesto.sys.last_forge_result() == 0) {
             # Getting user options if it exists
@@ -82,7 +82,7 @@ hefesto.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         # Now forging & running the unit tests
         hefesto.sys.cd("tests/unit");
-        hefesto.sys.forge("hfst-unit", "Forgefile.hsl", "");
+        hefesto.sys.forge("hfst-unit", "Forgefile.hsl", "--includes=../../here/src --libraries=../../here/src/lib");
         hefesto.sys.cd("../../");
         if (hefesto.sys.last_forge_result() == 0) {
             hefesto.sys.echo("-- build succeded.\n");

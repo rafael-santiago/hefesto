@@ -7,7 +7,7 @@
  */
 #include "synchk.h"
 #include "mem.h"
-#include "here/here.h"
+#include <here.h>
 #include "structs_io.h"
 #include "parser.h"
 #include "exprchk.h"

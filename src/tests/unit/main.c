@@ -12,7 +12,7 @@
 #include "../../dep_chain.h"
 #include "../../vfs.h"
 #include "../../hvm_toolset.h"
-#include "../../here/here.h"
+#include <here.h>
 #include "../../init.h"
 #include "../../expr_handler.h"
 
