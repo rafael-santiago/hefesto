@@ -1,7 +1,19 @@
 Building Hefesto
 ----------------
 
-In order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
+After done a git clone from "https://github.com/rafael-santiago/hefesto", some submodules is also needed... so:
+
+        git submodule init
+
+And still...
+
+        git submodule update
+
+Or in the moment of the hefesto's master cloning operation you should try:
+
+        git clone --recursive https://github.com/rafael-santiago/hefesto
+
+Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
 If you're on Linux/FreeBSD use: ./build.sh
 
@@ -16,7 +28,19 @@ The installation is pretty straightforward just follow the steps.
 Construindo o Hefesto
 ---------------------
 
-Para fazer o build do Hefesto da primeira vez você precisa usar o "src/build.sh" ou o "src/build.bat".
+Depois de feito um git clone à partir de "https://github.com/rafael-santiago/hefesto", alguns submódulos são também necessários... então:
+
+        git submodule init
+
+E ainda...
+
+        git submodule update
+
+Ou no momento em que você for clonar o master do hefesto... pode tentar:
+
+        git clone --recursive https://github.com/rafael-santiago/hefesto
+
+Agora, para fazer o build do Hefesto da primeira vez você precisa usar o "src/build.sh" ou o "src/build.bat".
 
 Se você está no Linux/FreeBSD use: ./build.sh
 
