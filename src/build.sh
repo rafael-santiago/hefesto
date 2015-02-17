@@ -18,15 +18,16 @@ else
     LINKERFLAGS="-ldl"
 fi
 
-LINKER_OPTS="-o../bin/hefesto dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
+LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
-                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/libhere.a -lpthread $LINKERFLAGS"
+                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/src/libhere.a -Ihere/src/ -lpthread $LINKERFLAGS"
 
-UNIT_TEST="-omain ../../dbg.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
+UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o ../../here/libhere.a -lpthread $LINKERFLAGS"
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o -lpthread $LINKERFLAGS\
+                    -lhere"
 
 ALL_OK=1
 
@@ -39,6 +40,11 @@ LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
 
 echo "### Compiling..."
 
+$COMPILER $COMPILER_OPTS conv.c
+if test $? -gt 0
+then
+    ALL_OK=0
+fi
 $COMPILER $COMPILER_OPTS dbg.c
 if test $? -gt 0
 then
@@ -195,8 +201,8 @@ then
     ALL_OK=0
 fi
 
-
-cd here
+ALL_OK=1
+cd here/src/
 $COMPILER $COMPILER_OPTS here.c
 if test $? -gt 0
 then
@@ -234,15 +240,12 @@ else
     ./here_unittest
 fi
 
-cd ..
-
-cd ..
-
 if test $? -gt 0
 then
     ALL_OK=0
 fi
 
+cd ../../../
 if test $ALL_OK -eq 1
 then
 echo "### Compiled."
@@ -252,8 +255,8 @@ echo "### Now running unit tests"
 # Running unit tests
 
 cd tests/unit
-$COMPILER -c main.c
-$COMPILER -c htest.c
+$COMPILER -c -I../../here/src main.c
+$COMPILER -c -I../../here/src htest.c
 $LINKER $UNIT_TEST
 ./main
 
