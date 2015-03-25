@@ -13,6 +13,10 @@
 
 #define HEFESTO_ARCH_X64 1
 
+#else
+
+#define HEFESTO_ARCH_X86 1
+
 #endif
 
 #endif

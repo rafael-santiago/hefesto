@@ -15,7 +15,7 @@
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
-static unsigned hefesto_int_t get_key_handle_from_wreg_path(const char *path);
+static hefesto_int_t get_key_handle_from_wreg_path(const char *path);
 
 static char *get_value_from_wreg_path(const char *path);
 
@@ -30,7 +30,7 @@ static char *get_subkey_from_winreg_path(const char *value_fullpath);
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
-static unsigned hefesto_int_t get_key_handle_from_wreg_path(const char *path) {
+static hefesto_int_t get_key_handle_from_wreg_path(const char *path) {
 
     const char *p, *pe;
     char handle[HEFESTO_MAX_BUFFER_SIZE], *h;
@@ -41,22 +41,22 @@ static unsigned hefesto_int_t get_key_handle_from_wreg_path(const char *path) {
         *h = *p;
     }
     if (strcmp(handle, "HKLM") == 0) {
-        return ((unsigned hefesto_int_t)HKEY_LOCAL_MACHINE);
+        return ((hefesto_int_t)HKEY_LOCAL_MACHINE);
     }
     if (strcmp(handle, "HKCU") == 0) {
-        return ((unsigned hefesto_int_t)HKEY_CURRENT_USER);
+        return ((hefesto_int_t)HKEY_CURRENT_USER);
     }
     if (strcmp(handle, "HKU") == 0) {
-        return ((unsigned hefesto_int_t)HKEY_USERS);
+        return ((hefesto_int_t)HKEY_USERS);
     }
     if (strcmp(handle, "HKCR") == 0) {
-        return ((unsigned hefesto_int_t)HKEY_CLASSES_ROOT);
+        return ((hefesto_int_t)HKEY_CLASSES_ROOT);
     }
     if (strcmp(handle, "HKCC") == 0) {
-        return ((unsigned hefesto_int_t)HKEY_CURRENT_CONFIG);
+        return ((hefesto_int_t)HKEY_CURRENT_CONFIG);
     }
 
-    return ((unsigned hefesto_int_t)-1);
+    return ((hefesto_int_t)-1);
 }
 
 static char *get_value_from_wreg_path(const char *path) {
