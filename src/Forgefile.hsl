@@ -17,6 +17,7 @@
 
 include ~/toolsets/gcc/gcc-app.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+include ~/string.hsl
 include version_handler.hsl
 
 var sources type list;
@@ -57,7 +58,7 @@ hefesto.prologue() {
     if (hfst_version_config() == 1) {
         # Now we'll invoke the libhere's forge
         hefesto.sys.cd("here/src");
-        hefesto.sys.forge("here", "Forgefile.hsl", "--compile-model=debug --obj-output-dir=obj --bin-output-dir=lib");
+        hefesto.sys.forge("here", "Forgefile.hsl", "--compile-model=release --obj-output-dir=obj --bin-output-dir=lib");
         hefesto.sys.cd("../..");
         # If all ok, now we forge the Hefesto app...
         if (hefesto.sys.last_forge_result() == 0) {
@@ -67,10 +68,13 @@ hefesto.prologue() {
             $ldflags = hefesto.sys.get_option("ldflags");
             $cflags = hefesto.sys.get_option("cflags");
             $cflags.add_item("-Wall");
+			var platform type string;
+			$platform = hefesto.sys.os_name();
+			$cflags.add_item("-DHEFESTO_TGT_OS=HEFESTO_" + strupr($platform));
             # Setting some basic dependencies needed for a successful linking
             config_basic_ld_deps();
             hefesto.sys.echo("--\n");
-            $deps = get_c_cpp_deps();
+            $deps = get_c_cpp_deps();			
             $sources.ls(".*\.c$");
         }
     } else {
@@ -82,7 +86,9 @@ hefesto.epilogue() {
     if (hefesto.sys.last_forge_result() == 0) {
         # Now forging & running the unit tests
         hefesto.sys.cd("tests/unit");
-        hefesto.sys.forge("hfst-unit", "Forgefile.hsl", "--includes=../../here/src --libraries=../../here/src/lib");
+		var platform type string;
+		$platform = hefesto.sys.os_name();
+        hefesto.sys.forge("hfst-unit", "Forgefile.hsl", "--includes=../../here/src --libraries=../../here/src/lib --cflags=-DHEFESTO_TGT_OS=HEFESTO_" + strupr($platform));
         hefesto.sys.cd("../../");
         if (hefesto.sys.last_forge_result() == 0) {
             hefesto.sys.echo("-- build succeded.\n");

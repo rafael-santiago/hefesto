@@ -21,7 +21,11 @@
 #define HEFESTO_WINDOWS         1
 #define HEFESTO_FREEBSD         2
 
+#ifndef HEFESTO_TGT_OS
+
 #define HEFESTO_TGT_OS HEFESTO_LINUX
+
+#endif
 
 #define HEFESTO_NULL_EVAL       "(null)"
 #define HEFESTO_NULL_EVAL_SZ    18
