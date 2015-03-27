@@ -2323,8 +2323,9 @@ char *hvm_syscalls_filesystem_tests() {
     remove("test_regex_cp/test.dat.b");
     remove("test_regex_cp/test.dat.c");
     remove("test_regex_cp/test.dat.d");
-    rmdir("test_regex_cp");
-    rmdir("test.dat.d");
+    rmdir("test_regex_cp/test.dat.d");
+	rmdir("test_regex_cp");
+	rmdir("test.dat.d");
 
     printf("-- passed.\n");
 
