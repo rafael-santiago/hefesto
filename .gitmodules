@@ -1,3 +1,6 @@
 [submodule "src/here"]
 	path = src/here
 	url = git://github.com/rafael-santiago/here.git
+[submodule "helios"]
+	path = helios
+	url = git://github.com/rafael-santiago/helios.git

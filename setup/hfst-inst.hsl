@@ -924,42 +924,42 @@ hefesto-install.prologue() {
         prepare_modules_src_paths($source_files);
     }
 
-    # The standard hls scripts
+    # A minimal hstd
 
-    $source_files.add_item("../include/toolsets/common/utils/lang/c/dependency_scanner.hsl");
-    $source_files.add_item("../include/toolsets/gcc/forges/common.hsl");
-    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_app_forge.hsl");
-    $source_files.add_item("../include/toolsets/gcc/forges/gcc_c_lib_forge.hsl");
-    $source_files.add_item("../include/toolsets/gcc/gcc-app.hsl");
-    $source_files.add_item("../include/toolsets/gcc/gcc-lib.hsl");
-    $source_files.add_item("../include/toolsets/gcc/README");
-    $source_files.add_item("../include/toolsets/latex/forges/latex_forge_stuff.hsl");
-    $source_files.add_item("../include/toolsets/latex/latex.hsl");
-    $source_files.add_item("../include/toolsets/null/null.hsl");
-    $source_files.add_item("../include/toolsets/java/forges/java_forge.hsl");
-    $source_files.add_item("../include/toolsets/java/java.hsl");
-    $source_files.add_item("../include/toolsets/java/README");
-    $source_files.add_item("../include/toolsets/vc/common/vssetupenv.hsl");
-    $source_files.add_item("../include/toolsets/vc/forges/common/vcutils.hsl");
-    $source_files.add_item("../include/toolsets/vc/forges/vc110_app_forge.hsl");
-    $source_files.add_item("../include/toolsets/vc/forges/vc110_lib_forge.hsl");
-    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_110.hsl");
-    $source_files.add_item("../include/toolsets/vc/forges/vc100_app_forge.hsl");
-    $source_files.add_item("../include/toolsets/vc/forges/vc100_lib_forge.hsl");
-    $source_files.add_item("../include/toolsets/vc/vcvarsall/vcvarsall_100.hsl");
-    $source_files.add_item("../include/toolsets/vc/README");
-    $source_files.add_item("../include/toolsets/vc/vc110-app.hsl");
-    $source_files.add_item("../include/toolsets/vc/vc110-lib.hsl");
-    $source_files.add_item("../include/toolsets/vc/vc100-app.hsl");
-    $source_files.add_item("../include/toolsets/vc/vc100-lib.hsl");
-    $source_files.add_item("../include/conv.hsl");
-    $source_files.add_item("../include/fsutil.hsl");
-    $source_files.add_item("../include/optutil.hsl");
-    $source_files.add_item("../include/string.hsl");
-    $source_files.add_item("../include/lsutil.hsl");
-    $source_files.add_item("../include/generators/codeblocks_project_generator.hsl");
-    $source_files.add_item("../include/generators/devcpp_project_generator.hsl");
-    $source_files.add_item("../include/generators/visualstudio_project_generator.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/common/utils/lang/c/dependency_scanner.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/forges/common.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/forges/gcc_c_app_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/forges/gcc_c_lib_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/gcc-app.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/gcc-lib.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/README");
+    $source_files.add_item("../helios/src/include/toolsets/latex/forges/latex_forge_stuff.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/latex/latex.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/null/null.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/java/forges/java_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/java/java.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/java/README");
+    $source_files.add_item("../helios/src/include/toolsets/vc/common/vssetupenv.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/forges/common/vcutils.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc110_app_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc110_lib_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vcvarsall/vcvarsall_110.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc100_app_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc100_lib_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vcvarsall/vcvarsall_100.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/README");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vc110-app.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vc110-lib.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vc100-app.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/vc100-lib.hsl");
+    $source_files.add_item("../helios/src/include/conv.hsl");
+    $source_files.add_item("../helios/src/include/fsutil.hsl");
+    $source_files.add_item("../helios/src/include/optutil.hsl");
+    $source_files.add_item("../helios/src/include/string.hsl");
+    $source_files.add_item("../helios/src/include/lsutil.hsl");
+    $source_files.add_item("../helios/src/include/generators/codeblocks_project_generator.hsl");
+    $source_files.add_item("../helios/src/include/generators/devcpp_project_generator.hsl");
+    $source_files.add_item("../helios/src/include/generators/visualstudio_project_generator.hsl");
 
     # The setup files
 
@@ -987,7 +987,7 @@ hefesto-install.prologue() {
         if ($uninst_opt.count() == 0) {
             prepare_modules_dest_paths($dest_files, $install_dir);
         }
-        # The standard hls scripts
+        # A minimal hstd
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_app_forge.hsl"));
@@ -1041,7 +1041,7 @@ hefesto-install.prologue() {
         if ($uninst_opt.count() == 0) {
             prepare_modules_dest_paths($dest_files, $install_dir);
         }
-        # The standard hls scripts
+        # A minimal hstd
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_app_forge.hsl"));
