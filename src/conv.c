@@ -13,9 +13,9 @@ hefesto_int_t hefesto_atoi(const char *value) {
     if (value == NULL) {
         return 0;
     }
-#ifdef HEFESTO_ARCH_X86
+//#ifdef HEFESTO_ARCH_X86
     return atoi(value);
-#else
-    return _atoi64(value);
-#endif
+//#else
+//    return _atoi64(value);
+//#endif
 }
