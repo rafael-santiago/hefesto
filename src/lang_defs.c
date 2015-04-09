@@ -454,6 +454,9 @@ hefesto_type_t get_hsl_list_subtype(hefesto_common_list_ctx *l_items) {
                 must_be_string = isprint(symbol);
             }
         }
+        if (!must_be_string && li->dsize != sizeof(hefesto_int_t)) {
+            return HEFESTO_VAR_TYPE_STRING;
+        }
         li = li->next;
     }
     return ((!must_be_string) ? HEFESTO_VAR_TYPE_INT : HEFESTO_VAR_TYPE_STRING);

@@ -27,6 +27,8 @@ struct hvm_alu_evaluate_return {
     hefesto_int_t *state;
 };
 
+static hefesto_type_t HVM_ALU_LAST_EVALUATED_TYPE = HEFESTO_VAR_TYPE_UNTYPED;
+
 static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
                                hefesto_var_list_ctx **gl_vars,
                                hefesto_func_list_ctx *functions,
@@ -870,8 +872,14 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
           get_hefesto_common_list_ctx_count((hefesto_common_list_ctx *)result);
     }
 
+    HVM_ALU_LAST_EVALUATED_TYPE = *etype;
+
     return result;
 
+}
+
+hefesto_type_t get_last_evaluated_type() {
+    return HVM_ALU_LAST_EVALUATED_TYPE;
 }
 
 static void *eval_add(hefesto_common_stack_ctx *a,

@@ -17,6 +17,7 @@
 #include "hvm_str.h"
 #include "dep_chain.h"
 #include "hvm_project.h"
+#include "synchk.h"
 #include <string.h>
 
 static void hvm_set_current_executed_instruction(
@@ -566,6 +567,13 @@ static void *hvm_attrib(hefesto_command_list_ctx *cmd,
                                  (hefesto_common_list_ctx *)expr_result : NULL);
                 if (etype == HEFESTO_VAR_TYPE_LIST) {
                     var->subtype = get_hsl_list_subtype((hefesto_common_list_ctx *)expr_result);
+                    /*if (get_hefesto_common_list_ctx_count((hefesto_common_list_ctx *)expr_result) > 0) {
+                        if (is_hefesto_numeric_constant(((hefesto_common_list_ctx *)expr_result)->data)) {
+                            var->subtype = HEFESTO_VAR_TYPE_INT;
+                        } else {
+                            var->subtype = HEFESTO_VAR_TYPE_STRING;
+                        }
+                    }*/
                     del_hefesto_common_list_ctx(
                         (hefesto_common_list_ctx *)expr_result);
                     expr_result = NULL;

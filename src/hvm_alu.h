@@ -17,4 +17,8 @@ void *expr_eval(char *expr,
                 hefesto_func_list_ctx *functions,
                 hefesto_type_t *etype, size_t *outsz);
 
+hefesto_type_t get_last_evaluated_type();
+
+hefesto_type_t get_last_evaluated_subtype();
+
 #endif
