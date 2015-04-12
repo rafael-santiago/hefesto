@@ -521,7 +521,7 @@ static hefesto_int_t can_apply_short_circuit(char *expression,
             e++;
         }
     }
-    if (*eval_ret->state == 0 || (*eval_ret->state == 1 && (*e == '&' || *e == '|'))) {
+    if (*eval_ret->state == 1 && (*e == '&' || *e == '|')) {
         if ((op_index = is_short_circuit_op(expression)) > -1 &&
             !hefesto_common_stack_ctx_empty(*alu_stack)) {
             //  INFO(Santiago): (dtype == HEFESTO_VAR_TYPE_INT) indicates that we have at least "a"
