@@ -4,58 +4,58 @@
 
 ----
 
-**Resumo**: Nesse documento voc√™ encontra algumas informa√ß√µes relacionadas ao projeto. Minhas motiva√ß√µes. Detalhes gerais sobre a ``HSL``. Decis√µes de projeto. Loucas divaga√ß√µes e ideias que podem ferir as suas, se voc√™ for uma alma sens√≠vel... :-)
+**Resumo**: Nesse documento vocÍ encontra algumas informaÁıes relacionadas ao projeto. Minhas motivaÁıes. Detalhes gerais sobre a ``HSL``. Decisıes de projeto. Loucas divagaÁıes e ideias que podem ferir as suas, se vocÍ for uma alma sensÌvel... :-)
 
 ----
 
 ## Hefesto quem?!
 
-``Hefesto`` √© um *build system* nada ortodoxo prop√≠cio para gente conservadora odiar... O principal conceito dele √© evidenciar tudo o que est√° sendo feito em termos de *build* no seu projeto de *software* lhe oferecendo as ferramentas b√°sicas para isso.
+``Hefesto`` È um *build system* nada ortodoxo propÌcio para gente conservadora odiar... O principal conceito dele È evidenciar tudo o que est· sendo feito em termos de *build* no seu projeto de *software* lhe oferecendo as ferramentas b·sicas para isso.
 
-## A motiva√ß√£o
+## A motivaÁ„o
 
-*Hefesto* √© um *build system* que resolvi criar buscando responder algumas perguntas que sempre fiz em termos de *build systems*:
+*Hefesto* È um *build system* que resolvi criar buscando responder algumas perguntas que sempre fiz em termos de *build systems*:
 
-- Por que build systems adotam linguagens excessivamente declarativas?
-- Por que a sintaxe dessas linguagens em geral s√£o horrendas?
-- Por que o desenvolvedor n√£o pode se sentir programando o build?
+- Por que *build systems* adotam linguagens excessivamente declarativas?
+- Por que a sintaxe dessas linguagens em geral s„o horrendas?
+- Por que o desenvolvedor n„o pode se sentir programando o *build*?
 - Por que para que ele se sinta assim precisa empilhar tanta coisa junto?
-- √â feio, nada polido, prezar por.... concis√£o, completude e clareza?!
+- … feio, nada polido, prezar por.... concis„o, completude e clareza?!
 - Por que adotar a filosofia do caracol para se sentir em casa?
 
-Talvez √† medida que come√ßar descrever o que criei voc√™ note que o *Hefesto* n√£o √© necessariamente um *build system* mas sobre o que um *build system* na ess√™ncia √©.
+Talvez ‡ medida que comeÁar descrever o que criei vocÍ note que o *Hefesto* n„o È necessariamente um *build system* mas sobre o que um *build system* na essÍncia È.
 
 ### Automate or die!
 
-Eu desenvolvo *software* e gosto de automatizar coisas, qualquer tipo de tarefa repetitiva √© uma tortura para mim, pois eu poderia estar fazendo outra coisa no lugar da repeti√ß√£o.
+Eu desenvolvo *software* e gosto de automatizar coisas, qualquer tipo de tarefa repetitiva È uma tortura para mim, pois eu poderia estar fazendo outra coisa no lugar da repetiÁ„o.
 
-Atualizando minha √∫ltima afirma√ß√£o: eu desenvolvo *software* e gosto de pensar em coisas novas o tempo todo e por isso *preciso* automatizar.
+Atualizando minha ˙ltima afirmaÁ„o: eu desenvolvo *software* e gosto de pensar em coisas novas o tempo todo e por isso *preciso* automatizar.
 
-Ao meu ver a automatiza√ß√£o mais b√°sica no ciclo que envolve o desenvolvimento de um *software* remonta aos prim√≥rdios de seu surgimento, em outras palavras, remonta ao seu *build*.
+Ao meu ver a automatizaÁ„o mais b·sica no ciclo que envolve o desenvolvimento de um *software* remonta aos primÛrdios de seu surgimento, em outras palavras, remonta ao seu *build*.
 
-Temos incont√°veis formas de automatizar *builds* desde *shell scripts* e *batch files* arcanas, at√© os *Makefiles*, *Jamfiles* e etc.
+Temos incont·veis formas de automatizar *builds* desde *shell scripts* e *batch files* arcanas, atÈ os *Makefiles*, *Jamfiles* e etc.
 
-Ao longo das d√©cadas que venho programando j√° usei todos os que citei e mais alguns. Pessoalmente, nunca fui atendido por completo por nenhum deles e √†s vezes me irritaram muito.
+Ao longo das dÈcadas que venho programando j· usei todos os que citei e mais alguns. Pessoalmente, nunca fui atendido por completo por nenhum deles e ‡s vezes me irritaram muito.
 
-Vou itemizar uns aspectos gerais que me fizeram desistir deles e ++apenas (√† penas mesmo) us√°-los++ quando o "senso" comum me obriga:
+Vou itemizar uns aspectos gerais que me fizeram desistir deles e ++apenas (‡ penas mesmo) us·-los++ quando o "senso" comum me obriga:
 
-- Linguagens simb√≥licas;
-- Linguagens √†s vezes inpiradas na Whitespace;
-- O poder de fogo n√£o √© constante quando mudamos de plataforma;
-- √Äs vezes √© preciso instalar uma infinidade de coisa para manter o poder de fogo, sem necessidade se o build system tivesse sido bem pensado;
-- Documenta√ß√£o confusa e nada direta;
+- Linguagens simbÛlicas;
+- Linguagens [Whitespace-Like](http://pt.wikipedia.org/wiki/Whitespace);
+- O poder de fogo n„o È constante quando mudamos de plataforma;
+- ¿s vezes È preciso instalar uma infinidade de coisa para manter o poder de fogo, sem necessidade se o *build system* tivesse sido bem pensado;
+- DocumentaÁ„o confusa e nada direta;
 - Mistureba de Linguagens sem nenhuma necessidade;
-- Utiliza√ß√£o confusa, envolvendo duas ou mais ferramentas para cumprir todo o ciclo do processo de build;
-- Ferramentas visuais baseadas em XML que √© por sua vez horr√≠vel de versionar e tirar diffs, a coisa se torna ainda pior quando o XML √© gerado automaticamente;
-- Adaptar seu senso de qualidade e clareza nivelando por baixo, algo como, preciso pensar meu c√≠rculo assim pois meu *build system* me oferece uma lacuna no formato de um tri√¢ngulo... "Sim, veja! √â incr√≠vel como meu c√≠rculo se encaixa nesse tri√¢ngulo menor que ele!!! Por essa eu n√£o esperava...."
+- UtilizaÁ„o confusa, envolvendo duas ou mais ferramentas para cumprir todo o ciclo do processo;
+- Ferramentas visuais baseadas em *XML* que È por sua vez horrÌvel de versionar e tirar *diffs*, a coisa se torna ainda pior quando o *XML* È gerado automaticamente;
+- Adaptar seu senso de qualidade e clareza nivelando por baixo, algo como, preciso pensar meu cÌrculo assim pois meu *build system* me oferece uma lacuna no formato de um tri‚ngulo... "Sim, veja! … incrÌvel como meu cÌrculo se encaixa nesse tri‚ngulo menor que ele!!! Por essa eu n„o esperava...."
 
 ## Como funciona o *Hefesto*
 
-O *Hefesto* leva em considera√ß√£o que voc√™ √© um programador que ++conhece++ os compiladores que est√° usando. Se voc√™ se julga um *sniper* mas at√© hoje se limitou em usar armas de *paintball* pare de ler isso.
+O *Hefesto* leva em consideraÁ„o que vocÍ È um programador que ++conhece++ os compiladores que est· usando. Se vocÍ se julga um *sniper* mas atÈ hoje se limitou em usar armas de *paintball* pare de ler isso.
 
-Ele √© baseado no conceito de automatizar a ess√™ncia do processo de *build* de um *software* isso recai na compila√ß√£o e *linkedi√ß√£o*, na maioria das vezes. Sou programador *C* e o *Hefesto* √© em grande parte feito nela, quando n√£o, √© feito na linguagem que ele implementa, que por sinal vou apresentar depois de mostrar a cara de um *script* de *build* *Hefesto*.
+Ele È baseado no conceito de automatizar a essÍncia do processo de *build* de um *software* e isso recai na compilaÁ„o e *linkediÁ„o*, na maioria das vezes. Sou programador *C* e o *Hefesto* È em grande parte feito nela, quando n„o, È feito na Linguagem que ele implementa, que por sinal vou apresentar depois de mostrar a cara de um *script* de *build* *Hefesto*.
 
-Quase todo *build system* possui um arquivo m√°gico que se existe no diret√≥rio *sheebang!* No *Hefesto* n√£o... ele deixa voc√™ dar o nome que melhor se adequa ao
+Quase todo *build system* possui um arquivo m·gico que se existe no diretÛrio *sheebang!* No *Hefesto* n„o... ele deixa vocÍ dar o nome que melhor se adequa ao
 seu estado de coisas. Eu gosto de chamar os meus de ``Forgefiles``.
 
 Segue um exemplo de um ``Forgefile`` para uma *lib* escrita em *C*:
@@ -74,90 +74,90 @@ Segue um exemplo de um ``Forgefile`` para uma *lib* escrita em *C*:
         	$sources.ls(".*\\.c$");
         }
 
-A ``HSL`` j√° come√ßa aqui e continua dentro do ``toolset``. ``HSL`` pode ser entendida como ``H``efesto ``S``cripting ``L``anguage. √â a Linguagem que se usa tanto para criar *builds* ou para automatizar a ess√™ncia deles. As automatiza√ß√µes do ``essencial de um build`` pode ser entendido como sendo um ``toolset``.
+A ``HSL`` j· comeÁa aqui e continua dentro do ``toolset``. ``HSL`` pode ser entendida como ``H``efesto ``S``cripting ``L``anguage. … a Linguagem que se usa tanto para criar *builds* ou para automatizar a essÍncia deles. O conjunto de automatizaÁıes do ``essencial de um build`` pode ser entendido como um ``toolset``.
 
-Note que no ``Forgefile`` apresentado, ap√≥s o coment√°rio, √© feita uma inclus√£o bem sugestiva. Estamos incutindo nesse ``Forgefile`` uma base de conhecimento pr√©via que recai sobre como executar um *build* de uma biblioteca escrita em *C* usando o compilador *GCC*.
+Note que no ``Forgefile`` apresentado, apÛs o coment·rio, È feita uma inclus„o bem sugestiva. Estamos incutindo nesse ``Forgefile`` uma base de conhecimento prÈvia que recai sobre como executar um *build* de uma biblioteca escrita em *C* usando o compilador *GCC*.
 
-Depois disso, algo que muitos odeiam com paix√£o. Voc√™ precisa declarar tudo, absolutamente tudo o que vai usar. Algo como: "ei pessoal, preciso usar isso aqui ent√£o, com licen√ßa viu?".
+Depois disso, algo que muitos odeiam com paix„o. VocÍ precisa declarar tudo, absolutamente tudo o que vai usar. Algo como: "ei pessoal, preciso usar isso aqui ent„o, com licenÁa viu?".
 
-Do ponto de vista do *design de Linguagens de programa√ß√£o*, eu pessoalmente acho que a necessidade de declara√ß√£o de uma vari√°vel √© uma *feature* que salta do dispositivo direto para a consci√™ncia do usu√°rio, pois no momento da declara√ß√£o ele ser√° levado a pensar sobre o porqu√™ e se realmente precisa daquela vari√°vel naquele dado momento.
+Do ponto de vista do *design de Linguagens de programaÁ„o*, eu pessoalmente acho que a necessidade de declaraÁ„o de uma vari·vel È uma *feature* que salta do dispositivo direto para a consciÍncia do usu·rio, pois no momento da declaraÁ„o ele ser· levado a pensar sobre o porquÍ e se realmente precisa daquela vari·vel naquele dado momento.
 Salvo isso, continuemos...
 
-Essas vari√°veis declaradas s√£o utilizadas pela ``fun√ß√£o de forja`` (entenda por enquanto como o ponto de entrada para a parte mais interna do build).
+Essas vari·veis declaradas s„o utilizadas pela ``funÁ„o de forja`` (entenda por enquanto como o ponto de entrada para a parte mais interna do *build*).
 
-Ap√≥s a declara√ß√£o das vari√°veis, ``declaramos o projeto``. Dizendo algo na linha: 
+ApÛs a declaraÁ„o das vari·veis, ``declaramos o projeto``. Dizendo algo na linha: 
 
->"Esse projeto se chama "here" √© uma *lib* escrita em *C* que esperamos compilar com o *GCC*. Seguem os par√¢metros na ordem que o motor de build para esse tipo de coisa espera."
+>"Esse projeto se chama "here" È uma *lib* escrita em *C* que esperamos compilar com o *GCC*. Seguem os par‚metros na ordem que o motor de *build* para esse tipo de coisa espera."
 
-Esse ``toolset`` espera receber uma lista de ``c√≥digos`` para compilar, uma lista de diret√≥rios de ``includes`` usados durante a compila√ß√£o, uma lista de ``op√ß√µes de compila√ß√£o`` que o compilador em quest√£o entende e um ``nome para o arquivo`` que ser√° produzido pelo processo, em outras palavras a *lib* propriamente dita.
+Esse ``toolset`` espera receber uma lista de ``cÛdigos`` para compilar, uma lista de diretÛrios de ``includes`` usados durante a compilaÁ„o, uma lista de ``opÁıes de compilaÁ„o`` que o compilador em quest„o entende e um ``nome para o arquivo`` que ser· produzido pelo processo, em outras palavras a *lib* propriamente dita.
 
-Um problema com a maioria dos *build systems* √© quanto a defini√ß√£o dos c√≥digos a serem processados. Alguns deixam a coisa solta e podemos ler essa lista de qualquer lugar, outros n√£o disponibilizam mecanismos para isso.
+Um problema com a maioria dos *build systems* È quanto a definiÁ„o dos cÛdigos a serem processados. Alguns deixam a coisa solta e podemos ler essa lista de qualquer lugar, outros n„o disponibilizam mecanismos para isso.
 
-O *Hefesto* fica no meio termo, antes de um *build* come√ßar, √†s vezes, para n√£o dizer quase sempre... existem uma infinidade de coisas muito espec√≠ficas √†quele projeto que precisam ser feitas. Quando um projeto √© criado no *Hefesto*, juntamente com ele s√£o criados tr√™s pontos de entrada: ``preloading``, ``prologue`` e ``epilogue``.
+O *Hefesto* fica no meio termo, antes de um *build* comeÁar, ‡s vezes, para n„o dizer quase sempre... existem uma infinidade de coisas muito especÌficas ‡quele projeto que precisam ser feitas. Quando um projeto È criado no *Hefesto*, juntamente com ele s„o criados trÍs pontos de entrada: ``preloading``, ``prologue`` e ``epilogue``.
 
-Confira na **Tabela 1** em que momento do processo esses pontos de entrada s√£o atingidos. A ideia b√°sica aqui √©: se existe c√≥digo definido dentro deles, no momento esperado, esses c√≥digos ser√£o executados.
+Confira na **Tabela 1** em que momento do processo esses pontos de entrada s„o atingidos. A ideia b·sica aqui È: se existe cÛdigo definido dentro deles, no momento esperado, esses cÛdigos ser„o executados.
 
-**Tabela 1**: Os est√°gios de um projeto *Hefesto*.
+**Tabela 1**: Os est·gios de um projeto *Hefesto*.
 
 | **Project entry-point** |            **Executado**         |
 |:-----------------------:|:--------------------------------:|
 |      preloading         | Antes mesmo de carregar o toolset|
 |       prologue          | Antes da forja ser iniciada       |
-|       epilogue          | Ap√≥s a forja ser finalizada      |
+|       epilogue          | ApÛs a forja ser finalizada      |
 
-Esque√ßamos por hora o ``preloading`` e o ``epilogue``. Uma coisa muito b√°sica,
-sempre dever√° ser feita antes de come√ßar uma forja, que √© coletar os *file paths*
-dos c√≥digos que precisam ser processados. Ent√£o, no ``prologue`` do exemplo:
+EsqueÁamos por hora o ``preloading`` e o ``epilogue``. H· uma coisa muito b·sica que sempre dever· ser feita antes de comeÁar uma forja que È coletar os *file paths* dos cÛdigos que precisam ser processados. Ent„o, no ``prologue`` do exemplo:
 
 		here.prologue() {
         	$sources.ls(".*\\.c$");
         }
 
-N√£o se preocupe com o ``.ls()``... Nas se√ß√µes futuras quando descrever melhor a ``HSL`` os facilitadores de lista ser√£o apresentados e tudo talvez fa√ßa mais sentido.
+N„o se preocupe com o ``.ls()``... Nas seÁıes futuras quando descrever melhor a ``HSL`` os facilitadores de lista ser„o apresentados e tudo talvez faÁa mais sentido.
 
 Com o ``Forgefile`` escrito, a forja poderia ser invocada na linha de comando da seguinte forma:
 
 > ``hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=here``
 
-Note que na op√ß√£o ``--forgefiles`` s√£o especificados uma lista de arquivos contendo projetos. A outra op√ß√£o √© din√¢mica e baseada nos arquivos passados em ``--forgefiles``. O esquema geral dessa op√ß√£o din√¢mica √©:
+Note que na opÁ„o ``--forgefiles`` s„o especificados uma lista de arquivos contendo projetos. A outra opÁ„o È din‚mica e baseada nos arquivos passados em ``--forgefiles``. O esquema geral dessa opÁ„o din‚mica È:
 
 > ``--<file-name>-projects=<projects defined inside this file>``
 
-J√° sei:
+J· sei:
 
-> ZzZZzzzZzzzZzZZZZZZzzzzzzZzzzZzzzzzZZZZZZZzzzzZZZ que comando longo... n√£o posso digitar algo mais breve? 
+> ZzZZzzzZzzzZzZZZZZZzzzzzzZzzzZzzzzzZZZZZZZzzzzZZZ que comando longo... n„o posso digitar algo mais breve? 
 
-Pode sim, voc√™ precisa criar um arquivo de invoca√ß√£o e imolar 5 cabras em nome de *Hefesto*... O arquivo de invoca√ß√£o precisa estar no diret√≥rio onde voc√™ deseja invocar a forja, o nome desse arquivo √© ``.ivk`` e dentro dele voc√™ deve colocar a linha de comando exatamente como passaria para o *Hefesto*.
+Pode sim, vocÍ precisa criar um arquivo de invocaÁ„o e imolar 5 cabras em nome de *Hefesto*... O arquivo de invocaÁ„o precisa estar no diretÛrio onde vocÍ deseja invocar a forja, o nome desse arquivo È ``.ivk`` e dentro dele vocÍ deve colocar a linha de comando exatamente como passaria para o *Hefesto*.
 
-Com o ``.ivk`` configurado, estando no diret√≥rio dele, apenas digitando ``hefesto`` voc√™ ter√° a forja nos moldes padr√£o que voc√™ necessita, caso passe op√ß√µes nessa chamada, as op√ß√µes que voc√™ fornecer ter√£o preced√™ncia maior quando *mergeadas* com as op√ß√µes do arquivo de invoca√ß√£o.
+Com o ``.ivk`` configurado, estando no diretÛrio dele, apenas digitando ``hefesto`` vocÍ ter· a forja nos moldes padr„o que vocÍ necessita, caso passe opÁıes nessa chamada, as opÁıes que vocÍ fornecer ter„o precedÍncia maior quando *mergeadas* com as opÁıes do arquivo de invocaÁ„o.
 
-E quanto as cabras?! N√£o precisa, era s√≥ brincadeira...
+E quanto as cabras?! N„o precisa, era sÛ brincadeira...
 
-Pronto, agora voc√™ j√° sabe os passos b√°sicos para compor um ``Forgefile`` no *Hefesto*, mas o que voc√™ n√£o sabe ainda s√£o os detalhes gerais da ``HSL`` e de como criar mais ``toolsets`` que atendam suas necessidades.
+Pronto, agora vocÍ j· sabe os passos b·sicos para compor um ``Forgefile`` no *Hefesto*, mas o que vocÍ n„o sabe ainda s„o os detalhes gerais da ``HSL`` e de como criar mais ``toolsets`` que atendam suas necessidades.
 
-Os ``toolsets`` por sua vez s√£o por√ß√µes de c√≥digo ``HSL`` que podem ter suas pr√≥prias conven√ß√µes, conveni√™ncias e tal. Por isso, antes de us√°-los uma boa provid√™ncia √© consultar a documenta√ß√£o espec√≠fica desse ``toolset``. Se voc√™ o baixou da base oficial provavelmente encontrar√° algum texto que o detalhe.
+Os ``toolsets`` por sua vez s„o porÁıes de cÛdigo ``HSL`` que podem ter suas prÛprias convenÁıes, conveniÍncias e tal. Por isso, antes de us·-los uma boa providÍncia È consultar a documentaÁ„o especÌfica desse ``toolset``. Se vocÍ o baixou da base oficial provavelmente encontrar· algum texto que o detalhe.
 
-### Reprocessando somente o que mudou desde a √∫ltima forja, tem como?
+### Reprocessando somente o que mudou desde a ˙ltima forja, tem como?
 
-Sim, isso envolve requisitar essa necessidade na declara√ß√£o do projeto. Vamos usar o mesmo projeto de *lib* do exemplo anterior.
+Sim, isso envolve requisitar essa necessidade na declaraÁ„o do projeto. Vamos usar o mesmo projeto de *lib* do exemplo anterior.
 
-Anteriormente a declara√ß√£o era essa:
+Anteriormente a declaraÁ„o era essa:
 
 		project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, "libhere.a";
 
-Agora vamos incluir a especifica√ß√£o da cadeia de depend√™ncias ou ``dep-chain``. Uma ``dep-chain`` basicamente √© uma ``string`` expressa num formato especial:
+Agora vamos incluir a especificaÁ„o da cadeia de dependÍncias ou ``dep-chain``. Uma ``dep-chain`` basicamente È uma ``string`` expressa num formato especial:
 
 >``<file-path>`` **:**  ``<file-path_0>`` [ **&** ``<file-path_n>`` ] **;**
 
-Imagine que ``a.x`` depende de ``b.x`` que depende de ``c.x`` que por sua vez depende de ``d.x`` e ``e.x``. A ``dep-chain`` para essa situa√ß√£o seria:
+Imagine que ``a.x`` depende de ``b.x`` que depende de ``c.x`` que por sua vez depende de ``d.x`` e ``e.x``. A ``dep-chain`` para essa situaÁ„o seria:
 
 >a.x: b.x;
+>
 >b.x: c.x;
+>
 >c.x: d.x & e.x;
 
-No caso de programas reais isso pode ser bem massante de se escrever, a biblioteca padr√£o do ``Hefesto`` inclui fun√ß√µes em ``HSL`` que tentam inferir por meios heur√≠sticos a interdepend√™ncia entre os arquivos que comp√µem um projeto.
+No caso de programas reais isso pode ser bem massante de se escrever, a biblioteca padr„o do ``Hefesto`` inclui funÁıes em ``HSL`` que tentam inferir por meios heurÌsticos a interdependÍncia entre os arquivos que compıem um projeto.
 
-Segue um uso pr√°tico das ``dep-chains``:
+Segue um uso pr·tico das ``dep-chains``:
 
 		include ~/toolsets/gcc/gcc-lib.hsl
 		include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
@@ -179,33 +179,33 @@ Segue um uso pr√°tico das ``dep-chains``:
     		$sources.ls(".*\\.c$");
 		}
 
-Note que agora foi inclusa a diretiva ``dependencies <string>`` na declara√ß√£o do projeto, al√©m do uso da fun√ß√£o ``get_c_cpp_deps()`` importada de ``dependency_scanner.hsl``. Contudo, voc√™ mesmo poderia grafar a sua ``string`` de depend√™ncia, caso quisesse. Importante ressaltar que uma ``dep-chain`` mal formada √© silenciosamente descartada pelo aplicativo. Esteja sempre atento durante a composi√ß√£o delas.
+Note que agora foi inclusa a diretiva ``dependencies <string>`` na declaraÁ„o do projeto, alÈm do uso da funÁ„o ``get_c_cpp_deps()`` importada de ``dependency_scanner.hsl``. Contudo, vocÍ mesmo poderia grafar a sua ``string`` de dependÍncia, caso quisesse. Importante ressaltar que uma ``dep-chain`` mal formada È silenciosamente descartada pelo aplicativo. Esteja sempre atento durante a composiÁ„o delas.
 
-E Pronto! Apenas com isso seus arquivos come√ßar√£o serem processados somente quando houverem altera√ß√µes expl√≠citas neles ou em algum outro arquivo que eles dependam.
+E Pronto! Apenas com isso seus arquivos comeÁar„o serem processados somente quando houverem alteraÁıes explÌcitas neles ou em algum outro arquivo que eles dependam.
 
-#### Como for√ßar o reprocessamento de tudo?
+#### Como forÁar o reprocessamento de tudo?
 
-Use a op√ß√£o ``--forge-anyway`` ao invocar uma forja.
+Use a opÁ„o ``--forge-anyway`` ao invocar uma forja.
 
 #### Algo mais que deva saber sobre as *dep-chains*?
 
-Sim, quando voc√™ adota o uso de ``dep-chains`` em um projeto os seus argumentos durante a invoca√ß√£o da forja come√ßam ser monitorados. A decis√£o de projeto que adotei foi:
+Sim, quando vocÍ adota o uso de ``dep-chains`` em um projeto os seus argumentos durante a invocaÁ„o da forja comeÁam ser monitorados. A decis„o de projeto que adotei foi:
 
->Se existe um ``bit`` que seja de diferen√ßa entre os argumentos de forja atuais e os √∫ltimos de uma forja bem sucedida, **tudo ser√° reprocessado**. Ao meu ver o pre√ßo que se paga √© menor. Se n√£o h√° como saber que ``flag`` √© pass√≠vel de reprocessamento de um mar de ``flags`` √© mais confi√°vel sempre reprocessar e acabou. A praticidade cotidiana n√£o √© uma *top-model* mas na sua simplicidade traz seus encantos...
+>Se existe um ``bit`` que seja de diferenÁa entre os argumentos de forja atuais e os ˙ltimos de uma forja bem sucedida, **tudo ser· reprocessado**. Ao meu ver o preÁo que se paga È menor. Se n„o h· como saber que ``flag`` È passÌvel de reprocessamento de um mar de ``flags`` È mais confi·vel sempre reprocessar e acabou. A praticidade cotidiana n„o È uma *top-model* mas na sua simplicidade traz seus encantos...
 
->Sinceramente eu n√£o acho que programadores realmente ocupados e com objetivos reais e bem conscientes ficam macaqueando ``flags`` aleat√≥rias o tempo inteiro para um ``build`` ou disputando ``build-turfe`` por a√≠. Voc√™ conhece algum?!
+>Sinceramente eu n„o acho que programadores realmente ocupados e com objetivos reais e bem conscientes ficam macaqueando ``flags`` aleatÛrias o tempo inteiro para um ``build`` ou disputando ``build-turfe`` por aÌ. VocÍ conhece algum?!
 
-Uma altera√ß√£o de arquivo √© julgada **n√£o pela data de altera√ß√£o**, mas **com base no conte√∫do**. Com um ``bit`` de diferen√ßa um arquivo j√° ser√° considerado "sujo".
+Uma alteraÁ„o de arquivo È julgada **n„o pela data de alteraÁ„o**, mas **com base no conte˙do**. Com um ``bit`` de diferenÁa um arquivo j· ser· considerado "sujo".
 
 ### Yoda`s proposal: que tal em *run-time* o *toolset* mudar?
 
-Sim meu jovem *Luke*, n√£o tenha medo muito... isso √© poss√≠vel. Para isso s√≥ √© preciso ter uma precau√ß√£o *Jedi*: os *toolsets* a serem escolhidos devem possuir a mesma assinatura de fun√ß√£o para a fun√ß√£o de forja, em outras palavras, devem receber o mesmo n√∫mero de argumentos, na mesma ordem e tipo.
+Sim meu jovem *Luke*, n„o tenha medo muito... isso È possÌvel. Para isso sÛ È preciso ter uma precauÁ„o *Jedi*: os *toolsets* a serem escolhidos devem possuir a mesma assinatura de funÁ„o para a funÁ„o de forja, em outras palavras, devem receber o mesmo n˙mero de argumentos, na mesma ordem e tipo.
 
-Lembra quando foram apresentados os ``entry-points`` de um projeto de forja? Que o ``entry-point`` chamado ``preloading`` ocorre mesmo antes do ``toolset`` ao qual o projeto √© dependente ser carregado? Vamos usar esse ``big-bang`` para criar um *Forgefile* mais adapt√°vel ao ambiente.
+Lembra quando foram apresentados os ``entry-points`` de um projeto de forja? Que o ``entry-point`` chamado ``preloading`` ocorre mesmo antes do ``toolset`` ao qual o projeto È dependente ser carregado? Vamos usar esse ``big-bang`` para criar um *Forgefile* mais adapt·vel ao ambiente.
 
 Vamos pegar o projeto daquela *lib* apresentado e criar o seguinte requisito:
 
->Se estivermos no ``Windows`` daremos prefer√™ncia por usar o *Visual Studio 2012*, caso ele exista na m√°quina. N√£o existindo usaremos o *GCC*, nas demais plataformas usaremos sempre o *GCC*.
+>Se estivermos no ``Windows`` daremos preferÍncia por usar o *Visual Studio 2012*, caso ele exista na m·quina. N„o existindo usaremos o *GCC*, nas demais plataformas usaremos sempre o *GCC*.
 
 Vou apresentar o *Forgefile* alterado e comentar as partes interessantes depois.
 
@@ -272,23 +272,23 @@ Vou apresentar o *Forgefile* alterado e comentar as partes interessantes depois.
     		$sources.ls(".*\\.c$");
 		}
 
-A fun√ß√£o ``has_vs_110`` verifica no registro do sistema a entrada de chave existente caso haja o *Visual Studio* na m√°quina, leia a se√ß√£o ``Sobre a HSL`` que voc√™ entender√° a l√≥gica b√°sica e o uso de ``hefesto syscalls`` nessa fun√ß√£o. Se existir na m√°quina retornar√° 1, de outra forma 0.
+A funÁ„o ``has_vs_110`` verifica no registro do sistema a entrada de chave existente caso haja o *Visual Studio* na m·quina, leia a seÁ„o ``Sobre a HSL`` que vocÍ entender· a lÛgica b·sica e o uso de ``hefesto syscalls`` nessa funÁ„o. Se existir na m·quina retornar· 1, de outra forma 0.
 
-Note que no ``preloading`` do projeto apenas chamaremos essa fun√ß√£o se estivermos executando a forja sob o ``Windows`` (novamente, consulte a se√ß√£o ``Sobre a HSL``) e se existir o *Visual Studio* na m√°quina, setamos o nome do toolset para "vc110-lib". Caso contr√°rio, o ``toolset`` ser√° o padr√£o "gcc-c-lib". Pelo fato da declara√ß√£o possuir uma indire√ß√£o para o nome do ``toolset`` via a vari√°vel que setamos no ``preloading``:
+Note que no ``preloading`` do projeto apenas chamaremos essa funÁ„o se estivermos executando a forja sob o ``Windows`` (novamente, consulte a seÁ„o ``Sobre a HSL``) e se existir o *Visual Studio* na m·quina, setamos o nome do toolset para "vc110-lib". Caso contr·rio, o ``toolset`` ser· o padr„o "gcc-c-lib". Pelo fato da declaraÁ„o possuir uma indireÁ„o para o nome do ``toolset`` via a vari·vel que setamos no ``preloading``:
 
 		project here : toolset $current_toolset : dependencies $deps : $sources,
         			                                                   $includes,
                     			                                       $cflags,
                                 			                           "libhere.a" ;
 
-Passamos ter a sele√ß√£o do ``toolset`` em ``run-time``, pois quando o ``toolset`` estiver sendo carregado o ``Hefesto`` j√° vai ter passado pelo ``preloading`` do nosso projeto. Por esse motivo √© importante ter a mesma assinatura de forja entre os ``toolsets``, pois s√≥ podemos declarar um projeto uma vez. Mas isso vai da intelig√™ncia e mais do que isso, do senso de reutiliza√ß√£o do desenvolvedor dos ``toolsets`` que voc√™ for usar.
+Passamos ter a seleÁ„o do ``toolset`` em ``run-time``, pois quando o ``toolset`` estiver sendo carregado o ``Hefesto`` j· vai ter passado pelo ``preloading`` do nosso projeto. Por esse motivo È importante ter a mesma assinatura de forja entre os ``toolsets``, pois sÛ podemos declarar um projeto uma vez. Mas isso vai da inteligÍncia e mais do que isso, do senso de reutilizaÁ„o do desenvolvedor dos ``toolsets`` que vocÍ for usar.
 
-Mas ainda tem um "problema" nisso a√≠... observe no in√≠cio do exemplo:
+Mas ainda tem um "problema" nisso aÌ... observe no inÌcio do exemplo:
 
 		include ~/toolsets/gcc/gcc-lib.hsl
 		include ~/toolsets/vc/vc110-lib.hsl
 
-Nossa forja √© multiplataforma, mas n√£o precisamos incluir o m√≥dulo ``vc110-lib.hsl`` fora do ``Windows``, n√£o usaremos *Visual Studio* no ``Linux``, para que ocupar o ``Hefesto`` em processar esse m√≥dulo sem necessidade toda vez? Que tal melhorar para:
+Nossa forja È multiplataforma, mas n„o precisamos incluir o mÛdulo ``vc110-lib.hsl`` fora do ``Windows``, n„o usaremos *Visual Studio* no ``Linux``, para que ocupar o ``Hefesto`` em processar esse mÛdulo sem necessidade toda vez? Que tal melhorar para:
 
 		include ~/toolsets/gcc/gcc-lib.hsl
 		include on windows ~/toolsets/vc/vc110-lib.hsl
@@ -297,9 +297,9 @@ Pronto!
 
 ### Como rodo meus testes?
 
-Nada me irrita mais do que a necessidade de criar ``batch-files`` ou mesmo ``shell-scripts`` para rodar testes e outras tarefas pr√© e p√≥s compila√ß√£o. Organiza√ß√£o ao meu ver envolve uniformidade e quanto menos mistureba melhor e o para√≠so seria perfeito se pud√©ssemos deixar tudo dentro da mesma esfera.
+Nada me irrita mais do que a necessidade de criar ``batch-files`` ou mesmo ``shell-scripts`` para rodar testes e outras tarefas prÈ e pÛs compilaÁ„o. OrganizaÁ„o ao meu ver envolve uniformidade e quanto menos mistureba melhor e o paraÌso seria perfeito se pudÈssemos deixar tudo dentro da mesma esfera.
 
-Que tal usar o ``entry-point epilogue`` para disparar a compila√ß√£o e execu√ß√£o dos testes, avaliando se quebraram ou passaram? No exemplo, da nossa *lib*, adicionar√≠amos:
+Que tal usar o ``entry-point epilogue`` para disparar a compilaÁ„o e execuÁ„o dos testes, avaliando se quebraram ou passaram? No exemplo, da nossa *lib*, adicionarÌamos:
 
 		here.epilogue() {
     		var notest type list;
@@ -318,11 +318,11 @@ Que tal usar o ``entry-point epilogue`` para disparar a compila√ß√£o e execu√ß√£
     		hefesto.sys.cd("..");
 		}
 
-Desculpe se estou adiantando um pouco as coisa aqui, mas basicamente em ``epilogue`` verifico se o ``build`` atual de nossa *lib* foi realmente bem sucedido, se tiver sido, vejo se a op√ß√£o de usu√°rio ``--no-test`` foi passada, caso n√£o tenha sido, chamo a fun√ß√£o de execu√ß√£o dos testes.
+Desculpe se estou adiantando um pouco as coisa aqui, mas basicamente em ``epilogue`` verifico se o ``build`` atual de nossa *lib* foi realmente bem sucedido, se tiver sido, vejo se a opÁ„o de usu·rio ``--no-test`` foi passada, caso n„o tenha sido, chamo a funÁ„o de execuÁ„o dos testes.
 
-A fun√ß√£o ``run-tests`` por sua vez muda para o subdiret√≥rio ``test`` onde teremos um outro projeto de forja o qual disparamos. Ap√≥s isso, finalizamos voltando ao diret√≥rio anterior.
+A funÁ„o ``run-tests`` por sua vez muda para o subdiretÛrio ``test`` onde teremos um outro projeto de forja o qual disparamos. ApÛs isso, finalizamos voltando ao diretÛrio anterior.
 
-Agora vamos ver como √© esse *Forgefile* dos testes:
+Agora vamos ver como È esse *Forgefile* dos testes:
 
 		include ~/toolsets/gcc/gcc-app.hsl
 
@@ -361,25 +361,25 @@ Agora vamos ver como √© esse *Forgefile* dos testes:
     		}
 		}
 
-A fun√ß√£o mais importante √© a ``run_unittests`` chamada √† partir do ``epilogue`` caso retorne algo diferente de zero sai com c√≥digo 1, o que far√° o *build* quebrar.
+A funÁ„o mais importante È a ``run_unittests`` chamada ‡ partir do ``epilogue`` caso retorne algo diferente de zero sai com cÛdigo 1, o que far· o *build* quebrar.
 
-Eu posso dizer que encontrei meu para√≠so no ``Hades``... :) Espero que voc√™ continue motivado(a) e siga com a se√ß√£o que te ensina de fato programar na ``HSL`` e possa tirar proveito do suporte e liberdade que esse aplicativo procura promover.
+Eu posso dizer que encontrei meu paraÌso no ``Hades``... :) Espero que vocÍ continue motivado(a) e siga com a seÁ„o que te ensina de fato programar na ``HSL`` e possa tirar proveito do suporte e liberdade que esse aplicativo procura promover.
 
 ## Sobre a HSL
 
-N√£o era a minha inten√ß√£o inicial criar uma [DSL]() para o *Hefesto*, o fato √© que cheguei a conclus√£o disso durante o processo de matura√ß√£o da ideia. Visto que desejava resolver meus problemas de uma forma mais geral.
+N„o era a minha intenÁ„o inicial criar uma [DSL]() para o *Hefesto*, o fato È que cheguei a conclus„o disso durante o processo de maturaÁ„o da ideia. Visto que desejava resolver meus problemas de uma forma mais geral.
 
-Em resumo, tive mais trabalho, contudo, hoje consigo expressar uma boa quantidade de automatiza√ß√µes para diversos processos que v√£o al√©m de simplesmente fazer *builds* de projetos *C/C++*.
+Em resumo, tive mais trabalho, contudo, hoje consigo expressar uma boa quantidade de automatizaÁıes para diversos processos que v„o alÈm de simplesmente fazer *builds* de projetos *C/C++*.
 
-### Por que uma *dsl* e n√£o *scriptar* uma que j√° existe?
+### Por que uma *dsl* e n„o *scriptar* uma que j· existe?
 
-Ao meu ver, o problema de usar uma linguagem de uso geral √© fazer o usu√°rio do *software* se preocupar com conven√ß√µes gerais que em suma n√£o s√£o importantes para expressar suas necessidades. Fora que isso cria uma depend√™ncia externa o que te faz ser ref√©m das decis√µes futuras de um outro projeto. Linguagens de uso geral abrem margem para muitas possibilidades, muitas possibilidades abrem margem para desordem.
+Ao meu ver, o problema de usar uma linguagem de uso geral È fazer o usu·rio do *software* se preocupar com convenÁıes gerais que em suma n„o s„o importantes para expressar suas necessidades. Fora que isso cria uma dependÍncia externa o que te faz ser refÈm das decisıes futuras de um outro projeto. Linguagens de uso geral abrem margem para muitas possibilidades, muitas possibilidades abrem margem para desordem.
 
 ### Definindo as bases
 
-A ``HSL`` em momento nenhum esquece que √© uma linguagem feita em suma para automatizar coisas, n√£o comece querer programar *software* de uso geral com ela. ++Por favor n√£o...++
+A ``HSL`` em momento nenhum esquece que È uma linguagem feita em suma para automatizar coisas, n„o comece querer programar *software* de uso geral com ela. ++Por favor n„o...++
 
-Ela possui 4 tipos primitivos e n√£o existe uma conveni√™ncia para se utilizar *user-defined types*, a *Tabela 2* sumariza esses tipos.
+Ela possui 4 tipos primitivos e n„o existe uma conveniÍncia para se utilizar *user-defined types*, a *Tabela 2* sumariza esses tipos.
 
 
 **Tabela 2**: Tipos primitivos presentes na ``HSL``.
@@ -387,19 +387,19 @@ Ela possui 4 tipos primitivos e n√£o existe uma conveni√™ncia para se utilizar *
 | **Palavra reservada** |                 **Tipo**                          |
 |:---------------------:|:-------------------------------------------------:|
 |     ``int``           | Inteiro de 32/64 bits                             |
-|   ``string``          | Sequ√™ncia de caracteres                           |
+|   ``string``          | SequÍncia de caracteres                           |
 |    ``file``           | Um descritor de arquivo                           |
 |    ``list``           | Container para dados do tipo ``int`` ou ``string``|
 
-Fato: vari√°veis precisam ser declaradas.
+Fato: vari·veis precisam ser declaradas.
 
-Em qualquer ponto de um c√≥digo ``HSL`` voc√™ pode declarar uma vari√°vel sob o seguinte esquema:
+Em qualquer ponto de um cÛdigo ``HSL`` vocÍ pode declarar uma vari·vel sob o seguinte esquema:
 
 > **var** ``<var-name>`` **type** ``<type-name>`` **;**
 
-Saiba que ``<var-name>`` pode ser composto por ``[A-Za-z0-9_]``. Pode-se ter uma e somente uma declara√ß√£o por linha.
+Saiba que ``<var-name>`` pode ser composto por ``[A-Za-z0-9_]``. Pode-se ter uma e somente uma declaraÁ„o por linha.
 
-Exemplos pr√°ticos:
+Exemplos pr·ticos:
 
 		var my_name type string;
 		var my_age type int ;
@@ -407,7 +407,7 @@ Exemplos pr√°ticos:
 		type
 		list;
 
-Para acessar uma vari√°vel declarada (me desculpe o pleonasmo) preceda-a com o s√≠mbolo ``$``, assim:
+Para acessar uma vari·vel declarada (me desculpe o pleonasmo) preceda-a com o sÌmbolo ``$``, assim:
 
 		$my_name = "John doe.";
 		$my_age = -1;
@@ -420,7 +420,7 @@ ou
 
 > **if** **(** ``<expr>`` **)** ``<hsl-single-stmt>`` [ **else** ``<hsl-single-stmt>`` ]
 
-S√≥ existe uma forma de expressar ``loops`` na Linguagem que √© via ``while``, segue o formato dele:
+SÛ existe uma forma de expressar ``loops`` na Linguagem que È via ``while``, segue o formato dele:
 
 > **while** **(** ``<expr>`` **)** **{** ``<hsl-stmt>`` **}**
 
@@ -428,40 +428,40 @@ ou
 
 > **while** **(** ``<expr>`` **)** ``<hsl-single-stmt>``
 
-A **Tabela 3** re√∫ne os operadores dispon√≠veis para compor express√µes na ``HSL``.
+A **Tabela 3** re˙ne os operadores disponÌveis para compor expressıes na ``HSL``.
 
-**Tabela 3**: Operadores dispon√≠veis at√© o momento.
+**Tabela 3**: Operadores disponÌveis atÈ o momento.
 
-|   **Operador**   |     **Opera√ß√£o**   | **Tipo** |
+|   **Operador**   |     **OperaÁ„o**   | **Tipo** |
 |:----------------:|:------------------:|:--------:|
-|     ``==``       |      Igual a       |  L√≥gico  |
-|     ``!=``       |   Diferente de     |  L√≥gico  |
-|      ``<``       |     Menor que      |  L√≥gico  |
-|      ``>``       |     Maior que      |  L√≥gico  |
-|     ``>=``       | Maior ou igual que |  L√≥gico  |
-|     ``<=``       | Menor ou igual a   |  L√≥gico  |
-|     ``&&``       |      .E.           |  L√≥gico  |
-|   &#124;&#124;   |      .OU.          |  L√≥gico  |
+|     ``==``       |      Igual a       |  LÛgico  |
+|     ``!=``       |   Diferente de     |  LÛgico  |
+|      ``<``       |     Menor que      |  LÛgico  |
+|      ``>``       |     Maior que      |  LÛgico  |
+|     ``>=``       | Maior ou igual que |  LÛgico  |
+|     ``<=``       | Menor ou igual a   |  LÛgico  |
+|     ``&&``       |      .E.           |  LÛgico  |
+|   &#124;&#124;   |      .OU.          |  LÛgico  |
 |     ``&``        |      .E.           |  Bitwise |
 |     &#124;       |      .OU.          |  Bitwise |
 |     ``<<``       |    ``Left Shift``  |  Bitwise |
 |     ``>>``       |    ``Right Shift`` |  Bitwise |
 
 
-Fun√ß√µes podem retornar qualquer tipo primitivo ou nada. O esquema geral de declara√ß√£o √©:
+FunÁıes podem retornar qualquer tipo primitivo ou nada. O esquema geral de declaraÁ„o È:
 
 >**function** ``<function-name>`` **(** ``<var-decl-list>`` **)** **: result type ** **{** ``<hsl-stmt>`` **}**
 
-Os caracteres aceitos para ``nomenclatura de uma fun√ß√£o`` **s√£o os mesmos** aceitos para ``nomenclatura de vari√°veis``.
+Os caracteres aceitos para ``nomenclatura de uma funÁ„o`` **s„o os mesmos** aceitos para ``nomenclatura de vari·veis``.
 
-Um exemplo mais pr√°tico... Uma fun√ß√£o que calcula de forma recurssiva o fatorial de um n√∫mero fornecido:
+Um exemplo mais pr·tico... Uma funÁ„o que calcula de forma recurssiva o fatorial de um n˙mero fornecido:
 
 		function fatorial(n type int) : result type int {
 			if ($n == 0) return 1;
         	return fatorial($n - 1) * $n;
     	}
 
-Uma fun√ß√£o que n√£o retorna nada, cujo ``return type`` deve ser ``none``:
+Uma funÁ„o que n„o retorna nada, cujo ``return type`` deve ser ``none``:
 
 		function say_hello() : result type none
         {
@@ -470,81 +470,81 @@ Uma fun√ß√£o que n√£o retorna nada, cujo ``return type`` deve ser ``none``:
 
 ### As *Hefesto Syscalls*
 
-Certo, o √∫ltimo exemplo com uma fun√ß√£o in√∫til que s√≥ dizia al√¥, n√£o foi t√£o in√∫til... Serviu para te criar uma d√∫vida:
+Certo, o ˙ltimo exemplo com uma funÁ„o in˙til que sÛ dizia alÙ, n„o foi t„o in˙til... Serviu para te criar uma d˙vida:
 
->"O que afinal de contas √© esse neg√≥cio de ``hefesto.sys.whatever``??"
+>"O que afinal de contas È esse negÛcio de ``hefesto.sys.whatever``??"
 
-Nada √© por acaso nessa vida, acredite! Uma *abomin√°vel doninha documentadora* p√¥s aquilo l√° para fazer voc√™ trope√ßar e cair aqui.... Quando comecei pensar a ``HSL`` uma das minhas principais indaga√ß√µes eram sobre o que √© comum a quase todo processo de *build* e dessas coisas comuns, o que √© direta ou indiretamente requisitado ao ``Sistema Operacional`` em quest√£o.
+Nada È por acaso nessa vida, acredite! Uma *[abomin·vel](http://en.wikipedia.org/wiki/Eastern_mole#/media/File:ScalopusAquaticus.jpg) [doninha](https://what-if.xkcd.com/4/) documentadora* pÙs aquilo l· para fazer vocÍ tropeÁar e cair aqui.... Quando comecei pensar a ``HSL`` uma das minhas principais indagaÁıes eram sobre o que È comum a quase todo processo de *build* e dessas coisas comuns, o que È direta ou indiretamente requisitado ao ``Sistema Operacional`` em quest„o.
 
-Essas indaga√ß√µes me levaram criar uma camada de abstra√ß√£o que garante escrever passos comuns em uma *build-task* mas heterog√™nos em termos pr√°ticos de um ``OS`` para outro, apenas uma vez e ter a garantia que rodar√£o iguais em qualquer plataforma suportada pelo ``Hefesto``.
+Essas indagaÁıes me levaram criar uma camada de abstraÁ„o que garante escrever passos comuns em uma *build-task* mas heterogÍnos em termos pr·ticos de um ``OS`` para outro, apenas uma vez e ter a garantia que rodar„o iguais em qualquer plataforma suportada pelo ``Hefesto``.
 
-Essa camada de abstra√ß√£o pode ser acessada √† partir do ``subsistema sys`` do ``Hefesto``, da seguinte forma:
+Essa camada de abstraÁ„o pode ser acessada ‡ partir do ``subsistema sys`` do ``Hefesto``, da seguinte forma:
 
 >``hefesto.sys.<sys-call>(<arg-list>)``
 
-Esse ``subsistema`` √© chamado de ``syscalls``, mas aqui n√£o se deixe levar pelo conceito cl√°ssico de *syscall*. De fato, voc√™ encontrar√° muito mais do que *"syscalls"*. Encontrar√° coisas que fazem muito mais numa √∫nica chamada e num n√≠vel bem mais alto do que as boas e velhas *syscalls* do nosso bom e velho *Unix*, por exemplo.
+Esse ``subsistema`` È chamado de ``syscalls``, mas aqui n„o se deixe levar pelo conceito cl·ssico de *syscall*. De fato, vocÍ encontrar· muito mais do que *"syscalls"*. Encontrar· coisas que fazem muito mais numa ˙nica chamada e num nÌvel bem mais alto do que as boas e velhas *syscalls* do nosso bom e velho *Unix*, por exemplo.
 
-Escolhi esse nome, porque durante meu trabalho notei que a maioria dos pontos de n√£o portabilidade de uma *build-task* recaiam na maior parte sobre algumas *syscalls* verdadeiras. Ent√£o, fica aqui explicada a origem de qualquer futuro equ√≠voco.
+Escolhi esse nome, porque durante meu trabalho notei que a maioria dos pontos de n„o portabilidade de uma *build-task* recaiam na maior parte sobre algumas *syscalls* verdadeiras. Ent„o, fica aqui explicada a origem de qualquer futuro equÌvoco.
 
-Uma outra forma de aceitar a n√£o ortodoxia das ``hefesto syscalls`` pode ser entendendo que elas tamb√©m englobam opera√ß√µes comuns de serem requisitadas e por isso postas de forma ``builtin`` no *build-system*. Criando o que eu aqui gosto de chamar de ``subsistema``.
+Uma outra forma de aceitar a n„o ortodoxia das ``hefesto syscalls`` pode ser entendendo que elas tambÈm englobam operaÁıes comuns de serem requisitadas e por isso postas de forma ``builtin`` no *build-system*. Criando o que eu aqui gosto de chamar de ``subsistema``.
 
-Na **Tabela 4** segue uma listagem com uma r√°pida descri√ß√£o do que uma referida ``syscall`` faz.
+Na **Tabela 4** segue uma listagem com uma r·pida descriÁ„o do que uma referida ``syscall`` faz.
 
-**Tabela 4**: ``Hefesto  syscalls`` dispon√≠veis at√© o presente momento.
+**Tabela 4**: ``Hefesto  syscalls`` disponÌveis atÈ o presente momento.
 
 |          **Syscall**            |         **Utilitade**                                                                                         |
 |:-------------------------------:|--------------------------------------------------------------------------------------------------------------:|
-| ``replace_in_file()``           |substitui um texto encontrado via uma express√£o regular                                                        |
-| ``lines_from_file()``	          |filtra linhas que casam com a express√£o regular passada                                                        |
-| ``ls()``	                      |retorna a contagem de arquivos encontrados no diret√≥rio corrente que casam seus nomes com a regex fornecida    |
-| ``pwd()``	                      |retorna o fullpath do diret√≥rio corrente                                                                       |
-| ``cd()``	                      |muda o diret√≥rio corrente para o caminho passado                                                               |
+| ``replace_in_file()``           |substitui um texto encontrado via uma express„o regular                                                        |
+| ``lines_from_file()``	          |filtra linhas que casam com a express„o regular passada                                                        |
+| ``ls()``	                      |retorna a contagem de arquivos encontrados no diretÛrio corrente que casam seus nomes com a regex fornecida    |
+| ``pwd()``	                      |retorna o fullpath do diretÛrio corrente                                                                       |
+| ``cd()``	                      |muda o diretÛrio corrente para o caminho passado                                                               |
 | ``rm()``	                      |remove o filepath fornecido                                                                                    |
-| ``cp()``	                      |copia um arquivo/diret√≥rio de um path existente para outro                                                     |
-| ``mkdir()``	                  |cria um diret√≥rio                                                                                              |
-| ``rmdir()``	                  |remove um diret√≥rio vazio                                                                                      |
-| ``fopen()``	                  |abre um arquivo retornando seu descritor que deve ser atribu√≠do a uma vari√°vel do tipo file                    |
+| ``cp()``	                      |copia um arquivo/diretÛrio de um path existente para outro                                                     |
+| ``mkdir()``	                  |cria um diretÛrio                                                                                              |
+| ``rmdir()``	                  |remove um diretÛrio vazio                                                                                      |
+| ``fopen()``	                  |abre um arquivo retornando seu descritor que deve ser atribuÌdo a uma vari·vel do tipo file                    |
 | ``fwrite()``	                  |escreve dados para o arquivo referenciado pelo descritor de arquivo fornecido                                  |
-| ``fread()``	                  |l√™ dados do arquivo referenciado pelo descritor de arquivo fornecido                                           |
+| ``fread()``	                  |lÍ dados do arquivo referenciado pelo descritor de arquivo fornecido                                           |
 | ``fclose()``	                  |limpa todos os recursos alocados por um descritor de arquivo                                                   |
-| ``feof()``	                  |verifica se √© o final do arquivo                                                                               |
+| ``feof()``	                  |verifica se È o final do arquivo                                                                               |
 | ``fseek()``	                  |pula para um determinado offset do arquivo                                                                     |
-| ``fseek_to_begin()``	          |pula para o in√≠cio do arquivo                                                                                  |
+| ``fseek_to_begin()``	          |pula para o inÌcio do arquivo                                                                                  |
 | ``fseek_to_end()``	          |pula para o final do arquivo                                                                                   |
 | ``fsize()``	                  |retorna o tamanho do arquivo em bytes                                                                          |
 | ``ftell()``	                  |retorna o offset corrente do arquivo                                                                           |
 | ``run()``	                      |roda um processo externo, retornando seu exit code                                                             |
 | ``echo()``	                  |escreve texto na tela                                                                                          |
-| ``env()``	                      |retorna o conte√∫do de uma vari√°vel de ambiente                                                                 |
-| ``prompt()``	                  |l√™ dados do teclado, esperando a confirma√ß√£o via "ENTER"                                                       |
-| ``exit()``	                  |aborta a m√°quina virtual do hefesto, alterando o error level para o valor fornecido                            |
+| ``env()``	                      |retorna o conte˙do de uma vari·vel de ambiente                                                                 |
+| ``prompt()``	                  |lÍ dados do teclado, esperando a confirmaÁ„o via "ENTER"                                                       |
+| ``exit()``	                  |aborta a m·quina virtual do hefesto, alterando o error level para o valor fornecido                            |
 | ``os_name()``	                  |retorna o nome da plataforma corrente                                                                          |
-| ``get_option()``	              |retorna dados de uma op√ß√£o fornecida via linha de comando                                                      |
+| ``get_option()``	              |retorna dados de uma opÁ„o fornecida via linha de comando                                                      |
 | ``make_path()``	              |cria uma string que corresponde a um caminho no sistema de arquivos                                            |
-| ``last_forge_result()``	      |obt√©m o exit code do √∫ltimo processo de forja executado                                                        |
+| ``last_forge_result()``	      |obtÈm o exit code do ˙ltimo processo de forja executado                                                        |
 | ``forge()``	                  |invoca um outro projeto de forja                                                                               |
-| ``byref()``	                  |atualiza os valores de um argumento de fun√ß√£o para a vari√°vel externa que foi passada como esse argumento local|
+| ``byref()``	                  |atualiza os valores de um argumento de funÁ„o para a vari·vel externa que foi passada como esse argumento local|
 | ``time()``	                  |retorna uma string representando o tempo do sistema de acordo com o formato passado                            |
-| ``setenv()``	                  |cria uma vari√°vel de ambiente                                                                                  |
-| ``unsetenv()``	              |remove uma vari√°vel de ambiente                                                                                |
-| ``call_from_module()``	      |chama uma fun√ß√£o implementada em uma biblioteca din√¢mica                                                       |
-| ``get_func_addr()``	          |obt√©m o endere√ßo de um nome de fun√ß√£o passado                                                                  |
-| ``call_func_addr()``	          |tenta fazer uma chamada de fun√ß√£o √† partir do endere√ßo passado                                                 |
+| ``setenv()``	                  |cria uma vari·vel de ambiente                                                                                  |
+| ``unsetenv()``	              |remove uma vari·vel de ambiente                                                                                |
+| ``call_from_module()``	      |chama uma funÁ„o implementada em uma biblioteca din‚mica                                                       |
+| ``get_func_addr()``	          |obtÈm o endereÁo de um nome de funÁ„o passado                                                                  |
+| ``call_func_addr()``	          |tenta fazer uma chamada de funÁ„o ‡ partir do endereÁo passado                                                 |
 
-#### Um guia pr√°tico para cada *Hefesto syscall*
+#### Um guia pr·tico para cada *Hefesto syscall*
 
-Aqui nessa parte voc√™ pode explorar melhor como usar cada ``syscall``, vendo que argumentos recebem e o que retornam. Tudo isso de um modo mais pr√°tico.
+Aqui nessa parte vocÍ pode explorar melhor como usar cada ``syscall``, vendo que argumentos recebem e o que retornam. Tudo isso de um modo mais pr·tico.
 
 ##### ++replace_in_file()++
 
-Substitui dados em um arquivo. O primeiro argumento deve ser o ``file path``, o segundo √© o padr√£o de busca expresso por uma ``regex``, o terceiro √© o texto de substitui√ß√£o desejado.
+Substitui dados em um arquivo. O primeiro argumento deve ser o ``file path``, o segundo È o padr„o de busca expresso por uma ``regex``, o terceiro È o texto de substituiÁ„o desejado.
 
 		function replace_in_file_sample() : result type none {
  			hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");
 		}
 ##### ++lines_from_file()++
 
-Filtra linhas de um arquivo. O primeiro argumento deve ser o ``file path``, o segundo √© o padr√£o de busca expresso por uma ``regex``. A ``syscall`` retorna uma lista contendo as linhas filtradas do arquivo.
+Filtra linhas de um arquivo. O primeiro argumento deve ser o ``file path``, o segundo È o padr„o de busca expresso por uma ``regex``. A ``syscall`` retorna uma lista contendo as linhas filtradas do arquivo.
 
 		function lines_from_file_sample() : result type none {
  			var retval type list;
@@ -553,7 +553,7 @@ Filtra linhas de um arquivo. O primeiro argumento deve ser o ``file path``, o se
 
 ##### ++ls()++
 
-Lista arquivos no diret√≥rio corrente. Recebe somente um argumento que deve ser o padr√£o de listagem em ``regex``.
+Lista arquivos no diretÛrio corrente. Recebe somente um argumento que deve ser o padr„o de listagem em ``regex``.
 
 		function ls_sample() : result type none {
  			if (hefesto.sys.ls(".*(c|cpp|s|asm)$") > 0) {
@@ -565,7 +565,7 @@ Lista arquivos no diret√≥rio corrente. Recebe somente um argumento que deve ser 
 
 ##### ++pwd()++
 
-Retorna o diret√≥rio corrente. √â muito ``DIF√çCIL`` de usar essa fun√ß√£o ``builtin``, d√™ uma olhada:
+Retorna o diretÛrio corrente. … muito ``DIFÕCIL`` de usar essa funÁ„o ``builtin``, dÍ uma olhada:
 
 		function pwd_only_to_PHDs() : result type none {
  			hefesto.sys.echo("The current work directory is: " + hefesto.sys.pwd() + "\n");
@@ -573,7 +573,7 @@ Retorna o diret√≥rio corrente. √â muito ``DIF√çCIL`` de usar essa fun√ß√£o ``bui
 
 ##### ++cd()++
 
-Muda o ``cwd`` para o diret√≥rio fornecido via argumento.
+Muda o ``cwd`` para o diretÛrio fornecido via argumento.
 
 		function cd_sample() : result type none {
  			hefesto.sys.cd("/home/rs");
@@ -589,7 +589,7 @@ Remove um arquivo.
 
 ##### ++cp()++
 
-Copia arquivo/diret√≥rios para o diret√≥rio especificado. O primeiro argumento √© o padr√£o regex correspondente ao source, o segundo √© o destino.
+Copia arquivo/diretÛrios para o diretÛrio especificado. O primeiro argumento È o padr„o regex correspondente ao source, o segundo È o destino.
 
 		function cp_sample() : result type none {
  			hefesto.sys.cp(".*.(exe|dll|msi)", "wpkg");
@@ -597,7 +597,7 @@ Copia arquivo/diret√≥rios para o diret√≥rio especificado. O primeiro argumento √
 
 ##### ++mkdir()++
 
-Cria o diret√≥rio sob o diret√≥rio de trabalho.
+Cria o diretÛrio sob o diretÛrio de trabalho.
 
 		function mkdir_sample() : result type none {
  			hefesto.sys.mkdir("wpkg");
@@ -605,7 +605,7 @@ Cria o diret√≥rio sob o diret√≥rio de trabalho.
 
 ##### ++rmdir()++
 
-Remove um diret√≥rio vazio.
+Remove um diretÛrio vazio.
 
 		function rmdir_sample() : result type none {
  			hefesto.sys.rmdir("stage");
@@ -614,7 +614,7 @@ Remove um diret√≥rio vazio.
 
 ##### ++fopen()++
 
-Abre um arquivo retornando o descritor que pode ser manipulado. O primeiro argumento √© o ``file path``, o segundo √© o modo de abertura. Os modos seguem o ``fopen`` cl√°ssico da ``libc`` ("r" = somente leitura, "w" = somente escrita, "a" = modo ``append``).
+Abre um arquivo retornando o descritor que pode ser manipulado. O primeiro argumento È o ``file path``, o segundo È o modo de abertura. Os modos seguem o ``fopen`` cl·ssico da ``libc`` ("r" = somente leitura, "w" = somente escrita, "a" = modo ``append``).
 
 		function fopen_sample() : result type none {
  			var fp type file;
@@ -624,7 +624,7 @@ Abre um arquivo retornando o descritor que pode ser manipulado. O primeiro argum
 
 ##### ++fwrite()++
 
-Escreve dados em um descritor de arquivo aberto com modo de escrita ou ``append``. O primeiro argumento √© o ``buffer`` de dados, o segundo √© o quanto escrever desse ``buffer``, o terceiro √© o descritor de arquivo.
+Escreve dados em um descritor de arquivo aberto com modo de escrita ou ``append``. O primeiro argumento È o ``buffer`` de dados, o segundo È o quanto escrever desse ``buffer``, o terceiro È o descritor de arquivo.
 
 Retorna a quantidade de dados escritos no arquivo.
 
@@ -638,7 +638,7 @@ Retorna a quantidade de dados escritos no arquivo.
 
 ##### ++fread()++
 
-L√™ dados de um descritor de arquivo (√≥bvio: aberto em modo de leitura) avan√ßando o ponteiro de arquivo por *n* ``bytes`` lidos. O primeiro argumento √© o ``buffer`` de dados, o segundo √© a quantidade que deve ser lida √† partir do arquivo, o terceiro √© o descritor.
+LÍ dados de um descritor de arquivo (Ûbvio: aberto em modo de leitura) avanÁando o ponteiro de arquivo por *n* ``bytes`` lidos. O primeiro argumento È o ``buffer`` de dados, o segundo È a quantidade que deve ser lida ‡ partir do arquivo, o terceiro È o descritor.
 
 Retorna a quantidade de dados lidos do arquivo.
 
@@ -652,7 +652,7 @@ Retorna a quantidade de dados lidos do arquivo.
 
 ##### ++fclose()++
 
-Fecha/limpa os recursos internos associados ao descritor de arquivo. Recebe o descritor que deve ser fechado. √â importante sempre chamar esta fun√ß√£o depois de uma manipula√ß√£o de arquivo. Seja higi√™ncio(a)!
+Fecha/limpa os recursos internos associados ao descritor de arquivo. Recebe o descritor que deve ser fechado. … importante sempre chamar esta funÁ„o depois de uma manipulaÁ„o de arquivo. Seja higiÍncio(a)!
 
 		function fclose_sample() : result type none {
  			var fp type file;
@@ -663,7 +663,7 @@ Fecha/limpa os recursos internos associados ao descritor de arquivo. Recebe o de
 
 ##### ++feof()++
 
-Retorna *1* se o final do arquivo foi alcan√ßado de outra forma *0*. Recebe o descritor de arquivo que deve ser verificado.
+Retorna *1* se o final do arquivo foi alcanÁado de outra forma *0*. Recebe o descritor de arquivo que deve ser verificado.
 
 		function feof_sample() : result type none {
  			var fp type file;
@@ -677,7 +677,7 @@ Retorna *1* se o final do arquivo foi alcan√ßado de outra forma *0*. Recebe o de
 
 ##### ++fseek()++
 
-Pula para um ``offset`` espec√≠fico do arquivo do in√≠cio ao fim. O primeiro argumento √© o descritor de arquivo, o segundo √© o ``offset`` desejado.
+Pula para um ``offset`` especÌfico do arquivo do inÌcio ao fim. O primeiro argumento È o descritor de arquivo, o segundo È o ``offset`` desejado.
 
 		function fseek_sample() : result type none {
  			var fp type file;
@@ -688,7 +688,7 @@ Pula para um ``offset`` espec√≠fico do arquivo do in√≠cio ao fim. O primeiro arg
 
 ##### ++fseek_to_begin()++
 
-Pula para o in√≠cio do arquivo. Recebe o descritor associado como argumento.
+Pula para o inÌcio do arquivo. Recebe o descritor associado como argumento.
 
 		function fseek_to_begin_sample() : result type none {
  			var fp type file;
@@ -732,13 +732,13 @@ Retorna o ``offset`` corrente do descritor de arquivo.
 
 ##### ++run()++
 
-Roda um processo externo retornando o ``exit code``. A chamada ``run`` √© sempre bloqueante.
+Roda um processo externo retornando o ``exit code``. A chamada ``run`` È sempre bloqueante.
 
 		function sync_run_sample() : result type none {
  			hefesto.sys.echo("ls /dev exits with " + hefesto.sys.run("ls /dev") + " exit code.\n");
 		}
 
-Voc√™ pode tamb√©m rodar *n* processos se voc√™ passar para essa ``syscall`` uma lista contendo as linhas de execu√ß√£o. O n√∫mero de processos concorrentes √© controlado pela op√ß√£o de linha de comando ``--qsize=n``. Nesse modo, a ``syscall run`` retorna a soma dos ``exit codes``.
+VocÍ pode tambÈm rodar *n* processos se vocÍ passar para essa ``syscall`` uma lista contendo as linhas de execuÁ„o. O n˙mero de processos concorrentes È controlado pela opÁ„o de linha de comando ``--qsize=n``. Nesse modo, a ``syscall run`` retorna a soma dos ``exit codes``.
 
 		function async_run_sample() : result type none {
  			var wqueue type list;
@@ -750,15 +750,15 @@ Voc√™ pode tamb√©m rodar *n* processos se voc√™ passar para essa ``syscall`` uma
 
 ##### ++echo()++
 
-Exibe uma ``string`` na tela. De fato √© uma ``Hefesto syscall`` muito complicada.
+Exibe uma ``string`` na tela. De fato È uma ``Hefesto syscall`` muito complicada.
 
 		function echo_sample() : result type none {
  			hefesto.sys.echo("Hello world.\n");
 		}
 
-#### ++env()++
+##### ++env()++
 
-Obt√©m o conte√∫do de uma vari√°vel de ambiente.
+ObtÈm o conte˙do de uma vari·vel de ambiente.
 
 		function env_sample() : result type none {
  			hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");
@@ -766,7 +766,7 @@ Obt√©m o conte√∫do de uma vari√°vel de ambiente.
 
 ##### ++prompt()++
 
-L√™ um valor do teclado. Retornando os dados lidos.
+LÍ um valor do teclado. Retornando os dados lidos.
 
 		function prompt_sample() : result type none {
  			var usr_data type string;
@@ -776,7 +776,7 @@ L√™ um valor do teclado. Retornando os dados lidos.
 
 ##### ++exit()++
 
-Aborta a execu√ß√£o da ``HVM`` saindo com o c√≥digo passado.
+Aborta a execuÁ„o da ``HVM`` saindo com o cÛdigo passado.
 
 		function exit_sample() : result type none {
  			hefesto.sys.exit(1);
@@ -784,7 +784,7 @@ Aborta a execu√ß√£o da ``HVM`` saindo com o c√≥digo passado.
 
 ##### ++os_name()++
 
-Retorna o nome do sistema operacional onde seu ``HSL`` est√° correndo. O retorno √© sempre o nome em ``lower-case`` e sem qualquer informa√ß√£o de vers√£o.
+Retorna o nome do sistema operacional onde seu ``HSL`` est· correndo. O retorno È sempre o nome em ``lower-case`` e sem qualquer informaÁ„o de vers„o.
 
 		function env_sample() : result type none {
  			if (hefesto.sys.os_name() == "windows") {
@@ -794,7 +794,7 @@ Retorna o nome do sistema operacional onde seu ``HSL`` est√° correndo. O retorno
 
 ##### ++get_option()++
 
-Obt√©m um argumento da linha de comando. Retorna uma lista contendo um ou mais valores ou uma lista vazia.
+ObtÈm um argumento da linha de comando. Retorna uma lista contendo um ou mais valores ou uma lista vazia.
 
 		function get_option_sample() : result type none {
  			var cups_of_tea type list;
@@ -807,7 +807,7 @@ Obt√©m um argumento da linha de comando. Retorna uma lista contendo um ou mais v
 
 ##### ++make_path()++
 
-Cria uma ``string path``. O primeiro argumento √© o ``root path``, o segundo √© o *"addendum"* do ``path``. Retorna a combina√ß√£o correta.
+Cria uma ``string path``. O primeiro argumento È o ``root path``, o segundo È o *"addendum"* do ``path``. Retorna a combinaÁ„o correta.
 
 		function make_path_sample() : result type none {
  			hefesto.sys.echo("STRING PATH must be /home/rs \"" + hefesto.sys.make_path("/home", "/rs") + "\"\n.");
@@ -815,15 +815,15 @@ Cria uma ``string path``. O primeiro argumento √© o ``root path``, o segundo √© 
 
 ##### ++last_forge_result()++
 
-Obt√©m o √∫ltimo resultado de forja (este resultado pode ser alterado pela ``syscall exit``).
+ObtÈm o ˙ltimo resultado de forja (este resultado pode ser alterado pela ``syscall exit``).
 
 		function last_forge_result_sample() : result type none {
  			hefesto.sys.echo("The last forge result was " + hefesto.sys.last_forge_result() + ".\n");
 		}
 
-#### ++forge()++
+##### ++forge()++
 
-Invoca um projeto de forja. O primeiro argumento √© o nome do projeto contido no ``HSL`` informado via primeiro argumento. O terceiro argumento s√£o as op√ß√µes de usu√°rio.
+Invoca um projeto de forja. O primeiro argumento È o nome do projeto contido no ``HSL`` informado via primeiro argumento. O terceiro argumento s„o as opÁıes de usu·rio.
 
 		function forge_sample() : result type none {
  			hefesto.sys.forge("foolib", "local_deps.hsl", "--user-includes-home=../alt_incs --pre-submit-me");
@@ -837,7 +837,7 @@ Invoca um projeto de forja. O primeiro argumento √© o nome do projeto contido no
 
 ##### ++byref()++
 
-Atualiza os valores de um argumento local de fun√ß√£o para uma vari√°vel externa que foi passada como esse argumento. Deve ser passada a vari√°vel local exata que deve ser atualizada para a vari√°vel externa.
+Atualiza os valores de um argumento local de funÁ„o para uma vari·vel externa que foi passada como esse argumento. Deve ser passada a vari·vel local exata que deve ser atualizada para a vari·vel externa.
 
 		function caller() : result type none {
  			var return type string;
@@ -853,7 +853,7 @@ Atualiza os valores de um argumento local de fun√ß√£o para uma vari√°vel externa
 
 ##### ++time()++
 
-Retorna uma ``string`` representando o tempo do sistema de acordo com o formato passado. Os formatos aceitos s√£o os mesmos aceitos pela fun√ß√£o ``strftime()`` contida na ``libc`` de seu ``OS``.
+Retorna uma ``string`` representando o tempo do sistema de acordo com o formato passado. Os formatos aceitos s„o os mesmos aceitos pela funÁ„o ``strftime()`` contida na ``libc`` de seu ``OS``.
 
 		function time_sample() : result type none {
  			hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");
@@ -861,13 +861,13 @@ Retorna uma ``string`` representando o tempo do sistema de acordo com o formato 
 
 ##### ++setenv()++
 
-Cria uma vari√°vel de ambiente. Ap√≥s o t√©rmino do processo a vari√°vel √© perdida.
+Cria uma vari·vel de ambiente. ApÛs o tÈrmino do processo a vari·vel È perdida.
 
 		function setenv_sample() : result type none {
  			hefesto.sys.setenv("mytempvar", "mytempval");
 		}
 
-No ``Windows`` voc√™ pode utilizar essa ``syscall`` para acessar o registro tamb√©m, bastando informar o caminho completo onde deseja salvar o valor, precedendo essa informa√ß√£o pelo marcador ``WINREG:``.
+No ``Windows`` vocÍ pode utilizar essa ``syscall`` para acessar o registro tambÈm, bastando informar o caminho completo onde deseja salvar o valor, precedendo essa informaÁ„o pelo marcador ``WINREG:``.
 
 		function setenv_sample() : result type none {
  			hefesto.sys.setenv("WINREG:HKCU\\Software\\Abc\\mytempvar:REG_SZ", "mytempval");
@@ -875,14 +875,14 @@ No ``Windows`` voc√™ pode utilizar essa ``syscall`` para acessar o registro tamb
 
 ##### ++unsetenv()++
 
-Remove uma vari√°vel de ambiente. O processo de remo√ß√£o somente afeta o processo referente a aplica√ß√£o.
+Remove uma vari·vel de ambiente. O processo de remoÁ„o somente afeta o processo referente a aplicaÁ„o.
 
 		function unsetenv_sample() : result type none {
  			hefesto.sys.unsetenv("VSCOMPILERPATH");
 		}
 
 
-No ``Windows`` voc√™ pode utilizar essa syscall para remover valores do registro tamb√©m (essa remo√ß√£o √© permanente). Da seguinte forma:
+No ``Windows`` vocÍ pode utilizar essa syscall para remover valores do registro tambÈm (essa remoÁ„o È permanente). Da seguinte forma:
 
 		function unsetenv_sample() : result type none {
  			hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");
@@ -890,25 +890,25 @@ No ``Windows`` voc√™ pode utilizar essa syscall para remover valores do registro
 
 ##### ++call_from_module()++
 
-Chama uma fun√ß√£o implementada numa biblioteca din√¢mica.
+Chama uma funÁ„o implementada numa biblioteca din‚mica.
 
-O m√≥dulo precisa conter fun√ß√µes implementadas utilizando uma estrutura de dados especial. Mais informa√ß√µes sobre isso podem ser encontradas no documento destinado a especificar os detalhes de implementa√ß√£o de m√≥dulos para o hefesto.
+O mÛdulo precisa conter funÁıes implementadas utilizando uma estrutura de dados especial. Mais informaÁıes sobre isso podem ser encontradas no documento destinado a especificar os detalhes de implementaÁ„o de mÛdulos para o hefesto.
 
 		function call_from_module_sample() : result type none {
  			hefesto.sys.call_from_moduke("/usr/share/mymods/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
 		}
 
-Voc√™ pode usar indire√ß√£o de paths para localizar um m√≥dulo, caso n√£o queira indicar o ``path`` completo para ele em seu c√≥digo ``HSL``:
+VocÍ pode usar indireÁ„o de paths para localizar um mÛdulo, caso n„o queira indicar o ``path`` completo para ele em seu cÛdigo ``HSL``:
 
 		function call_from_module_sample() : result type none {
  			hefesto.sys.call_from_module("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
 		}
 
-Nesse exemplo apresentado, a biblioteca ``"my_killer_mod.so"`` ser√° procurada nos ``paths`` configurados na vari√°vel de ambiente ``HEFESTO_MODULES_HOME``.
+Nesse exemplo apresentado, a biblioteca ``"my_killer_mod.so"`` ser· procurada nos ``paths`` configurados na vari·vel de ambiente ``HEFESTO_MODULES_HOME``.
 
 ##### ++get_func_addr()++
 
-Obt√©m o endere√ßo de um nome de fun√ß√£o informado.
+ObtÈm o endereÁo de um nome de funÁ„o informado.
 
 		function get_func_addr_sample() : result type int {
  			result hefesto.sys.get_func_addr("dummy_clbk");
@@ -916,7 +916,7 @@ Obt√©m o endere√ßo de um nome de fun√ß√£o informado.
 
 ##### ++call_func_addr()++
 
-Tenta fazer uma chamada de fun√ß√£o √† partir de um endere√ßo espec√≠fico. Se qualquer erro ocorrer no processo um erro de tempo de execu√ß√£o √© disparado.
+Tenta fazer uma chamada de funÁ„o ‡ partir de um endereÁo especÌfico. Se qualquer erro ocorrer no processo um erro de tempo de execuÁ„o È disparado.
 
 		function call_func_addr_sample() : result type int {
  			var clbk_p type int;
@@ -926,32 +926,32 @@ Tenta fazer uma chamada de fun√ß√£o √† partir de um endere√ßo espec√≠fico. Se qu
 
 ### Os facilitadores dos tipos *list* e *string*
 
-Talvez voc√™ fique tentado(a) em chamar os facilitadores de m√©todos, por√©m, a ``HSL`` n√£o √© uma Linguagem orientada √† objetos, de forma que os facilitadores podem ser entendidos como opera√ß√µes comuns de serem feitas sobre esses tipos de dados e que por serem comuns por motivos de performance foram implementadas de forma *builtin* na ``HSL``.
+Talvez vocÍ fique tentado(a) em chamar os facilitadores de mÈtodos, porÈm, a ``HSL`` n„o È uma Linguagem orientada ‡ objetos, de forma que os facilitadores podem ser entendidos como operaÁıes comuns de serem feitas sobre esses tipos de dados e que por serem comuns por motivos de performance foram implementadas de forma *builtin* na ``HSL``.
 
-A **Tabela 5** traz uma listagem dos facilitadores presentes no tipo ``string``. A **Tabela 5** re√∫ne os facilitadores implementados no tipo ``list``.
+A **Tabela 5** traz uma listagem dos facilitadores presentes no tipo ``string``. A **Tabela 6** re˙ne os facilitadores implementados no tipo ``list``.
 
 **Tabela 5**: Os facilitadores ``string-type``.
 
 | **Facilitador** | **Utilidade**                                 |**Exemplo de chamada**         |
 |:---------------:|----------------------------------------------:|:-----------------------------:|
-|   ``at``        | Retorna o *byte* presente no √≠ndice fornecido | $str.at(0)                    |
+|   ``at``        | Retorna o *byte* presente no Ìndice fornecido | $str.at(0)                    |
 |   ``len``       | Retorna o tamanho da *string*                 | $str.len()                    |
-|   ``match``     | Busca por um padr√£o *regex* dentro da *string*| $str.match(".*")              |
-|   ``replace``   | Substitui um padr√£o *regex* dentro da *string*| $str.replace(".*", "nothing") |
+|   ``match``     | Busca por um padr„o *regex* dentro da *string*| $str.match(".*")              |
+|   ``replace``   | Substitui um padr„o *regex* dentro da *string*| $str.replace(".*", "nothing") |
 
 **Tabela 6**: Os facilitadores ``list-type``.
 
 | **Facilitador**  | **Utilidade**                                                     | **Exemplo de chamada**                  |
 |:----------------:|------------------------------------------------------------------:|:---------------------------------------:|
-| ``item``         | Retorna o item presente no √≠ndice passado                         | $lst.item(0)                            |
+| ``item``         | Retorna o item presente no Ìndice passado                         | $lst.item(0)                            |
 | ``count``        | Retorna o total de itens presentes na lista                       | $lst.count()                            |
 | ``add_item``     | Adiciona um item                                                  | $lst.add_item("1")                      |
-| ``del_item``     | Remove um item baseado no conte√∫do passado                        | $lst.del_item("1")                      |
-| ``del_index``    | Remove o item presente no √≠ndice passado                          | $lst.del_index(1)                       |
+| ``del_item``     | Remove um item baseado no conte˙do passado                        | $lst.del_item("1")                      |
+| ``del_index``    | Remove o item presente no Ìndice passado                          | $lst.del_index(1)                       |
 | ``ls``           | Carrega os *paths* de arquivos que se encaixam na *regex* passada | $lst.ls(".*\\.c$")                      |
 | ``clear``        | Limpa a lista                                                     | $lst.clear()                            |
-| ``index_of``     | Retorna o √≠ndice de um conte√∫do passado ou -1                     | $lst.index_of("1")                      |
-| ``swap``         | Altera a posi√ß√£o de dois items baseados nos seus √≠ndices          | $lst.swap(0,9)                          |
+| ``index_of``     | Retorna o Ìndice de um conte˙do passado ou -1                     | $lst.index_of("1")                      |
+| ``swap``         | Altera a posiÁ„o de dois items baseados nos seus Ìndices          | $lst.swap(0,9)                          |
 
 #### Exemplos usando esses facilitadores
 
@@ -978,20 +978,35 @@ Seguem alguns:
 
 Exemplo de chamada:
 >``var dir type list;``
+>
 >``var os_name type string;``
+>
 >``$os_name = hefesto.sys.os_name();``
+>
 >``$dir.add_item(".");``
+>
 >``$dir.add_item("native/" + $os_name);``
+>
 >``$dir.add_item("native/" + $os_name + "/fs");``
+>
 >``$dir.add_item("native/" + $os_name + "/net");``
+>
 >``$dir.add_item("native/" + $os_name + "/mm");``
+>
 >``$dir.add_item("native/" + $os_name + "/ps");``
+>
 >``$dir.add_item("common/");``
+>
 >``$dir.add_item("common/fs");``
+>
 >``$dir.add_item("common/net");``
+>
 >``$dir.add_item("common/mm");``
+>
 >``$dir.add_item("common/ps");``
+>
 >``var files type list;``
+>
 >``$files = get_filepaths_from_directories($dir, "*.\\.c$");``
 
 
@@ -1120,52 +1135,54 @@ Exemplo de chamada:
 
 >``hefesto.sys.echo(piglatinize("I like to speak pig latin.") + "\n");``
 
-### Tem uma forma f√°cil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
+### Tem uma forma f·cil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
-Sim, claro! Quando voc√™ instala o ``Hefesto`` juntamente com os ``toolsets`` padr√£o ele instala um ``toolset`` oco, a fun√ß√£o de forja apenas retona o n√∫mero que voc√™ passa na declara√ß√£o do projeto. Com isso, voc√™ pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
+Sim, claro! Quando vocÍ instala o ``Hefesto`` juntamente com os ``toolsets`` padr„o ele instala um ``toolset`` oco, a funÁ„o de forja apenas retona o n˙mero que vocÍ passa na declaraÁ„o do projeto. Com isso, vocÍ pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
 
 ### Onde posso continuar explorando a *HSL*?
 
-A ``HSL`` possui um reposit√≥rio pr√≥prio de c√≥digos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o reposit√≥rio do ``Hefesto`` em sua m√°quina e uma parte que julgo b√°sica dele j√° est√° instalada. Por padr√£o, ele traz documenta√ß√µes acerca de seus m√≥dulos. √â uma boa dar uma lida nesses documentos caso queira saber mais sobre fun√ß√µes de apoio que voc√™ j√° possui √† sua disposi√ß√£o. Em termos pr√°ticos, o ``Helios`` pode ser entendido como o diret√≥rio de ``includes`` do ``Hefesto`` criado na c√≥pia que voc√™ instalou.
+A ``HSL`` possui um repositÛrio prÛprio de cÛdigos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositÛrio do ``Hefesto`` em sua m·quina e uma parte que julgo b·sica dele j· est· instalada. Por padr„o, ele traz documentaÁıes acerca de seus mÛdulos. … uma boa dar uma lida nesses documentos caso queira saber mais sobre funÁıes de apoio que vocÍ j· possui ‡ sua disposiÁ„o. Em termos pr·ticos, o ``Helios`` pode ser entendido como o diretÛrio de ``includes`` do ``Hefesto`` criado na cÛpia que vocÍ instalou.
+
+Existe uma coleÁ„o de cÛdigos dentro do *Helios* que s„o as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/hc/README.md), com elas È possÌvel verificar se o ambiente onde ser· executada a forja possui todos os requisitos necess·rios para isso. Essa bibliotecas de funÁıes ``HSL`` permite que vocÍ crie um *build* mais "parrudo". Seria interessante para quem deseja uma toler‚ncia maior para diferentes *build-environments*.
 
 ### Tirando as rodinhas: criando *Hefesto toolsets* e dominando completamente o *build-system*
 
-Se voc√™ leu as outras se√ß√µes e tentou rodar os exemplos, falta um passo para voc√™ se tornar um usu√°rio avan√ßado do ``Hefesto``, porque at√© o momento voc√™ est√° apto(a) em automatizar passos no sua pr√≥pria *build-task* e usar os ``toolsets`` "de f√°brica". O que te garante o ``status`` de usu√°rio final estando ainda dependente de um ``toolset devel``.
+Se vocÍ leu as outras seÁıes e tentou rodar os exemplos, falta um passo para vocÍ se tornar um usu·rio avanÁado do ``Hefesto``, porque atÈ o momento vocÍ est· apto(a) em automatizar passos no sua prÛpria *build-task* e usar os ``toolsets`` "de f·brica". O que te garante o ``status`` de usu·rio final estando ainda dependente de um ``toolset devel``.
 
-Nisso, eu te convido aprender como se implementa um ``Hefesto toolset``. Se voc√™ at√© o momento est√° gostando da proposta do aplicativo, ap√≥s as informa√ß√µes contidas nessa se√ß√£o, talvez goste mais e se sinta motivado(a) em criar extens√µes para ele, levando em considera√ß√£o suas pr√≥prias necessidades (o que √© uma das principais linhas mestras desse projeto. *Liberdade para criar*. *Clareza em se expressar*. *Generalidade ao usar*.).
+Nisso, eu te convido aprender como se implementa um ``Hefesto toolset``. Se vocÍ atÈ o momento est· gostando da proposta do aplicativo, apÛs as informaÁıes contidas nessa seÁ„o, talvez goste mais e se sinta motivado(a) em criar extensıes para ele, levando em consideraÁ„o suas prÛprias necessidades (o que È uma das principais linhas mestras desse projeto. *Liberdade para criar*. *Clareza em se expressar*. *Generalidade ao usar*.).
 
-#### Mas antes: uma breve recaptula√ß√£o em tudo que j√° foi visto
+#### Mas antes: uma breve recaptulaÁ„o em tudo que j· foi visto
 
-O que voc√™ j√° conferiu e/ou j√° sabe:
+O que vocÍ j· conferiu e/ou j· sabe:
 
-- O ``Hefesto`` √© um *build system* que busca dar clareza e liberdade para escrever de forma organizada uma *build-task*.
-- Ele implementa um *dsl* que √© usada tanto nas extens√µes que podem ser feitas em uma *build-task* espec√≠fica quanto nas generalidades que englobam qualquer *build-task* do mesmo tipo, neste caso tais generalidades nele s√£o denominadas ``toolsets``.
-- Foi apresentada a parte da ``HSL`` que recai sobre a declara√ß√£o de um projeto.
-- Foram apresentados c√≥digos exemplificando o reuso de ``toolsets`` previamente escritos.
-- Tamb√©m foram apresentadas diferentes formas de disparar o *build* (forja) de um projeto.
-- Foi visto como monitorar mudan√ßas nos arquivos que comp√µem um projeto.
-- Uma vis√£o geral, no contexto de usu√°rio, sobre as ``dep-chains`` foi apresentada.
+- O ``Hefesto`` È um *build system* que busca dar clareza e liberdade para escrever de forma organizada uma *build-task*.
+- Ele implementa um *dsl* que È usada tanto nas extensıes que podem ser feitas em uma *build-task* especÌfica quanto nas generalidades que englobam qualquer *build-task* do mesmo tipo, neste caso tais generalidades nele s„o denominadas ``toolsets``.
+- Foi apresentada a parte da ``HSL`` que recai sobre a declaraÁ„o de um projeto.
+- Foram apresentados cÛdigos exemplificando o reuso de ``toolsets`` previamente escritos.
+- TambÈm foram apresentadas diferentes formas de disparar o *build* (forja) de um projeto.
+- Foi visto como monitorar mudanÁas nos arquivos que compıem um projeto.
+- Uma vis„o geral, no contexto de usu·rio, sobre as ``dep-chains`` foi apresentada.
 - Foi mostrado como incluir passos adicionais ao processo de forja, sendo usado para isso o exemplo da necessidade de se disparar e avaliar o resultado de *unit tests*.
-- A possibilidade de se criar um *Forgefile* mais male√°vel cuja a escolha de um ``toolset`` espec√≠fico √© feita em *runtime*, tamb√©m foi vista.
+- A possibilidade de se criar um *Forgefile* mais male·vel cuja a escolha de um ``toolset`` especÌfico È feita em *runtime*, tambÈm foi vista.
 - Aspectos gerais sobre a ``HSL`` e seu subsistema ``sys`` foram detalhados.
 
-O que voc√™ ainda n√£o conhece e depois de ler essa parte poder√° dominar:
+O que vocÍ ainda n„o conhece e depois de ler essa parte poder· dominar:
 
 - Como declarar um ``toolset``.
 - O subsistema ``toolset``.
 - Como internamente o ``Hefesto`` sabe que um arquivo mudou.
 - O subsistema ``project``.
-- Boas pr√°ticas para se criar e manter novos ``toolsets``.
+- Boas pr·ticas para se criar e manter novos ``toolsets``.
 
 #### Nossa meta: um *toolset GCC* para compilar e gerar *libs* e *aplicativos* escritos em *C*
 
-Escolhi a Linguagem *C* por se tratar de uma Linguagem "compilada" e com depend√™ncias a serem resolvidas de forma externa ao compilador. Algumas Linguagens mais contempor√¢neas detectam essas depend√™ncias entre arquivos automaticamente, j√° a Linguagem *C* n√£o, isso vai nos fazer pensar em muitos detalhes o que ser√° um √≥timo **batismo de fogo no Hades** ;) e a√≠? Pronto(a)?!
+Escolhi a Linguagem *C* por se tratar de uma Linguagem "compilada" e com dependÍncias a serem resolvidas de forma externa ao compilador. Algumas Linguagens mais contempor‚neas detectam essas dependÍncias entre arquivos automaticamente, j· a Linguagem *C* n„o, isso vai nos fazer pensar em muitos detalhes o que ser· um Ûtimo **batismo de fogo no Hades** ;) e aÌ? Pronto(a)?!
 
 ##### Descobrindo quem depende de quem...
 
-Sim, seria bom que voc√™ para essa segunda parte trouxesse uma no√ß√£o de *C*, mesmo que *newbie*. Estou levando em conta que o leitor dessa se√ß√£o tem esse perfil.
+Sim, seria bom que vocÍ para essa segunda parte trouxesse uma noÁ„o de *C*, mesmo que *newbie*. Estou levando em conta que o leitor dessa seÁ„o tem esse perfil.
 
-Imagine um projeto em *C* cuja a fun√ß√£o ``main`` √© essa:
+Imagine um projeto em *C* cuja a funÁ„o ``main`` È essa:
 
 		#include "init.h"
         #include "config.h"
@@ -1184,12 +1201,12 @@ Imagine um projeto em *C* cuja a fun√ß√£o ``main`` √© essa:
             return 1;
         }
 
-Em *C* os ``includes`` dizem muito sobre as depend√™ncias diretas que um arquivo possui em rela√ß√£o aos outros. Geralmente, arquivos inclu√≠dos usando aspas duplas recaem sobre arquivos locais ao projeto e arquivos que utilizam o padr√£o ``< ... >``
-s√£o arquivos externos ao projeto.
+Em *C* os ``includes`` dizem muito sobre as dependÍncias diretas que um arquivo possui em relaÁ„o aos outros. Geralmente, arquivos incluÌdos usando aspas duplas recaem sobre arquivos locais ao projeto e arquivos que utilizam o padr„o ``< ... >``
+s„o arquivos externos ao projeto.
 
-√Ä partir disso, vamos compor uma fun√ß√£o que chegar√° √† conclus√£o da ``depchain`` de qualquer projeto *C* que use esses moldes cl√°ssicos de inclus√£o de c√≥digos. Convenhamos que indicar depend√™ncias manualmente √© muito chato, contudo, esteja avisado(a) que a busca por depend√™ncias entre arquivos √© algo heur√≠stico de modo que n√£o existe uma solu√ß√£o geral e completa. Eu pesquisei um pouco al√©m da conta sobre isso durante a escrita do ``Hefesto`` e foi algo que at√© certo ponto tirou meu sono.
+¿ partir disso, vamos compor uma funÁ„o que chegar· ‡ conclus„o da ``depchain`` de qualquer projeto *C* que use esses moldes cl·ssicos de inclus„o de cÛdigos. Convenhamos que indicar dependÍncias manualmente È muito chato, contudo, esteja avisado(a) que a busca por dependÍncias entre arquivos È algo heurÌstico de modo que n„o existe uma soluÁ„o geral e completa. Eu pesquisei um pouco alÈm da conta sobre isso durante a escrita do ``Hefesto`` e foi algo que atÈ certo ponto tirou meu sono.
 
-Qual √© melhor forma na ``HSL`` de serializar o conte√∫do de um arquivo em linhas? Eu voto na ``syscall lines_from_file()``. Vou apresentar o c√≥digo completo do ``c-scanner`` de depend√™ncias e depois discorro sobre o que achar relevante:
+Qual È melhor forma na ``HSL`` de serializar o conte˙do de um arquivo em linhas? Eu voto na ``syscall lines_from_file()``. Vou apresentar o cÛdigo completo do ``c-scanner`` de dependÍncias e depois discorro sobre o que achar relevante:
 
 	include ~/fsutil.hsl
 
@@ -1269,7 +1286,7 @@ Qual √© melhor forma na ``HSL`` de serializar o conte√∫do de um arquivo em linha
     	result $dep_chain;
 	}
 
-Sim, *parser* √© algo trabalhoso por mais bobo que seja pois envolve dar suporte para algumas caracter√≠sticas humanas: bagun√ßa, desmanzelo e falta de padr√£o.
+Sim, *parser* È algo trabalhoso por mais bobo que seja pois envolve dar suporte para algumas caracterÌsticas humanas: bagunÁa, desmanzelo e falta de padr„o.
 
 As linhas:
 
@@ -1282,35 +1299,35 @@ As linhas:
     	$exts.add_item("cpp");
     	$exts.add_item("CPP");
 
-S√£o respons√°veis por registrar as extens√µes de arquivo relevantes de serem escaneados. Pelo fato de haver milh√µes de possibilidade de se nomear ``headers`` e ``implementation files`` precisamos de uma lista... Se o desenvolvedor usar ``Hpp`` e/ou ``Cpp`` hahah ele j√° era. Poder√≠amos tamb√©m converter o ``filepath`` de um arquivo totalmente para min√∫sculas ou mai√∫sculas mas n√£o quis fazer isso, se quiser, sinta-se livre.
+S„o respons·veis por registrar as extensıes de arquivo relevantes de serem escaneados. Pelo fato de haver milhıes de possibilidade de se nomear ``headers`` e ``implementation files`` precisamos de uma lista... Se o desenvolvedor usar ``Hpp`` e/ou ``Cpp`` hahah ele j· era. PoderÌamos tambÈm converter o ``filepath`` de um arquivo totalmente para min˙sculas ou mai˙sculas mas n„o quis fazer isso, se quiser, sinta-se livre.
 
-Depois para cada extens√£o registrada, buscamos no diret√≥rio corrente via a fun√ß√£o de lista ``ls()`` o seguinte padr√£o ``Regex``:
+Depois para cada extens„o registrada, buscamos no diretÛrio corrente via a funÁ„o de lista ``ls()`` o seguinte padr„o ``Regex``:
 
 	$str = ".*\\." + $exts.item($e) + "$";
 
-O que nas itera√ß√µes poder√° ser:
+O que nas iteraÁıes poder· ser:
 
 > ".*\\\\.h$"...
 > > ".*\\\\.hpp$"...
 > > > ".*\\\\.c$"...
 > > > > ".*\\\\.C$"...
 
-Cada arquivo encontrado passa possuir um registro na ``dep-chain`` (lembra da sintaxe dela? ent√£o...). Dessa forma ele ter√° o conte√∫do monitorado pelo ``Hefesto``:
+Cada arquivo encontrado passa possuir um registro na ``dep-chain`` (lembra da sintaxe dela? ent„o...). Dessa forma ele ter· o conte˙do monitorado pelo ``Hefesto``:
 
 	$str = $files.item($f);
 	$dep_chain = $dep_chain + $str + ": ";
 
-Depois o conte√∫do desse arquivo √© varrido em busca de diretivas includes:
+Depois o conte˙do desse arquivo È varrido em busca de diretivas includes:
 
 	$includes = hefesto.sys.lines_from_file($str, "#include.*$");
 
-Note que n√£o √© uma boa ancorar a ``regex`` com o ``^``, pois pessoas tendem ser relapsas e digitarem ``includes`` nesse formato organizado:
+Note que n„o È uma boa ancorar a ``regex`` com o ``^``, pois pessoas tendem ser relapsas e digitarem ``includes`` nesse formato organizado:
 
 >      #includes "aqui.h"
 >               #include "lah.h"
->        /*vou incluir ali tamb√©m*/ #include "ali.h"
+>        /*vou incluir ali tambÈm*/ #include "ali.h"
 
-Com cada linha include encontrada, √© extra√≠do o nome do arquivo e gerado um ``fullpath`` com esse nome extra√≠do precedido pelo ``cwd``. Se esse arquivo for realmente acess√≠vel ele entra como uma depend√™ncia para o arquivo anteriormente registrado na ``dep-chain``:
+Com cada linha include encontrada, È extraÌdo o nome do arquivo e gerado um ``fullpath`` com esse nome extraÌdo precedido pelo ``cwd``. Se esse arquivo for realmente acessÌvel ele entra como uma dependÍncia para o arquivo anteriormente registrado na ``dep-chain``:
 
 	while ($i < $includes.count()) {
     	$str = $includes.item($i);
@@ -1327,7 +1344,7 @@ Com cada linha include encontrada, √© extra√≠do o nome do arquivo e gerado um ``
         $i = $i + 1;
 	}
 
-Para os ``headers`` essa fun√ß√£o aplica uma busca secund√°ria pelos arquivos de implementa√ß√£o deles. Se existirem e forem acess√≠veis sob o contexto do ``cwd`` as implementa√ß√µes tamb√©m ser√£o depend√™ncias, no caso, impl√≠citas, de nosso arquivo atualmente escaneado:
+Para os ``headers`` essa funÁ„o aplica uma busca secund·ria pelos arquivos de implementaÁ„o deles. Se existirem e forem acessÌveis sob o contexto do ``cwd`` as implementaÁıes tambÈm ser„o dependÍncias, no caso, implÌcitas, de nosso arquivo atualmente escaneado:
 
 	if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
     	$str = $files.item($f);
@@ -1348,30 +1365,30 @@ Para os ``headers`` essa fun√ß√£o aplica uma busca secund√°ria pelos arquivos de
         }
 	}
 
-Depois disso, o arquivo atual j√° ter√° todas as poss√≠veis depend√™ncias devidamente listadas na ``dep-chain`` o que apenas resta fechar a declara√ß√£o de suas depend√™ncias:
+Depois disso, o arquivo atual j· ter· todas as possÌveis dependÍncias devidamente listadas na ``dep-chain`` o que apenas resta fechar a declaraÁ„o de suas dependÍncias:
 
 	$dep_chain = $dep_chain + ";\n";
 
-Isso √© repetido com cada arquivo presente no ``cwd``, em outras palavras o diret√≥rio do projeto, ou o diret√≥rio atual de onde esse ``c-scanner`` de depend√™ncias foi chamado, note que √© poss√≠vel mudar o ``cwd`` com a ``syscall cd`` e ent√£o chamar o ``scanner``.
+Isso È repetido com cada arquivo presente no ``cwd``, em outras palavras o diretÛrio do projeto, ou o diretÛrio atual de onde esse ``c-scanner`` de dependÍncias foi chamado, note que È possÌvel mudar o ``cwd`` com a ``syscall cd`` e ent„o chamar o ``scanner``.
 
-Ap√≥s todos os arquivos processados a ``dep-chain`` composta retorna para o chamador:
+ApÛs todos os arquivos processados a ``dep-chain`` composta retorna para o chamador:
 
 		result $dep_chain;
 
-A qual provavelmente ser√° usada na se√ß√£o ``dependencies`` presente na declara√ß√£o de um projeto.
+A qual provavelmente ser· usada na seÁ„o ``dependencies`` presente na declaraÁ„o de um projeto.
 
-Caso queira, volte na listagem total do c√≥digo comentado e tente diger√≠-lo um pouco mais. At√© se sentir confiante sobre o que cada linha faz.
+Caso queira, volte na listagem total do cÛdigo comentado e tente digerÌ-lo um pouco mais. AtÈ se sentir confiante sobre o que cada linha faz.
 
 ##### Criando o toolset
 
-Um ``toolset`` precisa ser declarado. Na declara√ß√£o de um ``toolset`` n√£o apenas definimos por qual nome esse ser√° chamado, mas tamb√©m reunimos em sua declara√ß√£o de forma geral tudo que ele far√° usando ferramentas externas.
+Um ``toolset`` precisa ser declarado. Na declaraÁ„o de um ``toolset`` n„o apenas definimos por qual nome esse ser· chamado, mas tambÈm reunimos em sua declaraÁ„o de forma geral tudo que ele far· usando ferramentas externas.
 
 O que um ``toolset`` *C* precisa fazer que depende de ``tools`` externas?
 
-- Compilar os c√≥digos;
-- Linkedit√°-los;
+- Compilar os cÛdigos;
+- Linkedit·-los;
 
-Veja a declara√ß√£o desse ``toolset``:
+Veja a declaraÁ„o desse ``toolset``:
 
 	include ~/toolsets/gcc/forges/gcc_c_app_forge.hsl
 
@@ -1392,13 +1409,13 @@ Veja a declara√ß√£o desse ``toolset``:
     	>
 	$
 
-A sintaxe b√°sica de declara√ß√£o √©:
+A sintaxe b·sica de declaraÁ„o È:
 
 >``toolset <string-name> forge function <hsl-function-name> : [forge helpers <helpers-list>] : <command-templates> $``
 
-No exemplo apresentado, o ``toolset`` se chama: ``gcc-c-app``. Sua fun√ß√£o de forja √© ``gcc_c_binary_forge``, isso explica a diretiva ``include`` no in√≠cio do exemplo, pois √© nele que est√° definida a fun√ß√£o de forja em quest√£o. Os ajudantes de forja (fun√ß√µes ``HSL``) s√£o: ``gcc_compile_list``, ``gcc_link_ofiles`` e ``gcc_mk_compilation_command``. Uma declara√ß√£o de ``toolset`` sempre termina com o s√≠mbolo de final de fita (``$``).
+No exemplo apresentado, o ``toolset`` se chama: ``gcc-c-app``. Sua funÁ„o de forja È ``gcc_c_binary_forge``, isso explica a diretiva ``include`` no inÌcio do exemplo, pois È nele que est· definida a funÁ„o de forja em quest„o. Os ajudantes de forja (funÁıes ``HSL``) s„o: ``gcc_compile_list``, ``gcc_link_ofiles`` e ``gcc_mk_compilation_command``. Uma declaraÁ„o de ``toolset`` sempre termina com o sÌmbolo de final de fita (``$``).
 
-Os ``templates de comando`` que esse ``toolset`` implementa s√£o: ``compile_r``, ``compile_d``, ``link_shared`` e ``link_static``. Um template de comando nada mais √© do que uma abstra√ß√£o de um comando externo que o seu ``toolset`` ir√° fazer. Segue a sintaxe de declara√ß√£o dessa parte:
+Os ``templates de comando`` que esse ``toolset`` implementa s„o: ``compile_r``, ``compile_d``, ``link_shared`` e ``link_static``. Um template de comando nada mais È do que uma abstraÁ„o de um comando externo que o seu ``toolset`` ir· fazer. Segue a sintaxe de declaraÁ„o dessa parte:
 
 >``command <string-name> : <string-argument-list> < <command-line template> >``
 
@@ -1406,22 +1423,22 @@ Importante notar que um ``comando de toolset`` **sempre** recebe *strings* como 
 
 Existe uma regra bem estrita quanto a acessibilidade desses comandos de ``toolset``:
 
->Somente podem ser acessados pela fun√ß√£o de forja do ``toolset`` ou pelas fun√ß√µes ajudantes de forja.
+>Somente podem ser acessados pela funÁ„o de forja do ``toolset`` ou pelas funÁıes ajudantes de forja.
 
 Mas agora, como acessar esses comandos de ``toolset``?
 
-Muito simples, voc√™ os acessa √† partir do subsistema ``toolset``. Imagine o ``toolset`` apresentado, para acessar o comando ``compile_r`` √© necess√°rio:
+Muito simples, vocÍ os acessa ‡ partir do subsistema ``toolset``. Imagine o ``toolset`` apresentado, para acessar o comando ``compile_r`` È necess·rio:
 >(...)
 >``hefesto.toolset.compile_r($source_path, $outfile_path, $includes, $cflags);``
 >(...)
 
-Uma boa abordagem no in√≠cio da cria√ß√£o de um ``toolset`` √© se perguntar quais comandos externos esse ``toolset`` necessitar√° executar. Acho que essa √© a g√™nese de qualquer ``toolset``.
+Uma boa abordagem no inÌcio da criaÁ„o de um ``toolset`` È se perguntar quais comandos externos esse ``toolset`` necessitar· executar. Acho que essa È a gÍnese de qualquer ``toolset``.
 
-##### A fun√ß√£o de forja
+##### A funÁ„o de forja
 
-Talvez essa seja a parte mais trabalhosa do trajeto, pois √© na fun√ß√£o de forja que deve ser incutida a l√≥gica do *build*. Levando em considera√ß√£o que um ``toolset`` deve ser uma generaliza√ß√£o de tarefas que usem os comandos externos do ``toolset`` para produzirem alguma coisa...
+Talvez essa seja a parte mais trabalhosa do trajeto, pois È na funÁ„o de forja que deve ser incutida a lÛgica do *build*. Levando em consideraÁ„o que um ``toolset`` deve ser uma generalizaÁ„o de tarefas que usem os comandos externos do ``toolset`` para produzirem alguma coisa...
 
-Segue a fun√ß√£o de forja, depois da listagem, comentarei as partes que julgar relevantes:
+Segue a funÁ„o de forja, depois da listagem, comentarei as partes que julgar relevantes:
 
 	function gcc_c_binary_forge(SOURCES type list,
     							INCLUDES type list, CFLAGS type list,
@@ -1525,7 +1542,7 @@ Segue a fun√ß√£o de forja, depois da listagem, comentarei as partes que julgar r
         result $exit_code;
     }
 
-Note que a fun√ß√£o de forja tem a seguinte defini√ß√£o:
+Note que a funÁ„o de forja tem a seguinte definiÁ„o:
 
 	function gcc_c_binary_forge(SOURCES type list,
     							INCLUDES type list, CFLAGS type list,
@@ -1533,7 +1550,7 @@ Note que a fun√ß√£o de forja tem a seguinte defini√ß√£o:
                                 LDFLAGS type list,
                                 APPNAME type string) : result type int
 
-Isso explica a sequ√™ncia/tipo dos argumentos passados na declara√ß√£o do projeto:
+Isso explica a sequÍncia/tipo dos argumentos passados na declaraÁ„o do projeto:
 
 	var sources type list;
     var includes type list;
@@ -1544,7 +1561,7 @@ Isso explica a sequ√™ncia/tipo dos argumentos passados na declara√ß√£o do projet
 	project sample : toolset "gcc-c-app" : $sources, $includes, $cflags,
                                            $libraries, $ldflags, "sample" ;
 
-Esse ``toolset`` possui de cara uma conveni√™ncia:
+Esse ``toolset`` possui de cara uma conveniÍncia:
 
 	if ($SOURCES.count() == 0) {
         if (hefesto.project.toolset() == "gcc-c-app") {
@@ -1554,7 +1571,7 @@ Esse ``toolset`` possui de cara uma conveni√™ncia:
     	}
     }
 
-Se for passada uma lista de c√≥digos vazia, ele escaneia o diret√≥rio corrente por c√≥digos *C* ou *CC*. Pelo fato da mesma fun√ß√£o de forja ser usada por outro ``toolset`` (``gcc-cc-app``) respons√°vel por criar aplicativos *C++*, verificamos o nome do ``toolset`` atualmente carregado, via o subsistema ``project``, se for "gcc-c-app" listamos todos os arquivos que terminem com ".c" no nome para dentro da lista ``SOURCES``. Caso contr√°rio, buscamos por c√≥digos *C++*.
+Se for passada uma lista de cÛdigos vazia, ele escaneia o diretÛrio corrente por cÛdigos *C* ou *CC*. Pelo fato da mesma funÁ„o de forja ser usada por outro ``toolset`` (``gcc-cc-app``) respons·vel por criar aplicativos *C++*, verificamos o nome do ``toolset`` atualmente carregado, via o subsistema ``project``, se for "gcc-c-app" listamos todos os arquivos que terminem com ".c" no nome para dentro da lista ``SOURCES``. Caso contr·rio, buscamos por cÛdigos *C++*.
 
 Se mesmo assim ``SOURCES`` estiver vazia:
 
@@ -1563,9 +1580,9 @@ Se mesmo assim ``SOURCES`` estiver vazia:
         result 1;
     }
 
-Terminamos aqui, alertando sobre a lista vazia e saindo com ``1`` para sinalizar erro e fazer com que o ``Hefesto`` quebre o processo de forja para que o usu√°rio tome conhecimento que algo deu errado.
+Terminamos aqui, alertando sobre a lista vazia e saindo com ``1`` para sinalizar erro e fazer com que o ``Hefesto`` quebre o processo de forja para que o usu·rio tome conhecimento que algo deu errado.
 
-Mais algumas conveni√™ncias... √†s vezes por motivos de higiene n√£o desejamos poluir o diret√≥rio de onde o *build* roda com arquivos objeto:
+Mais algumas conveniÍncias... ‡s vezes por motivos de higiene n„o desejamos poluir o diretÛrio de onde o *build* roda com arquivos objeto:
 
 	var obj_output_dir type list;
     var obj_dir type string;
@@ -1578,9 +1595,9 @@ Mais algumas conveni√™ncias... √†s vezes por motivos de higiene n√£o desejamos p
     	$obj_dir = hefesto.sys.pwd();
     }
 
-Nisso, verificamos se o usu√°rio passou a op√ß√£o ``--obj-output-dir``. Lembrando que a ``syscall get_option`` retorna uma lista. Se a lista retornada contiver pelo menos um item √© porque algo foi realmente passado e neste caso pegamos o primeiro item da lista (que √© um *path*, *full* ou relativo) e passamos para a fun√ß√£o ``mktree()``, definida em ``fsutil.hsl``. Essa fun√ß√£o cria um ``path`` caso esse n√£o exista. Agora, se n√£o foi passada a op√ß√£o ``--obj-output-dir``, o diret√≥rio corrente √© assumido como o *output-dir* para os arquivos objeto, ``hefesto.sys.pwd()`` nos garante isso.
+Nisso, verificamos se o usu·rio passou a opÁ„o ``--obj-output-dir``. Lembrando que a ``syscall get_option`` retorna uma lista. Se a lista retornada contiver pelo menos um item È porque algo foi realmente passado e neste caso pegamos o primeiro item da lista (que È um *path*, *full* ou relativo) e passamos para a funÁ„o ``mktree()``, definida em ``fsutil.hsl``. Essa funÁ„o cria um ``path`` caso esse n„o exista. Agora, se n„o foi passada a opÁ„o ``--obj-output-dir``, o diretÛrio corrente È assumido como o *output-dir* para os arquivos objeto, ``hefesto.sys.pwd()`` nos garante isso.
 
-Algo similar √© feito com o diret√≥rio de sa√≠da para o bin√°rio que ser√° criado com a forja, confira:
+Algo similar È feito com o diretÛrio de saÌda para o bin·rio que ser· criado com a forja, confira:
 
 	$bin_output_dir = hefesto.sys.get_option("bin-output-dir");
     if ($bin_output_dir.count() > 0) {
@@ -1591,15 +1608,15 @@ Algo similar √© feito com o diret√≥rio de sa√≠da para o bin√°rio que ser√° criad
     	$bin_output = $APPNAME;
     }
 
-Agora √© chegada a hora de converter as op√ß√µes do compilador em lista para *strings*:
+Agora È chegada a hora de converter as opÁıes do compilador em lista para *strings*:
 
 		#  GCC's include list option string
         $includes = gcc_mk_gcc_incl_str_opt($INCLUDES);
         $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
 
-Essas fun√ß√µes ser√£o detalhadas posteriormente, por hora, s√≥ √© importante conhec√™-las superficialmente.
+Essas funÁıes ser„o detalhadas posteriormente, por hora, sÛ È importante conhecÍ-las superficialmente.
 
-Tamb√©m √© conveniente poder escolher a arquitetura do *target*, no caso a leitura de op√ß√£o que ser√° apresentada permite escolher entre um bin√°rio *32-bit* ou *64-bit*, confira:
+TambÈm È conveniente poder escolher a arquitetura do *target*, no caso a leitura de opÁ„o que ser· apresentada permite escolher entre um bin·rio *32-bit* ou *64-bit*, confira:
 
 	var cpu_arch type list;
     var chosen_arch type string;
@@ -1615,28 +1632,28 @@ Tamb√©m √© conveniente poder escolher a arquitetura do *target*, no caso a leitu
         }
 	}
 
-Se o usu√°rio passar ``--cpu-arch=32`` ou ``--cpu-arch=64``, ser√° adicionada a op√ß√£o ``-m32`` ou ``-m64`` na linha de comando que ser√° diretamente repassada ao *GCC*:
+Se o usu·rio passar ``--cpu-arch=32`` ou ``--cpu-arch=64``, ser· adicionada a opÁ„o ``-m32`` ou ``-m64`` na linha de comando que ser· diretamente repassada ao *GCC*:
 
 	$cflags = $cflags + " -m" + $chosen_arch;
 
-Essa op√ß√£o do *GCC* especifica a arquitetura do *target*. Caso seja passado um valor diferente de ``32`` ou ``64``, a forja ser√° interrompida retornando ``1`` que significa erro.
+Essa opÁ„o do *GCC* especifica a arquitetura do *target*. Caso seja passado um valor diferente de ``32`` ou ``64``, a forja ser· interrompida retornando ``1`` que significa erro.
 
-Agora entregamos o controle para a fun√ß√£o que propriamente compilar√° cada c√≥digo presente no projeto:
+Agora entregamos o controle para a funÁ„o que propriamente compilar· cada cÛdigo presente no projeto:
 
 	#  compiling...
     hefesto.sys.echo("*** compiling...\n");
 
     $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); 
 
-Mais para frente a fun√ß√£o ``gcc_compile_source_list()``, ser√° detalhada.
+Mais para frente a funÁ„o ``gcc_compile_source_list()``, ser· detalhada.
 
-Nesse ``toolset`` existe uma vari√°vel global chamada ``gcc_c_project_forge_dirty_files_nr``, que guarda a contagem de arquivos efetivamente processados. Se ap√≥s o final da compila√ß√£o n√£o houver nenhum arquivo processado, √© feita a verifica√ß√£o se o *target* (o bin√°rio propriamente dito) existe. Caso n√£o exista, a vari√°vel global de contagem √© setada para ``1``.
+Nesse ``toolset`` existe uma vari·vel global chamada ``gcc_c_project_forge_dirty_files_nr``, que guarda a contagem de arquivos efetivamente processados. Se apÛs o final da compilaÁ„o n„o houver nenhum arquivo processado, È feita a verificaÁ„o se o *target* (o bin·rio propriamente dito) existe. Caso n„o exista, a vari·vel global de contagem È setada para ``1``.
 
     if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
     	$gcc_c_project_forge_dirty_files_nr = 1;
     }
 
-O motivo de setar essa vari√°vel √© por conta de garantir que a *linkedi√ß√£o* ser√° feita (mesmo sem nenhum arquivo processado, por√©m sem o bin√°rio devemos *linkeditar*):
+O motivo de setar essa vari·vel È por conta de garantir que a *linkediÁ„o* ser· feita (mesmo sem nenhum arquivo processado, porÈm sem o bin·rio devemos *linkeditar*):
 
 	if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
 		$objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
@@ -1653,17 +1670,17 @@ O motivo de setar essa vari√°vel √© por conta de garantir que a *linkedi√ß√£o* s
 									 $bin_output);
 	}
 
-Note que al√©m da contagem de arquivos processados, a *linkedi√ß√£o* tamb√©m depende de n√£o ter havido nenhum erro na compila√ß√£o, o ``$exit_code == 0`` na ``if-clause`` nos  garante isso.
+Note que alÈm da contagem de arquivos processados, a *linkediÁ„o* tambÈm depende de n„o ter havido nenhum erro na compilaÁ„o, o ``$exit_code == 0`` na ``if-clause`` nos  garante isso.
 
-Se necess√°rio *linkeditar*:
+Se necess·rio *linkeditar*:
 
-- Os *file paths* correspondentes aos arquivos objeto s√£o reunidos numa *string*;
-- O mesmo √© feito com as op√ß√µes de *linker* passadas pelo usu√°rio, na declara√ß√£o do projeto de forja;
-- Se a arquitetura foi explicitada adiciona a op√ß√£o *GCC* correspondente nas op√ß√µes de *linker*;
-- Serializa tamb√©m os file paths adicionais onde podem ser encontradas bibliotecas (isso foi passado pelo usu√°rio na declara√ß√£o do projeto de forja);
-- Chama a fun√ß√£o que realiza efetivamente a *linkedi√ß√£o*: ``gcc_link_ofiles()``.
+- Os *file paths* correspondentes aos arquivos objeto s„o reunidos numa *string*;
+- O mesmo È feito com as opÁıes de *linker* passadas pelo usu·rio, na declaraÁ„o do projeto de forja;
+- Se a arquitetura foi explicitada adiciona a opÁ„o *GCC* correspondente nas opÁıes de *linker*;
+- Serializa tambÈm os file paths adicionais onde podem ser encontradas bibliotecas (isso foi passado pelo usu·rio na declaraÁ„o do projeto de forja);
+- Chama a funÁ„o que realiza efetivamente a *linkediÁ„o*: ``gcc_link_ofiles()``.
 
-Depois apenas um relat√≥rio de *status* baseado no *exit code*, para orientar o usu√°rio:
+Depois apenas um relatÛrio de *status* baseado no *exit code*, para orientar o usu·rio:
 
 	if ($exit_code == 0) {
     	hefesto.sys.echo("*** success.\n");
@@ -1671,36 +1688,36 @@ Depois apenas um relat√≥rio de *status* baseado no *exit code*, para orientar o 
     	hefesto.sys.echo("*** failure.\n");
     }
 
-E por fim o retorno do exit code, o que √© importante para que o ``Hefesto`` saiba que rumo a forja teve:
+E por fim o retorno do exit code, o que È importante para que o ``Hefesto`` saiba que rumo a forja teve:
 
 	result $exit_code;
 
-Volte na listagem integral do ``source-code`` da fun√ß√£o de forja e veja se consegue entender cada por√ß√£o de c√≥digo dela. √â importante para prosseguir entender realmente tudo que est√° sendo feito.
+Volte na listagem integral do ``source-code`` da funÁ„o de forja e veja se consegue entender cada porÁ„o de cÛdigo dela. … importante para prosseguir entender realmente tudo que est· sendo feito.
 
 ##### Detalhando cada forge helper
 
-Anteriormente foi detalhada a fun√ß√£o de forja, contudo, ela usa um conjunto de fun√ß√µes de apoio, as quais aqui ser√£o melhor detalhadas.
+Anteriormente foi detalhada a funÁ„o de forja, contudo, ela usa um conjunto de funÁıes de apoio, as quais aqui ser„o melhor detalhadas.
 
 
 ###### gcc_compile_source_list()
 
-Das ajudantes de forja, talvez a mais "complexa". Por isso, vamos come√ßar com ela.
-Nessa fun√ß√£o voc√™ ver√° como as altera√ß√µes dos arquivos s√£o monitoradas e que √© de responsabilidade do desenvolvedor do ``toolset`` manter a sanidade dessa ``feature``.
+Das ajudantes de forja, talvez a mais "complexa". Por isso, vamos comeÁar com ela.
+Nessa funÁ„o vocÍ ver· como as alteraÁıes dos arquivos s„o monitoradas e que È de responsabilidade do desenvolvedor do ``toolset`` manter a sanidade dessa ``feature``.
 
-Existem dois *branches* de execu√ß√£o, um recai sobre a compila√ß√£o ++s√≠ncrona++ o outro sobre a compila√ß√£o ++ass√≠ncrona++. Poderiam ter sido quebradas em duas fun√ß√µes, nada impede, mas aqui est√£o bifurcadas em *if-branches*.
+Existem dois *branches* de execuÁ„o, um recai sobre a compilaÁ„o ++sÌncrona++ o outro sobre a compilaÁ„o ++assÌncrona++. Poderiam ter sido quebradas em duas funÁıes, nada impede, mas aqui est„o bifurcadas em *if-branches*.
 
-Uma compila√ß√£o **s√≠ncrona** pode ser entendida como **uma compila√ß√£o de arquivo por ciclo**. J√° uma compila√ß√£o **ass√≠ncrona** pode ser entendida como ***n* compila√ß√µes de arquivos por ciclo**.
+Uma compilaÁ„o **sÌncrona** pode ser entendida como **uma compilaÁ„o de arquivo por ciclo**. J· uma compilaÁ„o **assÌncrona** pode ser entendida como ***n* compilaÁıes de arquivos por ciclo**.
 
-Essa √© a defini√ß√£o da fun√ß√£o:
+Essa È a definiÁ„o da funÁ„o:
 
 	function gcc_compile_source_list(sources type list,
     								 includes type string,
                                      cflags type string,
                                      obj_dir type string) : result type int
 
-Recebe a lista de c√≥digos que ser√£o compilados, uma lista de diret√≥rios de *includes*, uma lista com op√ß√µes que dever√£o ser usadas na compila√ß√£o de cada c√≥digo-fonte e o *path* para o diret√≥rio onde os arquivos objeto dever√£o ser gerados. Retorna zero para processamento sem erro e diferente de zero caso alguma coisa n√£o ocorra conforme esperado.
+Recebe a lista de cÛdigos que ser„o compilados, uma lista de diretÛrios de *includes*, uma lista com opÁıes que dever„o ser usadas na compilaÁ„o de cada cÛdigo-fonte e o *path* para o diretÛrio onde os arquivos objeto dever„o ser gerados. Retorna zero para processamento sem erro e diferente de zero caso alguma coisa n„o ocorra conforme esperado.
 
-O in√≠cio da fun√ß√£o √© esse:
+O inÌcio da funÁ„o È esse:
 
 	var size type int;
     var i type int;
@@ -1726,11 +1743,11 @@ O in√≠cio da fun√ß√£o √© esse:
         $qsize = $qsize_list.item(0);
     }
 
-Se passado uma lista de c√≥digos vazia retorna zero logo de cara. Ap√≥s isso √© feita a leitura de uma op√ß√£o reconhecida internamente pelo *Hefesto* que √© a ``--qsize=n``.
+Se passado uma lista de cÛdigos vazia retorna zero logo de cara. ApÛs isso È feita a leitura de uma opÁ„o reconhecida internamente pelo *Hefesto* que È a ``--qsize=n``.
 
-Essa op√ß√£o indica o total de processos concorrentes que a ``syscall run`` √© capaz de criar por chamada ass√≠ncrona. Para chamar a ``run`` de forma ass√≠ncrona √© preciso passar uma lista de comandos.
+Essa opÁ„o indica o total de processos concorrentes que a ``syscall run`` È capaz de criar por chamada assÌncrona. Para chamar a ``run`` de forma assÌncrona È preciso passar uma lista de comandos.
 
-Se a op√ß√£o ``--qsize`` for passada, a fun√ß√£o guarda o valor passado nela para uso posterior. Logo depois:
+Se a opÁ„o ``--qsize`` for passada, a funÁ„o guarda o valor passado nela para uso posterior. Logo depois:
 
 	$compile_model = hefesto.sys.get_option("compile-model");
 
@@ -1747,9 +1764,9 @@ Se a op√ß√£o ``--qsize`` for passada, a fun√ß√£o guarda o valor passado nela par
         $is_release = ($compile_model.item(0) == "release");
     }
 
-...Lemos a op√ß√£o ``compile-model``, se o usu√°rio passou essa op√ß√£o verifica se √© **release** ou **debug**, sendo outro conte√∫do quebra a forja saindo com *1*. Caso seja um dos dois valores reconhecidos, seta uma *flag* indicando a escolha, para uso posterior.
+...Lemos a opÁ„o ``compile-model``, se o usu·rio passou essa opÁ„o verifica se È **release** ou **debug**, sendo outro conte˙do quebra a forja saindo com *1*. Caso seja um dos dois valores reconhecidos, seta uma *flag* indicando a escolha, para uso posterior.
 
-Agora vem a compila√ß√£o propriamente dita:
+Agora vem a compilaÁ„o propriamente dita:
 
 	$exit_code = 0;
     $i = 0;
@@ -1796,33 +1813,33 @@ Agora vem a compila√ß√£o propriamente dita:
     	(...)
     }
 
-O *else* refere-se a parte ass√≠ncrona, por hora vamos abstra√≠-la e nos atermos a parte s√≠ncrona. Temos a seguinte inicializa√ß√£o:
+O *else* refere-se a parte assÌncrona, por hora vamos abstraÌ-la e nos atermos a parte sÌncrona. Temos a seguinte inicializaÁ„o:
 
 	$exit_code = 0;
 	$i = 0;
     $gcc_c_project_forge_dirty_files_nr = 0;
     $not_compiled = lsdup($sources);
 
-A vari√°vel que guarda o *exit code* das compila√ß√µes √© zerada. O contador que percorrer√° a lista de c√≥digos "come√ßar√° pelo come√ßo". A *flag* que indica que algum arquivo foi efetivamente processado √© *unsetada*. Depois usamos uma fun√ß√£o presente em ``lsutil.hsl``. Essa fun√ß√£o retorna uma c√≥pia da lista passada para ela.
+A vari·vel que guarda o *exit code* das compilaÁıes È zerada. O contador que percorrer· a lista de cÛdigos "comeÁar· pelo comeÁo". A *flag* que indica que algum arquivo foi efetivamente processado È *unsetada*. Depois usamos uma funÁ„o presente em ``lsutil.hsl``. Essa funÁ„o retorna uma cÛpia da lista passada para ela.
 
-A lista ``not_compiled`` tem uma utilidade especial. √â por meio dela que o *Hefesto* conseguir√° saber qual arquivo realmente mudou entre a √∫ltima forja e a atual.
+A lista ``not_compiled`` tem uma utilidade especial. … por meio dela que o *Hefesto* conseguir· saber qual arquivo realmente mudou entre a ˙ltima forja e a atual.
 
-Existem duas fun√ß√µes *builtin* no ``subsystem toolset``:
+Existem duas funÁıes *builtin* no ``subsystem toolset``:
 
 - ``hefesto.toolset.file_has_change(<file-path>)``
 - ``hefesto.toolset.base_refresh(<untouched-files>)``
 
-A ``file_has_change`` √© bem direta:
+A ``file_has_change`` È bem direta:
 
 >Recebe o *path* de um arquivo e retorna **1** caso esse **arquivo tenha mudado**, de outra forma **0**.
 
-J√° ``base_refresh()``:
+J· ``base_refresh()``:
 
->Recebe uma lista de *paths*, mas essa lista deve apenas conter os *paths* dos arquivos que **ainda n√£o foram processados**.
+>Recebe uma lista de *paths*, mas essa lista deve apenas conter os *paths* dos arquivos que **ainda n„o foram processados**.
 
-O *workflow* de uso dessas fun√ß√µes geralmente se resume em invocar ``file_has_change`` para saber se o arquivo corrente mudou, se mudou, se aplica o processamento necess√°rio. Realiza isso para cada arquivo. Ao final, chama apenas uma √∫nica vez a ``base_refresh``. Com essas duas ``toolset-functions`` o *Hefesto* √© capaz de saber exatamente quem mudou desde a √∫ltima forja.
+O *workflow* de uso dessas funÁıes geralmente se resume em invocar ``file_has_change`` para saber se o arquivo corrente mudou, se mudou, se aplica o processamento necess·rio. Realiza isso para cada arquivo. Ao final, chama apenas uma ˙nica vez a ``base_refresh``. Com essas duas ``toolset-functions`` o *Hefesto* È capaz de saber exatamente quem mudou desde a ˙ltima forja.
 
-Voltemos ao c√≥digo:
+Voltemos ao cÛdigo:
 
 	if ($qsize <= 1) {
         while ($i < $size && $exit_code == 0) {
@@ -1860,18 +1877,18 @@ Voltemos ao c√≥digo:
         }
     }
 
-Se a forja tiver que ser s√≠ncrona, i.e: se ``qsize`` ser igual ou menor a *1*, para cada caminho de arquivo (c√≥digo *C*) presente na lista, enquanto n√£o houver nenhum erro de compila√ß√£o:
+Se a forja tiver que ser sÌncrona, i.e: se ``qsize`` ser igual ou menor a *1*, para cada caminho de arquivo (cÛdigo *C*) presente na lista, enquanto n„o houver nenhum erro de compilaÁ„o:
 
-> √Ä partir do path do arquivo usamos a fun√ß√£o ``gcc_mk_ofile_name()`` para criar o nome objeto do arquivo, de fato apenas substitu√≠mos o ``.c`` por ``.o`` e juntamos esse novo nome com o conte√∫do do caminho para o diret√≥rio de arquivos objeto.
+> ¿ partir do path do arquivo usamos a funÁ„o ``gcc_mk_ofile_name()`` para criar o nome objeto do arquivo, de fato apenas substituÌmos o ``.c`` por ``.o`` e juntamos esse novo nome com o conte˙do do caminho para o diretÛrio de arquivos objeto.
 >
-> Verificamos se o arquivo ``.c`` teve altera√ß√£o ou se seu arquivo objeto n√£o existe.
->> Com uma dessas duas condi√ß√µes satisfeitas, incrementamos o contador de arquivos processados e rodamos o comando de compila√ß√£o. Se o arquivo for compilado com √™xito, removemos o *path* dele da lista ``not_compiled``.
+> Verificamos se o arquivo ``.c`` teve alteraÁ„o ou se seu arquivo objeto n„o existe.
+>> Com uma dessas duas condiÁıes satisfeitas, incrementamos o contador de arquivos processados e rodamos o comando de compilaÁ„o. Se o arquivo for compilado com Íxito, removemos o *path* dele da lista ``not_compiled``.
 >>
->> Se o arquivo ``.c`` n√£o mudou e o seu objeto existe, apenas informa que n√£o houveram mudan√ßas naquele arquivo.
+>> Se o arquivo ``.c`` n„o mudou e o seu objeto existe, apenas informa que n„o houveram mudanÁas naquele arquivo.
 
-Ap√≥s todos os c√≥digos-fonte processados, se houve efetivamente pelo menos uma compila√ß√£o, realiza o ``base-refresh`` e retorna o *exit code* do processo, para que o chamador tome a medida necess√°ria baseada nesse valor retornado.
+ApÛs todos os cÛdigos-fonte processados, se houve efetivamente pelo menos uma compilaÁ„o, realiza o ``base-refresh`` e retorna o *exit code* do processo, para que o chamador tome a medida necess·ria baseada nesse valor retornado.
 
-Agora vamos ver a parte ass√≠ncrona da compila√ß√£o:
+Agora vamos ver a parte assÌncrona da compilaÁ„o:
 
 	else {
         $not_compiled_tmp.clear();
@@ -1919,11 +1936,11 @@ Agora vamos ver a parte ass√≠ncrona da compila√ß√£o:
         }
     }
 
-O comportamento √© similar ao da por√ß√£o s√≠ncrona. Uma diferen√ßa √© que os comandos de compila√ß√£o n√£o s√£o imediatamente executados, sendo eles adicionados a uma lista para execu√ß√£o ao final de um ciclo. Outra diferen√ßa √© que aqui h√° uma lista auxiliar chamada ``not_compiled_tmp`` que √© preenchida por ciclos e o ``base-refreh`` √© feito ao final desses ciclos. Um c√≠clo √© completo quando o tamanho de ``run_list``, que √© a lista que cont√©m os comandos de compila√ß√£o ainda n√£o executados, contiver o total de elementos igual a ``--qsize``. Se alguma compila√ß√£o quebrar ao final de um ciclo, o *loop* ser√° interrompido. Se ao final do *loop* n√£o havendo erro de compila√ß√£o, ainda houverem c√≥digos por compilar, eles ser√£o compilados e o ``base-refresh`` feito.
+O comportamento È similar ao da porÁ„o sÌncrona. Uma diferenÁa È que os comandos de compilaÁ„o n„o s„o imediatamente executados, sendo eles adicionados a uma lista para execuÁ„o ao final de um ciclo. Outra diferenÁa È que aqui h· uma lista auxiliar chamada ``not_compiled_tmp`` que È preenchida por ciclos e o ``base-refreh`` È feito ao final desses ciclos. Um cÌclo È completo quando o tamanho de ``run_list``, que È a lista que contÈm os comandos de compilaÁ„o ainda n„o executados, contiver o total de elementos igual a ``--qsize``. Se alguma compilaÁ„o quebrar ao final de um ciclo, o *loop* ser· interrompido. Se ao final do *loop* n„o havendo erro de compilaÁ„o, ainda houverem cÛdigos por compilar, eles ser„o compilados e o ``base-refresh`` feito.
 
 ###### gcc_mk_app_compilation_command()
 
-Essa fun√ß√£o √© respons√°vel por **montar** os comandos de compila√ß√£o que ser√£o executados:
+Essa funÁ„o È respons·vel por **montar** os comandos de compilaÁ„o que ser„o executados:
 
 	local function gcc_mk_app_compilation_command(src_name type string,
     	                                          outfile type string,
@@ -1939,25 +1956,25 @@ Essa fun√ß√£o √© respons√°vel por **montar** os comandos de compila√ß√£o que ser
     	result $cmd;
 	}
 
-Note que s√£o passados para ela todos os par√¢metros necess√°rios para se compilar um fonte no *GCC* com a op√ß√£o ``-c`` (confira o *template* dos comandos ``compile_r`` e ``compile_d`` na declara√ß√£o do ``toolset``). Note que fora isso, √© tamb√©m informado o tipo de compila√ß√£o, se √© desejado incluir informa√ß√µes de *debug* ou n√£o (em *release* n√£o inclu√≠ra). Logo ap√≥s, apenas √© retornado a linha de comando formatada, pois um ``toolset-command`` n√£o √© executado, cabe ao desevolvedor do ``toolset`` escolher a melhor maneira de execut√°-lo via a ``syscall run`` e avaliar o *exit code* de tal comando. Lembrando que todos os ``toolset-commands`` est√£o dispon√≠veis para a fun√ß√£o de forja e suas ajudantes √† partir do subsistema ``toolset`` (``hefesto.toolset.<command>``). Ainda, tudo o que foi passado para o comando se resumiu em argumentos do tipo ``string``. Se existir um lema para um ``toolset-command``, pode ser esse:
+Note que s„o passados para ela todos os par‚metros necess·rios para se compilar um fonte no *GCC* com a opÁ„o ``-c`` (confira o *template* dos comandos ``compile_r`` e ``compile_d`` na declaraÁ„o do ``toolset``). Note que fora isso, È tambÈm informado o tipo de compilaÁ„o, se È desejado incluir informaÁıes de *debug* ou n„o (em *release* n„o incluÌra). Logo apÛs, apenas È retornado a linha de comando formatada, pois um ``toolset-command`` n„o È executado, cabe ao desevolvedor do ``toolset`` escolher a melhor maneira de execut·-lo via a ``syscall run`` e avaliar o *exit code* de tal comando. Lembrando que todos os ``toolset-commands`` est„o disponÌveis para a funÁ„o de forja e suas ajudantes ‡ partir do subsistema ``toolset`` (``hefesto.toolset.<command>``). Ainda, tudo o que foi passado para o comando se resumiu em argumentos do tipo ``string``. Se existir um lema para um ``toolset-command``, pode ser esse:
 
->Somente recebe *strings* **na ordem e quantidade** pr√©-definidas, somente retorna **uma** *string*.
+>Somente recebe *strings* **na ordem e quantidade** prÈ-definidas, somente retorna **uma** *string*.
 
 ###### gcc_link_ofiles()
 
-Essa fun√ß√£o √© respons√°vel por *linkeditar* os arquivos objeto produzindo a aplica√ß√£o sob o nome que ``appname`` contiver.
+Essa funÁ„o È respons·vel por *linkeditar* os arquivos objeto produzindo a aplicaÁ„o sob o nome que ``appname`` contiver.
 
-Note que o argumento ``objects`` j√° √© a lista de objetos no formato *string* que o *GCC* espera, i.e: *"foo.o bar.o baz.o"*.
+Note que o argumento ``objects`` j· È a lista de objetos no formato *string* que o *GCC* espera, i.e: *"foo.o bar.o baz.o"*.
 
-As vari√°veis ``libraries`` e ``ldflags`` a mesma coisa, listas no formato *string* que o *GCC* espera.
+As vari·veis ``libraries`` e ``ldflags`` a mesma coisa, listas no formato *string* que o *GCC* espera.
 
-Lembre que na fun√ß√£o de forja nos ocupamos de converter as listas ``HSL`` passadas pelo usu√°rio do ``toolset`` para o "formato *string* do *GCC*".
+Lembre que na funÁ„o de forja nos ocupamos de converter as listas ``HSL`` passadas pelo usu·rio do ``toolset`` para o "formato *string* do *GCC*".
 
-A primeira coisa que essa fun√ß√£o de *linking* faz √© verificar se a op√ß√£o ``--link-model`` foi passada pelo usu√°rio. Essa op√ß√£o admite dois modos de *linking*: ``static`` ou ``shared``. Se for passado um modo de *linkagem* alien√≠gena a forja quebrar√° com sa√≠da *1*.
+A primeira coisa que essa funÁ„o de *linking* faz È verificar se a opÁ„o ``--link-model`` foi passada pelo usu·rio. Essa opÁ„o admite dois modos de *linking*: ``static`` ou ``shared``. Se for passado um modo de *linkagem* alienÌgena a forja quebrar· com saÌda *1*.
 
-Se um dos modos reconhecidos foi passado (note que o modo padr√£o √© *shared*), essa fun√ß√£o monta o comando de *linking* necess√°rio √† partir do ``command-template`` correspondente, definido no ``toolset`` e o executa com a ``syscall run``. Retornando ao final o ``exit code`` do processo de *linkedi√ß√£o*.
+Se um dos modos reconhecidos foi passado (note que o modo padr„o È *shared*), essa funÁ„o monta o comando de *linking* necess·rio ‡ partir do ``command-template`` correspondente, definido no ``toolset`` e o executa com a ``syscall run``. Retornando ao final o ``exit code`` do processo de *linkediÁ„o*.
 
-Confira a listagem do c√≥digo e repasse o que leu:
+Confira a listagem do cÛdigo e repasse o que leu:
 
 	function gcc_link_ofiles(objects type string,
                              libraries type string,
@@ -1994,4 +2011,4 @@ Confira a listagem do c√≥digo e repasse o que leu:
     	result $exit_code;
 	}
 
-√â isso, um bom exerc√≠cio √© tentar criar um ``toolset`` para automatizar algo para o seu estado de coisas. N√£o precisa pensar apenas um compiladores, voc√™ pode tentar criar um ``toolset`` que fa√ßa o *deploy* do seu pacote, entre outras coisas. Seja criativo(a)!
+… isso, um bom exercÌcio È tentar criar um ``toolset`` para automatizar algo para o seu estado de coisas. N„o precisa pensar apenas em compiladores, vocÍ pode tentar criar um ``toolset`` que faÁa o *deploy* do seu pacote, entre outras coisas. Seja criativo(a)!
