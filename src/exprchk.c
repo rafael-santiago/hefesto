@@ -869,6 +869,8 @@ hefesto_type_t get_expression_out_type(const char *expression, hefesto_var_list_
         fp = get_hefesto_func_list_ctx_scoped_name(head_operator, get_current_compile_input(), functions);
         if (fp != NULL) {
             otype = fp->result_type;
+        } else {
+            otype = get_hsl_builtin_outtype(head_operator);
         }
     }
     return otype;

@@ -841,6 +841,8 @@ static void *hefesto_sys_fclose(const char *syscall,
     void *result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
+    **otype = HEFESTO_VAR_TYPE_NONE;
+
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
     arg = get_arg_from_call(syscall, &offset);
@@ -1065,7 +1067,7 @@ static void *hefesto_sys_echo(const char *syscall,
     fflush(stdout);
     free(str_fmt);
 
-    **otype = HEFESTO_VAR_TYPE_UNTYPED;
+    **otype = HEFESTO_VAR_TYPE_NONE;
 
     return NULL;
 
@@ -1182,7 +1184,7 @@ static void *hefesto_sys_prompt(const char *syscall,
     for (b = buf; *b != '\n' && *b != 0; b++);
     *b = 0;
 
-    **otype = (hefesto_type_t) HEFESTO_VAR_TYPE_STRING;
+    **otype = HEFESTO_VAR_TYPE_STRING;
 
     return buf;
 
@@ -1217,7 +1219,7 @@ static void *hefesto_sys_fseek(const char *syscall,
     free(arg_pos);
     free(arg_fd_name);
 
-    **otype = (hefesto_type_t) HEFESTO_VAR_TYPE_INT;
+    **otype = HEFESTO_VAR_TYPE_INT;
 
     return result;
 
@@ -1316,6 +1318,8 @@ static void *hefesto_sys_ftell(const char *syscall,
     void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
     hefesto_file_handle *fp_handle;
 
+    **otype = HEFESTO_VAR_TYPE_INT;
+
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
     arg_fd_name = get_arg_from_call(syscall, &offset);
@@ -1340,6 +1344,8 @@ static void *hefesto_sys_exit(const char *syscall,
     void *code;
     size_t offset;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
+
+    **otype = HEFESTO_VAR_TYPE_NONE;
 
     s = get_arg_list_start_from_call(syscall);
     offset = s - syscall + 1;
@@ -1575,6 +1581,8 @@ static void *hefesto_sys_byref(const char *syscall,
     size_t offset;
     hefesto_var_list_ctx *vp_d = NULL, *vp_s;
     hefesto_func_list_ctx *l_fp, *c_fp;
+
+    **otype = HEFESTO_VAR_TYPE_NONE;
 
     c_fp = hvm_get_current_executed_function();
 
@@ -1873,6 +1881,7 @@ static void *hefesto_sys_get_func_addr(const char *syscall,
     char *arg_func;
     void *func, *retval;
     hefesto_func_list_ctx *curr_func_p = NULL, *func_p;
+
     **otype = HEFESTO_VAR_TYPE_INT;
 
     s = get_arg_list_start_from_call(syscall);

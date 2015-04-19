@@ -305,6 +305,8 @@ static void *hvm_list_del_item(const char *method,
     hefesto_type_t etype;
     hefesto_var_list_ctx *vp;
 
+    *otype = HEFESTO_VAR_TYPE_NONE;
+
     arg = get_arg_from_call(method, &offset);
 
     data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
@@ -366,6 +368,8 @@ static void *hvm_list_ls(const char *method,
     here_search_program_ctx *search_program;
     here_search_result_ctx *search_result;
 
+    *otype = HEFESTO_VAR_TYPE_NONE;
+
     arg = get_arg_from_call(method, &offset);
     data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &offset);
     free(arg);
@@ -423,7 +427,7 @@ static void *hvm_list_clear(const char *method,
                             hefesto_var_list_ctx **lo_vars,
                             hefesto_var_list_ctx **gl_vars,
                             hefesto_func_list_ctx *functions) {
-
+    *otype = HEFESTO_VAR_TYPE_NONE;
     del_hefesto_common_list_ctx(*list_var);
     *list_var = NULL;
     return NULL;
@@ -490,6 +494,8 @@ static void *hvm_list_del_index(const char *method,
     hefesto_var_list_ctx *vp;
     hefesto_common_list_ctx *item;
 
+    *otype = HEFESTO_VAR_TYPE_NONE;
+
     arg = get_arg_from_call(method, &offset);
 
     data = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
@@ -537,6 +543,8 @@ static void *hvm_list_swap(const char *method,
     size_t offset = 0, outsz;
     hefesto_type_t etype = HEFESTO_VAR_TYPE_INT;
     hefesto_common_list_ctx *item1, *item2;
+
+    *otype = HEFESTO_VAR_TYPE_NONE;
 
     arg1 = get_arg_from_call(method, &offset);
     arg2 = get_arg_from_call(method, &offset);

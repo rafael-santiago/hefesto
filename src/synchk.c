@@ -1507,12 +1507,12 @@ static hefesto_int_t synchk_hefesto_sys_ls(const char *usr_calling,
                                      hefesto_var_list_ctx *gl_vars,
                                   hefesto_func_list_ctx *functions) {
 
-    char *args, *a;
+    char *args = NULL, *a = NULL;
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
     here_search_program_ctx *sp = NULL;
-    char *regex;
+    char *regex = NULL;
     args = get_arg_from_call(usr_calling, &offset);
 
     if (!is_expected_args_total(usr_calling, 1)) {
@@ -1532,6 +1532,7 @@ static hefesto_int_t synchk_hefesto_sys_ls(const char *usr_calling,
                 free(args);
                 return 1;
             }
+            free(regex);
         } else if (*args == '$') {
             vp = get_hefesto_var_list_ctx_name(args+1, lo_vars);
             if (!vp) vp = get_hefesto_var_list_ctx_name(args+1, gl_vars);
@@ -1553,7 +1554,6 @@ static hefesto_int_t synchk_hefesto_sys_ls(const char *usr_calling,
                 return 1;
             }
         }
-        free(regex);
         free(args);
 
     }

@@ -113,6 +113,63 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     "\0"
 };
 
+struct hsl_builtin_otype_table_ctx {
+    char *builtin;
+    hefesto_type_t otype;
+};
+
+static struct hsl_builtin_otype_table_ctx HSL_BUILTIN_OTYPE_TABLE[] = {
+    {  "hefesto.sys.replace_in_file",             HEFESTO_VAR_TYPE_INT},
+    {               "hefesto.sys.ls",             HEFESTO_VAR_TYPE_INT},
+    {              "hefesto.sys.pwd",          HEFESTO_VAR_TYPE_STRING},
+    {               "hefesto.sys.cd",             HEFESTO_VAR_TYPE_INT},
+    {               "hefesto.sys.rm",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.fopen", HEFESTO_VAR_TYPE_FILE_DESCRIPTOR},
+    {           "hefesto.sys.fwrite",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.fread",             HEFESTO_VAR_TYPE_INT},
+    {           "hefesto.sys.fclose",            HEFESTO_VAR_TYPE_NONE},
+    {               "hefesto.sys.cp",             HEFESTO_VAR_TYPE_INT},
+    {              "hefesto.sys.run",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.mkdir",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.rmdir",             HEFESTO_VAR_TYPE_INT},
+    {             "hefesto.sys.echo",            HEFESTO_VAR_TYPE_NONE},
+    {              "hefesto.sys.env",          HEFESTO_VAR_TYPE_STRING},
+    {             "hefesto.sys.feof",             HEFESTO_VAR_TYPE_INT},
+    {           "hefesto.sys.prompt",          HEFESTO_VAR_TYPE_STRING},
+    {            "hefesto.sys.fseek",             HEFESTO_VAR_TYPE_INT},
+    {   "hefesto.sys.fseek_to_begin",             HEFESTO_VAR_TYPE_INT},
+    {     "hefesto.sys.fseek_to_end",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.fsize",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.ftell",             HEFESTO_VAR_TYPE_INT},
+    {             "hefesto.sys.exit",            HEFESTO_VAR_TYPE_NONE},
+    {          "hefesto.sys.os_name",          HEFESTO_VAR_TYPE_STRING},
+    {           "hefesto.sys.option",            HEFESTO_VAR_TYPE_LIST},
+    {        "hefesto.sys.make_path",          HEFESTO_VAR_TYPE_STRING},
+    {"hefesto.sys.last_forge_result",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.forge",             HEFESTO_VAR_TYPE_INT},
+    {            "hefesto.sys.byref",            HEFESTO_VAR_TYPE_NONE},
+    {             "hefesto.sys.time",          HEFESTO_VAR_TYPE_STRING},
+    {           "hefesto.sys.setenv",             HEFESTO_VAR_TYPE_INT},
+    {         "hefesto.sys.unsetenv",             HEFESTO_VAR_TYPE_INT},
+    {  "hefesto.sys.lines_from_file",            HEFESTO_VAR_TYPE_LIST},
+    { "hefesto.sys.call_from_module",            HEFESTO_VAR_TYPE_NONE}, //  at this point, unpredictable!! 8-S
+    {    "hefesto.sys.get_func_addr",             HEFESTO_VAR_TYPE_INT},
+    {   "hefesto.sys.call_func_addr",            HEFESTO_VAR_TYPE_NONE},
+    {                        ".item",            HEFESTO_VAR_TYPE_NONE},
+    {                       ".count",             HEFESTO_VAR_TYPE_INT},
+    {                    ".add_item",            HEFESTO_VAR_TYPE_NONE},
+    {                    ".del_item",            HEFESTO_VAR_TYPE_NONE},
+    {                          ".ls",            HEFESTO_VAR_TYPE_NONE},
+    {                       ".clear",            HEFESTO_VAR_TYPE_NONE},
+    {                    ".index_of",             HEFESTO_VAR_TYPE_INT},
+    {                   ".del_index",            HEFESTO_VAR_TYPE_NONE},
+    {                        ".swap",            HEFESTO_VAR_TYPE_NONE},
+    {                         ".len",             HEFESTO_VAR_TYPE_INT},
+    {                          ".at",          HEFESTO_VAR_TYPE_STRING},
+    {                       ".match",             HEFESTO_VAR_TYPE_INT},
+    {                     ".replace",             HEFESTO_VAR_TYPE_INT}
+};
+
 hefesto_int_t is_hefesto_type(const char *type) {
 
     size_t t;
@@ -460,4 +517,18 @@ hefesto_type_t get_hsl_list_subtype(hefesto_common_list_ctx *l_items) {
         li = li->next;
     }
     return ((!must_be_string) ? HEFESTO_VAR_TYPE_INT : HEFESTO_VAR_TYPE_STRING);
+}
+
+hefesto_type_t get_hsl_builtin_outtype(const char *stmt) {
+    size_t hsl_builtin_count = sizeof(HSL_BUILTIN_OTYPE_TABLE) / sizeof(HSL_BUILTIN_OTYPE_TABLE[0]);
+    size_t h;
+    char *found = NULL;
+    hefesto_type_t type = HEFESTO_VAR_TYPE_UNTYPED;
+    for (h = 0; h < hsl_builtin_count && found == NULL; h++) {
+        found = strstr(HSL_BUILTIN_OTYPE_TABLE[h].builtin, stmt);
+        if (found == HSL_BUILTIN_OTYPE_TABLE[h].builtin) {
+            type = HSL_BUILTIN_OTYPE_TABLE[h].otype;
+        }
+    }
+    return type;
 }
