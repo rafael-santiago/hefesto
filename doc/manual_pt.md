@@ -42,7 +42,7 @@ Vou itemizar uns aspectos gerais que me fizeram desistir deles e ++apenas (à pen
 - Linguagens simbólicas;
 - Linguagens [Whitespace-Like](http://pt.wikipedia.org/wiki/Whitespace);
 - O poder de fogo não é constante quando mudamos de plataforma;
-- Às vezes é preciso instalar uma infinidade de coisa para manter o poder de fogo, sem necessidade se o *build system* tivesse sido bem pensado;
+- Às vezes é preciso instalar uma infinidade de coisa para manter o poder de fogo, sem necessidade, se o *build system* tivesse sido bem pensado;
 - Documentação confusa e nada direta;
 - Mistureba de Linguagens sem nenhuma necessidade;
 - Utilização confusa, envolvendo duas ou mais ferramentas para cumprir todo o ciclo do processo;
@@ -101,9 +101,9 @@ Confira na **Tabela 1** em que momento do processo esses pontos de entrada são a
 
 | **Project entry-point** |            **Executado**         |
 |:-----------------------:|:--------------------------------:|
-|      preloading         | Antes mesmo de carregar o toolset|
-|       prologue          | Antes da forja ser iniciada       |
-|       epilogue          | Após a forja ser finalizada      |
+|     ``preloading``      | Antes mesmo de carregar o toolset|
+|     ``prologue``        | Antes da forja ser iniciada      |
+|     ``epilogue``        | Após a forja ser finalizada      |
 
 Esqueçamos por hora o ``preloading`` e o ``epilogue``. Há uma coisa muito básica que sempre deverá ser feita antes de começar uma forja que é coletar os *file paths* dos códigos que precisam ser processados. Então, no ``prologue`` do exemplo:
 
@@ -127,13 +127,13 @@ Já sei:
 
 Pode sim, você precisa criar um arquivo de invocação e imolar 5 cabras em nome de *Hefesto*... O arquivo de invocação precisa estar no diretório onde você deseja invocar a forja, o nome desse arquivo é ``.ivk`` e dentro dele você deve colocar a linha de comando exatamente como passaria para o *Hefesto*.
 
-Com o ``.ivk`` configurado, estando no diretório dele, apenas digitando ``hefesto`` você terá a forja nos moldes padrão que você necessita, caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando *mergeadas* com as opções do arquivo de invocação.
+Com o ``.ivk`` configurado, estando no diretório dele, apenas digitando ``hefesto`` você terá a forja nos moldes padrão que você necessita e definiu, caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando *mergeadas* com as opções do arquivo de invocação.
 
 E quanto as cabras?! Não precisa, era só brincadeira...
 
 Pronto, agora você já sabe os passos básicos para compor um ``Forgefile`` no *Hefesto*, mas o que você não sabe ainda são os detalhes gerais da ``HSL`` e de como criar mais ``toolsets`` que atendam suas necessidades.
 
-Os ``toolsets`` por sua vez são porções de código ``HSL`` que podem ter suas próprias convenções, conveniências e tal. Por isso, antes de usá-los uma boa providência é consultar a documentação específica desse ``toolset``. Se você o baixou da base oficial provavelmente encontrará algum texto que o detalhe.
+Os ``toolsets`` por sua vez são porções de código ``HSL`` que podem ter suas próprias convenções, conveniências, etc. Por isso, antes de usá-los uma boa providência é consultar a documentação específica desse ``toolset``. Se você o baixou da base oficial provavelmente encontrará algum texto que o detalhe.
 
 ### Reprocessando somente o que mudou desde a última forja, tem como?
 
@@ -193,7 +193,7 @@ Sim, quando você adota o uso de ``dep-chains`` em um projeto os seus argumentos 
 
 >Se existe um ``bit`` que seja de diferença entre os argumentos de forja atuais e os últimos de uma forja bem sucedida, **tudo será reprocessado**. Ao meu ver o preço que se paga é menor. Se não há como saber que ``flag`` é passível de reprocessamento de um mar de ``flags`` é mais confiável sempre reprocessar e acabou. A praticidade cotidiana não é uma *top-model* mas na sua simplicidade traz seus encantos...
 
->Sinceramente eu não acho que programadores realmente ocupados e com objetivos reais e bem conscientes ficam macaqueando ``flags`` aleatórias o tempo inteiro para um ``build`` ou disputando ``build-turfe`` por aí. Você conhece algum?!
+>Sinceramente eu não acho que programadores realmente ocupados e com objetivos reais e bem conscientes ficam macaqueando ``flags`` aleatórias o tempo todo para um ``build`` ou disputando ``build-turfe`` por aí. Você conhece algum?!
 
 Uma alteração de arquivo é julgada **não pela data de alteração**, mas **com base no conteúdo**. Com um ``bit`` de diferença um arquivo já será considerado "sujo".
 
@@ -295,6 +295,10 @@ Nossa forja é multiplataforma, mas não precisamos incluir o módulo ``vc110-lib.h
 
 Pronto!
 
+A diretiva ``include`` aceita uma lista de plataformas para efetivamente incluir um arquivo ``HSL`` dentro de outro, se houvesse necessidade de incluir um arquivo apenas no ``FreeBSD`` e no ``Linux``:
+
+		include on freebsd,linux posix/utils.hsl
+
 ### Como rodo meus testes?
 
 Nada me irrita mais do que a necessidade de criar ``batch-files`` ou mesmo ``shell-scripts`` para rodar testes e outras tarefas pré e pós compilação. Organização ao meu ver envolve uniformidade e quanto menos mistureba melhor e o paraíso seria perfeito se pudéssemos deixar tudo dentro da mesma esfera.
@@ -318,7 +322,7 @@ Que tal usar o ``entry-point epilogue`` para disparar a compilação e execução do
     		hefesto.sys.cd("..");
 		}
 
-Desculpe se estou adiantando um pouco as coisa aqui, mas basicamente em ``epilogue`` verifico se o ``build`` atual de nossa *lib* foi realmente bem sucedido, se tiver sido, vejo se a opção de usuário ``--no-test`` foi passada, caso não tenha sido, chamo a função de execução dos testes.
+Desculpe se estou adiantando um pouco as coisas aqui, mas basicamente em ``epilogue`` verifico se o ``build`` atual de nossa *lib* foi realmente bem sucedido, se tiver sido, vejo se a opção de usuário ``--no-test`` foi passada, caso não tenha sido, chamo a função de execução dos testes.
 
 A função ``run-tests`` por sua vez muda para o subdiretório ``test`` onde teremos um outro projeto de forja o qual disparamos. Após isso, finalizamos voltando ao diretório anterior.
 
@@ -367,7 +371,7 @@ Eu posso dizer que encontrei meu paraíso no ``Hades``... :) Espero que você cont
 
 ## Sobre a HSL
 
-Não era a minha intenção inicial criar uma [DSL]() para o *Hefesto*, o fato é que cheguei a conclusão disso durante o processo de maturação da ideia. Visto que desejava resolver meus problemas de uma forma mais geral.
+Não era a minha intenção inicial criar uma [DSL](http://en.wikipedia.org/wiki/Domain-specific_language) para o *Hefesto*, o fato é que cheguei a conclusão disso durante o processo de maturação da ideia. Visto que desejava resolver meus problemas de uma forma mais geral.
 
 Em resumo, tive mais trabalho, contudo, hoje consigo expressar uma boa quantidade de automatizações para diversos processos que vão além de simplesmente fazer *builds* de projetos *C/C++*.
 
@@ -379,7 +383,7 @@ Ao meu ver, o problema de usar uma linguagem de uso geral é fazer o usuário do *
 
 A ``HSL`` em momento nenhum esquece que é uma linguagem feita em suma para automatizar coisas, não comece querer programar *software* de uso geral com ela. ++Por favor não...++
 
-Ela possui 4 tipos primitivos e não existe uma conveniência para se utilizar *user-defined types*, a *Tabela 2* sumariza esses tipos.
+Ela possui 4 tipos primitivos e não existe uma conveniência para se utilizar *user-defined types*, a **Tabela 2** sumariza esses tipos.
 
 
 **Tabela 2**: Tipos primitivos presentes na ``HSL``.
@@ -486,7 +490,7 @@ Esse ``subsistema`` é chamado de ``syscalls``, mas aqui não se deixe levar pelo 
 
 Escolhi esse nome, porque durante meu trabalho notei que a maioria dos pontos de não portabilidade de uma *build-task* recaiam na maior parte sobre algumas *syscalls* verdadeiras. Então, fica aqui explicada a origem de qualquer futuro equívoco.
 
-Uma outra forma de aceitar a não ortodoxia das ``hefesto syscalls`` pode ser entendendo que elas também englobam operações comuns de serem requisitadas e por isso postas de forma ``builtin`` no *build-system*. Criando o que eu aqui gosto de chamar de ``subsistema``.
+Uma outra forma de aceitar a não ortodoxia das ``hefesto syscalls`` pode ser entendendo que elas também englobam operações comuns de serem requisitadas e por isso postas de forma ``built-in`` no *build-system*. Criando o que eu aqui gosto de chamar de ``subsistema``.
 
 Na **Tabela 4** segue uma listagem com uma rápida descrição do que uma referida ``syscall`` faz.
 
@@ -565,7 +569,7 @@ Lista arquivos no diretório corrente. Recebe somente um argumento que deve ser o
 
 ##### ++pwd()++
 
-Retorna o diretório corrente. É muito ``DIFÍCIL`` de usar essa função ``builtin``, dê uma olhada:
+Retorna o diretório corrente. É muito ``DIFÍCIL`` de usar essa função ``built-in``, dê uma olhada:
 
 		function pwd_only_to_PHDs() : result type none {
  			hefesto.sys.echo("The current work directory is: " + hefesto.sys.pwd() + "\n");
@@ -926,7 +930,7 @@ Tenta fazer uma chamada de função à partir de um endereço específico. Se qualque
 
 ### Os facilitadores dos tipos *list* e *string*
 
-Talvez você fique tentado(a) em chamar os facilitadores de métodos, porém, a ``HSL`` não é uma Linguagem orientada à objetos, de forma que os facilitadores podem ser entendidos como operações comuns de serem feitas sobre esses tipos de dados e que por serem comuns por motivos de performance foram implementadas de forma *builtin* na ``HSL``.
+Talvez você fique tentado(a) em chamar os facilitadores de métodos, porém, a ``HSL`` não é uma Linguagem orientada à objetos, de forma que os facilitadores podem ser entendidos como operações comuns de serem feitas sobre esses tipos de dados e que por serem comuns por motivos de performance foram implementadas de forma *built-in* na ``HSL``.
 
 A **Tabela 5** traz uma listagem dos facilitadores presentes no tipo ``string``. A **Tabela 6** reúne os facilitadores implementados no tipo ``list``.
 
@@ -948,7 +952,7 @@ A **Tabela 5** traz uma listagem dos facilitadores presentes no tipo ``string``.
 | ``add_item``     | Adiciona um item                                                  | $lst.add_item("1")                      |
 | ``del_item``     | Remove um item baseado no conteúdo passado                        | $lst.del_item("1")                      |
 | ``del_index``    | Remove o item presente no índice passado                          | $lst.del_index(1)                       |
-| ``ls``           | Carrega os *paths* de arquivos que se encaixam na *regex* passada | $lst.ls(".*\\.c$")                      |
+| ``ls``           | Carrega os *paths* de arquivos que se encaixam na *regex* passada | $lst.ls(".*\\\\.c$")                    |
 | ``clear``        | Limpa a lista                                                     | $lst.clear()                            |
 | ``index_of``     | Retorna o índice de um conteúdo passado ou -1                     | $lst.index_of("1")                      |
 | ``swap``         | Altera a posição de dois items baseados nos seus índices          | $lst.swap(0,9)                          |
@@ -1135,23 +1139,41 @@ Exemplo de chamada:
 
 >``hefesto.sys.echo(piglatinize("I like to speak pig latin.") + "\n");``
 
+### O subsistema *project*
+
+Esse subsistema reúne informações sobre o projeto de forja atualmente executado pelo *Hefesto* e pode ser acessado de qualquer ponto da forja, ou seja, de dentro do ``toolset``, de fora, não importa.
+
+As funções apresentadas na **Tabela 7** podem ser acessadas à partir de:
+
+>``hefesto.project.<function-name>(<args>)``
+
+**Tabela 7**: Funções presentes no subsistema ``project``.
+
+|    **Função**    |                 **Utilidade**                             |    **Exemplo de chamada**       |
+|:----------------:|:---------------------------------------------------------:|--------------------------------:|
+|  ``name()``      | Retorna o nome do projeto em execução                     | ``hefesto.project.name()``      |
+|  ``toolset()``   | Retorna o nome do toolset usado                           | ``hefesto.project.toolset()``   |
+|  ``dep_chain()`` | Retorna a ``dep-chain`` usada                             | ``hefesto.project.dep_chain()`` |
+|   ``abort()``    | Aborta o projeto                                          | ``hefesto.project.abort(1)``    |
+|  ``cmdline()``   | Retorna a linha de comando que a forja está sendo baseada | ``hefesto.project.cmdline()``   |
+
 ### Tem uma forma fácil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
-Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` oco, a função de forja apenas retona o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
+Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/toolsets/null/README.md), a função de forja apenas retona o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
 
 ### Onde posso continuar explorando a *HSL*?
 
 A ``HSL`` possui um repositório próprio de códigos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositório do ``Hefesto`` em sua máquina e uma parte que julgo básica dele já está instalada. Por padrão, ele traz documentações acerca de seus módulos. É uma boa dar uma lida nesses documentos caso queira saber mais sobre funções de apoio que você já possui à sua disposição. Em termos práticos, o ``Helios`` pode ser entendido como o diretório de ``includes`` do ``Hefesto`` criado na cópia que você instalou.
 
-Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essa bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*.
+Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essa bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
 
 ### Tirando as rodinhas: criando *Hefesto toolsets* e dominando completamente o *build-system*
 
-Se você leu as outras seções e tentou rodar os exemplos, falta um passo para você se tornar um usuário avançado do ``Hefesto``, porque até o momento você está apto(a) em automatizar passos no sua própria *build-task* e usar os ``toolsets`` "de fábrica". O que te garante o ``status`` de usuário final estando ainda dependente de um ``toolset devel``.
+Se você leu as outras seções e tentou rodar os exemplos, falta um passo para você se tornar um usuário avançado do ``Hefesto``, porque até o momento você está apto(a) em automatizar passos no sua própria *build-task* e usar os ``toolsets`` "de fábrica". O que te garante o ``status`` de usuário final estando ainda dependente de um [``toolset devel``](http://en.wikipedia.org/wiki/Tasmanian_Devil_(Looney_Tunes)).
 
-Nisso, eu te convido aprender como se implementa um ``Hefesto toolset``. Se você até o momento está gostando da proposta do aplicativo, após as informações contidas nessa seção, talvez goste mais e se sinta motivado(a) em criar extensões para ele, levando em consideração suas próprias necessidades (o que é uma das principais linhas mestras desse projeto. *Liberdade para criar*. *Clareza em se expressar*. *Generalidade ao usar*.).
+Nisso, eu te convido a aprender como se implementa um ``Hefesto toolset``. Se você até o momento está gostando da proposta do aplicativo, após as informações contidas nessa seção, talvez goste mais e se sinta motivado(a) em criar extensões para ele, levando em consideração suas próprias necessidades (o que é uma das principais linhas mestras desse projeto. *Liberdade para criar*. *Clareza em se expressar*. *Generalidade ao usar*.).
 
-#### Mas antes: uma breve recaptulação em tudo que já foi visto
+#### Mas antes: uma breve recapitulação de tudo que já foi visto
 
 O que você já conferiu e/ou já sabe:
 
@@ -1174,7 +1196,7 @@ O que você ainda não conhece e depois de ler essa parte poderá dominar:
 - O subsistema ``project``.
 - Boas práticas para se criar e manter novos ``toolsets``.
 
-#### Nossa meta: um *toolset GCC* para compilar e gerar *libs* e *aplicativos* escritos em *C*
+#### Nossa meta: um *toolset GCC* para compilar e gerar *aplicativos* escritos em *C*
 
 Escolhi a Linguagem *C* por se tratar de uma Linguagem "compilada" e com dependências a serem resolvidas de forma externa ao compilador. Algumas Linguagens mais contemporâneas detectam essas dependências entre arquivos automaticamente, já a Linguagem *C* não, isso vai nos fazer pensar em muitos detalhes o que será um ótimo **batismo de fogo no Hades** ;) e aí? Pronto(a)?!
 
@@ -1201,8 +1223,7 @@ Imagine um projeto em *C* cuja a função ``main`` é essa:
             return 1;
         }
 
-Em *C* os ``includes`` dizem muito sobre as dependências diretas que um arquivo possui em relação aos outros. Geralmente, arquivos incluídos usando aspas duplas recaem sobre arquivos locais ao projeto e arquivos que utilizam o padrão ``< ... >``
-são arquivos externos ao projeto.
+Em *C* os ``includes`` dizem muito sobre as dependências diretas que um arquivo possui em relação aos outros. Geralmente, arquivos incluídos usando aspas duplas recaem sobre arquivos locais ao projeto e arquivos que utilizam o padrão ``< ... >`` são arquivos externos ao projeto.
 
 À partir disso, vamos compor uma função que chegará à conclusão da ``depchain`` de qualquer projeto *C* que use esses moldes clássicos de inclusão de códigos. Convenhamos que indicar dependências manualmente é muito chato, contudo, esteja avisado(a) que a busca por dependências entre arquivos é algo heurístico de modo que não existe uma solução geral e completa. Eu pesquisei um pouco além da conta sobre isso durante a escrita do ``Hefesto`` e foi algo que até certo ponto tirou meu sono.
 
@@ -1286,7 +1307,7 @@ Qual é melhor forma na ``HSL`` de serializar o conteúdo de um arquivo em linhas?
     	result $dep_chain;
 	}
 
-Sim, *parser* é algo trabalhoso por mais bobo que seja pois envolve dar suporte para algumas características humanas: bagunça, desmanzelo e falta de padrão.
+Sim, *parser* é algo trabalhoso por mais bobo que seja pois envolve dar suporte para algumas características encantadoras nos seres humanos: bagunça, desmanzelo e falta de padrão.
 
 As linhas:
 
@@ -1299,7 +1320,7 @@ As linhas:
     	$exts.add_item("cpp");
     	$exts.add_item("CPP");
 
-São responsáveis por registrar as extensões de arquivo relevantes de serem escaneados. Pelo fato de haver milhões de possibilidade de se nomear ``headers`` e ``implementation files`` precisamos de uma lista... Se o desenvolvedor usar ``Hpp`` e/ou ``Cpp`` hahah ele já era. Poderíamos também converter o ``filepath`` de um arquivo totalmente para minúsculas ou maiúsculas mas não quis fazer isso, se quiser, sinta-se livre.
+São responsáveis por registrar as extensões de arquivo relevantes de serem escaneados. Pelo fato de haver milhões de possibilidade para se nomear ``headers`` e ``implementation files`` precisamos de uma lista... Se o desenvolvedor usar ``Hpp`` e/ou ``Cpp`` hahah ele já era. Poderíamos também converter o ``filepath`` de um arquivo totalmente para minúsculas ou maiúsculas mas não quis fazer isso, se quiser, sinta-se livre.
 
 Depois para cada extensão registrada, buscamos no diretório corrente via a função de lista ``ls()`` o seguinte padrão ``Regex``:
 
@@ -1327,7 +1348,7 @@ Note que não é uma boa ancorar a ``regex`` com o ``^``, pois pessoas tendem ser 
 >               #include "lah.h"
 >        /*vou incluir ali também*/ #include "ali.h"
 
-Com cada linha include encontrada, é extraído o nome do arquivo e gerado um ``fullpath`` com esse nome extraído precedido pelo ``cwd``. Se esse arquivo for realmente acessível ele entra como uma dependência para o arquivo anteriormente registrado na ``dep-chain``:
+Com cada linha include encontrada, é extraído o nome do arquivo e gerado um ``fullpath`` com esse nome extraído precedido pelo [``cwd``](http://en.wikipedia.org/wiki/Working_directory). Se esse arquivo for realmente acessível ele entra como uma dependência para o arquivo anteriormente registrado na ``dep-chain``:
 
 	while ($i < $includes.count()) {
     	$str = $includes.item($i);
@@ -1415,7 +1436,7 @@ A sintaxe básica de declaração é:
 
 No exemplo apresentado, o ``toolset`` se chama: ``gcc-c-app``. Sua função de forja é ``gcc_c_binary_forge``, isso explica a diretiva ``include`` no início do exemplo, pois é nele que está definida a função de forja em questão. Os ajudantes de forja (funções ``HSL``) são: ``gcc_compile_list``, ``gcc_link_ofiles`` e ``gcc_mk_compilation_command``. Uma declaração de ``toolset`` sempre termina com o símbolo de final de fita (``$``).
 
-Os ``templates de comando`` que esse ``toolset`` implementa são: ``compile_r``, ``compile_d``, ``link_shared`` e ``link_static``. Um template de comando nada mais é do que uma abstração de um comando externo que o seu ``toolset`` irá fazer. Segue a sintaxe de declaração dessa parte:
+Os ``templates de comando`` que esse ``toolset`` implementa são: ``compile_r``, ``compile_d``, ``link_shared`` e ``link_static``. Um template de comando nada mais é do que uma abstração de um comando externo que o seu ``toolset`` irá montar. Segue a sintaxe de declaração dessa parte:
 
 >``command <string-name> : <string-argument-list> < <command-line template> >``
 
@@ -1429,14 +1450,14 @@ Mas agora, como acessar esses comandos de ``toolset``?
 
 Muito simples, você os acessa à partir do subsistema ``toolset``. Imagine o ``toolset`` apresentado, para acessar o comando ``compile_r`` é necessário:
 >(...)
->``hefesto.toolset.compile_r($source_path, $outfile_path, $includes, $cflags);``
+>``$cmd = hefesto.toolset.compile_r($source_path, $outfile_path, $includes, $cflags);``
 >(...)
 
 Uma boa abordagem no início da criação de um ``toolset`` é se perguntar quais comandos externos esse ``toolset`` necessitará executar. Acho que essa é a gênese de qualquer ``toolset``.
 
 ##### A função de forja
 
-Talvez essa seja a parte mais trabalhosa do trajeto, pois é na função de forja que deve ser incutida a lógica do *build*. Levando em consideração que um ``toolset`` deve ser uma generalização de tarefas que usem os comandos externos do ``toolset`` para produzirem alguma coisa...
+Talvez essa seja a parte mais trabalhosa do trajeto, pois é na função de forja que deve ser incutida a lógica do *build*. Levando em consideração que um ``toolset`` deve ser uma generalização de tarefas que usem os comandos externos do ``toolset`` para produzirem alguma coisa e ainda serem utilizados por mais de uma pessoa...
 
 Segue a função de forja, depois da listagem, comentarei as partes que julgar relevantes:
 
@@ -1608,15 +1629,15 @@ Algo similar é feito com o diretório de saída para o binário que será criado com
     	$bin_output = $APPNAME;
     }
 
-Agora é chegada a hora de converter as opções do compilador em lista para *strings*:
+Agora é chegada a hora de converter as opções do compilador em lista para *string*:
 
 		#  GCC's include list option string
         $includes = gcc_mk_gcc_incl_str_opt($INCLUDES);
         $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
 
-Essas funções serão detalhadas posteriormente, por hora, só é importante conhecê-las superficialmente.
+Essas funções serão detalhadas mais tarde, por hora, só é importante conhecê-las superficialmente.
 
-Também é conveniente poder escolher a arquitetura do *target*, no caso a leitura de opção que será apresentada permite escolher entre um binário *32-bit* ou *64-bit*, confira:
+Também convém poder escolher a arquitetura do *target*, no caso a leitura de opção que será apresentada permite escolher entre um binário *32-bit* ou *64-bit*, confira:
 
 	var cpu_arch type list;
     var chosen_arch type string;
@@ -1677,7 +1698,7 @@ Se necessário *linkeditar*:
 - Os *file paths* correspondentes aos arquivos objeto são reunidos numa *string*;
 - O mesmo é feito com as opções de *linker* passadas pelo usuário, na declaração do projeto de forja;
 - Se a arquitetura foi explicitada adiciona a opção *GCC* correspondente nas opções de *linker*;
-- Serializa também os file paths adicionais onde podem ser encontradas bibliotecas (isso foi passado pelo usuário na declaração do projeto de forja);
+- Deserializa também os file paths adicionais onde podem ser encontradas bibliotecas (isso foi passado pelo usuário na declaração do projeto de forja);
 - Chama a função que realiza efetivamente a *linkedição*: ``gcc_link_ofiles()``.
 
 Depois apenas um relatório de *status* baseado no *exit code*, para orientar o usuário:
@@ -1702,6 +1723,7 @@ Anteriormente foi detalhada a função de forja, contudo, ela usa um conjunto de f
 ###### gcc_compile_source_list()
 
 Das ajudantes de forja, talvez a mais "complexa". Por isso, vamos começar com ela.
+
 Nessa função você verá como as alterações dos arquivos são monitoradas e que é de responsabilidade do desenvolvedor do ``toolset`` manter a sanidade dessa ``feature``.
 
 Existem dois *branches* de execução, um recai sobre a compilação ++síncrona++ o outro sobre a compilação ++assíncrona++. Poderiam ter sido quebradas em duas funções, nada impede, mas aqui estão bifurcadas em *if-branches*.
@@ -1715,7 +1737,7 @@ Essa é a definição da função:
                                      cflags type string,
                                      obj_dir type string) : result type int
 
-Recebe a lista de códigos que serão compilados, uma lista de diretórios de *includes*, uma lista com opções que deverão ser usadas na compilação de cada código-fonte e o *path* para o diretório onde os arquivos objeto deverão ser gerados. Retorna zero para processamento sem erro e diferente de zero caso alguma coisa não ocorra conforme esperado.
+Recebe a lista de códigos que serão compilados, uma ``string`` de diretórios de *includes*, uma ``string`` com opções que deverão ser usadas na compilação de cada código-fonte e o *path* para o diretório onde os arquivos objeto deverão ser gerados. Retorna zero para processamento sem erro e diferente de zero caso alguma coisa não ocorra conforme esperado.
 
 O início da função é esse:
 
@@ -1824,7 +1846,7 @@ A variável que guarda o *exit code* das compilações é zerada. O contador que per
 
 A lista ``not_compiled`` tem uma utilidade especial. É por meio dela que o *Hefesto* conseguirá saber qual arquivo realmente mudou entre a última forja e a atual.
 
-Existem duas funções *builtin* no ``subsystem toolset``:
+Existem duas funções *built-in* no ``subsystem toolset``:
 
 - ``hefesto.toolset.file_has_change(<file-path>)``
 - ``hefesto.toolset.base_refresh(<untouched-files>)``
@@ -1877,7 +1899,7 @@ Voltemos ao código:
         }
     }
 
-Se a forja tiver que ser síncrona, i.e: se ``qsize`` ser igual ou menor a *1*, para cada caminho de arquivo (código *C*) presente na lista, enquanto não houver nenhum erro de compilação:
+Se a forja tiver que ser síncrona, i.e: se ``qsize`` for igual ou menor a *1*, para cada caminho de arquivo (código *C*) presente na lista, enquanto não houver nenhum erro de compilação:
 
 > À partir do path do arquivo usamos a função ``gcc_mk_ofile_name()`` para criar o nome objeto do arquivo, de fato apenas substituímos o ``.c`` por ``.o`` e juntamos esse novo nome com o conteúdo do caminho para o diretório de arquivos objeto.
 >
@@ -1936,7 +1958,7 @@ Agora vamos ver a parte assíncrona da compilação:
         }
     }
 
-O comportamento é similar ao da porção síncrona. Uma diferença é que os comandos de compilação não são imediatamente executados, sendo eles adicionados a uma lista para execução ao final de um ciclo. Outra diferença é que aqui há uma lista auxiliar chamada ``not_compiled_tmp`` que é preenchida por ciclos e o ``base-refreh`` é feito ao final desses ciclos. Um cíclo é completo quando o tamanho de ``run_list``, que é a lista que contém os comandos de compilação ainda não executados, contiver o total de elementos igual a ``--qsize``. Se alguma compilação quebrar ao final de um ciclo, o *loop* será interrompido. Se ao final do *loop* não havendo erro de compilação, ainda houverem códigos por compilar, eles serão compilados e o ``base-refresh`` feito.
+O comportamento é similar ao da porção síncrona. Uma diferença é que os comandos de compilação não são imediatamente executados, sendo eles adicionados a uma lista para execução ao final de um ciclo. Outra diferença é que aqui há uma lista auxiliar chamada ``not_compiled_tmp`` que é preenchida por ciclos e o ``base-refreh`` é feito ao final desses ciclos. Um ciclo é completo quando o tamanho de ``run_list``, que é a lista que contém os comandos de compilação ainda não executados, contiver o total de elementos igual a ``--qsize``. Se alguma compilação quebrar ao final de um ciclo, o *loop* será interrompido. Se ao final do *loop* não havendo erro de compilação, ainda houverem códigos por compilar, eles serão compilados e o ``base-refresh`` feito.
 
 ###### gcc_mk_app_compilation_command()
 
