@@ -167,7 +167,12 @@ static struct hsl_builtin_otype_table_ctx HSL_BUILTIN_OTYPE_TABLE[] = {
     {                         ".len",             HEFESTO_VAR_TYPE_INT},
     {                          ".at",          HEFESTO_VAR_TYPE_STRING},
     {                       ".match",             HEFESTO_VAR_TYPE_INT},
-    {                     ".replace",             HEFESTO_VAR_TYPE_INT}
+    {                     ".replace",             HEFESTO_VAR_TYPE_INT},
+    {         "hefesto.project.name",          HEFESTO_VAR_TYPE_STRING},
+    {      "hefesto.project.toolset",          HEFESTO_VAR_TYPE_STRING},
+    {    "hefesto.project.dep_chain",          HEFESTO_VAR_TYPE_STRING},
+    {        "hefesto.project.abort",             HEFESTO_VAR_TYPE_INT},
+    {      "hefesto.project.options",          HEFESTO_VAR_TYPE_STRING}
 };
 
 hefesto_int_t is_hefesto_type(const char *type) {
