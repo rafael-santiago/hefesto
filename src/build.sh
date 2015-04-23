@@ -3,7 +3,7 @@
 #
 
 COMPILER="gcc" # Adjust for your system compiler
-COMPILER_OPTS="-c -Wall " # Options too
+COMPILER_OPTS="-c -Wall -Ihere/src" # Options too
 LINKER="gcc" # Linker too
 LIB="ar"
 
