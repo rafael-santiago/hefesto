@@ -4,3 +4,6 @@
 [submodule "helios"]
 	path = helios
 	url = git://github.com/rafael-santiago/helios.git
+[submodule "src/tests/unit/cute"]
+	path = src/tests/unit/cute
+	url = git://github.com/rafael-santiago/cute.git
