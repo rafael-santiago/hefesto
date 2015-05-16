@@ -155,7 +155,7 @@ Imagine que ``a.x`` depende de ``b.x`` que depende de ``c.x`` que por sua vez de
 >
 >c.x: d.x & e.x;
 
-No caso de programas reais isso pode ser bem massante de se escrever, a biblioteca padrão do ``Hefesto`` inclui funções em ``HSL`` que tentam inferir por meios heurísticos a interdependência entre os arquivos que compõem um projeto.
+No caso de programas reais isso pode ser bem maçante de se escrever, a biblioteca padrão do ``Hefesto`` inclui funções em ``HSL`` que tentam inferir por meios heurísticos a interdependência entre os arquivos que compõem um projeto.
 
 Segue um uso prático das ``dep-chains``:
 
@@ -197,7 +197,7 @@ Sim, quando você adota o uso de ``dep-chains`` em um projeto os seus argumentos 
 
 Uma alteração de arquivo é julgada **não pela data de alteração**, mas **com base no conteúdo**. Com um ``bit`` de diferença um arquivo já será considerado "sujo".
 
-### Yoda`s proposal: que tal em *run-time* o *toolset* mudar?
+### Yoda`s proposal: que tal em *runtime* o *toolset* mudar?
 
 Sim meu jovem *Luke*, não tenha medo muito... isso é possível. Para isso só é preciso ter uma precaução *Jedi*: os *toolsets* a serem escolhidos devem possuir a mesma assinatura de função para a função de forja, em outras palavras, devem receber o mesmo número de argumentos, na mesma ordem e tipo.
 
@@ -281,7 +281,7 @@ Note que no ``preloading`` do projeto apenas chamaremos essa função se estivermo
                     			                                       $cflags,
                                 			                           "libhere.a" ;
 
-Passamos ter a seleção do ``toolset`` em ``run-time``, pois quando o ``toolset`` estiver sendo carregado o ``Hefesto`` já vai ter passado pelo ``preloading`` do nosso projeto. Por esse motivo é importante ter a mesma assinatura de forja entre os ``toolsets``, pois só podemos declarar um projeto uma vez. Mas isso vai da inteligência e mais do que isso, do senso de reutilização do desenvolvedor dos ``toolsets`` que você for usar.
+Passamos ter a seleção do ``toolset`` em ``runtime``, pois quando o ``toolset`` estiver sendo carregado o ``Hefesto`` já vai ter passado pelo ``preloading`` do nosso projeto. Por esse motivo é importante ter a mesma assinatura de forja entre os ``toolsets``, pois só podemos declarar um projeto uma vez. Mas isso vai da inteligência e mais do que isso, do senso de reutilização do desenvolvedor dos ``toolsets`` que você for usar.
 
 Mas ainda tem um "problema" nisso aí... observe no início do exemplo:
 
@@ -301,7 +301,7 @@ A diretiva ``include`` aceita uma lista de plataformas para efetivamente incluir
 
 ### Como rodo meus testes?
 
-Nada me irrita mais do que a necessidade de criar ``batch-files`` ou mesmo ``shell-scripts`` para rodar testes e outras tarefas pré e pós compilação. Organização ao meu ver envolve uniformidade e quanto menos mistureba melhor e o paraíso seria perfeito se pudéssemos deixar tudo dentro da mesma esfera.
+Nada me irrita mais do que a necessidade de criar ``batch-files`` ou mesmo ``shell-scripts`` para rodar testes e outras tarefas pré e pós compilação. Organização ao meu ver envolve uniformidade e quanto menos mistureba melhor e o paraíso seria perfeito se pudessemos deixar tudo dentro da mesma esfera.
 
 Que tal usar o ``entry-point epilogue`` para disparar a compilação e execução dos testes, avaliando se quebraram ou passaram? No exemplo, da nossa *lib*, adicionaríamos:
 
@@ -1023,7 +1023,7 @@ Exemplo de chamada:
 
 		if ($said.match("[0123456789]") == 1) {
         	hefesto.sys.echo("ANICPAY: I can't handle numbers... aieeeeeeee!!\n");
-            result "(ullnay)"; # now way: "nil" is not piglatin!!!! :D
+            result "(ullnay)"; # no way: "nil" is not piglatin!!!! :D
         }
 
         $punctoken.add_item(" ");
@@ -1159,13 +1159,13 @@ As funções apresentadas na **Tabela 7** podem ser acessadas à partir de:
 
 ### Tem uma forma fácil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
-Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/toolsets/null/README.md), a função de forja apenas retona o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
+Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md), a função de forja apenas retona o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
 
 ### Onde posso continuar explorando a *HSL*?
 
 A ``HSL`` possui um repositório próprio de códigos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositório do ``Hefesto`` em sua máquina e uma parte que julgo básica dele já está instalada. Por padrão, ele traz documentações acerca de seus módulos. É uma boa dar uma lida nesses documentos caso queira saber mais sobre funções de apoio que você já possui à sua disposição. Em termos práticos, o ``Helios`` pode ser entendido como o diretório de ``includes`` do ``Hefesto`` criado na cópia que você instalou.
 
-Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essa bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
+Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essa bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
 
 ### Tirando as rodinhas: criando *Hefesto toolsets* e dominando completamente o *build-system*
 
@@ -1178,7 +1178,7 @@ Nisso, eu te convido a aprender como se implementa um ``Hefesto toolset``. Se vo
 O que você já conferiu e/ou já sabe:
 
 - O ``Hefesto`` é um *build system* que busca dar clareza e liberdade para escrever de forma organizada uma *build-task*.
-- Ele implementa um *dsl* que é usada tanto nas extensões que podem ser feitas em uma *build-task* específica quanto nas generalidades que englobam qualquer *build-task* do mesmo tipo, neste caso tais generalidades nele são denominadas ``toolsets``.
+- Ele implementa uma *dsl* que é usada tanto nas extensões que podem ser feitas em uma *build-task* específica quanto nas generalidades que englobam qualquer *build-task* do mesmo tipo, neste caso tais generalidades nele são denominadas ``toolsets``.
 - Foi apresentada a parte da ``HSL`` que recai sobre a declaração de um projeto.
 - Foram apresentados códigos exemplificando o reuso de ``toolsets`` previamente escritos.
 - Também foram apresentadas diferentes formas de disparar o *build* (forja) de um projeto.
@@ -1978,7 +1978,7 @@ Essa função é responsável por **montar** os comandos de compilação que serão exe
     	result $cmd;
 	}
 
-Note que são passados para ela todos os parâmetros necessários para se compilar um fonte no *GCC* com a opção ``-c`` (confira o *template* dos comandos ``compile_r`` e ``compile_d`` na declaração do ``toolset``). Note que fora isso, é também informado o tipo de compilação, se é desejado incluir informações de *debug* ou não (em *release* não incluíra). Logo após, apenas é retornado a linha de comando formatada, pois um ``toolset-command`` não é executado, cabe ao desevolvedor do ``toolset`` escolher a melhor maneira de executá-lo via a ``syscall run`` e avaliar o *exit code* de tal comando. Lembrando que todos os ``toolset-commands`` estão disponíveis para a função de forja e suas ajudantes à partir do subsistema ``toolset`` (``hefesto.toolset.<command>``). Ainda, tudo o que foi passado para o comando se resumiu em argumentos do tipo ``string``. Se existir um lema para um ``toolset-command``, pode ser esse:
+Note que são passados para ela todos os parâmetros necessários para se compilar um fonte no *GCC* com a opção ``-c`` (confira o *template* dos comandos ``compile_r`` e ``compile_d`` na declaração do ``toolset``). Note que fora isso, é também informado o tipo de compilação, se é desejado incluir informações de *debug* ou não (em *release* não incluirá). Logo após, apenas é retornado a linha de comando formatada, pois um ``toolset-command`` não é executado, cabe ao desevolvedor do ``toolset`` escolher a melhor maneira de executá-lo via a ``syscall run`` e avaliar o *exit code* de tal comando. Lembrando que todos os ``toolset-commands`` estão disponíveis para a função de forja e suas ajudantes à partir do subsistema ``toolset`` (``hefesto.toolset.<command>``). Ainda, tudo o que foi passado para o comando se resumiu em argumentos do tipo ``string``. Se existir um lema para um ``toolset-command``, pode ser esse:
 
 >Somente recebe *strings* **na ordem e quantidade** pré-definidas, somente retorna **uma** *string*.
 
