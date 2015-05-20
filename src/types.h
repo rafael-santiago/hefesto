@@ -42,7 +42,7 @@
 #define HEFESTO_PATH_SEP        '\\'
 #endif
 
-#define HEFESTO_MAX_BUFFER_SIZE 1024
+#define HEFESTO_MAX_BUFFER_SIZE 8192
 
 typedef unsigned long hefesto_type_t;
 

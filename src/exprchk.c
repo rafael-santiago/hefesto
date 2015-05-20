@@ -145,7 +145,7 @@ hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *
     const char *e;
     hefesto_int_t state;
     size_t offset = 0, offset_aux;
-    char *t, *temp = NULL, *next_token;
+    char *t, *temp = NULL, *next_token, *t_end = NULL;
     hefesto_var_list_ctx *vp;
     hefesto_func_list_ctx *fp;
     hefesto_int_t o;
@@ -175,22 +175,24 @@ hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *
 
                     e = expression + offset;
                     t = temp + strlen(temp);
+                    t_end = temp + HEFESTO_MAX_BUFFER_SIZE - 1;
 
                     while (is_hefesto_blank(*e)) e++;
+
                     if (*e != '(') {
                         free(temp);
                         return 0;
                     }
+
                     o = 1;
                     do
                     {
-
                         if (is_hefesto_string_tok(*e)) {
                             *t = *e;
                             t++;
                             e++;
                             offset++;
-                            while (!is_hefesto_string_tok(*e) && *e != 0) {
+                            while (!is_hefesto_string_tok(*e) && *e != 0 && t < t_end) {
                                 *t = *e;
                                 if (*t == '\\') {
                                     *t = *e;
@@ -220,7 +222,7 @@ hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *
                         if (*e == '(') o++;
                         else if (*e == ')') o--;
 
-                    } while (*e != 0 && o > 0);
+                    } while (*e != 0 && o > 0 && t < t_end);
 
                     *t = *e;
                     t++;
@@ -274,7 +276,7 @@ hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *
                         e = (expression + offset);
 
                         if (*e == '.') {
-                            temp = 
+                            temp =
                               (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
                             for (t = temp; *e != 0 && *e != ')';) {
 
@@ -388,7 +390,7 @@ hefesto_int_t is_valid_expression(const char *expression, hefesto_var_list_ctx *
 
 static char *get_next_operand(const char *expression, size_t *offset) {
 
-    char *operand = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *o;
+    char *operand = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *o, *o_end = NULL;
     const char *e = expression + (*offset);
     hefesto_int_t b;
 
@@ -402,6 +404,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
     }
 
     o = operand;
+    o_end = operand + HEFESTO_MAX_BUFFER_SIZE - 1;
 
     *o = *e;
 
@@ -410,7 +413,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
 
     if (is_hefesto_string_tok(*(o-1))) {
 
-        while (!is_hefesto_string_tok(*e) && *e != 0) {
+        while (!is_hefesto_string_tok(*e) && *e != 0 && o != o_end) {
 
             if (*e == '\\') {
                 *o = *e;
@@ -434,7 +437,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
 
     } else {
 
-        while (is_hefesto_symbol_charset(*e) || *e == '.') {
+        while ((is_hefesto_symbol_charset(*e) || *e == '.') && o != o_end) {
             if ((*e == '.' || *e == '(' || *e == ')') && (*operand == '$' ||
                 isdigit(*operand))) {
                 break;
@@ -442,7 +445,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
             // a parameter can be a literal string
             if (is_hefesto_string_tok(*e)) { 
 
-                while (!is_hefesto_string_tok(*e) && *e != 0) {
+                while (!is_hefesto_string_tok(*e) && *e != 0 && o != o_end) {
 
                     if (*e == '\\') {
                         *o = *e;
@@ -475,7 +478,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
                     o++;
                     e++;
 
-                    while (!is_hefesto_string_tok(*e) && *e != 0 && b > 0) {
+                    while (!is_hefesto_string_tok(*e) && *e != 0 && b > 0 && o != o_end) {
 
                         if (*e == '\\') {
                             *o = *e;
@@ -491,7 +494,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
                         o++;
 
                     }
-                } while (b > 0 && *e != 0);
+                } while (b > 0 && *e != 0 && o != o_end);
 
             } else {
                 *o = *e;
@@ -511,7 +514,7 @@ static char *get_next_operand(const char *expression, size_t *offset) {
 
 static char *get_next_operator(const char *expression, size_t *offset) {
 
-    char *operand = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *o;
+    char *operand = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE), *o, *o_end = NULL;
     const char *e = expression + (*offset);
 
     memset(operand, 0, HEFESTO_MAX_BUFFER_SIZE);
@@ -524,13 +527,14 @@ static char *get_next_operator(const char *expression, size_t *offset) {
     }
 
     o = operand;
+    o_end = operand + HEFESTO_MAX_BUFFER_SIZE - 1;
 
     *o = *e;
 
     o++;
     e++;
 
-    while (is_op(*e)) {
+    while (is_op(*e) && o != o_end) {
         *o = *e;
         o++;
         e++;
