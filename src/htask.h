@@ -10,7 +10,7 @@
 
 #include "types.h"
 
-hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
+hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl_main,
                          hefesto_options_ctx *options);
 
 #endif
