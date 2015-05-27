@@ -480,7 +480,7 @@ Certo, o último exemplo com uma função inútil que só dizia alô, não foi tão inút
 
 Nada é por acaso nessa vida, acredite! Uma *[abominável](http://en.wikipedia.org/wiki/Eastern_mole#/media/File:ScalopusAquaticus.jpg) [doninha](https://what-if.xkcd.com/4/) documentadora* pôs aquilo lá para fazer você tropeçar e cair aqui.... Quando comecei pensar a ``HSL`` uma das minhas principais indagações eram sobre o que é comum a quase todo processo de *build* e dessas coisas comuns, o que é direta ou indiretamente requisitado ao ``Sistema Operacional`` em questão.
 
-Essas indagações me levaram criar uma camada de abstração que garante escrever passos comuns em uma *build-task* mas heterogênos em termos práticos de um ``OS`` para outro, apenas uma vez e ter a garantia que rodarão iguais em qualquer plataforma suportada pelo ``Hefesto``.
+Essas indagações me levaram criar uma camada de abstração que garante escrever passos comuns em uma *build-task* mas heterogêneos em termos práticos de um ``OS`` para outro, apenas uma vez e ter a garantia que rodarão iguais em qualquer plataforma suportada pelo ``Hefesto``.
 
 Essa camada de abstração pode ser acessada à partir do ``subsistema sys`` do ``Hefesto``, da seguinte forma:
 
@@ -1165,7 +1165,7 @@ Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` pad
 
 A ``HSL`` possui um repositório próprio de códigos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositório do ``Hefesto`` em sua máquina e uma parte que julgo básica dele já está instalada. Por padrão, ele traz documentações acerca de seus módulos. É uma boa dar uma lida nesses documentos caso queira saber mais sobre funções de apoio que você já possui à sua disposição. Em termos práticos, o ``Helios`` pode ser entendido como o diretório de ``includes`` do ``Hefesto`` criado na cópia que você instalou.
 
-Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essa bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
+Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essas bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
 
 ### Tirando as rodinhas: criando *Hefesto toolsets* e dominando completamente o *build-system*
 
