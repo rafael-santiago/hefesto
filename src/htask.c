@@ -16,12 +16,12 @@
 #include "conv.h"
 #include <stdio.h>
 
-hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls_main,
+hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl_main,
                          hefesto_options_ctx *options) {
 
     hefesto_options_ctx *qsize, *user_includes = NULL;
     hefesto_options_ctx *forge_functions_name;
-    hefesto_common_list_ctx *hls_main_project;
+    hefesto_common_list_ctx *hsl_main_project;
     hefesto_var_list_ctx *gl_vars = NULL;
     hefesto_func_list_ctx *functions = NULL, *curr_func;
     hefesto_toolset_ctx *toolsets = NULL;
@@ -33,11 +33,11 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls
         HEFESTO_OPTIONS = options;
     }
 
-    if ((hls_main_projects != NULL &&
-         hls_main_projects->data != NULL &&
-         hls_main_projects->data->data != NULL &&
-         *(char *)hls_main_projects->data->data != 0) &&
-         (hls_main && *hls_main)) {
+    if ((hsl_main_projects != NULL &&
+         hsl_main_projects->data != NULL &&
+         hsl_main_projects->data->data != NULL &&
+         *(char *)hsl_main_projects->data->data != 0) &&
+         (hsl_main && *hsl_main)) {
 
         user_includes =
          get_hefesto_options_ctx_option(HEFESTO_USER_INCLUDES_HOME_OPTION_LABEL,
@@ -50,14 +50,14 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls
             hvm_rqueue_set_queue_size(qsize_value);
         }
 
-        forge_functions_name = get_forge_functions_name(hls_main,
+        forge_functions_name = get_forge_functions_name(hsl_main,
                                                         user_includes);
 
-        if (!(code = fopen(hls_main, "r"))) {
+        if (!(code = fopen(hsl_main, "r"))) {
             return 1;
         }
 
-        functions = compile_and_load_hsl_code(hls_main, &errors, &gl_vars,
+        functions = compile_and_load_hsl_code(hsl_main, &errors, &gl_vars,
                                               forge_functions_name,
                                               user_includes);
 
@@ -69,24 +69,24 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls
                                                HEFESTO_OPTIONS) == NULL) {
 
                 if ((toolsets = ld_toolsets_configurations(toolsets,
-                                                           hls_main,
+                                                           hsl_main,
                                                            functions,
                                                            user_includes))) {
                     printf("hefesto: toolset loaded.\n");
 
-                    for (hls_main_project = hls_main_projects->data;
-                         hls_main_project && HEFESTO_LAST_FORGE_RESULT == 0;
-                         hls_main_project = hls_main_project->next) {
+                    for (hsl_main_project = hsl_main_projects->data;
+                         hsl_main_project && HEFESTO_LAST_FORGE_RESULT == 0;
+                         hsl_main_project = hsl_main_project->next) {
 
                         if ((projects = ld_project_configuration(projects,
                                                                  toolsets,
-                                                                 hls_main,
+                                                                 hsl_main,
                                                                  user_includes,
-                                                                 hls_main_project->data,
+                                                                 hsl_main_project->data,
                                                                  gl_vars,
                                                                  functions))) {
                             printf("hefesto: project \"%s\" loaded.\n\n",
-                                   (char *)hls_main_project->data);
+                                   (char *)hsl_main_project->data);
                             set_hvm_toolset_src_changes_check_flag(0);
                             curr_func = hvm_get_current_executed_function();
                             hvm_forge_project(projects, &gl_vars, functions);
@@ -94,7 +94,7 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hls_main_projects, const char *hls
                             del_hefesto_project_ctx(projects);
                             projects = NULL;
                         } else {
-                            printf("hefesto: project load failure.\n");
+                            printf("hefesto: unable to load project \"%s\".\n", (char *)hsl_main_project->data);
                             HEFESTO_LAST_FORGE_RESULT = 1;
                         }
 

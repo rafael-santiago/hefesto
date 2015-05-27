@@ -3,9 +3,9 @@ Hefesto
 
 Hefesto is a multiplatform build system which currently runs on Linux, FreeBSD and Windows.
 
-The main Hefesto's characteristic is give a more programatic aspect to build scripts.
+The main Hefesto's feature is allow a more programatic build scripting.
 
-In order to do it Hefesto adopts his own language in this case more procedural than declarative.
+In order to do it Hefesto uses his own language (more procedural than declarative).
 
 Seeking with it:
 
@@ -15,7 +15,7 @@ Seeking with it:
 
 This application can help not only a small amount of programmers which use some specific languages and toolsets, Hefesto helps on automation of several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend the Hefesto.
 
-When you extend Hefesto this doesn't mean that you need to recompile the application, all is done via Hsl, the specific domain language which Hefesto implements.
+When you extend Hefesto this does not mean that you need to recompile the application. All is done via Hsl, the domain specific language which Hefesto implements.
 
 The Hsl was developed to be simple but robust.
 

@@ -1468,7 +1468,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
             }
 
             if (project_curr->prologue != NULL &&
-                project_curr->epilogue != NULL && 
+                project_curr->epilogue != NULL &&
                 project_curr->preloading != NULL) {
                 break;
             }
@@ -1576,16 +1576,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                             }
                             state++;
                         } else {
-                            if (state > 0) {
-                                free(tok);
-                                fclose(fp);
-                                del_hefesto_func_list_ctx(preloading_p);
-                                del_hefesto_func_list_ctx(prologue_p);
-                                del_hefesto_func_list_ctx(epilogue_p);
-                                del_hefesto_include_list_ctx(includes);
-                                del_hefesto_common_list_ctx(parsed_files);
-                                return NULL;
-                            }
+                            state = 0;
                         }
                         free(tok);
                         tok = NULL;
@@ -1604,7 +1595,7 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                 if (includes_tail != includes) {
                     ip->next = NULL;
                     del_hefesto_include_list_ctx(includes_tail);
-                    includes_tail = (includes->next) ? 
+                    includes_tail = (includes->next) ?
                         get_hefesto_include_list_ctx_tail(includes) :
                             includes;
                 } else {
@@ -1612,6 +1603,15 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                     includes = NULL;
                 }
             }
+        }
+
+        if (state == 0) {
+            del_hefesto_func_list_ctx(preloading_p);
+            del_hefesto_func_list_ctx(prologue_p);
+            del_hefesto_func_list_ctx(epilogue_p);
+            del_hefesto_include_list_ctx(includes);
+            del_hefesto_common_list_ctx(parsed_files);
+            return NULL;
         }
 
         if (includes != NULL) {

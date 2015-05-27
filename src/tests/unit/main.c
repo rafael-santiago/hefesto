@@ -1,8 +1,10 @@
 #include <string.h>
 
+#include <cute.h>
+#include <here.h>
+
 #include "test_defs.h"
 
-#include "htest.h"
 #include "../../structs_io.h"
 #include "../../types.h"
 #include "../../hvm_str.h"
@@ -12,7 +14,6 @@
 #include "../../dep_chain.h"
 #include "../../vfs.h"
 #include "../../hvm_toolset.h"
-#include <here.h>
 #include "../../init.h"
 #include "../../expr_handler.h"
 
@@ -1455,20 +1456,19 @@ int extract_binary_image(const char *image, size_t image_size, const char *filep
     return 1;
 }
 
-char *hefesto_common_stack_ctx_tests() {
+CUTE_TEST_CASE(hefesto_common_stack_ctx_tests)
     hefesto_common_stack_ctx *stack = NULL;
     char *data;
     size_t dsize;
-    printf("-- running hefesto_common_stack_ctx_test\n");
     stack = hefesto_common_stack_ctx_push(stack, "foobar", 6,
                                           HEFESTO_VAR_TYPE_STRING);
-    HTEST_CHECK("stack == NULL", stack != NULL);
+    CUTE_CHECK("stack == NULL", stack != NULL);
     data = hefesto_common_stack_ctx_data_on_top(stack);
-    HTEST_CHECK("stack top != foobar", strcmp(data, "foobar") == 0);
+    CUTE_CHECK("stack top != foobar", strcmp(data, "foobar") == 0);
     dsize = hefesto_common_stack_ctx_dsize_on_top(stack);
-    HTEST_CHECK("stack top dsize != 6", dsize == 6);
+    CUTE_CHECK("stack top dsize != 6", dsize == 6);
     stack = hefesto_common_stack_ctx_pop(stack);
-    HTEST_CHECK("stack with 1 item after pop != NULL", stack == NULL);
+    CUTE_CHECK("stack with 1 item after pop != NULL", stack == NULL);
     stack = hefesto_common_stack_ctx_push(stack, "beavis", 6,
                                           HEFESTO_VAR_TYPE_STRING);
     stack = hefesto_common_stack_ctx_push(stack, "stuart", 6,
@@ -1476,68 +1476,59 @@ char *hefesto_common_stack_ctx_tests() {
     stack = hefesto_common_stack_ctx_push(stack, "butt-head", 9,
                                           HEFESTO_VAR_TYPE_STRING);
     data = hefesto_common_stack_ctx_data_on_top(stack);
-    HTEST_CHECK("stack top != butt-head", strcmp(data,
+    CUTE_CHECK("stack top != butt-head", strcmp(data,
                                                  "butt-head") == 0);
     stack = hefesto_common_stack_ctx_pop(stack);
     data = hefesto_common_stack_ctx_data_on_top(stack);
-    HTEST_CHECK("stack top != stuart", strcmp(data, "stuart") == 0);
+    CUTE_CHECK("stack top != stuart", strcmp(data, "stuart") == 0);
     stack = hefesto_common_stack_ctx_pop(stack);
     data = hefesto_common_stack_ctx_data_on_top(stack);
-    HTEST_CHECK("stack top != beavis", strcmp(data, "beavis") == 0);
+    CUTE_CHECK("stack top != beavis", strcmp(data, "beavis") == 0);
     stack = hefesto_common_stack_ctx_pop(stack);
-    HTEST_CHECK("stack with 1 item after pop != NULL", stack == NULL);
-    printf("-- passed.\n");
-    return NULL;
-}
+    CUTE_CHECK("stack with 1 item after pop != NULL", stack == NULL);
+CUTE_TEST_CASE_END
 
-char *hefesto_common_list_ctx_tests() {
-
+CUTE_TEST_CASE(hefesto_common_list_ctx_tests)
     hefesto_common_list_ctx *list = NULL, *copy;
-    printf("-- running hefesto_common_list_ctx_tests\n");
     list = add_data_to_hefesto_common_list_ctx(list, "hls", 3);
     list = add_data_to_hefesto_common_list_ctx(list, "middle", 6);
     list = add_data_to_hefesto_common_list_ctx(list, "hefesto", 7);
     copy = cp_hefesto_common_list_ctx(list);
-    HTEST_CHECK("get_hefesto_common_list_ctx_count() != 3",
+    CUTE_CHECK("get_hefesto_common_list_ctx_count() != 3",
                 get_hefesto_common_list_ctx_count(list) == 3);
     list = del_data_from_hefesto_common_list_ctx(list, "middle",
                                                  HEFESTO_VAR_TYPE_STRING);
-    HTEST_CHECK("get_hefesto_common_list_ctx_count() != 2",
+    CUTE_CHECK("get_hefesto_common_list_ctx_count() != 2",
                 get_hefesto_common_list_ctx_count(list) == 2);
-    HTEST_CHECK("common list head != hls", strcmp(list->data, "hls") == 0);
-    HTEST_CHECK("common list tail != hefesto",
+    CUTE_CHECK("common list head != hls", strcmp(list->data, "hls") == 0);
+    CUTE_CHECK("common list tail != hefesto",
                 strcmp((char *)get_hefesto_common_list_ctx_tail(list)->data,
                        "hefesto") == 0);
     list = del_data_from_hefesto_common_list_ctx(list, "hls",
                                                  HEFESTO_VAR_TYPE_STRING);
-    HTEST_CHECK("get_hefesto_common_list_ctx_count() != 1",
+    CUTE_CHECK("get_hefesto_common_list_ctx_count() != 1",
                 get_hefesto_common_list_ctx_count(list) == 1);
-    HTEST_CHECK("common list head != hefesto",
+    CUTE_CHECK("common list head != hefesto",
                 strcmp(list->data, "hefesto") == 0);
     list = del_data_from_hefesto_common_list_ctx(list, "hefesto",
                                                  HEFESTO_VAR_TYPE_STRING);
-    HTEST_CHECK("get_hefesto_common_list_ctx_count() != 0",
+    CUTE_CHECK("get_hefesto_common_list_ctx_count() != 0",
                 get_hefesto_common_list_ctx_count(list) == 0);
-    HTEST_CHECK("common list after all removes possible != NULL",
+    CUTE_CHECK("common list after all removes possible != NULL",
                 list == NULL);
-    HTEST_CHECK("copy list don't has 3 elements",
+    CUTE_CHECK("copy list don't has 3 elements",
                 get_hefesto_common_list_ctx_count(copy) == 3);
-    HTEST_CHECK("1st item != hls",
+    CUTE_CHECK("1st item != hls",
                 strcmp((char *)copy->data, "hls") == 0);
-    HTEST_CHECK("2nd item != middle",
+    CUTE_CHECK("2nd item != middle",
                 strcmp((char *)copy->next->data, "middle") == 0);
-    HTEST_CHECK("3rd item != hefesto",
+    CUTE_CHECK("3rd item != hefesto",
                 strcmp((char *)copy->next->next->data, "hefesto") == 0);
     del_hefesto_common_list_ctx(copy);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hefesto_var_list_ctx_tests() {
-
+CUTE_TEST_CASE(hefesto_var_list_ctx_tests)
     hefesto_var_list_ctx *vlist = NULL;
-    printf("-- running hefesto_var_list_ctx_tests\n");
     vlist = add_var_to_hefesto_var_list_ctx(vlist,
                                             "int_var",
                                             HEFESTO_VAR_TYPE_INT);
@@ -1547,85 +1538,65 @@ char *hefesto_var_list_ctx_tests() {
     vlist = add_var_to_hefesto_var_list_ctx(vlist,
                                             "file_var",
                                             HEFESTO_VAR_TYPE_FILE_DESCRIPTOR);
-    HTEST_CHECK("int_var not found",
+    CUTE_CHECK("int_var not found",
                 get_hefesto_var_list_ctx_name("int_var", vlist) != NULL);
-    HTEST_CHECK("str_var not found",
+    CUTE_CHECK("str_var not found",
                 get_hefesto_var_list_ctx_name("str_var", vlist) != NULL);
-    HTEST_CHECK("file_var not found",
+    CUTE_CHECK("file_var not found",
                 get_hefesto_var_list_ctx_name("file_var", vlist) != NULL);
-    HTEST_CHECK("1st var != int type",
+    CUTE_CHECK("1st var != int type",
                 vlist->type == HEFESTO_VAR_TYPE_INT);
-    HTEST_CHECK("2nd var != string type",
+    CUTE_CHECK("2nd var != string type",
                 vlist->next->type == HEFESTO_VAR_TYPE_STRING);
-    HTEST_CHECK("3rd item != file type",
+    CUTE_CHECK("3rd item != file type",
                 vlist->next->next->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR);
     del_hefesto_var_list_ctx(vlist);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hefesto_func_list_ctx_tests() {
-
+CUTE_TEST_CASE(hefesto_func_list_ctx_tests)
     hefesto_func_list_ctx *flist = NULL;
-    printf("-- running hefesto_func_list_ctx_tests\n");
     flist = add_func_to_hefesto_func_list_ctx(flist,
                                               "hsl_int_type_function",
                                               NULL, 0,
                                               HEFESTO_VAR_TYPE_INT);
-    HTEST_CHECK("hls_int_type_function not found",
+    CUTE_CHECK("hls_int_type_function not found",
                 get_hefesto_func_list_ctx_name("hsl_int_type_function",
                                                flist) != NULL);
-    HTEST_CHECK("function result type != int",
+    CUTE_CHECK("function result type != int",
                 flist->result_type == HEFESTO_VAR_TYPE_INT);
     del_hefesto_func_list_ctx(flist);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *options_tests() {
-
+CUTE_TEST_CASE(options_tests)
     hefesto_options_ctx *options = NULL;
-    printf("-- running parse_options_tests\n");
     options = add_option_to_hefesto_options_ctx(options, "single-option=X");
     options = add_option_to_hefesto_options_ctx(options,
                                                 "multi-option=X, Y ,Z");
-    HTEST_CHECK("1st option != single-option",
+    CUTE_CHECK("1st option != single-option",
                 strcmp(options->option, "single-option") == 0);
-    HTEST_CHECK("single-option != X",
+    CUTE_CHECK("single-option != X",
                 strcmp(options->data->data, "X") == 0 &&
                             options->data->next == NULL);
-    HTEST_CHECK("2nd option != multi-option",
+    CUTE_CHECK("2nd option != multi-option",
                 strcmp(options->next->option, "multi-option") == 0);
-    HTEST_CHECK("multi-option != X, Y ,Z",
+    CUTE_CHECK("multi-option != X, Y ,Z",
                 strcmp(options->next->data->data, "X") == 0 &&
                 strcmp(options->next->data->next->data, "Y ") == 0 &&
                 strcmp(options->next->data->next->next->data, "Z") == 0);
     del_hefesto_options_ctx(options);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_str_conversion_tests() {
-
+CUTE_TEST_CASE(hvm_str_conversion_tests)
     char *x = hvm_int_to_str(101);
-    printf("-- running hvm_str_conversion_tests\n");
-    HTEST_CHECK("x != \"101\"", strcmp(x, "101") == 0);
-    HTEST_CHECK("hvm_str_to_int() != 101", hvm_str_to_int(x) == 101);
+    CUTE_CHECK("x != \"101\"", strcmp(x, "101") == 0);
+    CUTE_CHECK("hvm_str_to_int() != 101", hvm_str_to_int(x) == 101);
     free(x);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_str_format_tests() {
-
+CUTE_TEST_CASE(hvm_str_format_tests)
     char *fmt_str;
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL, *vp;
     int dec;
-    printf("-- running hvm_str_format\n");
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars,
                                               "age", HEFESTO_VAR_TYPE_INT);
     gl_vars = add_var_to_hefesto_var_list_ctx(gl_vars,
@@ -1646,15 +1617,12 @@ char *hvm_str_format_tests() {
     vp = assign_data_to_hefesto_var(vp, "anos atras", 10);
     fmt_str = hvm_str_format("$I \" \" + $was_born + \" \" + $age + \" \""
                              " + $years_ago + \".\" +", &lo_vars, &gl_vars, NULL);
-    HTEST_CHECK("fmt_str != Eu nasci 10000 anos atras.",
+    CUTE_CHECK("fmt_str != Eu nasci 10000 anos atras.",
                 strcmp(fmt_str, "Eu nasci 10000 anos atras.") == 0);
     del_hefesto_var_list_ctx(lo_vars);
     del_hefesto_var_list_ctx(gl_vars);
     free(fmt_str);
-    printf("-- passed.\n");
-
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
 size_t create_test_code(char *fname, char *cbuf) {
     FILE *fp;
@@ -1671,8 +1639,7 @@ size_t create_test_code(char *fname, char *cbuf) {
     return fsize;
 }
 
-char *hvm_function_recurssion_tests() {
-
+CUTE_TEST_CASE(hvm_function_recurssion_tests)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -1685,32 +1652,26 @@ char *hvm_function_recurssion_tests() {
     function = compile_and_load_hsl_code("ftest.hsl", &errors,
                                          &gl_vars, NULL, NULL);
     remove("ftest.hsl");
-    printf("-- running function_execution_tests\n");
-    HTEST_CHECK("function == NULL", function != NULL);
-    HTEST_CHECK("function->code == NULL", function->code != NULL);
+    CUTE_CHECK("function == NULL", function != NULL);
+    CUTE_CHECK("function->code == NULL", function->code != NULL);
     // basic recurssion, save and stack restore must be working
     // else you f_cked something.
     result = hvm_call_function("fatorial(3)", &lo_vars, &gl_vars, function);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 6", *(hefesto_int_t *)result == 6);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 6", *(hefesto_int_t *)result == 6);
     free(result);
     result = hvm_call_function("fatorial(0)", &lo_vars, &gl_vars, function);
-    HTEST_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result == NULL", result != NULL);
     // result must interrupts execution and go back...
-    HTEST_CHECK("result != 1", *(hefesto_int_t *)result == 1);
+    CUTE_CHECK("result != 1", *(hefesto_int_t *)result == 1);
     free(result);
     del_hefesto_func_list_ctx(function);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_if_tests() {
-
+CUTE_TEST_CASE(hvm_if_tests)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
-    printf("-- running hvm_if_tests\n");
     char *code = "function if_zero_results_one(value type int) : "
                  "result type int {\n"
                  "\tif ($value == 0) result 1;\n"
@@ -1726,30 +1687,25 @@ char *hvm_if_tests() {
     remove("ftest.hsl");
     result = hvm_call_function("if_zero_results_one(10)",
                                &lo_vars, &gl_vars, function);
-    HTEST_CHECK("result == NULL",
+    CUTE_CHECK("result == NULL",
                 result != NULL);
-    HTEST_CHECK("result != 0",
+    CUTE_CHECK("result != 0",
                 *(int *)result == 0);
     free(result);
     result = hvm_call_function("if_zero_results_one(0)",
                                &lo_vars, &gl_vars, function);
-    HTEST_CHECK("result == NULL",
+    CUTE_CHECK("result == NULL",
                 result != NULL);
-    HTEST_CHECK("result != 0",
+    CUTE_CHECK("result != 0",
                 *(int *)result == 1);
     free(result);
     del_hefesto_func_list_ctx(function);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_while_tests() {
-
+CUTE_TEST_CASE(hvm_while_tests)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
-    printf("-- running hvm_while_tests\n");
     char *code = "function while_test(limit type int) : result type int"
                  "{\n\tvar i type int;\n\t$i = 0;\n\twhile ($i < $limit)"
                  " {\n\t\t$i = $i + 1;\n\t}\n\tresult $i;\n}\n";
@@ -1764,34 +1720,28 @@ char *hvm_while_tests() {
     result = hvm_call_function("while_test(1000)",
                                &lo_vars,
                                &gl_vars, function);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1000", *(int *)result == 1000);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1000", *(int *)result == 1000);
     free(result);
     result = hvm_call_function("while_test(0)", &lo_vars,
                                &gl_vars, function);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
     del_hefesto_func_list_ctx(function);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_syscalls_file_io_tests() {
-
+CUTE_TEST_CASE(hvm_syscalls_file_io_tests)
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL;
     hefesto_type_t otype;
     hefesto_file_handle *fhandle = NULL;
     void *result;
 
-    printf("-- running hvm_syscalls_file_io_tests\n");
-
     //  fopen w
     fhandle = (hefesto_file_handle *)
                 hefesto_sys_call("hefesto.sys.fopen(\"test.dat\", \"w\")",
                                  &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("fhandle == NULL", fhandle != NULL);
+    CUTE_CHECK("fhandle == NULL", fhandle != NULL);
 
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars,
                                               "fhandle",
@@ -1803,15 +1753,15 @@ char *hvm_syscalls_file_io_tests() {
 
     result = hefesto_sys_call("hefesto.sys.fwrite(\"with power of soul\", 18, $fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 18", *(int *)result == 18);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 18", *(int *)result == 18);
     free(result);
 
     //  fclose
     result = hefesto_sys_call("hefesto.sys.fclose($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     del_hefesto_var_list_ctx(lo_vars);
@@ -1821,7 +1771,7 @@ char *hvm_syscalls_file_io_tests() {
     fhandle = (hefesto_file_handle *)
                 hefesto_sys_call("hefesto.sys.fopen(\"test.dat\", \"r\")",
                                  &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("fhandle == NULL", fhandle != NULL);
+    CUTE_CHECK("fhandle == NULL", fhandle != NULL);
 
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars,
                                               "fhandle",
@@ -1837,69 +1787,69 @@ char *hvm_syscalls_file_io_tests() {
     //   fread
     result = hefesto_sys_call("hefesto.sys.fread($fbuffer, 18, $fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 18", *(int *)result == 18);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 18", *(int *)result == 18);
     free(result);
 
     gl_vars = get_hefesto_var_list_ctx_name("fbuffer", lo_vars);
-    HTEST_CHECK("fbuffer == NULL", gl_vars != NULL && gl_vars->contents != NULL);
-    HTEST_CHECK("fbuffer != with power of soul",
+    CUTE_CHECK("fbuffer == NULL", gl_vars != NULL && gl_vars->contents != NULL);
+    CUTE_CHECK("fbuffer != with power of soul",
                 strcmp(gl_vars->contents->data, "with power of soul") == 0);
     gl_vars = NULL;
 
     //  feof
     result = hefesto_sys_call("hefesto.sys.fread($fbuffer, 18, $fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.feof($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     //  fseek_to_begin
     result = hefesto_sys_call("hefesto.sys.fseek_to_begin($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     //   fseek_to_end
     result = hefesto_sys_call("hefesto.sys.fseek_to_end($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     //   fseek
     result = hefesto_sys_call("hefesto.sys.fseek($fhandle, 2)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     //   ftell
     result = hefesto_sys_call("hefesto.sys.ftell($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 2", *(int *)result == 2);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 2", *(int *)result == 2);
     free(result);
 
     //   fsize
     result = hefesto_sys_call("hefesto.sys.fsize($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 18", *(int *)result == 18);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 18", *(int *)result == 18);
     free(result);
 
     //  fclose
     result = hefesto_sys_call("hefesto.sys.fclose($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     del_hefesto_var_list_ctx(lo_vars);
@@ -1910,14 +1860,14 @@ char *hvm_syscalls_file_io_tests() {
                                                           "\"with power of soul\","
                                                           "\"anything is possible\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     fhandle = (hefesto_file_handle *)
                 hefesto_sys_call("hefesto.sys.fopen(\"test.dat\", \"r\")",
                                  &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("fhandle == NULL", fhandle != NULL);
+    CUTE_CHECK("fhandle == NULL", fhandle != NULL);
 
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars,
                                               "fhandle",
@@ -1932,30 +1882,25 @@ char *hvm_syscalls_file_io_tests() {
 
     result = hefesto_sys_call("hefesto.sys.fread($fbuffer, 20, $fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 20", *(int *)result == 20);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 20", *(int *)result == 20);
     free(result);
 
     gl_vars = get_hefesto_var_list_ctx_name("fbuffer", lo_vars);
-    HTEST_CHECK("fbuffer == NULL", gl_vars != NULL && gl_vars->contents != NULL);
-    HTEST_CHECK("fbuffer != anything is possible",
+    CUTE_CHECK("fbuffer == NULL", gl_vars != NULL && gl_vars->contents != NULL);
+    CUTE_CHECK("fbuffer != anything is possible",
                 strcmp(gl_vars->contents->data, "anything is possible") == 0);
     gl_vars = NULL;
 
     //  fclose
     result = hefesto_sys_call("hefesto.sys.fclose($fhandle)",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-}
-
-char *hvm_syscalls_filesystem_tests() {
-
+CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
     void *result;
     char temp[256], test_dir[256];
     char *complains = NULL;
@@ -1963,8 +1908,6 @@ char *hvm_syscalls_filesystem_tests() {
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL;
     hefesto_func_list_ctx *func = NULL;
     FILE *fp;
-
-    printf("-- running hvm_syscalls_filesystem_tests\n");
 
     //  setting the cwd and saving fullpath to compare below.
 
@@ -2008,15 +1951,15 @@ char *hvm_syscalls_filesystem_tests() {
     //  mkdir
     result = hefesto_sys_call("hefesto.sys.mkdir(\"test_directory\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     //  mkdir
     result = hefesto_sys_call("hefesto.sys.mkdir(\"src_cp_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     //  cd
@@ -2049,15 +1992,15 @@ char *hvm_syscalls_filesystem_tests() {
     //  pwd again
     result = hefesto_sys_call("hefesto.sys.pwd()",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result == NULL", result != NULL);
     sprintf(temp, "%s", test_dir);
     temp[strlen(temp)+1] = 0;
     temp[strlen(temp)] = HEFESTO_PATH_SEP;
     strcat(temp, "test_directory");
-    HTEST_CHECK("result != temp", strcmp(result, temp) == 0);
+    CUTE_CHECK("result != temp", strcmp(result, temp) == 0);
     free(result);
 
-    //  cd with relative path/indirection hefesto_init() done this...
+    //  cd with relative path/indirection hefesto_init() does this...
     result = hefesto_sys_call("hefesto.sys.cd(\"..\")",
                               &lo_vars, &gl_vars, NULL, &otype);
     free(result);
@@ -2070,23 +2013,23 @@ char *hvm_syscalls_filesystem_tests() {
     result = hefesto_sys_call("hefesto.sys.cp(\"test.dat\","
                               "\"test_directory/test.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     //  cp between directories
     result = hefesto_sys_call("hefesto.sys.cp(\"test.dat\","
                               "\"src_cp_dir/src_cp_dir.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cp(\"test.dat\","
                               "\"src_cp_dir/src_cp_dir.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cp(\"src_cp_dir/src_cp_dir.dat\","
@@ -2101,8 +2044,8 @@ char *hvm_syscalls_filesystem_tests() {
     result = hefesto_sys_call("hefesto.sys.cp(\"src_cp_dir\","
                               "\"test_directory\")", &lo_vars,
                               &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"test_directory\")",
@@ -2112,8 +2055,8 @@ char *hvm_syscalls_filesystem_tests() {
     //  ls
     result = hefesto_sys_call("hefesto.sys.ls(\"test.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"empty_sub_dir\")",
@@ -2122,8 +2065,8 @@ char *hvm_syscalls_filesystem_tests() {
 
     result = hefesto_sys_call("hefesto.sys.ls(\".*\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"..\")",
                               &lo_vars, &gl_vars, NULL, &otype);
@@ -2135,8 +2078,8 @@ char *hvm_syscalls_filesystem_tests() {
 
     result = hefesto_sys_call("hefesto.sys.ls(\".*\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 2);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 2);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"..\")",
                               &lo_vars, &gl_vars, NULL, &otype);
@@ -2149,129 +2092,129 @@ char *hvm_syscalls_filesystem_tests() {
     //  make_path
     result = hefesto_sys_call("hefesto.sys.make_path(\"/home\", \"rs\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result == NULL", result != NULL);
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-    HTEST_CHECK("result != /home/rs", strcmp(result, "/home/rs") == 0);
+    CUTE_CHECK("result != /home/rs", strcmp(result, "/home/rs") == 0);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
-    HTEST_CHECK("result != /home\\rs", strcmp(result, "/home\\rs") == 0);
+    CUTE_CHECK("result != /home\\rs", strcmp(result, "/home\\rs") == 0);
 #endif
     free(result);
 
     //  rm
     result = hefesto_sys_call("hefesto.sys.rm(\"test.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm(\"test_directory/test.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"test_directory/src_cp_dir.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"test_directory/src_cp_dir.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"test_directory/sub_dir/src_cp_dir.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"test_directory/sub_dir/src_cp_dir.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"src_cp_dir/src_cp_dir.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"src_cp_dir/src_cp_dir.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"src_cp_dir/sub_dir/src_cp_dir.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rm("
                               "\"src_cp_dir/sub_dir/src_cp_dir.dat.bak\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 0);
     free(result);
 
     //  rmdir
     result = hefesto_sys_call("hefesto.sys.rmdir("
                               "\"src_cp_dir/sub_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rmdir(\""
                               "src_cp_dir/empty_sub_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rmdir(\"src_cp_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rmdir(\""
                               "test_directory/sub_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rmdir(\""
                               "test_directory/empty_sub_dir\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.rmdir("
                               "\"test_directory\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.mkdir(\"test_regex_cp\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 0", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 0", *(int *)result == 0);
     free(result);
 
     fp = fopen("test.dat.a", "w");
@@ -2286,8 +2229,8 @@ char *hvm_syscalls_filesystem_tests() {
     result = hefesto_sys_call("hefesto.sys.cp(\"test\\.dat\\.[abd]$\","
                               "\"test_regex_cp\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"test_regex_cp\")",
@@ -2296,20 +2239,20 @@ char *hvm_syscalls_filesystem_tests() {
 
     result = hefesto_sys_call("hefesto.sys.ls(\"test\\.dat\\.a$\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.ls(\"test\\.dat\\.b$\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.ls(\"test\\.dat\\.d$\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("result != 1", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("result != 1", *(int *)result == 1);
     free(result);
 
     result = hefesto_sys_call("hefesto.sys.cd(\"..\")",
@@ -2324,16 +2267,11 @@ char *hvm_syscalls_filesystem_tests() {
     remove("test_regex_cp/test.dat.c");
     remove("test_regex_cp/test.dat.d");
     rmdir("test_regex_cp/test.dat.d");
-	rmdir("test_regex_cp");
-	rmdir("test.dat.d");
+    rmdir("test_regex_cp");
+    rmdir("test.dat.d");
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-}
-
-char *hvm_byref_syscall_test() {
-
+CUTE_TEST_CASE(hvm_byref_syscall_test)
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL, *vp;
     hefesto_func_list_ctx *function = NULL;
     hefesto_type_t otype;
@@ -2352,7 +2290,6 @@ char *hvm_byref_syscall_test() {
                                          &gl_vars, NULL, NULL);
     if (function == NULL) exit(1);
     remove("byref_test.hsl");
-    printf("-- hvm_byref_syscall_test\n");
     gl_vars = add_var_to_hefesto_var_list_ctx(gl_vars, "byref_works",
                                               HEFESTO_VAR_TYPE_INT);
     vp = get_hefesto_var_list_ctx_name("byref_works", gl_vars);
@@ -2361,9 +2298,9 @@ char *hvm_byref_syscall_test() {
     result = hvm_call_function("byref_test($byref_works)",
                                &lo_vars, &gl_vars, function);
 
-    HTEST_CHECK("result != NULL", result == NULL);
+    CUTE_CHECK("result != NULL", result == NULL);
     vp = get_hefesto_var_list_ctx_name("byref_works", gl_vars);
-    HTEST_CHECK("byref_works != 1", *(int *)vp->contents->data == 1);
+    CUTE_CHECK("byref_works != 1", *(int *)vp->contents->data == 1);
 
     t = time(NULL);
     tmp = localtime(&t);
@@ -2371,18 +2308,15 @@ char *hvm_byref_syscall_test() {
     strftime(out, sizeof(out)-1, "%H:%M", tmp);
     result = hefesto_sys_call("hefesto.sys.time(\"%H:%M\")",
                               &lo_vars, &gl_vars, NULL, &otype);
-    HTEST_CHECK("result != out", strcmp(out, result) == 0);
+    CUTE_CHECK("result != out", strcmp(out, result) == 0);
     free(result);
 
     del_hefesto_var_list_ctx(gl_vars);
     del_hefesto_var_list_ctx(lo_vars);
     del_hefesto_func_list_ctx(function);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hvm_call_from_module_syscall_test() {
+CUTE_TEST_CASE(hvm_call_from_module_syscall_test)
 #ifdef HEFESTO_ARCH_X86
     char *hsl_code = "function call_from_module_test() : result type int {\n"
                      "var retval type int;\n"
@@ -2402,7 +2336,6 @@ char *hvm_call_from_module_syscall_test() {
     hefesto_func_list_ctx *function = NULL;
     void *res;
     hefesto_int_t errors = 0;
-    printf("-- hvm_call_from_module_syscall_test\n");
 
     // module loading with extension
 
@@ -2417,13 +2350,13 @@ char *hvm_call_from_module_syscall_test() {
                                          &errors,
                                          &gl_vars, NULL, NULL);
     remove("call_from_module_test.hsl");
-    HTEST_CHECK("function == NULL", function != NULL);
+    CUTE_CHECK("function == NULL", function != NULL);
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
-    HTEST_CHECK("extraction_result != 1", errors == 1);
+    CUTE_CHECK("extraction_result != 1", errors == 1);
     res = hvm_call_function("call_from_module_test()",
                              &lo_vars, &gl_vars, function);
-    HTEST_CHECK("res == NULL", res != NULL);
-    HTEST_CHECK("res != 1", *(int *)res == 1);
+    CUTE_CHECK("res == NULL", res != NULL);
+    CUTE_CHECK("res != 1", *(int *)res == 1);
     del_hefesto_var_list_ctx(lo_vars);
     del_hefesto_func_list_ctx(function);
     free(res);
@@ -2434,7 +2367,7 @@ char *hvm_call_from_module_syscall_test() {
     function = NULL;
     errors = 0;
 
-    // it's very important for validate the next test!
+    // this is very important for the next test validation!
     hvm_mod_ldmod_table_cleanup();
 
     // module loading without extension
@@ -2450,17 +2383,17 @@ char *hvm_call_from_module_syscall_test() {
                                          &errors,
                                          &gl_vars, NULL, NULL);
     remove("call_from_module_test.hsl");
-    HTEST_CHECK("function == NULL", function != NULL);
+    CUTE_CHECK("function == NULL", function != NULL);
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.dll");
 #endif
-    HTEST_CHECK("extraction_result != 1", errors == 1);
+    CUTE_CHECK("extraction_result != 1", errors == 1);
     res = hvm_call_function("call_from_module_test()",
                              &lo_vars, &gl_vars, function);
-    HTEST_CHECK("res == NULL", res != NULL);
-    HTEST_CHECK("res != 1", *(int *)res == 1);
+    CUTE_CHECK("res == NULL", res != NULL);
+    CUTE_CHECK("res != 1", *(int *)res == 1);
     del_hefesto_var_list_ctx(lo_vars);
     del_hefesto_func_list_ctx(function);
     free(res);
@@ -2470,12 +2403,10 @@ char *hvm_call_from_module_syscall_test() {
     remove("libhmodtest.dll");
 #endif
 
-    printf("-- passed.\n");
 #endif
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
-char *hvm_get_func_addr_call_func_addr_syscall_test() {
+CUTE_TEST_CASE(hvm_get_func_addr_call_func_addr_syscall_test)
     char *hsl_code = "function max(x type int, y type int) : result type int {\n"
                      "\tif ($x > $y) result $x;\n"
                      "\tresult $y;\n"
@@ -2492,7 +2423,6 @@ char *hvm_get_func_addr_call_func_addr_syscall_test() {
     hefesto_func_list_ctx *functions = NULL;
     void *retval;
     hefesto_int_t errors = 0;
-    printf("-- hvm_get_func_addr_call_func_addr_syscall_test\n");
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "max_p", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     create_test_code("func_addr-101.hsl", hsl_code);
@@ -2500,18 +2430,16 @@ char *hvm_get_func_addr_call_func_addr_syscall_test() {
                                          &errors,
                                          &gl_vars, NULL, NULL);
     remove("func_addr-101.hsl");
-    HTEST_CHECK("functions == NULL", functions != NULL);
+    CUTE_CHECK("functions == NULL", functions != NULL);
     retval = hvm_call_function("run_test()",
                                 &lo_vars, &gl_vars, functions);
-    HTEST_CHECK("retval != \"yes!!\"", strcmp((char *)retval, "yes!!") == 0);
+    CUTE_CHECK("retval != \"yes!!\"", strcmp((char *)retval, "yes!!") == 0);
     free(retval);
     del_hefesto_var_list_ctx(lo_vars);
     del_hefesto_func_list_ctx(functions);
-    printf("-- passed.\n");
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
-char *hvm_syscalls_tests() {
+CUTE_TEST_CASE(hvm_syscalls_tests)
 
     // XXX: these are untested syscalls:
     //  hefesto_sys_echo, hefesto_sys_prompt, hefesto_sys_exit,
@@ -2522,15 +2450,13 @@ char *hvm_syscalls_tests() {
     char *result = NULL;
     void *res;
 
-    printf("-- running hvm_syscalls_tests\n");
-
     if ((result = hvm_syscalls_filesystem_tests()) == NULL &&
         (result = hvm_byref_syscall_test()) == NULL) {
         //  os_name
         res = hefesto_sys_call("hefesto.sys.os_name()",
                                &lo_vars, &gl_vars, NULL, &otype);
-        HTEST_CHECK("result == NULL", res != NULL);
-        HTEST_CHECK("result == HEFESTO_SYS_OS_NAME_RETURN",
+        CUTE_CHECK("result == NULL", res != NULL);
+        CUTE_CHECK("result == HEFESTO_SYS_OS_NAME_RETURN",
                     strcmp(res, HEFESTO_SYS_OS_NAME_RETURN) == 0);
         free(res);
 
@@ -2542,16 +2468,16 @@ char *hvm_syscalls_tests() {
         res = hefesto_sys_call("hefesto.sys.env(\"PATH\")",
                                &lo_vars, &gl_vars, NULL, &otype);
 #endif
-        HTEST_CHECK("result == NULL", res != NULL);
-        HTEST_CHECK("result == (null)", strcmp(res, "(null)") != 0);
+        CUTE_CHECK("result == NULL", res != NULL);
+        CUTE_CHECK("result == (null)", strcmp(res, "(null)") != 0);
         free(res);
 
         //  run
         res = hefesto_sys_call("hefesto.sys.run("
                                "\"echo \\\"hefesto.sys.run test passed"
                                " :)\\\"\")", &lo_vars, &gl_vars, NULL, &otype);
-        HTEST_CHECK("result == NULL", res != NULL);
-        HTEST_CHECK("result != 0", *(int *)res == 0);
+        CUTE_CHECK("result == NULL", res != NULL);
+        CUTE_CHECK("result != 0", *(int *)res == 0);
         free(res);
 
         //  async run
@@ -2571,8 +2497,8 @@ char *hvm_syscalls_tests() {
 
         res = hefesto_sys_call("hefesto.sys.run($jobs)",
                                &lo_vars, &gl_vars, NULL, &otype);
-        HTEST_CHECK("result == NULL", res != NULL);
-        HTEST_CHECK("result != 0", *(int *)res == 0);
+        CUTE_CHECK("result == NULL", res != NULL);
+        CUTE_CHECK("result != 0", *(int *)res == 0);
         free(res);
 
         del_hefesto_var_list_ctx(lo_vars);
@@ -2586,99 +2512,90 @@ char *hvm_syscalls_tests() {
         result = hvm_get_func_addr_call_func_addr_syscall_test();
     }
 
-    if (result == NULL) printf("-- passed.\n");
+    CUTE_CHECK("result != NULL", result == NULL);
+CUTE_TEST_CASE_END
 
-    return result;
-
-}
-
-char *regex_tests() {
-
+CUTE_TEST_CASE(regex_tests)
     char user_regex[HEFESTO_MAX_BUFFER_SIZE];
     char text[HEFESTO_MAX_BUFFER_SIZE];
     here_search_program_ctx *search_program;
     here_search_result_ctx *search_result;
-    printf("-- regex_tests\n");
     strncpy(user_regex, "^Wild thing", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     strncpy(text, "Wild thing you make me everything", sizeof(text)-1);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Wild thing\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"Wild thing\" not found", here_matches(search_result) == 1);
     del_here_search_result_ctx(search_result);
 
     text[0] = 'w';
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    CUTE_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
     del_here_search_result_ctx(search_result);
     strncpy(text, " Wild thing you make me everything", sizeof(text)-1);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    CUTE_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
     del_here_search_result_ctx(search_result);
 
     del_here_search_program_ctx(search_program);
 
     strncpy(user_regex, "^Wild thing$", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
+    CUTE_CHECK("\"Wild thing\" found", here_matches(search_result) == 0);
     del_here_search_result_ctx(search_result);
     del_here_search_program_ctx(search_program);
     strncpy(user_regex, ".*you make me.*", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"you make me\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"you make me\" not found", here_matches(search_result) == 1);
     del_here_search_program_ctx(search_program);
     del_here_search_result_ctx(search_result);
     strncpy(text, "Theres a red house over younder", sizeof(text)-1);
     strncpy(user_regex, "Theres a (green|blue) house", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("Some pattern found", here_matches(search_result) == 0);
+    CUTE_CHECK("Some pattern found", here_matches(search_result) == 0);
     del_here_search_program_ctx(search_program);
     del_here_search_result_ctx(search_result);
     strncpy(user_regex, "Theres a (red|blue|green) house", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
     del_here_search_result_ctx(search_result);
     del_here_search_program_ctx(search_program);
     strncpy(user_regex, "Theres a (blue|green|red) house", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"Theres a red house\" not found", here_matches(search_result) == 1);
     del_here_search_result_ctx(search_result);
     del_here_search_program_ctx(search_program);
     strncpy(text, "Theres a ReD house over younder", sizeof(text)-1);
     strncpy(user_regex,
             "Theres a ([rR]e[Dd]|blue|green) house", sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Theres a ReD house\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"Theres a ReD house\" not found", here_matches(search_result) == 1);
     del_here_search_program_ctx(search_program);
     del_here_search_result_ctx(search_result);
     strncpy(text, "Are you experienced?$", sizeof(text)-1);
     strncpy(user_regex, "[aA]re.*y(O|[AaEeIiuUOo])u experi[Ee]nced\\?.*$",
             sizeof(user_regex)-1);
     search_program = here_compile(user_regex, NULL);
-    HTEST_CHECK("search_program == NULL", search_program != NULL);
+    CUTE_CHECK("search_program == NULL", search_program != NULL);
     search_result = here_match_string(text, search_program);
-    HTEST_CHECK("\"Are you experienced?\" not found", here_matches(search_result) == 1);
+    CUTE_CHECK("\"Are you experienced?\" not found", here_matches(search_result) == 1);
     del_here_search_result_ctx(search_result);
     del_here_search_program_ctx(search_program);
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_with_redeclared_var_test() {
-
+CUTE_TEST_CASE(hsl_with_redeclared_var_test)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2686,20 +2603,15 @@ char *hsl_with_redeclared_var_test() {
                  "\n\tvar foovar type int;\n\tvar foovar type list;\n}\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_with_redeclared_var_test\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_accessing_var_without_dollar_prefix() {
-
+CUTE_TEST_CASE(hsl_accessing_var_without_dollar_prefix)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2707,19 +2619,14 @@ char *hsl_accessing_var_without_dollar_prefix() {
                  "\n\tvar foovar type int;\n\tfoovar = 1;\n}\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_accessing_var_without_dollar_prefix\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_wrong_function_argument_list_decl() {
-
+CUTE_TEST_CASE(hsl_wrong_function_argument_list_decl)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2728,14 +2635,13 @@ char *hsl_wrong_function_argument_list_decl() {
                  "\t$foovar = 1;\n}\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_wrong_function_argument_list_decl\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
     del_hefesto_var_list_ctx(gl_vars);
-    HTEST_CHECK("errors != 1", errors == 1);
+    CUTE_CHECK("errors != 1", errors == 1);
 
     errors = 0;
     gl_vars = NULL;
@@ -2747,14 +2653,10 @@ char *hsl_wrong_function_argument_list_decl() {
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_unknown_function_result_type() {
-
+CUTE_TEST_CASE(hsl_unknown_function_result_type)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2763,20 +2665,15 @@ char *hsl_unknown_function_result_type() {
                  "\tvar foovar type int;\n\t$foovar = 1;\n}\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_unknown_function_result_type\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &lo_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_uncommented_comment() {
-
+CUTE_TEST_CASE(hsl_uncommented_comment)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2786,20 +2683,15 @@ char *hsl_uncommented_comment() {
                  "\t$foovar = 1;\n}\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_uncommented_comment\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_function_with_undeterminated_code_section() {
-
+CUTE_TEST_CASE(hsl_function_with_undeterminated_code_section)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2807,13 +2699,12 @@ char *hsl_function_with_undeterminated_code_section() {
                  "\t$v = 1;\n\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_function_with_undeterminated_code_section\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
+    CUTE_CHECK("errors != 1", errors == 1);
 
     function = NULL;
     errors = 0;
@@ -2823,15 +2714,10 @@ char *hsl_function_with_undeterminated_code_section() {
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-
-}
-
-char *hsl_else_without_if() {
-
+CUTE_TEST_CASE(hsl_else_without_if)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2839,20 +2725,15 @@ char *hsl_else_without_if() {
                  "\telse\n\t{\n\t$v = 1;\n\t}\n}\n\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_else_without_if\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_if_else_else() {
-
+CUTE_TEST_CASE(hsl_if_else_else)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2862,20 +2743,15 @@ char *hsl_if_else_else() {
                  "\n\t}\n}\n\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_if_else_else\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_wrong_while_statement() {
-
+CUTE_TEST_CASE(hsl_wrong_while_statement)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2885,20 +2761,15 @@ char *hsl_wrong_while_statement() {
                  "Huh-huh!\");\n\t}\n}\n\n";
     void *result;
     hefesto_int_t errors = 0;
-    printf("-- running hsl_wrong_while_statement\n");
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl",
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
-    printf("-- passed.\n");
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *hsl_unterminated_code_lines() {
-
+CUTE_TEST_CASE(hsl_unterminated_code_lines)
     hefesto_func_list_ctx *function = NULL;
     hefesto_var_list_ctx *lo_vars = NULL;
     hefesto_var_list_ctx *gl_vars = NULL;
@@ -2912,7 +2783,7 @@ char *hsl_unterminated_code_lines() {
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
+    CUTE_CHECK("errors != 1", errors == 1);
 
     code = "function foolction(v type int) : result type int {\n"
            "\tif ($v == 0) {\n\t\t$v = 1\n\t}\n}\n\n";
@@ -2924,15 +2795,10 @@ char *hsl_unterminated_code_lines() {
                                          &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
     del_hefesto_func_list_ctx(function);
-    HTEST_CHECK("errors != 1", errors == 1);
+    CUTE_CHECK("errors != 1", errors == 1);
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-
-}
-
-char *hsl_list_variable_without_dollar_prefix() {
+CUTE_TEST_CASE(hsl_list_variable_without_dollar_prefix)
     char *code = "function f1(lst type list) : result type int {\n"
                  "\tvar s type string;"
                  "\tf2(lst);result 1;\n"
@@ -2945,8 +2811,6 @@ char *hsl_list_variable_without_dollar_prefix() {
     hefesto_var_list_ctx *gl_vars = NULL;
     hefesto_int_t errors = 0;
 
-    printf("-- running hsl_list_variable_without_dollar_prefix\n");
-
     create_test_code("broken_hsl.hsl", code);
     function = compile_and_load_hsl_code("broken_hsl.hsl", &errors, &gl_vars, NULL, NULL);
     remove("broken_hsl.hsl");
@@ -2957,7 +2821,7 @@ char *hsl_list_variable_without_dollar_prefix() {
     gl_vars = NULL;
     function = NULL;
 
-    HTEST_CHECK("errors != 1", errors == 1);
+    CUTE_CHECK("errors != 1", errors == 1);
 
     errors = 0;
 
@@ -2979,14 +2843,10 @@ char *hsl_list_variable_without_dollar_prefix() {
     del_hefesto_func_list_ctx(function);
     function = NULL;
 
-    HTEST_CHECK("errors != 0", errors == 0);
+    CUTE_CHECK("errors != 0", errors == 0);
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-}
-
-char *hsl_function_declaration_just_after_close_bracket() {
+CUTE_TEST_CASE(hsl_function_declaration_just_after_close_bracket)
     char *hsl_code = "function get_false(called type int) : result type int {\n"
                      "\t$called = 1;\n"
                      "\thefesto.sys.byref($called);\n"
@@ -3033,29 +2893,20 @@ char *hsl_function_declaration_just_after_close_bracket() {
     hefesto_var_list_ctx *gl_vars = NULL;
     hefesto_int_t errors = 0;
 
-    printf("-- running hsl_function_declaration_just_after_close_bracket\n");
-
     create_test_code("correct_hsl.hsl", hsl_code);
     functions = compile_and_load_hsl_code("correct_hsl.hsl", &errors, &gl_vars, NULL, NULL);
     remove("correct_hsl.hsl");
 
-    HTEST_CHECK("function == NULL", functions != NULL);
+    CUTE_CHECK("function == NULL", functions != NULL);
 
-    HTEST_CHECK("errors != 0", errors == 0);
+    CUTE_CHECK("errors != 0", errors == 0);
 
     del_hefesto_func_list_ctx(functions);
     del_hefesto_var_list_ctx(gl_vars);
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-
-}
-
-char *hsl_compilation_tests() {
-
+CUTE_TEST_CASE(hsl_compilation_tests)
     char *result;
-    printf("-- running compilation_tests\n");
     result = hsl_with_redeclared_var_test();
     if (result != NULL) return result;
     result = hsl_accessing_var_without_dollar_prefix();
@@ -3080,13 +2931,9 @@ char *hsl_compilation_tests() {
     if (result != NULL) return result;
     result = hsl_function_declaration_just_after_close_bracket();
     if (result != NULL) return result;
-    printf("-- passed.\n");
+CUTE_TEST_CASE_END
 
-    return NULL;
-}
-
-char *dep_chain_tests() {
-
+CUTE_TEST_CASE(dep_chain_tests)
     FILE *fp;
     char *dep_chain = "foo.bar: bar.foo;bar.foo: foo.baz;";
     char *fullpath, *cwd;
@@ -3094,7 +2941,6 @@ char *dep_chain_tests() {
             get_dep_chain_by_user_dep_string(dep_chain), *d;
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL;
     void *result;
-    printf("-- running dep_chain_tests\n");
     remove(".hefesto-src-chsum-base");
     fp = fopen("foo.bar", "w");
     fclose(fp);
@@ -3124,16 +2970,16 @@ char *dep_chain_tests() {
                                       "$sources.item(0))", NULL, &lo_vars,
                                       &gl_vars, NULL);
 
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("foo.bar has change", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("foo.bar has change", *(int *)result == 0);
     free(result);
 
     result = hvm_toolset_call_command("hefesto.toolset.file_has_change("
                                       "$sources.item(1))",
                                       NULL, &lo_vars, &gl_vars, NULL);
 
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("bar.foo has change", *(int *)result == 0);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("bar.foo has change", *(int *)result == 0);
     free(result);
 
     fp = fopen("foo.baz", "w");
@@ -3144,16 +2990,16 @@ char *dep_chain_tests() {
                                       "$sources.item(1))",
                                       NULL, &lo_vars, &gl_vars, NULL);
 
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("bar.foo hasn't change", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("bar.foo hasn't change", *(int *)result == 1);
     free(result);
 
     result = hvm_toolset_call_command("hefesto.toolset.file_has_change("
                                       "$sources.item(0))",
                                       NULL, &lo_vars, &gl_vars, NULL);
 
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("foo.bar has change", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("foo.bar has change", *(int *)result == 1);
     free(result);
 
     fp = fopen("bar.foo", "w");
@@ -3164,8 +3010,8 @@ char *dep_chain_tests() {
                                       "$sources.item(0))",
                                       NULL, &lo_vars, &gl_vars, NULL);
 
-    HTEST_CHECK("result == NULL", result != NULL);
-    HTEST_CHECK("foo.bar has change", *(int *)result == 1);
+    CUTE_CHECK("result == NULL", result != NULL);
+    CUTE_CHECK("foo.bar has change", *(int *)result == 1);
     free(result);
 
     del_hefesto_var_list_ctx(lo_vars);
@@ -3175,65 +3021,55 @@ char *dep_chain_tests() {
     remove("bar.foo");
     remove("foo.baz");
     remove(".hefesto-src-chsum-base");
+CUTE_TEST_CASE_END
 
-    printf("-- passed.\n");
-
-    return NULL;
-}
-
-char *infix2postfix_tests() {
+CUTE_TEST_CASE(infix2postfix_tests)
     char *expected_result = "(\">\" \"=\" +,1,2,$a,$x $y + $z +)";
     char *expr = "(\">\" + \"=\",   1, 2, $a ,  $x + $y + $z)";
     char *pfixd_args = infix2postfix_args(expr, strlen(expr));
-    printf("-- running infix2postfix_tests\n");
-    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
     expected_result = "(\">\" \"=\" + f($a $b +,$z) +,1,2,$a,$x $y + $z +)";
     expr = "(\">\" + \"=\" + f($a + $b, $z),   1, 2, $a ,  $x + $y + $z)";
     pfixd_args = infix2postfix_args(expr, strlen(expr));
-    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
     expected_result = "(\">\" \"=\" + f($a $b +,ff($z $u +)) +,1,2,$a,$x $y + $z +)";
     expr = "(\">\" + \"=\" + f($a + $b, ff($z + $u)),   1, 2, $a ,  $x + $y + $z)";
     pfixd_args = infix2postfix_args(expr, strlen(expr));
-    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
     expr = "($option_item, $extensions, $extensions_root_dir);\n\t\t\t$o = $o + 1;\n\t\t}\n\t}";
     pfixd_args = infix2postfix_args(expr, get_expression_buffer_size(expr));
     expected_result = "($option_item,$extensions,$extensions_root_dir)";
-    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
     expr = "$sum + ((($hi_byte << 8) | $lo_byte))";
     expected_result = "$sum $hi_byte 8 << $lo_byte | +";
     pfixd_args = infix2postfix(expr, strlen(expr), 1);
-    HTEST_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
-    printf("-- passed.\n");
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
-char *get_expression_buffer_size_tests() {
+CUTE_TEST_CASE(get_expression_buffer_size_tests)
     char *expression = "(\">\" + get_equal_symbol(), \"1_42\", \"\", \"error message!\", \"success message.\")";
     size_t expected_buffer_size = strlen(expression);
-    printf("-- get_expression_buffer_size_tests\n");
-    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    CUTE_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
     expression = "(((((\">\" + get_equal_symbol())))), ((((\"1_42\")))), \"\", (\"(((error message!\"),(   \"(success message.))\"))";
     expected_buffer_size = strlen(expression);
-    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    CUTE_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
     expression = "\n\t\t\t\t\n\r\r\r\n\n\n\n\">\" + get_equal_symbol())))), ((((\"1_42\")))), \"\", (\"(((error message!\"),(   \"(success message.))\"))";
     expected_buffer_size = strlen(expression);
-    HTEST_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
-    HTEST_CHECK("result != 0", get_expression_buffer_size(NULL) == 0);
+    CUTE_CHECK("result != expected_buffer_size", get_expression_buffer_size(expression) == expected_buffer_size);
+    CUTE_CHECK("result != 0", get_expression_buffer_size(NULL) == 0);
     expression = "($option_item, $extensions, $extensions_root_dir);\n\t\t\t$o = $o + 1;\n\t\t}\n\t}";
     expected_buffer_size = strlen("($option_item, $extensions, $extensions_root_dir)");
-    HTEST_CHECK("result != expected_buffer_size", expected_buffer_size == get_expression_buffer_size(expression));
-    printf("-- passed.\n");
-    return NULL;
-}
+    CUTE_CHECK("result != expected_buffer_size", expected_buffer_size == get_expression_buffer_size(expression));
+CUTE_TEST_CASE_END
 
 #if HVM_ALU_ENABLE_SHORT_CIRCUIT
 
-char *hvm_short_circuit_mode_tests() {
+CUTE_TEST_CASE(hvm_short_circuit_mode_tests)
     char *hsl_code = "function get_false(called type int) : result type int {\n"
                      "\t$called = 1;\n"
                      "\thefesto.sys.byref($called);\n"
@@ -3280,20 +3116,19 @@ char *hvm_short_circuit_mode_tests() {
     hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
     hefesto_int_t errors = 0;
     void *retval;
-    printf("-- running hvm_short_circuit_mode_tests\n");
     create_test_code("sc_hsl.hsl", hsl_code);
     functions = compile_and_load_hsl_code("sc_hsl.hsl",
                                           &errors,
                                           &gl_vars, NULL, NULL);
     remove("sc_hsl.hsl");
-    HTEST_CHECK("functions == NULL", functions != NULL);
+    CUTE_CHECK("functions == NULL", functions != NULL);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "retval", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "cf", HEFESTO_VAR_TYPE_INT);
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "ct", HEFESTO_VAR_TYPE_INT);
     retval = hvm_call_function("test_or()",
                                 &lo_vars, &gl_vars, functions);
-    HTEST_CHECK("retval == NULL", retval != NULL);
-    HTEST_CHECK("retval != 1", *(int *)retval == 1);
+    CUTE_CHECK("retval == NULL", retval != NULL);
+    CUTE_CHECK("retval != 1", *(int *)retval == 1);
     del_hefesto_var_list_ctx(lo_vars);
     free(retval);
     lo_vars = NULL;
@@ -3302,19 +3137,17 @@ char *hvm_short_circuit_mode_tests() {
     lo_vars = add_var_to_hefesto_var_list_ctx(lo_vars, "ct", HEFESTO_VAR_TYPE_INT);
     retval = hvm_call_function("test_and()",
                                 &lo_vars, &gl_vars, functions);
-    HTEST_CHECK("retval == NULL", retval != NULL);
-    HTEST_CHECK("retval != 1", *(int *)retval == 1);
+    CUTE_CHECK("retval == NULL", retval != NULL);
+    CUTE_CHECK("retval != 1", *(int *)retval == 1);
     del_hefesto_func_list_ctx(functions);
     del_hefesto_var_list_ctx(gl_vars);
     del_hefesto_var_list_ctx(lo_vars);
     free(retval);
-    printf("-- passed.\n");
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
 #endif
 
-char *hvm_list_int_list_values_tests() {
+CUTE_TEST_CASE(hvm_list_int_list_values_tests)
     char *hsl_code = "function test_cast() : result type int {\n"
                      " var i_list type list;\n"
                      " var e_list type list;\n"
@@ -3358,55 +3191,42 @@ char *hvm_list_int_list_values_tests() {
     hefesto_var_list_ctx *gl_vars = NULL, *lo_vars = NULL;
     hefesto_int_t errors = 0;
     void *retval;
-    printf("-- running hvm_list_int_list_values_tests\n");
     create_test_code("lt_hsl.hsl", hsl_code);
     functions = compile_and_load_hsl_code("lt_hsl.hsl",
                                           &errors,
                                           &gl_vars, NULL, NULL);
     remove("lt_hsl.hsl");
-    HTEST_CHECK("functions == NULL", functions != NULL);
+    CUTE_CHECK("functions == NULL", functions != NULL);
     retval = hvm_call_function("test_cast()",
                                 &lo_vars, &gl_vars, functions);
-    HTEST_CHECK("retval == NULL", retval != NULL);
-    HTEST_CHECK("retval != 1", *(hefesto_int_t *)retval == 1);
+    CUTE_CHECK("retval == NULL", retval != NULL);
+    CUTE_CHECK("retval != 1", *(hefesto_int_t *)retval == 1);
     free(retval);
     del_hefesto_func_list_ctx(functions);
-    printf("-- passed.\n");
-    return NULL;
-}
+CUTE_TEST_CASE_END
 
-char *run_tests() {
+CUTE_TEST_CASE(run_tests)
     printf("* running tests...\n");
-    HTEST_RUN(hefesto_common_stack_ctx_tests);
-    HTEST_RUN(hefesto_common_list_ctx_tests);
-    HTEST_RUN(hefesto_var_list_ctx_tests);
-    HTEST_RUN(hefesto_func_list_ctx_tests);
-    HTEST_RUN(options_tests);
-    HTEST_RUN(hsl_compilation_tests);
-    HTEST_RUN(hvm_str_conversion_tests);
-    HTEST_RUN(hvm_str_format_tests);
-    HTEST_RUN(hvm_function_recurssion_tests);
-    HTEST_RUN(hvm_if_tests);
-    HTEST_RUN(hvm_while_tests);
-    HTEST_RUN(regex_tests);
-    HTEST_RUN(hvm_syscalls_tests);
-    HTEST_RUN(dep_chain_tests);
-    HTEST_RUN(infix2postfix_tests);
-    HTEST_RUN(get_expression_buffer_size_tests);
+    CUTE_RUN_TEST(hefesto_common_stack_ctx_tests);
+    CUTE_RUN_TEST(hefesto_common_list_ctx_tests);
+    CUTE_RUN_TEST(hefesto_var_list_ctx_tests);
+    CUTE_RUN_TEST(hefesto_func_list_ctx_tests);
+    CUTE_RUN_TEST(options_tests);
+    CUTE_RUN_TEST(hsl_compilation_tests);
+    CUTE_RUN_TEST(hvm_str_conversion_tests);
+    CUTE_RUN_TEST(hvm_str_format_tests);
+    CUTE_RUN_TEST(hvm_function_recurssion_tests);
+    CUTE_RUN_TEST(hvm_if_tests);
+    CUTE_RUN_TEST(hvm_while_tests);
+    CUTE_RUN_TEST(regex_tests);
+    CUTE_RUN_TEST(hvm_syscalls_tests);
+    CUTE_RUN_TEST(dep_chain_tests);
+    CUTE_RUN_TEST(infix2postfix_tests);
+    CUTE_RUN_TEST(get_expression_buffer_size_tests);
 #ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
-    HTEST_RUN(hvm_short_circuit_mode_tests);
+    CUTE_RUN_TEST(hvm_short_circuit_mode_tests);
 #endif
-    HTEST_RUN(hvm_list_int_list_values_tests);
-    return NULL;
-}
+    CUTE_RUN_TEST(hvm_list_int_list_values_tests);
+CUTE_TEST_CASE_END
 
-int main(int argc, char **argv) {
-    char *result = run_tests();
-    if (result != NULL) {
-        printf("%s [%d test(s) ran]\n", result, htest_runned_tests);
-        return 1;
-    } else {
-        printf("* all tests passed :-) [%d test(s) ran]\n", htest_runned_tests);
-    }
-    return 0;
-}
+CUTE_MAIN(run_tests)
