@@ -26,7 +26,7 @@ LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o 
 UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o htest.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o -lpthread $LINKERFLAGS\
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o cute.o cute_memory.o cute_mmap.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o -lpthread $LINKERFLAGS\
                     -lhere"
 
 ALL_OK=1
@@ -231,6 +231,7 @@ if test $? -gt 0
 then
     ALL_OK=0
 fi
+$COMPILER $COMPILER_OPTS here/test
 $COMPILER $COMPILER_OPTS main.c
 if test $? -gt 0
 then
@@ -255,8 +256,10 @@ echo "### Now running unit tests"
 # Running unit tests
 
 cd tests/unit
-$COMPILER -c -I../../here/src main.c
-$COMPILER -c -I../../here/src htest.c
+$COMPILER -c -I../../here/src -Icute/src main.c
+$COMPILER -c cute/src/cute.c
+$COMPILER -c cute/src/cute_memory.c
+$COMPILER -c cute/src/cute_mmap.c
 $LINKER $UNIT_TEST
 ./main
 
