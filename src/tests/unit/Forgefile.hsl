@@ -51,16 +51,16 @@ function get_hfst_objs() : result type none {
 hfst-unit.prologue() {
     var exit_code type int;
     $exit_code = 1;
-    if (hefesto.sys.cd("cute/src")) {
-        $exit_code = hefesto.sys.forge("cute", "Forgefile.hsl", "--obj-output-dir=obj --bin-output-dir=lib");
+    if (hefesto.sys.cd("cutest/src")) {
+        $exit_code = hefesto.sys.forge("cutest", "Forgefile.hsl", "--obj-output-dir=obj --bin-output-dir=lib");
         hefesto.sys.cd("../..");
     }
     if ($exit_code == 0) {
         $includes = hefesto.sys.get_option("includes");
-        $includes.add_item("cute/src");
+        $includes.add_item("cutest/src");
         $libraries = hefesto.sys.get_option("libraries");
         $ldflags = hefesto.sys.get_option("ldflags");
-        $ldflags.add_item("cute/src/lib/libcute.a");
+        $ldflags.add_item("cutest/src/lib/libcutest.a");
         $cflags = hefesto.sys.get_option("cflags");
         $sources.ls(".*\.c$");
         get_hfst_objs();
