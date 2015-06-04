@@ -3,11 +3,7 @@ Building Hefesto
 
 After done a git clone from "https://github.com/rafael-santiago/hefesto", some submodules is also needed... so:
 
-        git submodule init
-
-And still...
-
-        git submodule update
+        git submodule update --init
 
 Or in the moment of the hefesto's master cloning operation you should try:
 
