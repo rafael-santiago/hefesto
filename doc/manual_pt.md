@@ -42,7 +42,7 @@ Vou itemizar uns aspectos gerais que me fizeram desistir deles e ++apenas (à pen
 - Linguagens simbólicas;
 - Linguagens [Whitespace-Like](http://pt.wikipedia.org/wiki/Whitespace);
 - O poder de fogo não é constante quando mudamos de plataforma;
-- Às vezes é preciso instalar uma infinidade de coisa para manter o poder de fogo, sem necessidade, se o *build system* tivesse sido bem pensado;
+- Às vezes é preciso instalar uma infinidade de coisas para manter o poder de fogo, sem necessidade, se o *build system* tivesse sido bem pensado;
 - Documentação confusa e nada direta;
 - Mistureba de Linguagens sem nenhuma necessidade;
 - Utilização confusa, envolvendo duas ou mais ferramentas para cumprir todo o ciclo do processo;
@@ -117,7 +117,7 @@ Com o ``Forgefile`` escrito, a forja poderia ser invocada na linha de comando da
 
 > ``hefesto --forgefiles=Forgefile.hsl --Forgefile-projects=here``
 
-Note que na opção ``--forgefiles`` são especificados uma lista de arquivos contendo projetos. A outra opção é dinâmica e baseada nos arquivos passados em ``--forgefiles``. O esquema geral dessa opção dinâmica é:
+Note que na opção ``--forgefiles`` é especificada uma lista de arquivos contendo projetos. A outra opção é dinâmica e baseada nos arquivos passados em ``--forgefiles``. O esquema geral dessa opção dinâmica é:
 
 > ``--<file-name>-projects=<projects defined inside this file>``
 
@@ -127,7 +127,7 @@ Já sei:
 
 Pode sim, você precisa criar um arquivo de invocação e imolar 5 cabras em nome de *Hefesto*... O arquivo de invocação precisa estar no diretório onde você deseja invocar a forja, o nome desse arquivo é ``.ivk`` e dentro dele você deve colocar a linha de comando exatamente como passaria para o *Hefesto*.
 
-Com o ``.ivk`` configurado, estando no diretório dele, apenas digitando ``hefesto`` você terá a forja nos moldes padrão que você necessita e definiu, caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando *mergeadas* com as opções do arquivo de invocação.
+Com o ``.ivk`` configurado, estando no diretório dele, apenas digitando ``hefesto`` você terá a forja nos moldes padrão que você necessita e definiu. Caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando *mergeadas* com as opções do arquivo de invocação.
 
 E quanto as cabras?! Não precisa, era só brincadeira...
 
@@ -1159,7 +1159,7 @@ As funções apresentadas na **Tabela 7** podem ser acessadas à partir de:
 
 ### Tem uma forma fácil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
-Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md), a função de forja apenas retona o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
+Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md), a função de forja apenas retorna o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
 
 ### Onde posso continuar explorando a *HSL*?
 
