@@ -156,6 +156,11 @@ char *infix2postfix(const char *expr, const size_t esize, const hefesto_int_t ma
                         }
                     }
                 }
+                //  WARN(Santiago): null buffer position skipping avoidance.
+                while (*t == 0 && t != term) {
+                    t--;
+                }
+                t++;
                 tt = ((char *)e + offset);
                 while (is_hefesto_blank(*tt)) tt++;
                 // can't add one more ')' because this is a function that is an

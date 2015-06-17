@@ -3049,6 +3049,11 @@ CUTE_TEST_CASE(infix2postfix_tests)
     pfixd_args = infix2postfix(expr, strlen(expr), 1);
     CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
     free(pfixd_args);
+    expr = "hefesto.sys.run(\\\"git commit -a -m \\\"\" + $message + \\\"\\\"\")";
+    expected_result = "hefesto.sys.run(\\\"git commit -a -m \\\"\" $message + \\\"\\\"\" +)";
+    pfixd_args = infix2postfix(expr, strlen(expr), 1);
+    CUTE_CHECK("pfixd_args != expected_result", strcmp(expected_result, pfixd_args) == 0);
+    free(pfixd_args);
 CUTE_TEST_CASE_END
 
 CUTE_TEST_CASE(get_expression_buffer_size_tests)
