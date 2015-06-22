@@ -16,6 +16,8 @@
 #include "conv.h"
 #include <stdio.h>
 
+static void set_current_forgefile_name(const char *forgefile_path);
+
 hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl_main,
                          hefesto_options_ctx *options) {
 
@@ -28,6 +30,7 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
     hefesto_project_ctx *projects = NULL;
     hefesto_int_t qsize_value, errors = 0;
     FILE *code;
+    const char *later_forgefile_path = NULL;
 
     if (HEFESTO_OPTIONS == NULL) {
         HEFESTO_OPTIONS = options;
@@ -89,10 +92,13 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
                                    (char *)hsl_main_project->data);
                             set_hvm_toolset_src_changes_check_flag(0);
                             curr_func = hvm_get_current_executed_function();
+                            later_forgefile_path = HEFESTO_CURRENT_FORGEFILE_NAME;
+                            set_current_forgefile_name(hsl_main);
                             hvm_forge_project(projects, &gl_vars, functions);
                             hvm_set_current_executed_function(curr_func);
                             del_hefesto_project_ctx(projects);
                             projects = NULL;
+                            HEFESTO_CURRENT_FORGEFILE_NAME = later_forgefile_path;
                         } else {
                             printf("hefesto: unable to load project \"%s\".\n", (char *)hsl_main_project->data);
                             HEFESTO_LAST_FORGE_RESULT = 1;
@@ -126,4 +132,24 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
 
     return HEFESTO_LAST_FORGE_RESULT;
 
+}
+
+static void set_current_forgefile_name(const char *forgefile_path) {
+    const char *fp = forgefile_path;
+    if (fp == NULL) {
+        return;
+    }
+    while (*fp != 0) {
+        fp++;
+    }
+#ifndef HEFESTO_WINDOWS
+    while (*fp != HEFESTO_PATH_SEP && fp != forgefile_path) {
+        fp--;
+    }
+#else
+    while (*fp != HEFESTO_PATH_SEP && *fp != '/' && fp != forgefile_path) {
+        fp--;
+    }
+#endif
+    HEFESTO_CURRENT_FORGEFILE_NAME = fp + ((fp != forgefile_path) ? 1 : 0);
 }

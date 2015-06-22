@@ -246,6 +246,7 @@ extern hefesto_dep_chain_ctx *HEFESTO_CURRENT_DEP_CHAIN;
 extern hefesto_options_ctx *HEFESTO_OPTIONS;
 extern hefesto_int_t HEFESTO_LAST_FORGE_RESULT;
 extern hefesto_project_ctx *HEFESTO_CURRENT_PROJECT;
+extern const char *HEFESTO_CURRENT_FORGEFILE_NAME;
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 #include <pthread.h>

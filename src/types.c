@@ -22,3 +22,5 @@ hefesto_options_ctx *HEFESTO_OPTIONS = NULL;
 hefesto_int_t HEFESTO_LAST_FORGE_RESULT = 1;
 
 hefesto_project_ctx *HEFESTO_CURRENT_PROJECT = NULL;
+
+const char *HEFESTO_CURRENT_FORGEFILE_NAME = NULL;

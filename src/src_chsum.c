@@ -34,10 +34,42 @@ static hefesto_int_t validate_sum_base_header(FILE *sum_base, const char *sumbas
 
 static char *hefesto_options_to_string();
 
+static char *get_sumbase_filename();
+
 struct chsum_rec {
     char path[HEFESTO_MAX_BUFFER_SIZE];
     unsigned short chsum;
 };
+
+static char *get_sumbase_filename() {
+    static char smbname[0xff], *sp = NULL;
+    const char *fp = NULL;
+    if (HEFESTO_CURRENT_PROJECT == NULL ||
+        HEFESTO_CURRENT_FORGEFILE_NAME == NULL) {
+        return ".hefesto-src-chsum-base";  //  WARN(Santiago): It should never happen on well-initialized forges.
+    }
+    //
+    //  INFO(Santiago): The sumbase file name scheme is:
+    //
+    //    '.' + <project name> + '-' + <forgefile name without extension> + '-hefesto-src-chsum-base'
+    //
+    memset(smbname, 0, sizeof(smbname));
+    smbname[0] = '.';
+    strcat(smbname, HEFESTO_CURRENT_PROJECT->name);
+    strcat(smbname,"-");
+    fp = HEFESTO_CURRENT_FORGEFILE_NAME;
+    sp = smbname;
+    while (*sp != 0) {
+        sp++;
+    }
+    while (*fp != '.' && *fp != 0) {
+        *sp = *fp;
+        sp++;
+        fp++;
+    }
+    strcat(smbname, "-hefesto-src-chsum-base");
+    return smbname;
+}
 
 static unsigned short get_buffer_chsum(const char *buffer, size_t buffer_size,
                                        const unsigned short chsum) {
@@ -136,7 +168,7 @@ hefesto_int_t current_forge_options_differs_from_last(const char *directory) {
     char c;
     hefesto_int_t retval = 1;
     FILE *sum_base = NULL;
-    temp = hefesto_make_path(directory, ".hefesto-src-chsum-base",
+    temp = hefesto_make_path(directory, get_sumbase_filename(),
                              HEFESTO_MAX_BUFFER_SIZE);
     sum_base = fopen(temp, "rb");
     free(temp);
@@ -178,7 +210,7 @@ hefesto_int_t refresh_hefesto_src_chsum_base(const char *directory,
     hefesto_base_refresh_ctx *s;
     hefesto_sum_base_ctx *pre_base = get_src_sum_base(directory), *bp;
 
-    temp = hefesto_make_path(directory, ".hefesto-src-chsum-base",
+    temp = hefesto_make_path(directory, get_sumbase_filename(),
                              HEFESTO_MAX_BUFFER_SIZE);
     sum_base = fopen(temp, "wb");
 
@@ -271,7 +303,7 @@ static hefesto_sum_base_ctx *get_src_sum_base(const char *directory) {
     hefesto_sum_base_ctx *deps = NULL;
     long sum_base_total_size = 0;
 
-    temp = hefesto_make_path(directory, ".hefesto-src-chsum-base",
+    temp = hefesto_make_path(directory, get_sumbase_filename(),
                              HEFESTO_MAX_BUFFER_SIZE);
     sb = fopen(temp, "rb");
 

@@ -32,16 +32,16 @@ hefesto_dep_chain_ctx
         while (is_hefesto_blank(*u)) u++;
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
-		if (*u != 0 && *(u + 1) != 0 && *(u + 1) == ':') {
-			*p = *u;
-			p++;
-			u++;
-			*p = *u;
-			p++;
-			u++;
-		}
+	if (*u != 0 && *(u + 1) != 0 && *(u + 1) == ':') {
+		*p = *u;
+		p++;
+		u++;
+		*p = *u;
+		p++;
+		u++;
+	}
 #endif
-		
+
         while (*u != ':' && *u != 0) {
             *p = *u;
             u++;
