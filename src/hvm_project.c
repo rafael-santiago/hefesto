@@ -41,6 +41,11 @@ static void *hefesto_project_options(const char *method,
                                      hefesto_func_list_ctx *functions,
                                      hefesto_type_t *otype);
 
+static void *hefesto_project_filepath(const char *method,
+                                      hefesto_var_list_ctx **lo_vars,
+                                      hefesto_var_list_ctx **gl_vars,
+                                      hefesto_func_list_ctx *functions,
+                                      hefesto_type_t *otype);
 
 static struct hefesto_project_method_callvector
         HEFESTO_PROJECT_METHOD_EXEC_TABLE[HEFESTO_PROJECT_METHODS_NR] = {
@@ -48,7 +53,8 @@ static struct hefesto_project_method_callvector
     {hefesto_project_toolset},
     {hefesto_project_dep_chain},
     {hefesto_project_abort},
-    {hefesto_project_options}
+    {hefesto_project_options},
+    {hefesto_project_filepath}
 };
 
 char
@@ -221,3 +227,20 @@ static void *hefesto_project_options(const char *method,
     return retval;
 }
 
+static void *hefesto_project_filepath(const char *method,
+                                      hefesto_var_list_ctx **lo_vars,
+                                      hefesto_var_list_ctx **gl_vars,
+                                      hefesto_func_list_ctx *functions,
+                                      hefesto_type_t *otype) {
+    void *result = NULL;
+    *otype = HEFESTO_VAR_TYPE_STRING;
+    if (HEFESTO_CURRENT_FORGEFILE_PATH == NULL) {
+        result = hefesto_mloc(sizeof(hefesto_int_t));
+        memset(result, 0, sizeof(hefesto_int_t));
+    } else {
+        result = hefesto_mloc(strlen(HEFESTO_CURRENT_FORGEFILE_PATH) + 1);
+        memset(result, 0, strlen(HEFESTO_CURRENT_FORGEFILE_PATH) + 1);
+        strncpy(result, HEFESTO_CURRENT_FORGEFILE_PATH, strlen(HEFESTO_CURRENT_FORGEFILE_PATH));
+    }
+    return result;
+}

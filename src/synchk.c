@@ -256,6 +256,11 @@ static hefesto_int_t synchk_hefesto_project_cmdline(const char *usr_calling,
                                               hefesto_var_list_ctx *gl_vars,
                                            hefesto_func_list_ctx *functions);
 
+static hefesto_int_t synchk_hefesto_project_filepath(const char *usr_calling,
+                                               hefesto_var_list_ctx *lo_vars,
+                                               hefesto_var_list_ctx *gl_vars,
+                                            hefesto_func_list_ctx *functions);
+
 struct hefesto_syntax_checker_ctx {
     hefesto_int_t (*synchk)(const char *statement, hefesto_var_list_ctx *lo_vars,
                   hefesto_var_list_ctx *gl_vars, hefesto_func_list_ctx *fn);
@@ -316,7 +321,8 @@ static struct hefesto_syscall_syntax_checker_ctx
     set_hefesto_synchk_slot(synchk_hefesto_project_toolset),
     set_hefesto_synchk_slot(synchk_hefesto_project_dep_chain),
     set_hefesto_synchk_slot(synchk_hefesto_project_abort),
-    set_hefesto_synchk_slot(synchk_hefesto_project_cmdline)
+    set_hefesto_synchk_slot(synchk_hefesto_project_cmdline),
+    set_hefesto_synchk_slot(synchk_hefesto_project_filepath)
 };
 
 #undef set_hefesto_synchk_slot
@@ -3097,6 +3103,22 @@ static hefesto_int_t synchk_hefesto_project_cmdline(const char *usr_calling,
                                               hefesto_var_list_ctx *lo_vars,
                                               hefesto_var_list_ctx *gl_vars,
                                            hefesto_func_list_ctx *functions) {
+    hefesto_int_t result;
+    const char *s;
+    for (s = usr_calling; *s != '(' && *s != 0; s++);
+    result = is_expected_args_total(s + 1, 0);
+    if (result == 0) {
+        hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_SYSCALL_WRONG_ARG_NR,
+                  usr_calling);
+        return 0;
+    }
+    return result;
+}
+
+static hefesto_int_t synchk_hefesto_project_filepath(const char *usr_calling,
+                                               hefesto_var_list_ctx *lo_vars,
+                                               hefesto_var_list_ctx *gl_vars,
+                                            hefesto_func_list_ctx *functions) {
     hefesto_int_t result;
     const char *s;
     for (s = usr_calling; *s != '(' && *s != 0; s++);

@@ -151,5 +151,6 @@ static void set_current_forgefile_name(const char *forgefile_path) {
         fp--;
     }
 #endif
+    HEFESTO_CURRENT_FORGEFILE_PATH = forgefile_path;
     HEFESTO_CURRENT_FORGEFILE_NAME = fp + ((fp != forgefile_path) ? 1 : 0);
 }
