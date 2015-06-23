@@ -1156,6 +1156,7 @@ As funções apresentadas na **Tabela 7** podem ser acessadas à partir de:
 |  ``dep_chain()`` | Retorna a ``dep-chain`` usada                             | ``hefesto.project.dep_chain()`` |
 |   ``abort()``    | Aborta o projeto                                          | ``hefesto.project.abort(1)``    |
 |  ``cmdline()``   | Retorna a linha de comando que a forja está sendo baseada | ``hefesto.project.cmdline()``   |
+|  ``file_path()`` | Retorna o ``file path`` do arquivo do projeto em execução | ``hefesto.project.file_path()`` |
 
 ### Tem uma forma fácil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
