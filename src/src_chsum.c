@@ -51,14 +51,12 @@ static char *get_sumbase_filename() {
     //
     //  INFO(Santiago): The sumbase file name scheme is:
     //
-    //    '.' + <project name> + '-' + <forgefile name without extension> + '-hefesto-src-chsum-base'
+    //    '.' +  <forgefile name without extension> + '-' + <project name> + '-hefesto-src-chsum-base'
     //
     memset(smbname, 0, sizeof(smbname));
     smbname[0] = '.';
-    strcat(smbname, HEFESTO_CURRENT_PROJECT->name);
-    strcat(smbname,"-");
     fp = HEFESTO_CURRENT_FORGEFILE_NAME;
-    sp = smbname;
+    sp = smbname + 1;
     while (*sp != 0) {
         sp++;
     }
@@ -67,6 +65,8 @@ static char *get_sumbase_filename() {
         sp++;
         fp++;
     }
+    strcat(smbname,"-");
+    strcat(smbname, HEFESTO_CURRENT_PROJECT->name);
     strcat(smbname, "-hefesto-src-chsum-base");
     return smbname;
 }
