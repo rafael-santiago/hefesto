@@ -7,7 +7,7 @@ The main Hefesto's feature is allow a more programatic build scripting.
 
 In order to do it Hefesto uses his own language (more procedural than declarative).
 
-Seeking with it:
+Seeking:
 
     * Clarity
     * Organization
