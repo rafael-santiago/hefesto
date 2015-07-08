@@ -135,7 +135,8 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                     //cmd = cmd->next;
                     cmd = get_last_cmd_to_exec(cmd);
                 }
-                if (hvm_last_if_test == 1) {
+                if (hvm_last_if_test != 0) {
+                    //  WARN(Santiago): else block skipping.
                     while (cmd != NULL && cmd->next != NULL &&
                            cmd->next->instruction == HEFESTO_ELSE) {
                         cmd = cmd->next;
@@ -174,7 +175,8 @@ void *hvm_exec_command_list(hefesto_command_list_ctx *cmd,
                     return result;
                 }
                 // INFO(Santiago): it's needed, due to linked else if's.
-                if (hvm_last_if_test == 1) {
+                if (hvm_last_if_test != 0) {
+                    //  WARN(Santiago): else block skipping
                     while (cmd != NULL && cmd->next != NULL &&
                            cmd->next->instruction == HEFESTO_ELSE) {
                         cmd = cmd->next;
