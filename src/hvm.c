@@ -466,8 +466,7 @@ static void *hvm_while(hefesto_command_list_ctx *cmd,
         } else if (hvm_continue_loop) {
             if (result != NULL) free(result);
             hvm_continue_loop = 0;
-            test = (void *) hefesto_mloc(sizeof(hefesto_int_t));
-            *(hefesto_int_t *)test = 1;
+            test = expr_eval(cmd->expr, lo_vars, gl_vars, functions, &etype, &osize);
             continue;
         }
 
