@@ -164,6 +164,8 @@ static void *hvm_list_item(const char *method,
 
     index_p = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
 
+    free(arg);
+
     outsz = *(size_t *)index_p;
     free(index_p);
 
@@ -473,6 +475,8 @@ static void *hvm_list_index_of(const char *method,
             *(hefesto_int_t *)result = offset;
         }
     }
+
+    free(arg);
 
     free(data);
 

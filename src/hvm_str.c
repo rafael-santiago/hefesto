@@ -147,6 +147,7 @@ static void *hvm_str_at(const char *method,
     index_p = expr_eval(arg, lo_vars, gl_vars, functions, &etype, &outsz);
     index = *(size_t *)index_p;
     free(index_p);
+    free(arg);
 
     result =  (char *) hefesto_mloc(sizeof(char)*2);
     if (strlen((char *)(*string_var)->data) > 0) {

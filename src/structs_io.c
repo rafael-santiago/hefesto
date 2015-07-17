@@ -807,6 +807,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
             temp = get_next_expression_from_buffer(b, &sz);
             p->expr = infix2postfix(temp, sz, 1);
             b += sz;
+            free(temp);
         } else if (tok[0] == '$' && *b == '=') {
             p->instruction = HEFESTO_ATTRIB;
             p->params = add_data_to_hefesto_common_list_ctx(p->params,
@@ -896,6 +897,7 @@ hefesto_command_list_ctx *add_command_to_hefesto_command_list_ctx(
                 free(buf_p);
                 buf_p = get_arg_from_call(sub_buf_p, &sz);
             }
+            free(buf_p);
             free(sub_buf_p);
             b += ssz;
             while (*b != 0 && !is_hefesto_line_terminator(*b)) b++;

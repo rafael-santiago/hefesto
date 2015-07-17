@@ -269,7 +269,7 @@ void hvm_init_function_args(const char *args,
     }
 
     free(expr);
-
+    free(temp);
     // we must to clear local stack initializing all with null or zero.
     for (; vp != NULL; vp = vp->next) {
         if (vp->type == HEFESTO_VAR_TYPE_FILE_DESCRIPTOR && vp->contents) {
