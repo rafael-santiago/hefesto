@@ -34,7 +34,7 @@ function get_hfst_objs() : result type none {
     var tmp type string;
     $tmp = hefesto.sys.pwd();
     hefesto.sys.cd("../../");
-    $ldflags.ls(".*\.o$");
+    $ldflags.ls(".*\\.o$");
     hefesto.sys.cd($tmp);
     var l type int;
     $l = 0;
