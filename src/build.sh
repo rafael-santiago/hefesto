@@ -31,7 +31,8 @@ UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ..
 
 ALL_OK=1
 
-HERE_UNIT_TEST="-ohere_unittest main.o htest.o ../libhere.a"
+
+HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o -ldl"
 
 LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
 
@@ -226,13 +227,12 @@ else
     $LIB -r "libhere.a" $LIBHERE_OBJS
 fi
 cd test
-$COMPILER $COMPILER_OPTS htest.c
-if test $? -gt 0
-then
-    ALL_OK=0
-fi
-$COMPILER $COMPILER_OPTS here/test
-$COMPILER $COMPILER_OPTS main.c
+cd cutest/src/
+$COMPILER -c cutest.c
+$COMPILER -c cutest_memory.c
+$COMPILER -c cutest_mmap.c
+cd ../..
+$COMPILER $COMPILER_OPTS main.c -Icutest/src
 if test $? -gt 0
 then
     ALL_OK=0
