@@ -23,7 +23,19 @@
 
 #ifndef HEFESTO_TGT_OS
 
+#if defined(__linux__)
+
 #define HEFESTO_TGT_OS HEFESTO_LINUX
+
+#elif defined(__FreeBSD__)
+
+#define HEFESTO_TGT_OS HEFESTO_FREEBSD
+
+#elif defined(_WIN32)
+
+#define HEFESTO_TGT_OS HEFESTO_WINDOWS
+
+#endif
 
 #endif
 

@@ -11,9 +11,7 @@ If you're on Linux/FreeBSD use: ./build.sh
 
 If you're on Windows use: build.bat
 
-Ok, I forgot... Before edit the header src/types.h, adjusting the macro HEFESTO_TGT_OS to your current platform. The allowed values are: ``HEFESTO_LINUX``, ``HEFESTO_FREEBSD``, ``HEFESTO_WINDOWS``.
-
-The both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)
+Both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)
 
 The installation is pretty straightforward just follow the steps.
 
@@ -29,8 +27,6 @@ Agora, para fazer o build do Hefesto da primeira vez você precisa usar o "src/bu
 Se você está no Linux/FreeBSD use: ./build.sh
 
 Se você está no Windows use: build.bat
-
-Ok, eu esqueci... Antes edite o header src/types.h, ajustando a macro HEFESTO_TGT_OS para sua plataforma atual. Os valores permitidos são: ``HEFESTO_LINUX``, ``HEFESTO_FREEBSD``, ``HEFESTO_WINDOWS``.
 
 Ambos os comandos irão compilar e linkeditar a aplicação, irão rodar os testes e então usará o Hefesto para instalar o Hefesto ;)
 
