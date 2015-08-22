@@ -14,7 +14,7 @@
 
 @SET LIBHERE_OBJS=here.o here_ctx.o here_mmachine.o here_mem.o
 
-@SET HERE_UNIT_TEST=-ohere_unittest main.o htest.o ../libhere.a
+@SET HERE_UNIT_TEST=-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o
 
 @echo ### Compiling
 
@@ -134,10 +134,16 @@
 
 @cd test
 
-@%COMPILER% %COMPILER_OPTS% htest.c
-@IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
+@cd cutest/src
+@%COMPILER% -c cutest.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO UNIT_TEST_COMPILATION_FAIL )
+@%COMPILER% -c cutest_memory.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO UNIT_TEST_COMPILATION_FAIL )
+@%COMPILER% -c cutest_mmap.c
+@IF %ERRORLEVEL% NEQ 0 ( GOTO UNIT_TEST_COMPILATION_FAIL )
+@cd ../..
 
-@%COMPILER% %COMPILER_OPTS% main.c
+@%COMPILER% %COMPILER_OPTS% main.c -Icutest/src
 @IF %ERRORLEVEL% NEQ 0 ( GOTO COMPILATION_FAIL )
 
 @%LINKER% %HERE_UNIT_TEST%
