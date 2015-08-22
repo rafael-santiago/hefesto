@@ -1,13 +1,9 @@
 Building Hefesto
 ----------------
 
-After done a git clone from "https://github.com/rafael-santiago/hefesto", some submodules is also needed... so:
+The easiest way to clone hefesto's repo is:
 
-        git submodule update --init
-
-Or in the moment of the hefesto's master cloning operation you should try:
-
-        git clone --recursive https://github.com/rafael-santiago/hefesto
+``git clone https://github.com/rafael-santiago/hefesto --recursive``
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
@@ -15,7 +11,7 @@ If you're on Linux/FreeBSD use: ./build.sh
 
 If you're on Windows use: build.bat
 
-Ok, I forgot... Before edit the header src/types.h, adjusting the macro HEFESTO_TGT_OS to your current platform.
+Ok, I forgot... Before edit the header src/types.h, adjusting the macro HEFESTO_TGT_OS to your current platform. The allowed values are: ``HEFESTO_LINUX``, ``HEFESTO_FREEBSD``, ``HEFESTO_WINDOWS``.
 
 The both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)
 
@@ -24,15 +20,7 @@ The installation is pretty straightforward just follow the steps.
 Construindo o Hefesto
 ---------------------
 
-Depois de feito um git clone à partir de "https://github.com/rafael-santiago/hefesto", alguns submódulos são também necessários... então:
-
-        git submodule init
-
-E ainda...
-
-        git submodule update
-
-Ou no momento em que você for clonar o master do hefesto... pode tentar:
+O jeito mais fácil de clonar o repo do hefesto é:
 
         git clone --recursive https://github.com/rafael-santiago/hefesto
 
@@ -42,7 +30,7 @@ Se você está no Linux/FreeBSD use: ./build.sh
 
 Se você está no Windows use: build.bat
 
-Ok, eu esqueci... Antes edite o header src/types.h, ajustando a macro HEFESTO_TGT_OS para sua plataforma atual.
+Ok, eu esqueci... Antes edite o header src/types.h, ajustando a macro HEFESTO_TGT_OS para sua plataforma atual. Os valores permitidos são: ``HEFESTO_LINUX``, ``HEFESTO_FREEBSD``, ``HEFESTO_WINDOWS``.
 
 Ambos os comandos irão compilar e linkeditar a aplicação, irão rodar os testes e então usará o Hefesto para instalar o Hefesto ;)
 
