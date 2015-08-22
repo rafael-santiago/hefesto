@@ -7,3 +7,6 @@
 [submodule "src/tests/unit/cutest"]
 	path = src/tests/unit/cutest
 	url = git://github.com/rafael-santiago/cutest.git
+[submodule "src/here"]
+	path = src/here
+	url = https://github.com/rafael-santiago/here
