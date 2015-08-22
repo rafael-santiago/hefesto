@@ -31,8 +31,14 @@ UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ..
 
 ALL_OK=1
 
+if test "$PLATFORM" = "FreeBSD"
+then
+    HERE_FLAGS="-lexecinfo"
+else
+    HERE_FLAGS="-ldl"
+fi
 
-HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o -ldl"
+HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o $HERE_FLAGS"
 
 LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
 
