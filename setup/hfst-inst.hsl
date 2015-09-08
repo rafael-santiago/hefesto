@@ -930,6 +930,7 @@ hefesto-install.prologue() {
 
     $source_files.add_item("../helios/src/include/toolsets/common/utils/lang/c/dependency_scanner.hsl");
     $source_files.add_item("../helios/src/include/toolsets/gcc/forges/common.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/gcc/forges/win_common.hsl");
     $source_files.add_item("../helios/src/include/toolsets/gcc/forges/gcc_c_app_forge.hsl");
     $source_files.add_item("../helios/src/include/toolsets/gcc/forges/gcc_c_lib_forge.hsl");
     $source_files.add_item("../helios/src/include/toolsets/gcc/gcc-app.hsl");
@@ -941,6 +942,7 @@ hefesto-install.prologue() {
     $source_files.add_item("../helios/src/include/toolsets/null/null.hsl");
     $source_files.add_item("../helios/src/include/doc/toolsets/null/README.md");
     $source_files.add_item("../helios/src/include/toolsets/vc/common/vssetupenv.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/vc/common/vssetuputils.hsl");
     $source_files.add_item("../helios/src/include/toolsets/vc/forges/common/vcutils.hsl");
     $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc110_app_forge.hsl");
     $source_files.add_item("../helios/src/include/toolsets/vc/forges/vc110_lib_forge.hsl");
@@ -996,6 +998,7 @@ hefesto-install.prologue() {
         # A minimal hstd
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/common/utils/lang/c/dependency_scanner.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/win_common.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_app_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/forges/gcc_c_lib_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-app.hsl"));
@@ -1007,6 +1010,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/null/null.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/doc/toolsets/null/README.md"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/common/vssetupenv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/common/vssetuputils.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/common/vcutils.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_app_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/vc/forges/vc110_lib_forge.hsl"));
@@ -1054,6 +1058,7 @@ hefesto-install.prologue() {
         # A minimal hstd
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\common\\utils\\lang\\c\\dependency_scanner.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\win_common.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_app_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\forges\\gcc_c_lib_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-app.hsl"));
@@ -1065,6 +1070,7 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\null\\null.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\doc\\toolsets\\null\\README.md"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\common\\vssetupenv.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\common\\vssetuputils.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\common\\vcutils.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_app_forge.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\vc\\forges\\vc110_lib_forge.hsl"));
