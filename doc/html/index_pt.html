@@ -18,8 +18,10 @@
     var sources type list;
     var includes type list;
     var cflags type list;
+    var libraries type list;
+    var ldflags type list;
 
-    project here : toolset &quot;gcc-c-lib&quot; : $sources, $includes, $cflags, &quot;libhere.a&quot;;
+    project here : toolset &quot;gcc-c-lib&quot; : $sources, $includes, $cflags, $libraries, $ldflags, &quot;libhere.a&quot;;
 
     here.prologue() {
         $sources.ls(&quot;.*\\.c@@bodyquot;);
@@ -31,15 +33,17 @@
     var sources type list;
     var includes type list;
     var cflags type list;
+    var libraries type list;
+    var ldflags type list;
 
-    project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, "libhere.a";
+    project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
 
     here.prologue() {
         $sources.ls(".*\\.c$");
     }
 </code></pre><p>A <code>HSL</code> já começa aqui e continua dentro do <code>toolset</code>. <code>HSL</code> pode ser entendida como <code>H</code>efesto <code>S</code>cripting <code>L</code>anguage. É a Linguagem que se usa tanto para criar <em>builds</em> ou para automatizar a essência deles. O conjunto de automatizações do <code>essencial de um build</code> pode ser entendido como um <code>toolset</code>.</p><p>Note que no <code>Forgefile</code> apresentado, após o comentário, é feita uma inclusão bem sugestiva. Estamos incutindo nesse <code>Forgefile</code> uma base de conhecimento prévia que recai sobre como executar um <em>build</em> de uma biblioteca escrita em <em>C</em> usando o compilador <em>GCC</em>.</p><p>Depois disso, algo que muitos odeiam com paixão. Você precisa declarar tudo, absolutamente tudo o que vai usar. Algo como: “ei pessoal, preciso usar isso aqui então, com licença viu?”.</p><p>Do ponto de vista do <em>design de Linguagens de programação</em>, eu pessoalmente acho que a necessidade de declaração de uma variável é uma <em>feature</em> que salta do dispositivo direto para a consciência do usuário, pois no momento da declaração ele será levado a pensar sobre o porquê e se realmente precisa daquela variável naquele dado momento.<br>Salvo isso, continuemos…</p><p>Essas variáveis declaradas são utilizadas pela <code>função de forja</code> (entenda por enquanto como o ponto de entrada para a parte mais interna do <em>build</em>).</p><p>Após a declaração das variáveis, <code>declaramos o projeto</code>. Dizendo algo na linha: </p><blockquote>
 <p>“Esse projeto se chama “here” é uma <em>lib</em> escrita em <em>C</em> que esperamos compilar com o <em>GCC</em>. Seguem os parâmetros na ordem que o motor de <em>build</em> para esse tipo de coisa espera.”</p>
-</blockquote><p>Esse <code>toolset</code> espera receber uma lista de <code>códigos</code> para compilar, uma lista de diretórios de <code>includes</code> usados durante a compilação, uma lista de <code>opções de compilação</code> que o compilador em questão entende e um <code>nome para o arquivo</code> que será produzido pelo processo, em outras palavras a <em>lib</em> propriamente dita.</p><p>Um problema com a maioria dos <em>build systems</em> é quanto a definição dos códigos a serem processados. Alguns deixam a coisa solta e podemos ler essa lista de qualquer lugar, outros não disponibilizam mecanismos para isso.</p><p>O <em>Hefesto</em> fica no meio termo, antes de um <em>build</em> começar, às vezes, para não dizer quase sempre… existem uma infinidade de coisas muito específicas àquele projeto que precisam ser feitas. Quando um projeto é criado no <em>Hefesto</em>, juntamente com ele são criados três pontos de entrada: <code>preloading</code>, <code>prologue</code> e <code>epilogue</code>.</p><p>Confira na <strong>Tabela 1</strong> em que momento do processo esses pontos de entrada são atingidos. A ideia básica aqui é: se existe código definido dentro deles, no momento esperado, esses códigos serão executados.</p><p><strong>Tabela 1</strong>: Os estágios de um projeto <em>Hefesto</em>.</p><table>
+</blockquote><p>Esse <code>toolset</code> espera receber uma lista de <code>códigos</code> para compilar, uma lista de diretórios de <code>includes</code> usados durante a compilação, uma lista de <code>opções de compilação</code> que o compilador em questão entende, uma lista de diretórios onde ficam as <code>libs</code>, uma lista de <code>flags</code> de compilação e um <code>nome para o arquivo</code> que será produzido pelo processo, em outras palavras a <em>lib</em> propriamente dita.</p><p>Um problema com a maioria dos <em>build systems</em> é quanto a definição dos códigos a serem processados. Alguns deixam a coisa solta e podemos ler essa lista de qualquer lugar, outros não disponibilizam mecanismos para isso.</p><p>O <em>Hefesto</em> fica no meio termo, antes de um <em>build</em> começar, às vezes, para não dizer quase sempre… existem uma infinidade de coisas muito específicas àquele projeto que precisam ser feitas. Quando um projeto é criado no <em>Hefesto</em>, juntamente com ele são criados três pontos de entrada: <code>preloading</code>, <code>prologue</code> e <code>epilogue</code>.</p><p>Confira na <strong>Tabela 1</strong> em que momento do processo esses pontos de entrada são atingidos. A ideia básica aqui é: se existe código definido dentro deles, no momento esperado, esses códigos serão executados.</p><p><strong>Tabela 1</strong>: Os estágios de um projeto <em>Hefesto</em>.</p><table>
 <thead>
 <tr>
 <th style="text-align:center"><strong>Project entry-point</strong></th>
@@ -72,8 +76,8 @@
 <p><code>--&lt;file-name&gt;-projects=&lt;projects defined inside this file&gt;</code></p>
 </blockquote><p>Já sei:</p><blockquote>
 <p>ZzZZzzzZzzzZzZZZZZZzzzzzzZzzzZzzzzzZZZZZZZzzzzZZZ que comando longo… não posso digitar algo mais breve? </p>
-</blockquote><p>Pode sim, você precisa criar um arquivo de invocação e imolar 5 cabras em nome de <em>Hefesto</em>… O arquivo de invocação precisa estar no diretório onde você deseja invocar a forja, o nome desse arquivo é <code>.ivk</code> e dentro dele você deve colocar a linha de comando exatamente como passaria para o <em>Hefesto</em>.</p><p>Com o <code>.ivk</code> configurado, estando no diretório dele, apenas digitando <code>hefesto</code> você terá a forja nos moldes padrão que você necessita e definiu. Caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando <em>mergeadas</em> com as opções do arquivo de invocação.</p><p>E quanto as cabras?! Não precisa, era só brincadeira…</p><p>Pronto, agora você já sabe os passos básicos para compor um <code>Forgefile</code> no <em>Hefesto</em>, mas o que você não sabe ainda são os detalhes gerais da <code>HSL</code> e de como criar mais <code>toolsets</code> que atendam suas necessidades.</p><p>Os <code>toolsets</code> por sua vez são porções de código <code>HSL</code> que podem ter suas próprias convenções, conveniências, etc. Por isso, antes de usá-los uma boa providência é consultar a documentação específica desse <code>toolset</code>. Se você o baixou da base oficial provavelmente encontrará algum texto que o detalhe.</p><h3 id="reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?"><a name="reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?" href="#reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?"></a>Reprocessando somente o que mudou desde a última forja, tem como?</h3><p>Sim, isso envolve requisitar essa necessidade na declaração do projeto. Vamos usar o mesmo projeto de <em>lib</em> do exemplo anterior.</p><p>Anteriormente a declaração era essa:</p><pre><code data-origin="<pre><code>    project here : toolset &quot;gcc-c-lib&quot; : $sources, $includes, $cflags, &quot;libhere.a&quot;;
-</code></pre>">    project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, "libhere.a";
+</blockquote><p>Pode sim, você precisa criar um arquivo de invocação e imolar 5 cabras em nome de <em>Hefesto</em>… O arquivo de invocação precisa estar no diretório onde você deseja invocar a forja, o nome desse arquivo é <code>.ivk</code> e dentro dele você deve colocar a linha de comando exatamente como passaria para o <em>Hefesto</em>.</p><p>Com o <code>.ivk</code> configurado, estando no diretório dele, apenas digitando <code>hefesto</code> você terá a forja nos moldes padrão que você necessita e definiu. Caso passe opções nessa chamada, as opções que você fornecer terão precedência maior quando <em>mergeadas</em> com as opções do arquivo de invocação.</p><p>E quanto as cabras?! Não precisa, era só brincadeira…</p><p>Pronto, agora você já sabe os passos básicos para compor um <code>Forgefile</code> no <em>Hefesto</em>, mas o que você não sabe ainda são os detalhes gerais da <code>HSL</code> e de como criar mais <code>toolsets</code> que atendam suas necessidades.</p><p>Os <code>toolsets</code> por sua vez são porções de código <code>HSL</code> que podem ter suas próprias convenções, conveniências, etc. Por isso, antes de usá-los uma boa providência é consultar a documentação específica desse <code>toolset</code>. Se você o baixou da base oficial provavelmente encontrará algum texto que o detalhe.</p><h3 id="reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?"><a name="reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?" href="#reprocessando-somente-o-que-mudou-desde-a-última-forja,-tem-como?"></a>Reprocessando somente o que mudou desde a última forja, tem como?</h3><p>Sim, isso envolve requisitar essa necessidade na declaração do projeto. Vamos usar o mesmo projeto de <em>lib</em> do exemplo anterior.</p><p>Anteriormente a declaração era essa:</p><pre><code data-origin="<pre><code>    project here : toolset &quot;gcc-c-lib&quot; : $sources, $includes, $cflags, $libraries, $ldflags, &quot;libhere.a&quot;;
+</code></pre>">    project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
 </code></pre><p>Agora vamos incluir a especificação da cadeia de dependências ou <code>dep-chain</code>. Uma <code>dep-chain</code> basicamente é uma <code>string</code> expressa num formato especial:</p><blockquote>
 <p><code>&lt;file-path&gt;</code> <strong>:</strong>  <code>&lt;file-path_0&gt;</code> [ <strong>&amp;</strong> <code>&lt;file-path_n&gt;</code> ] <strong>;</strong></p>
 </blockquote><p>Imagine que <code>a.x</code> depende de <code>b.x</code> que depende de <code>c.x</code> que por sua vez depende de <code>d.x</code> e <code>e.x</code>. A <code>dep-chain</code> para essa situação seria:</p><blockquote>
@@ -93,6 +97,8 @@
     project here : toolset &quot;gcc-c-lib&quot; : dependencies $deps : $sources,
                                                               $includes,
                                                               $cflags,
+                                                              $libraries,
+                                                              $ldflags,
                                                               &quot;libhere.a&quot; ;
 
     here.prologue() {
@@ -112,6 +118,8 @@
     project here : toolset "gcc-c-lib" : dependencies $deps : $sources,
                                                               $includes,
                                                               $cflags,
+                                                              $libraries,
+                                                              $ldflags,
                                                               "libhere.a" ;
 
     here.prologue() {
@@ -138,6 +146,8 @@
     project here : toolset $current_toolset : dependencies $deps : $sources,
                                                                    $includes,
                                                                    $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
                                                                    &quot;libhere.a&quot; ;
 
     function has_vs_110() : result type int {
@@ -200,6 +210,8 @@
     project here : toolset $current_toolset : dependencies $deps : $sources,
                                                                    $includes,
                                                                    $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
                                                                    "libhere.a" ;
 
     function has_vs_110() : result type int {
@@ -250,10 +262,14 @@
 </code></pre><p>A função <code>has_vs_110</code> verifica no registro do sistema a entrada de chave existente caso haja o <em>Visual Studio</em> na máquina, leia a seção <code>Sobre a HSL</code> que você entenderá a lógica básica e o uso de <code>hefesto syscalls</code> nessa função. Se existir na máquina retornará 1, de outra forma 0.</p><p>Note que no <code>preloading</code> do projeto apenas chamaremos essa função se estivermos executando a forja sob o <code>Windows</code> (novamente, consulte a seção <code>Sobre a HSL</code>) e se existir o <em>Visual Studio</em> na máquina, setamos o nome do toolset para “vc110-lib”. Caso contrário, o <code>toolset</code> será o padrão “gcc-c-lib”. Pelo fato da declaração possuir uma indireção para o nome do <code>toolset</code> via a variável que setamos no <code>preloading</code>:</p><pre><code data-origin="<pre><code>    project here : toolset $current_toolset : dependencies $deps : $sources,
                                                                    $includes,
                                                                    $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
                                                                    &quot;libhere.a&quot; ;
 </code></pre>">    project here : toolset $current_toolset : dependencies $deps : $sources,
                                                                    $includes,
                                                                    $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
                                                                    "libhere.a" ;
 </code></pre><p>Passamos ter a seleção do <code>toolset</code> em <code>runtime</code>, pois quando o <code>toolset</code> estiver sendo carregado o <code>Hefesto</code> já vai ter passado pelo <code>preloading</code> do nosso projeto. Por esse motivo é importante ter a mesma assinatura de forja entre os <code>toolsets</code>, pois só podemos declarar um projeto uma vez. Mas isso vai da inteligência e mais do que isso, do senso de reutilização do desenvolvedor dos <code>toolsets</code> que você for usar.</p><p>Mas ainda tem um “problema” nisso aí… observe no início do exemplo:</p><pre><code data-origin="<pre><code>    include ~/toolsets/gcc/gcc-lib.hsl
     include ~/toolsets/vc/vc110-lib.hsl

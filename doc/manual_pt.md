@@ -67,8 +67,10 @@ Segue um exemplo de um ``Forgefile`` para uma *lib* escrita em *C*:
         var sources type list;
         var includes type list;
         var cflags type list;
+        var libraries type list;
+        var ldflags type list;
 
-        project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, "libhere.a";
+        project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
 
         here.prologue() {
         	$sources.ls(".*\\.c$");
@@ -89,7 +91,7 @@ Após a declaração das variáveis, ``declaramos o projeto``. Dizendo algo na linha
 
 >"Esse projeto se chama "here" é uma *lib* escrita em *C* que esperamos compilar com o *GCC*. Seguem os parâmetros na ordem que o motor de *build* para esse tipo de coisa espera."
 
-Esse ``toolset`` espera receber uma lista de ``códigos`` para compilar, uma lista de diretórios de ``includes`` usados durante a compilação, uma lista de ``opções de compilação`` que o compilador em questão entende e um ``nome para o arquivo`` que será produzido pelo processo, em outras palavras a *lib* propriamente dita.
+Esse ``toolset`` espera receber uma lista de ``códigos`` para compilar, uma lista de diretórios de ``includes`` usados durante a compilação, uma lista de ``opções de compilação`` que o compilador em questão entende, uma lista de diretórios onde ficam as ``libs``, uma lista de ``flags`` de compilação e um ``nome para o arquivo`` que será produzido pelo processo, em outras palavras a *lib* propriamente dita.
 
 Um problema com a maioria dos *build systems* é quanto a definição dos códigos a serem processados. Alguns deixam a coisa solta e podemos ler essa lista de qualquer lugar, outros não disponibilizam mecanismos para isso.
 
@@ -141,7 +143,7 @@ Sim, isso envolve requisitar essa necessidade na declaração do projeto. Vamos us
 
 Anteriormente a declaração era essa:
 
-		project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, "libhere.a";
+		project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
 
 Agora vamos incluir a especificação da cadeia de dependências ou ``dep-chain``. Uma ``dep-chain`` basicamente é uma ``string`` expressa num formato especial:
 
@@ -172,6 +174,8 @@ Segue um uso prático das ``dep-chains``:
 		project here : toolset "gcc-c-lib" : dependencies $deps : $sources,
         		                                                  $includes,
                 		                                          $cflags,
+                                                                  $libraries,
+                                                                  $ldflags,
                         		                                  "libhere.a" ;
 
 		here.prologue() {
@@ -224,6 +228,8 @@ Vou apresentar o *Forgefile* alterado e comentar as partes interessantes depois.
 		project here : toolset $current_toolset : dependencies $deps : $sources,
         			                                                   $includes,
                     			                                       $cflags,
+                                                                       $libraries,
+                                                                       $ldflags,
                                 			                           "libhere.a" ;
 
 		function has_vs_110() : result type int {
@@ -279,6 +285,8 @@ Note que no ``preloading`` do projeto apenas chamaremos essa função se estivermo
 		project here : toolset $current_toolset : dependencies $deps : $sources,
         			                                                   $includes,
                     			                                       $cflags,
+                                                                       $libraries,
+                                                                       $ldflags,
                                 			                           "libhere.a" ;
 
 Passamos ter a seleção do ``toolset`` em ``runtime``, pois quando o ``toolset`` estiver sendo carregado o ``Hefesto`` já vai ter passado pelo ``preloading`` do nosso projeto. Por esse motivo é importante ter a mesma assinatura de forja entre os ``toolsets``, pois só podemos declarar um projeto uma vez. Mas isso vai da inteligência e mais do que isso, do senso de reutilização do desenvolvedor dos ``toolsets`` que você for usar.
