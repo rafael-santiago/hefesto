@@ -1494,6 +1494,13 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
         del_hefesto_project_ctx(project_curr);
         project_curr = NULL;
 
+        if (preloading_p != NULL) {
+            tmp_res = hvm_exec_function(preloading_p,
+                                        &preloading_p->vars,
+                                        &gl_vars, functions);
+            if (tmp_res != NULL) free(tmp_res);
+        }
+
         while (includes != NULL && state < 5) {
 
             includes_tail = get_hefesto_include_list_ctx_tail(includes);
@@ -1550,11 +1557,11 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                         if (preloading_p != NULL &&
                                             vp->type == HEFESTO_VAR_TYPE_STRING)
                                         {
-                                            tmp_res =
+                                            /*tmp_res =
                                               hvm_exec_function(preloading_p,
                                                          &preloading_p->vars,
                                                          &gl_vars, functions);
-                                            if (tmp_res != NULL) free(tmp_res);
+                                            if (tmp_res != NULL) free(tmp_res);*/
                                             toolset =
                                               get_hefesto_toolset_ctx_name(
                                                 vp->contents->data, toolsets);
