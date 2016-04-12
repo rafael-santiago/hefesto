@@ -11,6 +11,8 @@ include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 var sources type list;
 var includes type list;
 var cflags type list;
+var libs type list;
+var ldflags type list;
 var binary type string;
 
 var deps type string;
@@ -18,6 +20,8 @@ var deps type string;
 project random : toolset "gcc-c-lib" : dependencies $deps : $sources,
                                                             $includes,
                                                             $cflags,
+                                                            $libs,
+                                                            $ldflags,
                                                             $binary;
 
 random.prologue() {
