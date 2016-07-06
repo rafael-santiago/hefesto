@@ -266,11 +266,11 @@ static void *hvm_toolset_base_refresh(const char *command,
                                       hefesto_var_list_ctx **gl_vars,
                                       hefesto_func_list_ctx *functions) {
 
-    hefesto_var_list_ctx *proc_files;
-    hefesto_dep_chain_ctx *dp;
-    hefesto_common_list_ctx *cp;
-    hefesto_base_refresh_ctx *bref = NULL, *brp;
-    char *arg;
+    hefesto_var_list_ctx *proc_files = NULL;
+    hefesto_dep_chain_ctx *dp = NULL;
+    hefesto_common_list_ctx *cp = NULL;
+    hefesto_base_refresh_ctx *bref = NULL, *brp = NULL;
+    char *arg = NULL;
     size_t offset = 0;
 
     arg = get_arg_from_call(command, &offset);
@@ -340,12 +340,12 @@ static void *hvm_toolset_file_has_change(const char *command,
                                          hefesto_func_list_ctx *functions) {
 
     void *result = (void *) hefesto_mloc(sizeof(hefesto_int_t));
-    hefesto_dep_chain_ctx *d;
-    char *arg;
-    char *expr;
-    void *expr_result;
-    hefesto_type_t etype;
-    size_t offset = 0;
+    hefesto_dep_chain_ctx *d = NULL;
+    char *arg = NULL;
+    char *expr = NULL, *ep = NULL, *epp = NULL;
+    void *expr_result = NULL;
+    hefesto_type_t etype = HEFESTO_VAR_TYPE_UNTYPED;
+    size_t offset = 0, len = 0;
 
     *(hefesto_int_t *)result = 1;
 
@@ -361,12 +361,28 @@ static void *hvm_toolset_file_has_change(const char *command,
         etype = HEFESTO_VAR_TYPE_STRING;
         expr_result = expr_eval(expr, lo_vars, gl_vars, functions, &etype, &offset);
         free(expr);
+
+        if (*((char *)expr_result) == '"') {
+            len = strlen(expr_result);
+            expr = hefesto_mloc(len + 1);
+            memset(expr, 0, len + 1);
+            ep = expr_result + 1;
+            epp = expr;
+            while (*ep != 0 && *ep != '"') {
+                *epp = *ep;
+                ep++;
+                epp++;
+            }
+            free(expr_result);
+            expr_result = expr;
+            expr = NULL;
+        }
+
         if ((d = get_hefesto_dep_chain_ctx_file_path(expr_result,
                                       HEFESTO_CURRENT_DEP_CHAIN)) != NULL) {
             *(hefesto_int_t *)result = d->dirty;
         }
         free(expr_result);
-
     }
 
     return result;

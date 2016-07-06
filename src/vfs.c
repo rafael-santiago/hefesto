@@ -493,10 +493,11 @@ hefesto_int_t hefesto_ls(const char *mask) {
 
 hefesto_file_handle *hefesto_fopen(const char *file_path, const char *mode) {
 
-    hefesto_file_handle *fp_handle;
-    char temp_mode[20];
-    const char *m;
-    size_t t;
+    hefesto_file_handle *fp_handle = NULL;
+    char temp_mode[20] = "";
+    const char *m = NULL, *fp = NULL;
+    size_t t = 0, file_path_sz = 0;
+    char *real_file_path = NULL, *rp = NULL;
 
     strncpy(temp_mode, mode, sizeof(temp_mode)-1);
 
@@ -517,7 +518,27 @@ hefesto_file_handle *hefesto_fopen(const char *file_path, const char *mode) {
         }
     }
 
-    new_hefesto_file_handle(fp_handle, file_path);
+    file_path_sz = strlen(file_path);
+
+    real_file_path = (char *)hefesto_mloc(file_path_sz + 1);
+
+    memset(real_file_path, 0, file_path_sz + 1);
+
+    t = (*file_path == '"') ? 1 : 0;
+
+    memcpy(real_file_path, file_path + t, file_path_sz - t);
+
+    rp = real_file_path + strlen(real_file_path) - 1;
+    while (*rp == 0) {
+        rp--;
+    }
+
+    if (*rp == '"') {
+        *rp = 0;
+    }
+
+    new_hefesto_file_handle(fp_handle, real_file_path);
+    free(real_file_path);
     fp_handle->fp = fopen(fp_handle->path, temp_mode);
 
     if (fp_handle->fp != NULL) {
