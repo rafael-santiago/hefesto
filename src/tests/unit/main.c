@@ -2107,6 +2107,16 @@ CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
 #endif
     free(result);
 
+    result = hefesto_sys_call("hefesto.sys.make_path(\"\\\"/home\\\"\", \"\\\"rs\\\"     \")",
+                              &lo_vars, &gl_vars, NULL, &otype);
+    CUTE_CHECK("result == NULL", result != NULL);
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+    CUTE_CHECK("result != /home/rs", strcmp(result, "/home/rs") == 0);
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+    CUTE_CHECK("result != /home\\rs", strcmp(result, "/home\\rs") == 0);
+#endif
+    free(result);
+
     //  rm
     result = hefesto_sys_call("hefesto.sys.rm(\"test.dat\")",
                               &lo_vars, &gl_vars, NULL, &otype);

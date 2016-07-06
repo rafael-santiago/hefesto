@@ -290,15 +290,15 @@ static void *hvm_toolset_base_refresh(const char *command,
     if (HEFESTO_CURRENT_DEP_CHAIN != NULL) {
 
         if (!proc_files->contents->is_dummy_item) {
-            for (cp = proc_files->contents; cp; cp = cp->next) {
+            for (cp = proc_files->contents; cp != NULL; cp = cp->next) {
                 bref = add_path_to_hefesto_base_refresh_ctx(bref, cp->data, cp->dsize);
                 brp = get_hefesto_base_refresh_ctx_tail(bref);
                 brp->refresh = 0;
-                //printf("NAO ATUALIZA: %s\n", brp->path);
+//                printf("NAO ATUALIZA: %s\n", brp->path);
             }
         }
 
-        for (dp = HEFESTO_CURRENT_DEP_CHAIN; dp; dp = dp->next) {
+        for (dp = HEFESTO_CURRENT_DEP_CHAIN; dp != NULL; dp = dp->next) {
             if (get_hefesto_base_refresh_ctx_path(dp->file_path,
                                                       bref) == NULL)  {
                 bref =
@@ -309,7 +309,7 @@ static void *hvm_toolset_base_refresh(const char *command,
                 brp = get_hefesto_base_refresh_ctx_tail(bref);
                 brp->refresh = 1;
 //                printf("P: %s\n", brp->path);
-                for (cp = dp->deps; cp && brp->refresh; cp = cp->next) {
+                for (cp = dp->deps; cp != NULL && brp->refresh; cp = cp->next) {
 //                    printf("\tDEP: %s\n", cp->data);
                     if (get_hefesto_common_list_ctx_content(cp->data,
                                                      HEFESTO_VAR_TYPE_STRING,

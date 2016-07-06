@@ -87,34 +87,68 @@ char *hefesto_pwd(void) {
 
 char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
 
-    char *result, *r;
-    const char *p;
+    char *result = NULL, *r = NULL;
+    const char *p = NULL;
+    const char *begin_p = NULL, *end_p = NULL;
 
     result = (char *) hefesto_mloc(max_sz+1);
 
+    begin_p = root;
+    end_p = root + strlen(root);
+
+    if (*begin_p == '"') {
+        begin_p++;
+    }
+
+    while (*(end_p - 1) == ' ' || *(end_p -1) == '\t') {
+        end_p--;
+    }
+
+    if (*(end_p - 1) == '"') {
+        end_p--;
+    }
+
 #if HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
-    for (p = root, r = result; *p != 0; p++, r++)
+    for (p = begin_p, r = result; p != end_p; p++, r++) {
         *r = *p;
+    }
 
     if (*(r-1) != HEFESTO_PATH_SEP) {
         *r = HEFESTO_PATH_SEP;
         r++;
     }
 
-    p = path;
+    begin_p = path;
+    end_p = path + strlen(path);
+
+    if (*begin_p == '"') {
+        begin_p++;
+    }
+
+    while (*(end_p - 1) == ' ' || *(end_p -1) == '\t') {
+        end_p--;
+    }
+
+    if (*(end_p - 1) == '"') {
+        end_p--;
+    }
+
+    p = begin_p;
 
     while (*p == HEFESTO_PATH_SEP) p++;
 
-    for (; *p != 0; p++, r++)
+    for (; p != end_p; p++, r++) {
         *r = *p;
+    }
 
     *r = 0;
 
 #else
 
-    for (p = root, r = result; *p != 0; p++, r++)
+    for (p = begin_p, r = result; p != end_p; p++, r++) {
         *r = *p;
+    }
 
     if (*root != 0) {
         if (*(r-1) != HEFESTO_PATH_SEP && *(r-1) != '/') {
@@ -123,7 +157,22 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
         }
     }
 
-    p = path;
+    begin_p = path;
+    end_p = path + strlen(path);
+
+    if (*begin_p == '"') {
+        begin_p++;
+    }
+
+    while (*(end_p - 1) == ' ' || *(end_p -1) == '\t') {
+        end_p--;
+    }
+
+    if (*(end_p - 1) == '"') {
+        end_p--;
+    }
+
+    p = begin_p;
 
     if (strstr(p, ":") != NULL && (root && *root != 0)) {
        while (*p != ':') p++;
@@ -132,8 +181,9 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
 
     while (*p == HEFESTO_PATH_SEP || *p == '/') p++;
 
-    for (; *p != 0; p++, r++)
+    for (; p != end_p; p++, r++) {
         *r = *p;
+    }
 
     *r = 0;
 
@@ -159,8 +209,7 @@ static hefesto_int_t copy_single_file(const char *src, const char *dest) {
         return 0;
     }
 
-    do
-    {
+    do {
         rd = fread(buf, 1, HEFESTO_MAX_BUFFER_SIZE, fs);
         if (rd > 0)
             fwrite(buf, 1, rd, fd);
