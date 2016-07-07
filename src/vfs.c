@@ -495,7 +495,7 @@ hefesto_file_handle *hefesto_fopen(const char *file_path, const char *mode) {
 
     hefesto_file_handle *fp_handle = NULL;
     char temp_mode[20] = "";
-    const char *m = NULL, *fp = NULL;
+    const char *m = NULL;
     size_t t = 0, file_path_sz = 0;
     char *real_file_path = NULL, *rp = NULL;
 
