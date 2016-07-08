@@ -41,15 +41,15 @@ function get_hfst_objs() : result type none {
     var tmp type string;
     $tmp = hefesto.sys.pwd();
     hefesto.sys.cd("../../");
-    $ldflags.ls(".*\\.o$");
+    var temp_ldflags type list;
+    $temp_ldflags.ls(".*\\.o$");
     hefesto.sys.cd($tmp);
     var l type int;
     $l = 0;
-    while ($l < $ldflags.count()) {
-        $tmp = $ldflags.item($l);
-        if ($tmp.match(".*main\\.o$") == 1) {
-            $ldflags.del_index($l);
-            break;
+    while ($l < $temp_ldflags.count()) {
+        $tmp = $temp_ldflags.item($l);
+        if ($tmp.match(".*main\\.o\"$") == 0 && $tmp.match(".*main\\.o$") == 0) {
+            $ldflags.add_item($tmp);
         }
         $l = $l + 1;
     }

@@ -1320,7 +1320,13 @@ static hefesto_int_t get_project_functions(hefesto_project_ctx *project, FILE *f
         strcat(decl_label, prj_functions[p].name);
         *prj_functions[p].fn_p = NULL;
         while (!feof(fp) && result) {
-            tok = get_next_word_or_string_from_file(fp, file_size);
+            //  WARN(Santiago): To use get_next_word_or_string_from_file() here is not a good idea
+            //                  because, some prior string occurrence can annoy this parsing task.
+            //
+            //                  Then if you get some function definition which explores some string
+            //                  constant before the project function wanted, this wanted function
+            //                  can not be found.
+            tok = get_next_word_from_file(fp, file_size);
             if (strstr(tok, decl_label) != NULL) {
                 if (strstr(tok, "{") == NULL) {
                     while ((c = fgetc(fp)) != '{' && !feof(fp)) {
