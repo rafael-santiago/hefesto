@@ -49,6 +49,9 @@ function get_hfst_objs() : result type none {
     while ($l < $temp_ldflags.count()) {
         $tmp = $temp_ldflags.item($l);
         if ($tmp.match(".*main\\.o\"$") == 0 && $tmp.match(".*main\\.o$") == 0) {
+            if ($tmp.at(0) != "\"") {
+                $tmp = "\"" + $tmp + "\"";
+            }
             $ldflags.add_item($tmp);
         }
         $l = $l + 1;
