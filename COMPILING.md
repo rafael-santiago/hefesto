@@ -15,7 +15,7 @@ Both commands will compile and linking the application, it will run the tests an
 
 The installation is pretty straightforward just follow the steps.
 
-After installing you need to perform a new login in order to load some evironment variables.
+After installing you need to perform a new login in order to load some environment variables.
 
 Construindo o Hefesto
 ---------------------
