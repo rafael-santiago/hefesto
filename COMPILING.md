@@ -15,6 +15,8 @@ Both commands will compile and linking the application, it will run the tests an
 
 The installation is pretty straightforward just follow the steps.
 
+After installing you need to perform a new login in order to load some evironment variables.
+
 Construindo o Hefesto
 ---------------------
 
@@ -31,3 +33,5 @@ Se você está no Windows use: build.bat
 Ambos os comandos irão compilar e linkeditar a aplicação, irão rodar os testes e então usará o Hefesto para instalar o Hefesto ;)
 
 A instalação é bem direta apenas siga os passos.
+
+Após instalar você precisa fazer um novo login para que algumas variáveis de ambiente sejam carregadas.
