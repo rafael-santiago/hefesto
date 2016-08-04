@@ -2772,6 +2772,7 @@ for (ip = includes; ip != NULL; ip = ip->next) {
 */
     if (includes) {
         includes_tail = get_hefesto_include_list_ctx_tail(includes);
+
         while (includes != NULL && *errors == 0) {
             if (includes_tail != includes) {
                 for (ip = includes; ip->next != includes_tail;

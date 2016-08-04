@@ -100,12 +100,14 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
         begin_p++;
     }
 
-    while (*(end_p - 1) == ' ' || *(end_p -1) == '\t') {
-        end_p--;
-    }
+    if (end_p != begin_p) {
+        while (*(end_p - 1) == ' ' || *(end_p - 1) == '\t') {
+            end_p--;
+        }
 
-    if (*(end_p - 1) == '"') {
-        end_p--;
+        if (*(end_p - 1) == '"') {
+            end_p--;
+        }
     }
 
 #if HEFESTO_TGT_OS != HEFESTO_WINDOWS

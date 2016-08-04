@@ -39,9 +39,10 @@ static char *HEFESTO_TYPES[] = {
   "int",
   "file",
   "list",
-  "none",
-  "\0"
+  "none"
 };
+
+size_t HEFESTO_TYPES_SIZE = sizeof(HEFESTO_TYPES) / sizeof(HEFESTO_TYPES[0]);
 
 static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.replace_in_file",
@@ -79,9 +80,10 @@ static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.lines_from_file",
   "hefesto.sys.call_from_module",
   "hefesto.sys.get_func_addr",
-  "hefesto.sys.call_func_addr",
-  "\0"
+  "hefesto.sys.call_func_addr"
 };
+
+size_t HEFESTO_SYS_CALLS_SIZE = sizeof(HEFESTO_SYS_CALLS) / sizeof(HEFESTO_SYS_CALLS[0]);
 
 static char *HEFESTO_LIST_METHODS[] = {
   ".item",
@@ -92,17 +94,19 @@ static char *HEFESTO_LIST_METHODS[] = {
   ".clear",
   ".index_of",
   ".del_index",
-  ".swap",
-  "\0"
+  ".swap"
 };
+
+size_t HEFESTO_LIST_METHODS_SIZE = sizeof(HEFESTO_LIST_METHODS) / sizeof(HEFESTO_LIST_METHODS[0]);
 
 static char *HEFESTO_STRING_METHODS[] = {
     ".at",
     ".len",
     ".match",
-    ".replace",
-    "\0"
+    ".replace"
 };
+
+size_t HEFESTO_STRING_METHODS_SIZE = sizeof(HEFESTO_STRING_METHODS) / sizeof(HEFESTO_STRING_METHODS[0]);
 
 static char *HEFESTO_PROJECT_METHODS[] = {
     ".name",
@@ -110,9 +114,10 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     ".dep_chain",
     ".abort",
     ".cmdline",
-    ".file_path",
-    "\0"
+    ".file_path"
 };
+
+size_t HEFESTO_PROJECT_METHODS_SIZE = sizeof(HEFESTO_PROJECT_METHODS) / sizeof(HEFESTO_PROJECT_METHODS[0]);
 
 struct hsl_builtin_otype_table_ctx {
     char *builtin;
@@ -180,7 +185,7 @@ hefesto_int_t is_hefesto_type(const char *type) {
 
     size_t t;
 
-    for (t = 0; *(&HEFESTO_TYPES[t+1]) != 0; t++) {
+    for (t = 0; t < HEFESTO_TYPES_SIZE; t++) {
         if (strcmp(type, HEFESTO_TYPES[t]) == 0) return 1;
     }
 
@@ -192,7 +197,7 @@ hefesto_type_t get_var_type(const char *type) {
 
     size_t t;
 
-    for (t = 0; *(&HEFESTO_TYPES[t]) != 0; t++) {
+    for (t = 0; t < HEFESTO_TYPES_SIZE; t++) {
         // +1 is due to untyped which confirms not user defined value
         if (strcmp(type, HEFESTO_TYPES[t]) == 0) return t+1;
     }
@@ -237,7 +242,7 @@ hefesto_instruction_code_t get_instruction_code(const char *usr_instruction,
 
     if (is_list_indexing_method_invoke(usr_instruction, local_vars, global_vars))
     {
-        return HEFESTO_LIST_ARRAY_INDEXING;
+        return HEFESTO_LIST_ARRAY_INDEXING; //  WARN(Santiago): DEPRECATED.
     }
 
     if (is_attrib_statement(usr_instruction, local_vars, global_vars)) {
@@ -265,7 +270,7 @@ ssize_t get_hefesto_sys_call_index(const char *syscall_name) {
 
     if (*syscall_name == 0) return -1;
 
-    for (s = 0; *(&HEFESTO_SYS_CALLS[s]) != 0; s++) {
+    for (s = 0; s < HEFESTO_SYS_CALLS_SIZE; s++) {
         if (strcmp(HEFESTO_SYS_CALLS[s], syscall_name) == 0) return s;
     }
 
@@ -395,7 +400,7 @@ hefesto_int_t is_hefesto_list_method(const char *method) {
 
     size_t m;
 
-    for (m = 0; *(&HEFESTO_LIST_METHODS[m]) != 0; m++)
+    for (m = 0; m < HEFESTO_LIST_METHODS_SIZE; m++)
         if (strcmp(HEFESTO_LIST_METHODS[m], method) == 0) return 1;
 
     return 0;
@@ -406,7 +411,7 @@ hefesto_int_t is_hefesto_string_method(const char *method) {
 
     size_t m;
 
-    for (m = 0; *(&HEFESTO_STRING_METHODS[m]) != 0; m++)
+    for (m = 0; m < HEFESTO_STRING_METHODS_SIZE; m++)
         if (strcmp(HEFESTO_STRING_METHODS[m], method) == 0) return 1;
 
     return 0;
@@ -417,7 +422,7 @@ ssize_t get_hefesto_list_method_index(const char *method) {
 
     ssize_t m;
 
-    for (m = 0; *(&HEFESTO_LIST_METHODS[m]) != 0; m++)
+    for (m = 0; m < HEFESTO_LIST_METHODS_SIZE; m++)
         if (strcmp(HEFESTO_LIST_METHODS[m], method) == 0) return m;
 
     return -1;
@@ -428,7 +433,7 @@ ssize_t get_hefesto_string_method_index(const char *method) {
 
     ssize_t m;
 
-    for (m = 0; *(&HEFESTO_STRING_METHODS[m]) != 0; m++)
+    for (m = 0; m < HEFESTO_STRING_METHODS_SIZE; m++)
         if (strcmp(method, HEFESTO_STRING_METHODS[m]) == 0) return m;
 
     return -1;
@@ -490,7 +495,7 @@ ssize_t get_hefesto_project_method_index(const char *method) {
     for (; *m != '.' && m != method; m--);
     for (t = &temp[0]; *m != '(' && *m != 0; t++, m++) *t = *m;
     *t = 0;
-    for (s = 0; *HEFESTO_PROJECT_METHODS[s] != 0; s++) {
+    for (s = 0; s < HEFESTO_PROJECT_METHODS_SIZE; s++) {
         if (strcmp(temp, HEFESTO_PROJECT_METHODS[s]) == 0) return s;
     }
     return -1;
