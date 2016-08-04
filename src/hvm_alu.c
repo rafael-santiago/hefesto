@@ -275,7 +275,6 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
     hefesto_var_list_ctx *vp;
     char *var_name = NULL, *v, *o, *sub_expr = NULL;
     void *result = NULL;
-    void *index = NULL;
     hefesto_int_t *integer_result, foo;
     size_t offset, osize;
     hefesto_type_t etype;
@@ -291,7 +290,7 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
         var_name = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
 
         if (strstr(operand, "[") > 0) {
-
+            // WARN(Santiago): DEPRECATED.
             sub_expr = (char *) hefesto_mloc(HEFESTO_MAX_BUFFER_SIZE);
 
             for (v = var_name, o = operand; *o != '[' && *o != 0; v++, o++) {
@@ -303,8 +302,8 @@ static void *get_operand_value(char *operand, hefesto_var_list_ctx **lo_vars,
             sub_expr[strlen(sub_expr)-1] = 0;
 
             etype = HEFESTO_VAR_TYPE_INT;
-            index = expr_eval(sub_expr+1, lo_vars, gl_vars, functions,
-                              &etype, &osize);
+            /*index = expr_eval(sub_expr+1, lo_vars, gl_vars, functions,
+                              &etype, &osize);*/
             free(sub_expr);
 
             *v = 0;
@@ -755,7 +754,7 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
 
     void *result = NULL;
     hefesto_common_stack_ctx *sp = NULL, *ap = NULL, *bp = NULL;
-    char *e, *e_end;
+    char *e;
     char *buf, *b;
     char *indexing;
     size_t offset;
@@ -767,7 +766,6 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
     b = buf;
 
     e = expr;
-    e_end = expr + strlen(expr)-1;
 
     if (*etype != HEFESTO_VAR_TYPE_UNTYPED && *etype != HEFESTO_VAR_TYPE_INT &&
         *etype != HEFESTO_VAR_TYPE_STRING &&

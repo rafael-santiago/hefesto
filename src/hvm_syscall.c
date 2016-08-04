@@ -532,7 +532,6 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
     size_t offset, osz;
     hefesto_type_t etype;
     long file_size;
-    size_t replace_text_size;
     char *buffer = NULL, *replaced_buffer = NULL;
     here_search_program_ctx *search_program;
 
@@ -554,7 +553,6 @@ static void *hefesto_sys_replace_in_file(const char *syscall,
         etype = HEFESTO_VAR_TYPE_STRING;
         replace_text = expr_eval(arg_replace_text, lo_vars, gl_vars,
                                  functions, &etype, &osz);
-        replace_text_size = strlen((char *)replace_text);
 
         if (!(fp = fopen((char *)file_path, "rb"))) {
             *(hefesto_int_t *)result = -1;

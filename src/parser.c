@@ -226,11 +226,9 @@ static hefesto_var_list_ctx *get_vars(FILE *fp, const long stop_at,
 
     hefesto_var_list_ctx *vars = NULL;
     char c, *buffer = NULL, *var = NULL, *type = NULL;
-    size_t b;
 
     if (fp == NULL) return NULL;
 
-    b = 0;
     c = skip_blank(fp);
 
     while (!feof(fp) && ftell(fp) < stop_at) {

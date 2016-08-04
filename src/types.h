@@ -116,46 +116,46 @@ typedef enum _hefesto_instruction_code_t {
   HEFESTO_CONTINUE,
   HEFESTO_STRING_METHOD,
   HEFESTO_PROJECT_COMMAND_INVOKE,
-  HEFESTO_INSTRUCTION_NR
+  HEFESTO_INSTRUCTION_NR,
+  // WARN(Santiago): Under the hood stuff... ;)
+  HEFESTO_SYS_CALL_REPLACE_IN_FILE = 0x01000000,
+  HEFESTO_SYS_CALL_LS = 0x02000000,
+  HEFESTO_SYS_CALL_CWD = 0x03000000,
+  HEFESTO_SYS_CALL_CD = 0x04000000,
+  HEFESTO_SYS_CALL_RM = 0x05000000,
+  HEFESTO_SYS_CALL_FD = 0x06000000,
+  HEFESTO_SYS_CALL_WRITE = 0x07000000,
+  HEFESTO_SYS_CALL_READ = 0x08000000,
+  HEFESTO_SYS_CALL_CLOSEFD = 0x09000000,
+  HEFESTO_SYS_CALL_CP = 0x0a000000,
+  HEFESTO_SYS_CALL_RUN = 0x0b000000,
+  HEFESTO_SYS_CALL_MKDIR = 0x0c000000,
+  HEFESTO_SYS_CALL_RMDIR = 0x0d000000,
+  HEFESTO_SYS_CALL_ECHO = 0x0e000000,
+  HEFESTO_SYS_CALL_ENV = 0x0f000000,
+  HEFESTO_SYS_CALL_FDEND = 0x10000000,
+  //HEFESTO_SYS_CALL_ARRAY_COUNT = 0x11000000,
+  HEFESTO_SYS_PROMPT = 0x11000000,
+  HEFESTO_SYS_FSEEK = 0x12000000,
+  HEFESTO_SYS_FSEEK_TO_BEGIN = 0x13000000,
+  HEFESTO_SYS_FSEEK_TO_END = 0x14000000,
+  HEFESTO_SYS_FSIZE = 0x15000000,
+  HEFESTO_SYS_FTELL = 0x16000000,
+  HEFESTO_SYS_EXIT = 0x17000000,
+  HEFESTO_SYS_OS_NAME = 0x18000000,
+  HEFESTO_SYS_GET_OPTION = 0x19000000,
+  HEFESTO_SYS_MAKE_PATH = 0x1a000000,
+  HEFESTO_SYS_LAST_FORGE_RESULT = 0x1b000000,
+  HEFESTO_SYS_FORGE = 0x1c000000,
+  HEFESTO_SYS_BYREF = 0x1d000000,
+  HEFESTO_SYS_TIME = 0x1e000000,
+  HEFESTO_SYS_SETENV = 0x1f000000,
+  HEFESTO_SYS_UNSETENV = 0x20000000,
+  HEFESTO_SYS_LINES_FROM_FILE = 0x21000000,
+  HEFESTO_SYS_CALL_FROM_MODULE = 0x22000000,
+  HEFESTO_SYS_GET_FUNC_ADDR = 0x23000000,
+  HEFESTO_SYS_CALL_FUNC_ADDR = 0x24000000
 }hefesto_instruction_code_t;
-
-#define HEFESTO_SYS_CALL_REPLACE_IN_FILE                        0x01000000
-#define HEFESTO_SYS_CALL_LS                                     0x02000000
-#define HEFESTO_SYS_CALL_CWD                                    0x03000000
-#define HEFESTO_SYS_CALL_CD                                     0x04000000
-#define HEFESTO_SYS_CALL_RM                                     0x05000000
-#define HEFESTO_SYS_CALL_FD                                     0x06000000
-#define HEFESTO_SYS_CALL_WRITE                                  0x07000000
-#define HEFESTO_SYS_CALL_READ                                   0x08000000
-#define HEFESTO_SYS_CALL_CLOSEFD                                0x09000000
-#define HEFESTO_SYS_CALL_CP                                     0x0a000000
-#define HEFESTO_SYS_CALL_RUN                                    0x0b000000
-#define HEFESTO_SYS_CALL_MKDIR                                  0x0c000000
-#define HEFESTO_SYS_CALL_RMDIR                                  0x0d000000
-#define HEFESTO_SYS_CALL_ECHO                                   0x0e000000
-#define HEFESTO_SYS_CALL_ENV                                    0x0f000000
-#define HEFESTO_SYS_CALL_FDEND                                  0x10000000
-//#define HEFESTO_SYS_CALL_ARRAY_COUNT                          0x11000000
-#define HEFESTO_SYS_PROMPT                                      0x11000000
-#define HEFESTO_SYS_FSEEK                                       0x12000000
-#define HEFESTO_SYS_FSEEK_TO_BEGIN                              0x13000000
-#define HEFESTO_SYS_FSEEK_TO_END                                0x14000000
-#define HEFESTO_SYS_FSIZE                                       0x15000000
-#define HEFESTO_SYS_FTELL                                       0x16000000
-#define HEFESTO_SYS_EXIT                                        0x17000000
-#define HEFESTO_SYS_OS_NAME                                     0x18000000
-#define HEFESTO_SYS_GET_OPTION                                  0x19000000
-#define HEFESTO_SYS_MAKE_PATH                                   0x1a000000
-#define HEFESTO_SYS_LAST_FORGE_RESULT                           0x1b000000
-#define HEFESTO_SYS_FORGE                                       0x1c000000
-#define HEFESTO_SYS_BYREF                                       0x1d000000
-#define HEFESTO_SYS_TIME                                        0x1e000000
-#define HEFESTO_SYS_SETENV                                      0x1f000000
-#define HEFESTO_SYS_UNSETENV                                    0x20000000
-#define HEFESTO_SYS_LINES_FROM_FILE                             0x21000000
-#define HEFESTO_SYS_CALL_FROM_MODULE                            0x22000000
-#define HEFESTO_SYS_GET_FUNC_ADDR                               0x23000000
-#define HEFESTO_SYS_CALL_FUNC_ADDR                              0x24000000
 
 typedef struct _hefesto_command_list_ctx {
   hefesto_instruction_code_t instruction;
