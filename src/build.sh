@@ -9,6 +9,20 @@ LIB="ar"
 
 LINKERFLAGS=""
 
+$COMPILER --version > /dev/null 2>&1
+
+if [ $? -ne 0 ] ; then
+COMPILER="clang"
+LINKER="clang"
+fi
+
+$COMPILER --version > /dev/null 2>&1
+
+if [ $? -ne 0 ] ; then
+echo "PANIC: For compiling Hefesto you should install GCC or Clang. None of them were found on your environment."
+exit 1
+fi
+
 PLATFORM=$(uname -o)
 
 if test "$PLATFORM" = "FreeBSD"

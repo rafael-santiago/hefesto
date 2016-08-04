@@ -42,7 +42,7 @@ static char *HEFESTO_TYPES[] = {
   "none"
 };
 
-size_t HEFESTO_TYPES_SIZE = sizeof(HEFESTO_TYPES) / sizeof(HEFESTO_TYPES[0]);
+static size_t HEFESTO_TYPES_SIZE = sizeof(HEFESTO_TYPES) / sizeof(HEFESTO_TYPES[0]);
 
 static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.replace_in_file",
@@ -83,7 +83,7 @@ static char *HEFESTO_SYS_CALLS[] = {
   "hefesto.sys.call_func_addr"
 };
 
-size_t HEFESTO_SYS_CALLS_SIZE = sizeof(HEFESTO_SYS_CALLS) / sizeof(HEFESTO_SYS_CALLS[0]);
+static size_t HEFESTO_SYS_CALLS_SIZE = sizeof(HEFESTO_SYS_CALLS) / sizeof(HEFESTO_SYS_CALLS[0]);
 
 static char *HEFESTO_LIST_METHODS[] = {
   ".item",
@@ -97,7 +97,7 @@ static char *HEFESTO_LIST_METHODS[] = {
   ".swap"
 };
 
-size_t HEFESTO_LIST_METHODS_SIZE = sizeof(HEFESTO_LIST_METHODS) / sizeof(HEFESTO_LIST_METHODS[0]);
+static size_t HEFESTO_LIST_METHODS_SIZE = sizeof(HEFESTO_LIST_METHODS) / sizeof(HEFESTO_LIST_METHODS[0]);
 
 static char *HEFESTO_STRING_METHODS[] = {
     ".at",
@@ -106,7 +106,7 @@ static char *HEFESTO_STRING_METHODS[] = {
     ".replace"
 };
 
-size_t HEFESTO_STRING_METHODS_SIZE = sizeof(HEFESTO_STRING_METHODS) / sizeof(HEFESTO_STRING_METHODS[0]);
+static size_t HEFESTO_STRING_METHODS_SIZE = sizeof(HEFESTO_STRING_METHODS) / sizeof(HEFESTO_STRING_METHODS[0]);
 
 static char *HEFESTO_PROJECT_METHODS[] = {
     ".name",
@@ -117,7 +117,7 @@ static char *HEFESTO_PROJECT_METHODS[] = {
     ".file_path"
 };
 
-size_t HEFESTO_PROJECT_METHODS_SIZE = sizeof(HEFESTO_PROJECT_METHODS) / sizeof(HEFESTO_PROJECT_METHODS[0]);
+static size_t HEFESTO_PROJECT_METHODS_SIZE = sizeof(HEFESTO_PROJECT_METHODS) / sizeof(HEFESTO_PROJECT_METHODS[0]);
 
 struct hsl_builtin_otype_table_ctx {
     char *builtin;
