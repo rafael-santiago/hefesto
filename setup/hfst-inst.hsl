@@ -936,6 +936,12 @@ hefesto-install.prologue() {
     $source_files.add_item("../helios/src/include/toolsets/gcc/gcc-app.hsl");
     $source_files.add_item("../helios/src/include/toolsets/gcc/gcc-lib.hsl");
     $source_files.add_item("../helios/src/include/doc/toolsets/gcc/README.md");
+    $source_files.add_item("../helios/src/include/toolsets/clang/forges/common.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/clang/forges/clang_c_app_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/clang/forges/clang_c_lib_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/clang/clang-app.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/clang/clang-lib.hsl");
+    $source_files.add_item("../helios/src/include/doc/toolsets/clang/README.md");
     $source_files.add_item("../helios/src/include/toolsets/latex/forges/latex_forge_stuff.hsl");
     $source_files.add_item("../helios/src/include/toolsets/latex/latex.hsl");
     $source_files.add_item("../helios/src/include/doc/toolsets/latex/README.md");
@@ -1003,6 +1009,12 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-app.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/gcc/gcc-lib.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/doc/toolsets/gcc/README.md"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/clang/forges/common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/clang/forges/clang_c_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/clang/forges/clang_c_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/clang/clang-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/clang/clang-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/doc/toolsets/clang/README.md"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/forges/latex_forge_stuff.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/latex/latex.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/doc/toolsets/latex/README.md"));
@@ -1062,6 +1074,12 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-app.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\gcc\\gcc-lib.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\doc\\toolsets\\gcc\\README.md"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\clang\\forges\\common.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\clang\\forges\\clang_c_app_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\clang\\forges\\clang_c_lib_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\clang\\clang-app.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\clang\\clang-lib.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\doc\\toolsets\\clang\\README.md"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\forges\\latex_forge_stuff.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\latex\\latex.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\doc\\toolsets\\latex\\README.md"));
