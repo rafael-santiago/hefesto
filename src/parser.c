@@ -1561,14 +1561,20 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                         if (preloading_p != NULL &&
                                             vp->type == HEFESTO_VAR_TYPE_STRING)
                                         {
-                                            /*tmp_res =
+                                            tmp_res =
                                               hvm_exec_function(preloading_p,
                                                          &preloading_p->vars,
                                                          &gl_vars, functions);
-                                            if (tmp_res != NULL) free(tmp_res);*/
-                                            toolset =
-                                              get_hefesto_toolset_ctx_name(
-                                                vp->contents->data, toolsets);
+
+                                            if (tmp_res != NULL) {
+                                                free(tmp_res);
+                                            }
+
+                                            if (vp != NULL && vp->contents != NULL && vp->contents->data != NULL) {
+                                                toolset =
+                                                  get_hefesto_toolset_ctx_name(
+                                                    vp->contents->data, toolsets);
+                                            }
                                         }
                                     }
                                 }
