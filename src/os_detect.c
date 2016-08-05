@@ -12,55 +12,42 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <sys/stat.h>
-
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-
-static size_t get_procfile_size(FILE *fp) {
-    size_t retval = 0;
-    while (!feof(fp)) {
-        retval++;
-        fgetc(fp);
-    }
-    fseek(fp, 0L, SEEK_SET);
-    return retval;
-}
-
-#endif
+#include <sys/utsname.h>
 
 char *get_os_name() {
 
-    char *result = NULL;    
+    char *result = NULL;
+    static char os_name[255] = "";
+    static size_t os_name_sz = 0;
+
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
-    result = (char *) hefesto_mloc(8);
-    strncpy(result, "windows", 7);
-    result[7] = 0;
+    if (os_name_sz == 0) {
+        strncpy(os_name, "windows", sizeof(os_name) - 1);
+    }
 #elif HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-	char *r = NULL;
-    FILE *ostype = fopen("/proc/sys/kernel/ostype", "r");
-    size_t ostype_size = 0;
-    if (ostype != NULL) {
-        ostype_size = get_procfile_size(ostype);
-        result = (char *) hefesto_mloc(ostype_size + 1);
-        memset(result, 0, ostype_size);
-        fread(result, 1, ostype_size, ostype);
-        for (r = result; *r != 0; r++) {
-            *r = tolower(*r);
+    struct utsname unbuf;
+    static size_t o;
+
+    if (os_name_sz == 0 && uname(&unbuf) == 0) {
+        strncpy(os_name, unbuf.sysname, sizeof(os_name) - 1);
+
+        for (o = 0; os_name[o] != 0; o++) {
+            os_name[o] = tolower(os_name[o]);
         }
-        for (r--; (*r == ' '  || *r == '\r' ||
-                   *r == '\n' || *r == '\t') && r != result; r--) {
-            *r = 0;
-        }
-        fclose(ostype);
-    } else {
-        result = (char *) hefesto_mloc(8);
-        strncpy(result, "freebsd", 7);
-        result[7] = 0;
     }
 #else
-    result = (char *) hefesto_mloc(15);
-    strncpy(result, "superunknownos", 14);
-    result[14] = 0;
+    if (os_name_sz == 0) {
+        strncpy(os_name, "superunknownos", sizeof(os_name) - 1);
+    }
 #endif
+
+    if (os_name_sz == 0) {
+        os_name_sz = strlen(os_name);
+    }
+
+    result = (char *) hefesto_mloc(os_name_sz + 1);
+    memset(result, 0, os_name_sz + 1);
+    strncpy(result, os_name, os_name_sz);
 
     return result;
 
