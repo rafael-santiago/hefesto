@@ -1,0 +1,50 @@
+#
+#                               Copyright (C) 2016 by Rafael Santiago
+#
+# This is a free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+local function run_cmd_without_output(cmdline type string) : result type int {
+    if (hefesto.sys.os_name() != "windows") {
+        $cmdline = $cmdline + " > /dev/null 2>&1";
+    } else {
+        $cmdline = $cmdline + " > nul 2>&1";
+    }
+    result hefesto.sys.run($cmdline);
+}
+
+local function has_gcc() : result type int {
+    result (run_cmd_without_output("gcc --version") == 0);
+}
+
+local function has_clang() : result type int {
+    result (run_cmd_without_output("clang --version") == 0);
+}
+
+function get_toolset_basename() : result type string {
+    var chosen_toolset type string;
+    var toolset_option type list;
+
+    $toolset_option = hefesto.sys.get_option("toolset");
+
+    if ($toolset_option.count() > 0) {
+        $chosen_toolset = $toolset_option.item(0);
+        $chosen_toolset.replace("(lib|app)$", "");
+    } else {
+        $chosen_toolset = "";
+        if (has_gcc()) {
+            $chosen_toolset = "gcc-c-";
+        } else if (has_clang()) {
+            $chosen_toolset = "clang-c-";
+        }
+    }
+
+    if ($chosen_toolset.len() == 0) {
+        hefesto.sys.echo("PANIC: You need to install GCC or Clang before continuing.\nAborted.\n");
+        hefesto.project.abort(1);
+    }
+
+    result $chosen_toolset;
+}

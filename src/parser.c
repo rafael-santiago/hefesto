@@ -1498,12 +1498,17 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
         del_hefesto_project_ctx(project_curr);
         project_curr = NULL;
 
+        //  WARN(Santiago): We need to run the preloading function as soon as possible.
+        //                  So, currently we are avoiding to run the preloading() from
+        //                  inside the following loop.
+
         if (preloading_p != NULL) {
             tmp_res = hvm_exec_function(preloading_p,
                                         &preloading_p->vars,
                                         &gl_vars, functions);
             if (tmp_res != NULL) free(tmp_res);
         }
+
 
         while (includes != NULL && state < 5) {
 
@@ -1547,9 +1552,11 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                 tok = get_next_word_or_string_from_file(fp,
                                                                  file_size);
                                 if (*tok != '$') {
-                                    tmp_res = strip_quotes_from_string(tok);
-                                    free(tok);
-                                    tok = tmp_res;
+                                    if (*tok == '"') {
+                                        tmp_res = strip_quotes_from_string(tok);
+                                        free(tok);
+                                        tok = tmp_res;
+                                    }
                                     // loads the toolset
                                     toolset = get_hefesto_toolset_ctx_name(tok,
                                                                      toolsets);
@@ -1561,14 +1568,16 @@ hefesto_project_ctx *ld_project_configuration(hefesto_project_ctx *projects,
                                         if (preloading_p != NULL &&
                                             vp->type == HEFESTO_VAR_TYPE_STRING)
                                         {
-                                            tmp_res =
+                                            //  WARN(Santiago): The preloading function must be unconditional.
+                                            //                  It is running from outside this loop.
+                                            /*tmp_res =
                                               hvm_exec_function(preloading_p,
                                                          &preloading_p->vars,
                                                          &gl_vars, functions);
 
                                             if (tmp_res != NULL) {
                                                 free(tmp_res);
-                                            }
+                                            }*/
 
                                             if (vp != NULL && vp->contents != NULL && vp->contents->data != NULL) {
                                                 toolset =

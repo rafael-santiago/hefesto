@@ -20,9 +20,11 @@
 #       --libraries=<list>      # defines extra libraries' directories;
 #       --ldflags=<list>        # defines extra linking options;
 #       --cflags=<list>         # defines extra compiler options;
+#       --toolset=<toolset>     # defines the toolset's name;
 #
 
-include ~/toolsets/gcc/gcc-app.hsl
+include ../../Toolsets.hsl
+include ../../Forgeutils.hsl
 
 var sources type list;
 var includes type list;
@@ -30,12 +32,14 @@ var libraries type list;
 var ldflags type list;
 var cflags type list;
 
-project hfst-unit : toolset "gcc-c-app" : $sources,
-                                          $includes,
-                                          $cflags,
-                                          $libraries,
-                                          $ldflags,
-                                          "hfst-unit";
+var toolset_name type string;
+
+project hfst-unit : toolset $toolset_name : $sources,
+                                            $includes,
+                                            $cflags,
+                                            $libraries,
+                                            $ldflags,
+                                            "hfst-unit";
 
 function get_hfst_objs() : result type none {
     var tmp type string;
@@ -58,11 +62,15 @@ function get_hfst_objs() : result type none {
     }
 }
 
+hfst-unit.preloading() {
+    $toolset_name = get_toolset_basename() + "app";
+}
+
 hfst-unit.prologue() {
     var exit_code type int;
     $exit_code = 1;
     if (hefesto.sys.cd("cutest/src")) {
-        $exit_code = hefesto.sys.forge("cutest", "Forgefile.hsl", "--obj-output-dir=obj --bin-output-dir=lib");
+        $exit_code = hefesto.sys.forge("cutest", "Forgefile.hsl", "--obj-output-dir=obj --bin-output-dir=lib --toolset=" + $toolset_name);
         hefesto.sys.cd("../..");
     }
     if ($exit_code == 0) {
