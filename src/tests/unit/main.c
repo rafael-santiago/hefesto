@@ -23,12 +23,10 @@
 #include "../../hvm_toolset.h"
 #include "../../init.h"
 #include "../../expr_handler.h"
-
-#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+#include "../../hvm_mod.h"
+#include "../../hvm_rqueue.h"
 
 #include <time.h>
-
-#endif
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX
 

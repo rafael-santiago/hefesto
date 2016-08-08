@@ -270,6 +270,11 @@ struct hefesto_hvm_syscall {
                      hefesto_func_list_ctx *functions, hefesto_type_t **otype);
 };
 
+static int hfst_sync_run(const char *str_run,
+                         hefesto_var_list_ctx **lo_vars,
+                         hefesto_var_list_ctx **gl_vars,
+                         hefesto_func_list_ctx *functions);
+
 #define set_method(m) { m }
 
 static struct hefesto_hvm_syscall
@@ -324,67 +329,67 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
     switch (*(hefesto_instruction_code_t *)code->params->data) {
 
         case HEFESTO_SYS_CALL_REPLACE_IN_FILE: 
-            label = "hefesto.sys.replace_in_file(\0";
+            label = "hefesto.sys.replace_in_file(";
             break;
 
         case HEFESTO_SYS_CALL_LS:
-            label = "hefesto.sys.ls(\0";
+            label = "hefesto.sys.ls(";
             break;
 
         case HEFESTO_SYS_CALL_CWD:
-            label = "hefesto.sys.cwd(\0";
+            label = "hefesto.sys.cwd(";
             break;
 
         case HEFESTO_SYS_CALL_CD:
-            label = "hefesto.sys.cd(\0";
+            label = "hefesto.sys.cd(";
             break;
 
         case HEFESTO_SYS_CALL_RM:
-            label = "hefesto.sys.rm(\0";
+            label = "hefesto.sys.rm(";
             break;
 
         case HEFESTO_SYS_CALL_FD:
-            label = "hefesto.sys.fopen(\0";
+            label = "hefesto.sys.fopen(";
             break;
 
         case HEFESTO_SYS_CALL_WRITE:
-            label = "hefesto.sys.fwrite(\0";
+            label = "hefesto.sys.fwrite(";
             break;
 
         case HEFESTO_SYS_CALL_READ:
-            label = "hefesto.sys.fread(\0";
+            label = "hefesto.sys.fread(";
             break;
 
         case HEFESTO_SYS_CALL_CLOSEFD:
-            label = "hefesto.sys.fclose(\0";
+            label = "hefesto.sys.fclose(";
             break;
 
         case HEFESTO_SYS_CALL_CP:
-            label = "hefesto.sys.cp(\0";
+            label = "hefesto.sys.cp(";
             break;
 
         case HEFESTO_SYS_CALL_RUN:
-            label = "hefesto.sys.run(\0";
+            label = "hefesto.sys.run(";
             break;
 
         case HEFESTO_SYS_CALL_MKDIR:
-            label = "hefesto.sys.mkdir(\0";
+            label = "hefesto.sys.mkdir(";
             break;
 
         case HEFESTO_SYS_CALL_RMDIR:
-            label = "hefesto.sys.rmdir(\0";
+            label = "hefesto.sys.rmdir(";
             break;
 
         case HEFESTO_SYS_CALL_ECHO:
-            label = "hefesto.sys.echo(\0";
+            label = "hefesto.sys.echo(";
             break;
 
         case HEFESTO_SYS_CALL_ENV:
-            label = "hefesto.sys.env(\0";
+            label = "hefesto.sys.env(";
             break;
 
         case HEFESTO_SYS_CALL_FDEND:
-            label = "hefesto.sys.feof(\0";
+            label = "hefesto.sys.feof(";
             break;
 
         case HEFESTO_SYS_PROMPT:
@@ -926,27 +931,37 @@ static void *hefesto_sys_run(const char *syscall,
         (fp && fp->result_type == HEFESTO_VAR_TYPE_LIST)) {
         ret = hefesto_nrun(syscall, lo_vars, gl_vars, functions, otype);
     } else {
-        str_fmt = hvm_str_format(str_run, lo_vars, gl_vars, functions);
         ret = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
-        *ret = system(str_fmt);
-        if (*ret != -1) {
-            *ret = WEXITSTATUS(*ret);
-        }
-        free(str_fmt);
+        *ret = hfst_sync_run(str_run, lo_vars, gl_vars, functions);
     }
 
     free(str_run);
 
     **otype = HEFESTO_VAR_TYPE_INT;
+
     return ret;
 
+}
+
+static int hfst_sync_run(const char *str_run,
+                         hefesto_var_list_ctx **lo_vars,
+                         hefesto_var_list_ctx **gl_vars,
+                         hefesto_func_list_ctx *functions) {
+    char *str_fmt;
+    int retval = 1;
+    str_fmt = hvm_str_format(str_run, lo_vars, gl_vars, functions);
+    if (str_fmt == NULL) {
+        return 1;
+    }
+    retval = system(str_fmt);
+    free(str_fmt);
+    return WEXITSTATUS(retval);
 }
 
 static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
                           hefesto_var_list_ctx **gl_vars,
                           hefesto_func_list_ctx *functions,
                           hefesto_type_t **otype) {
-
     hefesto_type_t etype;
     void *plist, *ret = NULL;
     const char *s, *se;
@@ -982,7 +997,6 @@ static void *hefesto_nrun(const char *syscall, hefesto_var_list_ctx **lo_vars,
     **otype = HEFESTO_VAR_TYPE_INT;
 
     return ret;
-
 }
 
 static void *hefesto_sys_mkdir(const char *syscall,

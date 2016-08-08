@@ -2,8 +2,10 @@
 # Hefesto's bootstrap :)
 #
 
+# WARNING: If PThread is not available on your UNIX-like remove "-DHVM_ASYNC_RQUEUE" from "COMPILER_OPTS".
+
 COMPILER="gcc" # Adjust for your system compiler
-COMPILER_OPTS="-c -Wall -Ihere/src" # Options too
+COMPILER_OPTS="-c -Wall -DHVM_ASYNC_RQUEUE -Ihere/src" # Options too
 LINKER="gcc" # Linker too
 LIB="ar"
 
@@ -32,15 +34,19 @@ else
     LINKERFLAGS="-ldl"
 fi
 
+if [ $(echo $COMPILER_OPTS | grep "HVM_ASYNC_RQUEUE" | wc -l) > 1 ] ; then
+    LINKERFLAGS=${LINKERFLAGS}" -lpthread"
+fi
+
 LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
-                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/src/libhere.a -Ihere/src/ -lpthread $LINKERFLAGS"
+                         src_chsum.o structs_io.o synchk.o types.o vfs.o hvm_project.o hvm_winreg.o ivk.o hvm_mod.o here/src/libhere.a -Ihere/src/ $LINKERFLAGS"
 
 UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ../../expr_handler.o ../../exprchk.o ../../file_io.o ../../hlsc_msg.o\
             ../../htask.o ../../hvm.o ../../hvm_alu.o ../../hvm_func.o ../../hvm_list.o ../../hvm_rqueue.o ../../hvm_str.o\
                 ../../hvm_syscall.o ../../hvm_thread.o ../../hvm_toolset.o ../../init.o ../../lang_defs.o ../../mem.o ../../os_detect.o\
-                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o cutest.o cutest_memory.o cutest_mmap.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o -lpthread $LINKERFLAGS\
+                  ../../parser.o ../../src_chsum.o ../../structs_io.o ../../synchk.o ../../types.o ../../vfs.o main.o cutest.o cutest_memory.o cutest_mmap.o ../../hvm_project.o ../../hvm_winreg.o ../../ivk.o ../../hvm_mod.o $LINKERFLAGS\
                     -lhere"
 
 ALL_OK=1

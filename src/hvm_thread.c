@@ -7,6 +7,8 @@
  */
 #include "hvm_thread.h"
 
+#ifdef HVM_ASYNC_RQUEUE
+
 hefesto_int_t hvm_thread_create(hefesto_thread_t *thread_id,
                       hefesto_thread_routine_t start_routine(void *),
                       void *args) {
@@ -40,3 +42,5 @@ hefesto_int_t hvm_thread_create(hefesto_thread_t *thread_id,
     return result;
 
 }
+
+#endif

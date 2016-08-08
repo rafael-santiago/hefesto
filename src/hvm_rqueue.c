@@ -12,9 +12,11 @@
 #include "mem.h"
 #include <string.h>
 
-static hefesto_thread_routine_t hefesto_async_run(void *args);
-
 hefesto_int_t hefesto_current_rqueue_size = 1;
+
+#ifdef HVM_ASYNC_RQUEUE
+
+static hefesto_thread_routine_t hefesto_async_run(void *args);
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
@@ -26,11 +28,15 @@ HANDLE run_mutex;
 
 #endif
 
+#endif
+
 struct hvm_rqueue_ctx {
     char *path_to_run;
     hefesto_int_t exit_code, idle;
     hefesto_thread_t id;
 };
+
+#ifdef HVM_ASYNC_RQUEUE
 
 hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
@@ -148,10 +154,24 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 #endif
 
 }
+#else
+
+hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
+    hefesto_common_list_ctx *p;
+    hefesto_int_t retval = 0;
+    for (p = plist; p != NULL; p = p->next) {
+        retval += system(p->data);
+    }
+    return retval;
+}
+
+#endif
 
 void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size) {
     hefesto_current_rqueue_size = new_size;
 }
+
+#ifdef HVM_ASYNC_RQUEUE
 
 static hefesto_thread_routine_t hefesto_async_run(void *args) {
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
@@ -179,3 +199,5 @@ static hefesto_thread_routine_t hefesto_async_run(void *args) {
 #endif
     return NULL;
 }
+
+#endif

@@ -261,6 +261,8 @@ extern hefesto_project_ctx *HEFESTO_CURRENT_PROJECT;
 extern const char *HEFESTO_CURRENT_FORGEFILE_NAME;
 extern const char *HEFESTO_CURRENT_FORGEFILE_PATH;
 
+#ifdef HVM_ASYNC_RQUEUE
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 #include <pthread.h>
 typedef void * hefesto_thread_routine_args_t;
@@ -273,6 +275,12 @@ typedef void * hefesto_thread_routine_t;
 typedef HANDLE hefesto_thread_t;
 #endif
 
+#else
+
+typedef int hefesto_thread_t;
+
+#endif
+
 typedef struct _hefesto_rqueue_ctx {
     char *path_to_run;
     hefesto_int_t exit_code;
@@ -281,5 +289,6 @@ typedef struct _hefesto_rqueue_ctx {
     hefesto_thread_t id;
     struct _hefesto_rqueue_ctx *next;
 }hefesto_rqueue_ctx;
+
 
 #endif
