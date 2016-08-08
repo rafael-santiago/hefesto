@@ -1,6 +1,6 @@
 @SET COMPILER=gcc
 
-@SET COMPILER_OPTS=-c -Ihere/src
+@SET COMPILER_OPTS=-c -Ihere/src -DHVM_ASYNC_RQUEUE
 
 @SET LINKER=gcc
 
