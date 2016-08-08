@@ -11,8 +11,10 @@
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+#ifndef HEFESTO_WINDOWS
 #include <sys/stat.h>
 #include <sys/utsname.h>
+#endif
 
 char *get_os_name() {
 

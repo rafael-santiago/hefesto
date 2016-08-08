@@ -37,6 +37,8 @@
 
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
+#include <windows.h>
+
 #define WEXITSTATUS(s) (s)
 
 #endif
