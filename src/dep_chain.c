@@ -32,14 +32,14 @@ hefesto_dep_chain_ctx
         while (is_hefesto_blank(*u)) u++;
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
-	if (*u != 0 && *(u + 1) != 0 && *(u + 1) == ':') {
-		*p = *u;
-		p++;
-		u++;
-		*p = *u;
-		p++;
-		u++;
-	}
+        if (*u != 0 && *(u + 1) != 0 && *(u + 1) == ':') {
+            *p = *u;
+            p++;
+            u++;
+            *p = *u;
+            p++;
+            u++;
+        }
 #endif
 
         while (*u != ':' && *u != 0) {
@@ -81,7 +81,11 @@ hefesto_dep_chain_ctx
 
             while (*u != '&' && *u != ';' && *u != 0) u++;
 
-            if (*dep == 0) continue;
+            if (*dep == 0) {
+                free(dep);
+                dep = NULL;
+                continue;
+            }
 
             if (hefesto_is_relative_path(dep)) {
                 strncpy(temp_file_path, dep, sizeof(temp_file_path)-1);

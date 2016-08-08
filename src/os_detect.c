@@ -11,7 +11,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
-#ifndef HEFESTO_WINDOWS
+#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #endif

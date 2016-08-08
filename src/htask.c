@@ -15,6 +15,7 @@
 #include "hvm_toolset.h"
 #include "conv.h"
 #include <stdio.h>
+#include <string.h>
 
 static void set_current_forgefile_name(const char *forgefile_path);
 
@@ -30,7 +31,7 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
     hefesto_project_ctx *projects = NULL;
     hefesto_int_t qsize_value, errors = 0;
     FILE *code;
-    const char *later_forgefile_path = NULL;
+    char previous_forgefile_path[HEFESTO_MAX_BUFFER_SIZE];
 
     if (HEFESTO_OPTIONS == NULL) {
         HEFESTO_OPTIONS = options;
@@ -68,6 +69,8 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
         if (errors == 0) {
             printf("hefesto: script compilation success.\n");
 
+            memset(previous_forgefile_path, 0, sizeof(previous_forgefile_path));
+
             if (get_hefesto_options_ctx_option(HEFESTO_COMPILE_ONLY_OPTION_LABEL,
                                                HEFESTO_OPTIONS) == NULL) {
 
@@ -92,13 +95,13 @@ hefesto_int_t boot_forge(hefesto_options_ctx *hsl_main_projects, const char *hsl
                                    (char *)hsl_main_project->data);
                             set_hvm_toolset_src_changes_check_flag(0);
                             curr_func = hvm_get_current_executed_function();
-                            later_forgefile_path = HEFESTO_CURRENT_FORGEFILE_NAME;
+                            memcpy(previous_forgefile_path, HEFESTO_CURRENT_FORGEFILE_PATH, sizeof(previous_forgefile_path));
                             set_current_forgefile_name(hsl_main);
                             hvm_forge_project(projects, &gl_vars, functions);
                             hvm_set_current_executed_function(curr_func);
                             del_hefesto_project_ctx(projects);
                             projects = NULL;
-                            HEFESTO_CURRENT_FORGEFILE_NAME = later_forgefile_path;
+                            set_current_forgefile_name(previous_forgefile_path);
                         } else {
                             printf("hefesto: unable to load project \"%s\".\n", (char *)hsl_main_project->data);
                             HEFESTO_LAST_FORGE_RESULT = 1;
@@ -151,6 +154,8 @@ static void set_current_forgefile_name(const char *forgefile_path) {
         fp--;
     }
 #endif
-    HEFESTO_CURRENT_FORGEFILE_PATH = forgefile_path;
-    HEFESTO_CURRENT_FORGEFILE_NAME = fp + ((fp != forgefile_path) ? 1 : 0);
+    memset(HEFESTO_CURRENT_FORGEFILE_PATH, 0, sizeof(HEFESTO_CURRENT_FORGEFILE_PATH));
+    strncpy(HEFESTO_CURRENT_FORGEFILE_PATH, forgefile_path, sizeof(HEFESTO_CURRENT_FORGEFILE_PATH) - 1);
+    memset(HEFESTO_CURRENT_FORGEFILE_NAME, 0, sizeof(HEFESTO_CURRENT_FORGEFILE_NAME));
+    strncpy(HEFESTO_CURRENT_FORGEFILE_NAME, fp + ((fp != forgefile_path) ? 1 : 0), sizeof(HEFESTO_CURRENT_FORGEFILE_NAME) - 1);
 }
