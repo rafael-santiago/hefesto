@@ -646,6 +646,12 @@ unsigned char hmod_img[] = {
     '\x63', '\x6d', '\x70', '\x40', '\x40', '\x46', '\x42', '\x53', '\x44', '\x5f', '\x31', '\x2e', '\x30', '\x00', '\x5f', '\x69',
     '\x6e', '\x69', '\x74', '\x00'};
 
+#elif HEFESTO_TGT_OS == HEFESTO_MINIX
+
+static unsigned char hmod_img[] = {
+    '\x00'
+};
+
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static unsigned char hmod_img[] = {
