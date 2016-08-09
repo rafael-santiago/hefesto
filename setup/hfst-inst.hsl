@@ -920,7 +920,7 @@ hefesto-install.prologue() {
     $source_files.add_item("../doc/html/module-writing-guidelines.html");
 
     # The binaries
-    if ($os_name == "linux" || $os_name == "freebsd") {
+    if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "minix") {
         $source_files.add_item("../bin/hefesto");
     } else {
         $source_files.add_item("../bin/hefesto.exe");
