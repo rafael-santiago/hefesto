@@ -511,9 +511,9 @@ static hefesto_int_t can_apply_short_circuit(char *expression,
     size_t dsize = 0;
     char *e = expression;
     //  INFO(Santiago): this function verifies if a short-circuit diversion can be applied
-    //                  considering the current state of evaluation process besides the stack and the next
+    //                  considering the current state of the evaluation process besides the stack and the next
     //                  short-circuit operator ahead which is connecting the last and the next sub-expression...
-    //                  and yes, "is not expected that you understand it.".
+    //                  and yes, "is not expected that you understand it." :P.
     while (*e != 0 && !is_op(*e)) {
         e++;
         if (*e == '&' || *e == '|') {

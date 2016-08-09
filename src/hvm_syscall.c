@@ -31,7 +31,9 @@
 #include <string.h>
 #include <time.h>
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
 
 #include <sys/wait.h>
 
@@ -330,7 +332,7 @@ char *reassemble_syscall_from_intruction_code(hefesto_command_list_ctx *code) {
 
     switch (*(hefesto_instruction_code_t *)code->params->data) {
 
-        case HEFESTO_SYS_CALL_REPLACE_IN_FILE: 
+        case HEFESTO_SYS_CALL_REPLACE_IN_FILE:
             label = "hefesto.sys.replace_in_file(";
             break;
 
@@ -1111,7 +1113,9 @@ static void *hefesto_sys_env(const char *syscall,
     free(arg);
 
     if (strstr(arg_fmt, "WINREG:") != arg_fmt) {
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
         value = getenv(arg_fmt);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
         value = (char *) hefesto_mloc(0x100000);
@@ -1138,7 +1142,9 @@ static void *hefesto_sys_env(const char *syscall,
         result = (char *) hefesto_mloc(sz + 1);
         memset(result, 0, sz + 1);
         strncpy(result, value, sz);
-#if HEFESTO_TGT_OS != HEFESTO_LINUX && HEFESTO_TGT_OS != HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS != HEFESTO_LINUX   &&\
+    HEFESTO_TGT_OS != HEFESTO_FREEBSD &&\
+    HEFESTO_TGT_OS != HEFESTO_MINIX
         free(value);
 #endif
     }
@@ -1772,7 +1778,9 @@ static void *hefesto_sys_setenv(const char *syscall,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
     result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
     *(hefesto_int_t *)result = setenv(var, val, 1);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     if (strstr(var, "WINREG:") != var) {
@@ -1816,7 +1824,9 @@ static void *hefesto_sys_unsetenv(const char *syscall,
 
     result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
     *(hefesto_int_t *)result = unsetenv(var);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     if (strstr(var, "WINREG:") != var) {

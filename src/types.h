@@ -20,6 +20,7 @@
 #define HEFESTO_LINUX           0
 #define HEFESTO_WINDOWS         1
 #define HEFESTO_FREEBSD         2
+#define HEFESTO_MINIX           3
 
 #ifndef HEFESTO_TGT_OS
 
@@ -30,6 +31,10 @@
 #elif defined(__FreeBSD__)
 
 #define HEFESTO_TGT_OS HEFESTO_FREEBSD
+
+#elif defined(__minix__)
+
+#define HEFESTO_TGT_OS HEFESTO_MINIX
 
 #elif defined(_WIN32)
 
@@ -44,8 +49,12 @@
 
 #define HVM_ALU_ENABLE_SHORT_CIRCUIT    1
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
+
 #define HEFESTO_IX_ENV 1
+
 #endif
 
 #ifdef HEFESTO_IX_ENV

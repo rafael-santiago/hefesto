@@ -688,7 +688,9 @@ void set_hefesto_app_directory(const char *directory) {
 hefesto_int_t hefesto_is_relative_path(const char *path) {
 
     hefesto_int_t is_relative = 0;
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];
 

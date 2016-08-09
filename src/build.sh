@@ -25,9 +25,9 @@ echo "PANIC: For compiling Hefesto you should install GCC or Clang. None of them
 exit 1
 fi
 
-PLATFORM=$(uname -o)
+PLATFORM=$(uname)
 
-if test "$PLATFORM" = "FreeBSD"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix"
 then
     LINKERFLAGS="-lexecinfo"
 else
@@ -36,7 +36,8 @@ fi
 
 CUTEST_CFLAGS=""
 
-if [ $(echo $COMPILER_OPTS | grep "HVM_ASYNC_RQUEUE" | wc -l) > 1 ] ; then
+if test $(echo $COMPILER_OPTS | grep "HVM_ASYNC_RQUEUE" | wc -l) = 1
+then
     LINKERFLAGS=${LINKERFLAGS}" -lpthread"
 else
     CUTEST_CFLAGS="-DHAS_NO_PTHREAD"
@@ -55,7 +56,7 @@ UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ..
 
 ALL_OK=1
 
-if test "$PLATFORM" = "FreeBSD"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix"
 then
     HERE_FLAGS="-lexecinfo"
 else

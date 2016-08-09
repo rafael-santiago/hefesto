@@ -17,7 +17,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
 
 #include <execinfo.h>
 
@@ -30,7 +32,9 @@ void sigint_watchdog(int signo) {
     HEFESTO_LAST_FORGE_RESULT = 1;
 }
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
 
 void sigsegv_watchdog(int signo) {
     size_t size;
@@ -55,7 +59,9 @@ char *get_forgefile_projects_option_label(char *forgefile) {
     for (f_end = f-1; *f_end != '.' && f_end != forgefile; f_end--);
     memset(filename, 0, HEFESTO_MAX_BUFFER_SIZE);
     if (f_end == forgefile) return filename;
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_MINIX
     for (f_init = f_end-1;
          *f_init != HEFESTO_PATH_SEP && f_init != forgefile; f_init--);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
