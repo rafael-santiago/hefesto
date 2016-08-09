@@ -1,15 +1,16 @@
-Building Hefesto
-----------------
+# Building Hefesto
 
 The easiest way to clone hefesto's repo is:
 
 ``git clone https://github.com/rafael-santiago/hefesto --recursive``
 
+If you are a MINIX user you should read the remarks on ``Additional steps for cloning it on MINIX`` before going ahead.
+
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
-If you're on Linux/FreeBSD use: ./build.sh
+If you are on ``Linux``, ``FreeBSD`` or ``MINIX`` use: ./build.sh
 
-If you're on Windows use: build.bat
+If you are on ``Windows`` use: build.bat
 
 Both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)
 
@@ -17,21 +18,35 @@ The installation is pretty straightforward just follow the steps.
 
 After installing you need to perform a new login in order to load some environment variables.
 
-Construindo o Hefesto
----------------------
+## Additional steps for cloning it on MINIX
 
-O jeito mais fácil de clonar o repo do hefesto é:
+If you are on ``MINIX``. You need to have a little more guts to accomplish the build...
 
-        git clone --recursive https://github.com/rafael-santiago/hefesto
+The clone step is a little bit trick because until now on MINIX 3.3.0 the ``git`` is compiled without ``https`` support.
 
-Agora, para fazer o build do Hefesto da primeira vez você precisa usar o "src/build.sh" ou o "src/build.bat".
+This axiom will lead you to experiment some pretty nice submodule cloning errors. But do not give up.
 
-Se você está no Linux/FreeBSD use: ./build.sh
+All you should do is re-make submodules using the ``git-protocol`` instead of ``https``.
 
-Se você está no Windows use: build.bat
+So do the following, after cloning the main repo supposing that you cloned it to a local directory called "hefesto":
 
-Ambos os comandos irão compilar e linkeditar a aplicação, irão rodar os testes e então usará o Hefesto para instalar o Hefesto ;)
+```
+# cd hefesto
+# git submodule deinit helios
+# git rm helios
+# git submodule add git://github.com/rafael-santiago/helios helios
+# git submodule deinit src/tests/unit/cutest
+# git rm src/tests/unit/cutest
+# git submodule add git://github.com/rafael-santiago/cutest src/tests/unit/cutest
+# git submodule deinit src/here
+# git rm src/here
+# git submodule add git://github.com/rafael-santiago/here src/here
+# cd src/here
+# git submodule deinit src/test/cute
+# git rm src/test/cute
+# git submodule deinit src/test/cutest
+# git submodule add git://github.com/rafael-santiago/cutest src/test/cutest
+# cd ..
+```
 
-A instalação é bem direta apenas siga os passos.
-
-Após instalar você precisa fazer um novo login para que algumas variáveis de ambiente sejam carregadas.
+Now call the ``./build.sh``. It will build and try to install your Hefesto's copy. Congrats, well done, you deserve it! ;)

@@ -1,6 +1,6 @@
 # Hefesto
 
-Hefesto is a multiplatform build system which currently runs on Linux, FreeBSD and Windows.
+Hefesto is a multiplatform build system which currently runs on ``Linux``, ``FreeBSD``, ``MINIX`` and ``Windows``.
 
 The main Hefesto's feature is allow a more programatic build scripting.
 
@@ -20,25 +20,3 @@ The Hsl was developed to be simple but robust.
 
 In order to build this project follow the steps in [COMPILING.md](https://github.com/rafael-santiago/hefesto/blob/master/COMPILING.md).
 
-# Hefesto
-
-Hefesto é um build system multiplataforma que atualmente roda no Linux, FreeBSD e Windows.
-
-Uma das principais características do Hefesto é dar um aspecto mais programático para um build.
-
-Para isso, adota uma linguagem própria com aspecto mais procedural que declarativo.
-
-Visando com isso:
-
-    * Clareza
-    * Organização
-    * Expansibilidade
-
-Não foi pensando para auxiliar um número limitado de programadores que usam alguns toolsets e linguagens específicas, de fato Hefesto pode ajudar na automatização de
-muitas tarefas que vão além de compilar e linkeditar programas, tudo depende de sua necessidade e disposição de expandir o Hefesto para que te atenda.
-
-Expandir o Hefesto fazendo com que ele trabalhe com um novo conjunto de toolsets não envolve sua recompilação, tudo é feito via Hsl que é a linguagem específica de domínio usada pelo aplicativo.
-
-A Hsl foi desenvolvida com o intuito de ser simples porém robusta.
-
-Para compilar esse projeto siga os passos presentes em [COMPILING.md](https://github.com/rafael-santiago/hefesto/blob/master/COMPILING.md).
