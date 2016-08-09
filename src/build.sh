@@ -34,8 +34,12 @@ else
     LINKERFLAGS="-ldl"
 fi
 
+CUTEST_CFLAGS=""
+
 if [ $(echo $COMPILER_OPTS | grep "HVM_ASYNC_RQUEUE" | wc -l) > 1 ] ; then
     LINKERFLAGS=${LINKERFLAGS}" -lpthread"
+else
+    CUTEST_CFLAGS="-DHAS_NO_PTHREAD"
 fi
 
 LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
@@ -254,9 +258,9 @@ else
 fi
 cd test
 cd cutest/src/
-$COMPILER -c cutest.c
-$COMPILER -c cutest_memory.c
-$COMPILER -c cutest_mmap.c
+$COMPILER -c cutest.c $CUTEST_CFLAGS
+$COMPILER -c cutest_memory.c $CUTEST_CFLAGS
+$COMPILER -c cutest_mmap.c $CUTEST_CFLAGS
 cd ../..
 $COMPILER $COMPILER_OPTS main.c -Icutest/src
 if test $? -gt 0
@@ -283,9 +287,9 @@ echo "### Now running unit tests"
 
 cd tests/unit
 $COMPILER -c -I../../here/src -Icutest/src main.c
-$COMPILER -c cutest/src/cutest.c
-$COMPILER -c cutest/src/cutest_memory.c
-$COMPILER -c cutest/src/cutest_mmap.c
+$COMPILER -c cutest/src/cutest.c $CUTEST_CFLAGS
+$COMPILER -c cutest/src/cutest_memory.c $CUTEST_CFLAGS
+$COMPILER -c cutest/src/cutest_mmap.c $CUTEST_CFLAGS
 $LINKER $UNIT_TEST
 ./main
 
