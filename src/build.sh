@@ -2,6 +2,8 @@
 # Hefesto's bootstrap :)
 #
 
+# It supposed should run without any manual adjustment over Linux, FreeBSD and MINIX.
+
 # WARNING: If PThread is not available on your UNIX-like remove "-DHVM_ASYNC_RQUEUE" from "COMPILER_OPTS".
 
 COMPILER="gcc" # Adjust for your system compiler
@@ -14,18 +16,25 @@ LINKERFLAGS=""
 $COMPILER --version > /dev/null 2>&1
 
 if [ $? -ne 0 ] ; then
-COMPILER="clang"
-LINKER="clang"
+    COMPILER="clang"
+    LINKER="clang"
 fi
 
 $COMPILER --version > /dev/null 2>&1
 
 if [ $? -ne 0 ] ; then
-echo "PANIC: For compiling Hefesto you should install GCC or Clang. None of them were found on your environment."
-exit 1
+    echo "PANIC: For compiling Hefesto you should install GCC or Clang. None of them were found on your environment."
+    exit 1
 fi
 
 PLATFORM=$(uname)
+
+# WARNING: If your MINIX has support to Pthreads comment the following if-block and let's give it a try! :)
+if test "$PLATFORM" = "Minix"
+then
+    # WARNING: This implicitly disables the Pthread support on cutest.
+    COMPILER_OPTS=$(echo $COMPILER_OPTS | sed s/-DHVM_ASYNC_RQUEUE//)
+fi
 
 if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix"
 then
