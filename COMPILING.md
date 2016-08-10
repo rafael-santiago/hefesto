@@ -4,7 +4,7 @@ The easiest way to clone hefesto's repo is:
 
 ``git clone https://github.com/rafael-santiago/hefesto --recursive``
 
-If you are a MINIX user you should read the remarks on ``Additional steps for cloning it on MINIX`` before going ahead.
+If you are a ``MINIX`` user you should read the remarks on ``Additional steps for cloning it on MINIX`` before going ahead.
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
@@ -22,13 +22,13 @@ After installing you need to perform a new login in order to load some environme
 
 If you are on ``MINIX``. You need to have a little more guts to accomplish the build...
 
-The clone step is a little bit trick because until now on MINIX 3.3.0 the ``git`` is compiled without ``https`` support.
+The clone step is a little bit tricky because until now on MINIX 3.3.0 the ``git`` is compiled without ``https`` support.
 
-This axiom will lead you to experiment some pretty nice submodule cloning errors. But do not give up.
+This axiom will lead you to taste some pretty nice submodule cloning errors. But do not give up.
 
 All you should do is re-make submodules using the ``git-protocol`` instead of ``https``.
 
-So do the following, after cloning the main repo supposing that you cloned it to a local directory called "hefesto":
+So do the following, after cloning the main repo supposing that you have cloned it into a local directory called "hefesto":
 
 ```
 # cd hefesto

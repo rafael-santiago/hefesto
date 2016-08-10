@@ -54,9 +54,10 @@ function config_basic_ld_deps() : result type none {
     if ($os == "linux") {
         $ldflags.add_item("-lpthread");
         $ldflags.add_item("-ldl");
-    }
-    if ($os == "freebsd") {
+    } else if ($os == "freebsd") {
         $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-lexecinfo");
+    } else if ($os == "minix") {
         $ldflags.add_item("-lexecinfo");
     }
     if (hefesto.sys.os_name() == "windows") {
@@ -79,6 +80,9 @@ hefesto.prologue() {
             $ldflags = hefesto.sys.get_option("ldflags");
             $cflags = hefesto.sys.get_option("cflags");
             $cflags.add_item("-Wall");
+            if (hefesto.sys.os_name() == "minix") {
+                $cflags.del_item($cflags.index_of("-DHVM_ASYNC_RQUEUE"));
+            }
             var platform type string;
             $platform = hefesto.sys.os_name();
             $cflags.add_item("-DHEFESTO_TGT_OS=HEFESTO_" + strupr($platform));

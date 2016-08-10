@@ -90,8 +90,9 @@ hfst-unit.prologue() {
         }
         if ($os_name == "linux") {
             $ldflags.add_item("-ldl");
-        }
-        if ($os_name == "freebsd") {
+        } else if ($os_name == "freebsd") {
+            $ldflags.add_item("-lexecinfo");
+        } else if ($os_name == "minix") {
             $ldflags.add_item("-lexecinfo");
         }
     } else {
