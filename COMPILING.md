@@ -26,7 +26,7 @@ The clone step is a little bit tricky because until now on MINIX 3.3.0 the ``git
 
 This axiom will lead you to taste some pretty nice submodule cloning errors. But do not give up.
 
-All you should do is re-make submodules using the ``git-protocol`` instead of ``https``.
+All you should do is to re-make the submodules using the ``git-protocol`` instead of ``https``.
 
 So do the following, after cloning the main repo supposing that you have cloned it into a local directory called "hefesto":
 
@@ -49,4 +49,10 @@ So do the following, after cloning the main repo supposing that you have cloned 
 # cd ..
 ```
 
-Now call the ``./build.sh``. It will build and try to install your Hefesto's copy. Congrats, well done, you deserve it! ;)
+Yes, maybe I should include a ``shell script`` for doing this dull submodule re-making task. However, I think that this problem
+on ``MINIX`` will be fixed soon. At least I expect. Besides, this "nice" script could result on nasty things like pull requests
+with submodules using "git" protocol instead of ``http``. By the way, if you want to pull request me something, try to avoid
+pulling it using a copy with the submodules schemas changed. And thank you in advance! ;)
+
+Now returning to the main subject, once the submodules downloaded, call the ``./build.sh``. It will build and try to install
+your Hefesto's copy. Congrats, well done, you deserve it! ;)

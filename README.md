@@ -8,9 +8,9 @@ In order to do it Hefesto uses his own language (more procedural than declarativ
 
 Seeking:
 
-    * Clarity
-    * Organization
-    * Expansibility
+- Clarity
+- Organization
+- Expansibility
 
 This application can help not only a small amount of programmers which use some specific languages and toolsets, Hefesto helps on automation of several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend the Hefesto.
 
