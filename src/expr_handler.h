@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _EXPR_HANDLER_H
-#define _EXPR_HANDLER_H 1
+#ifndef EXPR_HANDLER_H
+#define EXPR_HANDLER_H 1
 
 #include "types.h"
 

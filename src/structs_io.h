@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _STRUCTS_IO_H
-#define _STRUCTS_IO_H 1
+#ifndef HEFESTO_STRUCTS_IO_H
+#define HEFESTO_STRUCTS_IO_H 1
 
 #include "types.h"
 #include "mem.h"

@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _HEFESTO_HVM_STR_H
-#define _HEFESTO_HVM_STR_H 1
+#ifndef HEFESTO_HVM_STR_H
+#define HEFESTO_HVM_STR_H 1
 
 #include "types.h"
 #include "lang_defs.h"

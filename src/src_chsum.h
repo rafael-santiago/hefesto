@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _HEFESTO_SRC_CHSUM_H
-#define _HEFESTO_SRC_CHSUM_H 1
+#ifndef HEFESTO_SRC_CHSUM_H
+#define HEFESTO_SRC_CHSUM_H 1
 
 #include "types.h"
 

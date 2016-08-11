@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _HEFESTO_ARCH_H
-#define _HEFESTO_ARCH_H 1
+#ifndef HEFESTO_ARCH_H
+#define HEFESTO_ARCH_H 1
 
 #ifdef __GNUC__
 

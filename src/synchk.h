@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _HEFESTO_SYNCHK_H
-#define _HEFESTO_SYNCHK_H 1
+#ifndef HEFESTO_SYNCHK_H
+#define HEFESTO_SYNCHK_H 1
 
 #include "types.h"
 #include "lang_defs.h"

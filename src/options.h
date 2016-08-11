@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _HEFESTO_OPTIONS_H
-#define _HEFESTO_OPTIONS_H 1
+#ifndef HEFESTO_OPTIONS_H
+#define HEFESTO_OPTIONS_H 1
 
 #define HEFESTO_FORGEFILES_OPTION_LABEL         "--forgefiles"
 #define HEFESTO_PROJECTS_OPTION_LABEL_PREFIX    "-projects"

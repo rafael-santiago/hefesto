@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _LANG_DEFS_H
-#define _LANG_DEFS_H 1
+#ifndef HEFESTO_LANG_DEFS_H
+#define HEFESTO_LANG_DEFS_H 1
 
 #include "types.h"
 

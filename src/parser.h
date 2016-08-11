@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef _PARSER_H
-#define _PARSER_H 1
+#ifndef HEFESTO_PARSER_H
+#define HEFESTO_PARSER_H 1
 
 #include <stdio.h>
 #include <stdlib.h>
