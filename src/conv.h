@@ -12,4 +12,4 @@
 
 hefesto_int_t hefesto_atoi(const char *value);
 
-#endif
+#endif  // HEFESTO_CONV_H

@@ -17,4 +17,4 @@
 #define HEFESTO_VERSION_OPTION_LABEL            "--version"
 #define HEFESTO_USER_MODULES_HOME_OPTION_LABEL  "--user-modules-home"
 
-#endif
+#endif  // HEFESTO_OPTIONS_H

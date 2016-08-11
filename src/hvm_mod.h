@@ -20,4 +20,4 @@ void set_modules_home(hefesto_options_ctx *options);
 
 void unset_modules_home();
 
-#endif
+#endif  // HEFESTO_HVM_MOD_H

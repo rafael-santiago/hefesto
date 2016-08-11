@@ -16,10 +16,10 @@
 
 void HEFESTO_DEBUG_INFO(hefesto_int_t wait, char *fmt, ...);
 
-#else
+#else  // HEFESTO_DEBUG
 
 #define HEFESTO_DEBUG_INFO(x,y,...)
 
-#endif
+#endif  // HEFESTO_DEBUG
 
-#endif
+#endif  // HEFESTO_DBG_H

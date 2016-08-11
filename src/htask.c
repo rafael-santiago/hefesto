@@ -145,15 +145,21 @@ static void set_current_forgefile_name(const char *forgefile_path) {
     while (*fp != 0) {
         fp++;
     }
+
 #ifndef HEFESTO_WINDOWS
+
     while (*fp != HEFESTO_PATH_SEP && fp != forgefile_path) {
         fp--;
     }
-#else
+
+#else  // HEFESTO_WINDOWS
+
     while (*fp != HEFESTO_PATH_SEP && *fp != '/' && fp != forgefile_path) {
         fp--;
     }
-#endif
+
+#endif  // HEFESTO_WINDOWS
+
     memset(HEFESTO_CURRENT_FORGEFILE_PATH, 0, sizeof(HEFESTO_CURRENT_FORGEFILE_PATH));
     strncpy(HEFESTO_CURRENT_FORGEFILE_PATH, forgefile_path, sizeof(HEFESTO_CURRENT_FORGEFILE_PATH) - 1);
     memset(HEFESTO_CURRENT_FORGEFILE_NAME, 0, sizeof(HEFESTO_CURRENT_FORGEFILE_NAME));

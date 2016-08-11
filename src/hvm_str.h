@@ -24,4 +24,4 @@ char *hvm_int_to_str(const hefesto_int_t value);
 
 hefesto_int_t hvm_str_to_int(const char *str);
 
-#endif
+#endif  // HEFESTO_HVM_STR_H

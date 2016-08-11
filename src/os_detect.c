@@ -16,7 +16,7 @@
     HEFESTO_TGT_OS == HEFESTO_MINIX
 #include <sys/stat.h>
 #include <sys/utsname.h>
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 char *get_os_name() {
 
@@ -25,12 +25,15 @@ char *get_os_name() {
     static size_t os_name_sz = 0;
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
     if (os_name_sz == 0) {
         strncpy(os_name, "windows", sizeof(os_name) - 1);
     }
+
 #elif HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
       HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
       HEFESTO_TGT_OS == HEFESTO_MINIX
+
     struct utsname unbuf;
     static size_t o;
 
@@ -41,11 +44,14 @@ char *get_os_name() {
             os_name[o] = tolower(os_name[o]);
         }
     }
-#else
+
+#else  //  HEFESTO_TGT_OS == X
+
     if (os_name_sz == 0) {
         strncpy(os_name, "superunknownos", sizeof(os_name) - 1);
     }
-#endif
+
+#endif  //  HEFESTO_TGT_OS == X
 
     if (os_name_sz == 0) {
         os_name_sz = strlen(os_name);

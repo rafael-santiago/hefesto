@@ -23,7 +23,7 @@
 
 #include <execinfo.h>
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 void sigint_watchdog(int signo) {
     printf("\nhvm info: aborting execution...\n");
@@ -48,7 +48,7 @@ void sigsegv_watchdog(int signo) {
     exit(1);
 }
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 char *get_forgefile_projects_option_label(char *forgefile) {
 
@@ -59,6 +59,7 @@ char *get_forgefile_projects_option_label(char *forgefile) {
     for (f_end = f-1; *f_end != '.' && f_end != forgefile; f_end--);
     memset(filename, 0, HEFESTO_MAX_BUFFER_SIZE);
     if (f_end == forgefile) return filename;
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX
@@ -68,7 +69,8 @@ char *get_forgefile_projects_option_label(char *forgefile) {
     for (f_init = f_end-1;
          *f_init != HEFESTO_PATH_SEP && *f_init != '/' &&
                                         f_init != forgefile; f_init--);
-#endif
+#endif  // HEFESTO_TGT_OS == X
+
     if (f_init != forgefile) f_init++;
 
     *filename = '-';
@@ -176,10 +178,12 @@ int main(int argc, char **argv) {
                         signal(SIGINT, sigint_watchdog);
                         signal(SIGTERM, sigint_watchdog);
                         signal(SIGABRT, sigint_watchdog);
+
 #if HEFESTO_TGT_OS != HEFESTO_WINDOWS
                         signal(SIGSEGV, sigsegv_watchdog);
                         signal(SIGHUP, sigint_watchdog);
-#endif
+#endif  // HEFESTO_TGT_OS != HEFESTO_WINDOWS
+
                         exit_code = boot_forge(projects, fp->data, o);
                     }
                     free(temp);

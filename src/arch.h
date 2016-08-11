@@ -14,20 +14,20 @@
 
 #define HEFESTO_ARCH_X86 1
 
-#else
+#else  // __WORDSIZE == 32
 
 #if __WORDSIZE == 64
 
 #define HEFESTO_ARCH_X64 1
 
-#else
+#else  // __WORDSIZE == 64
 
 #define HEFESTO_ARCH_X86 1
 
-#endif
+#endif  // __WORDSIZE == 64
 
-#endif
+#endif  // __WORDSIZE == 32
 
-#endif
+#endif  // __GNUC__
 
-#endif
+#endif  // HEFESTO_ARCH_H

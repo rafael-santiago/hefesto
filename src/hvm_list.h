@@ -16,4 +16,4 @@ void *hvm_list_method(const char *method, hefesto_common_list_ctx **list_var,
                       hefesto_var_list_ctx **gl_vars,
                       hefesto_func_list_ctx *functions);
 
-#endif
+#endif  // HEFESTO_HVM_LIST_H

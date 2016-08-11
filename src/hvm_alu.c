@@ -130,7 +130,7 @@ static hefesto_int_t can_apply_short_circuit(char *expression,
                                            char *buf, char *b,
                      struct hvm_alu_evaluate_return *eval_ret);
 
-#endif
+#endif  // HVM_ALU_ENABLE_SHORT_CIRCUIT
 
 struct hefesto_evaluator_ctx {
     void *(*evaluator)(hefesto_common_stack_ctx *a,
@@ -551,7 +551,7 @@ static hefesto_int_t can_apply_short_circuit(char *expression,
     return 0;
 }
 
-#endif
+#endif  // HVM_ALU_ENABLE_SHORT_CIRCUIT
 
 static void hvm_alu_evaluator(char *buf, char *b, char *expression,
                               hefesto_var_list_ctx **lo_vars,
@@ -573,10 +573,13 @@ static void hvm_alu_evaluator(char *buf, char *b, char *expression,
     hefesto_int_t state = *eval_ret->state;
 
 #ifdef HVM_ALU_ENABLE_SHORT_CIRCUIT
+
     if (can_apply_short_circuit(expression, alu_stack, vtype, buf, b, eval_ret)) {
         return;
     }
-#endif
+
+#endif  // HVM_ALU_ENABLE_SHORT_CIRCUIT
+
     if (*buf != '(' && !is_op(*expression)) {
 
         if (*buf == '$' && *etype == HEFESTO_VAR_TYPE_STRING &&

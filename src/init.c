@@ -18,7 +18,7 @@
 
 #include <unistd.h>
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 void hefesto_init(hefesto_options_ctx *options) {
     char *temp;

@@ -19,24 +19,20 @@ hefesto_int_t hvm_thread_create(hefesto_thread_t *thread_id,
 
     pthread_attr_t attr;
 
-#endif
-
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
-
     pthread_attr_init(&attr);
     result = (pthread_create(thread_id, &attr, start_routine, args) == 0);
 
-#else
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
     *thread_id = CreateThread(NULL, 0,
                                   (LPTHREAD_START_ROUTINE) start_routine,
                                   args, 0, 0);
     result = (*thread_id != NULL);
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
     return result;
 
 }
 
-#endif
+#endif  // HVM_ASYNC_RQUEUE

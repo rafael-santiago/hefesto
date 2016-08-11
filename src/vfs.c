@@ -22,7 +22,7 @@
 
 #include <windows.h>
 
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 struct hefesto_file_ptr_pool {
     FILE *p;
@@ -146,7 +146,7 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
 
     *r = 0;
 
-#else
+#else  // HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
     for (p = begin_p, r = result; p != end_p; p++, r++) {
         *r = *p;
@@ -189,7 +189,7 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
 
     *r = 0;
 
-#endif
+#endif  // HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
     return result;
 
@@ -202,7 +202,7 @@ static hefesto_int_t copy_single_file(const char *src, const char *dest) {
     FILE *fs, *fd;
     struct stat f_st;
 
-#if HFESTO_TGT_OS != HEFESTO_WINDOWS
+#if HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
     if (!(fs = fopen(src, "rb"))) return 0;
 
@@ -224,11 +224,11 @@ static hefesto_int_t copy_single_file(const char *src, const char *dest) {
         chmod(dest, f_st.st_mode);
     }
 
-#else
+#else  // HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
     CopyFile(src, dest, FALSE);
 
-#endif
+#endif  // HEFESTO_TGT_OS != HEFESTO_WINDOWS
 
     return 1;
 
@@ -385,10 +385,14 @@ hefesto_int_t hefesto_mkdir(const char *dir) {
     full_src = hefesto_make_path(HEFESTO_FS_CWD, dir, HEFESTO_MAX_BUFFER_SIZE);
 
 #if HEFESTO_TGT_OS !=  HEFESTO_WINDOWS
+
     result = mkdir(full_src, 0);
-#else
+
+#else  // HEFESTO_TGT_OS !=  HEFESTO_WINDOWS
+
     result = mkdir(full_src);
-#endif
+
+#endif  // HEFESTO_TGT_OS !=  HEFESTO_WINDOWS
 
     free(full_src);
 
@@ -688,9 +692,11 @@ void set_hefesto_app_directory(const char *directory) {
 hefesto_int_t hefesto_is_relative_path(const char *path) {
 
     hefesto_int_t is_relative = 0;
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX
+
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];
 
@@ -707,7 +713,9 @@ hefesto_int_t hefesto_is_relative_path(const char *path) {
     if (*p == HEFESTO_PATH_SEP) *p = 0;
     is_relative = (strcmp(temp, cwd) != 0);
     free(cwd);
+
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];
 
@@ -731,7 +739,8 @@ hefesto_int_t hefesto_is_relative_path(const char *path) {
     }
     is_relative = (strcmp(temp, cwd) != 0);
     free(cwd);
-#endif
+
+#endif  // HEFESTO_TGT_OS == X
 
     return is_relative;
 

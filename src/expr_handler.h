@@ -5,8 +5,8 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef EXPR_HANDLER_H
-#define EXPR_HANDLER_H 1
+#ifndef HEFESTO_EXPR_HANDLER_H
+#define HEFESTO_EXPR_HANDLER_H 1
 
 #include "types.h"
 
@@ -14,7 +14,7 @@
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 #include <sys/types.h>
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 struct hefesto_expr_ops_ctx {
   char *op;
@@ -38,4 +38,4 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size);
 
 size_t get_expression_buffer_size(const char *expr);
 
-#endif
+#endif  // HEFESTO_EXPR_HANDLER_H

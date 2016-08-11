@@ -40,9 +40,9 @@
 
 #define HEFESTO_TGT_OS HEFESTO_WINDOWS
 
-#endif
+#endif  // defined(X)
 
-#endif
+#endif  // HEFESTO_TGT_OS
 
 #define HEFESTO_NULL_EVAL       "(null)"
 #define HEFESTO_NULL_EVAL_SZ    18
@@ -55,13 +55,13 @@
 
 #define HEFESTO_IX_ENV 1
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 #ifdef HEFESTO_IX_ENV
 #define HEFESTO_PATH_SEP        '/'
-#else
+#else  // HEFESTO_IX_ENV
 #define HEFESTO_PATH_SEP        '\\'
-#endif
+#endif  // HEFESTO_IX_ENV
 
 #define HEFESTO_MAX_BUFFER_SIZE 8192
 
@@ -70,14 +70,14 @@ typedef unsigned long hefesto_type_t;
 #ifdef HEFESTO_ARCH_X86
 typedef int32_t hefesto_int_t;
 typedef uint32_t hefesto_uint_t;
-#else
+#else  // HEFESTO_ARCH_X86
 #ifdef HEFESTO_ARCH_X64
 typedef int64_t hefesto_int_t;
 typedef uint64_t hefesto_uint_t;
-#else
+#else  // HEFESTO_ARCH_X64
 #error "ERROR: alien cpu architecture found... or at least the assumptions inside arch.h header file must be improved."
-#endif
-#endif
+#endif  // HEFESTO_ARCH_X64
+#endif  // HEFESTO_ARCH_X86
 
 #define HEFESTO_VAR_TYPE_UNTYPED                                0x0
 #define HEFESTO_VAR_TYPE_STRING                                 0x1
@@ -277,18 +277,18 @@ extern char HEFESTO_CURRENT_FORGEFILE_PATH[HEFESTO_MAX_BUFFER_SIZE];
 typedef void * hefesto_thread_routine_args_t;
 typedef void * hefesto_thread_routine_t;
 typedef pthread_t hefesto_thread_t;
-#else
+#else  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 #include <windows.h>
 typedef void * hefesto_thread_routine_args_t;
 typedef void * hefesto_thread_routine_t;
 typedef HANDLE hefesto_thread_t;
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
-#else
+#else  // HVM_ASYNC_RQUEUE
 
 typedef int hefesto_thread_t;
 
-#endif
+#endif  // HVM_ASYNC_RQUEUE
 
 typedef struct _hefesto_rqueue_ctx {
     char *path_to_run;
@@ -299,5 +299,4 @@ typedef struct _hefesto_rqueue_ctx {
     struct _hefesto_rqueue_ctx *next;
 }hefesto_rqueue_ctx;
 
-
-#endif
+#endif  // HEFESTO_TYPES_H

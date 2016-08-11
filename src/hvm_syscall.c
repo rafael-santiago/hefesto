@@ -43,7 +43,7 @@
 
 #define WEXITSTATUS(s) (s)
 
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
 static void *hefesto_sys_replace_in_file(const char *syscall,
                                          hefesto_var_list_ctx **lo_vars,
@@ -1113,6 +1113,7 @@ static void *hefesto_sys_env(const char *syscall,
     free(arg);
 
     if (strstr(arg_fmt, "WINREG:") != arg_fmt) {
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX
@@ -1125,7 +1126,8 @@ static void *hefesto_sys_env(const char *syscall,
             free(value);
             value = NULL;
         }
-#endif
+#endif  // HEFESTO_TGT_OS == X
+
     } else {
         value = get_value_from_winreg(arg_fmt + 7);
     }
@@ -1142,11 +1144,13 @@ static void *hefesto_sys_env(const char *syscall,
         result = (char *) hefesto_mloc(sz + 1);
         memset(result, 0, sz + 1);
         strncpy(result, value, sz);
+
 #if HEFESTO_TGT_OS != HEFESTO_LINUX   &&\
     HEFESTO_TGT_OS != HEFESTO_FREEBSD &&\
     HEFESTO_TGT_OS != HEFESTO_MINIX
         free(value);
-#endif
+#endif  // HEFESTO_TGT_OS != X
+
     }
 
     return result;
@@ -1778,6 +1782,7 @@ static void *hefesto_sys_setenv(const char *syscall,
                     lo_vars, gl_vars, functions, &etype, &offset);
 
     result = (hefesto_int_t *) hefesto_mloc(sizeof(hefesto_int_t));
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX
@@ -1834,7 +1839,7 @@ static void *hefesto_sys_unsetenv(const char *syscall,
     } else {
         *(hefesto_int_t *)result = del_value_from_winreg(var + 7);
     }
-#endif
+#endif  // HEFESTO_TGT_OS == X
 
     free(arg_var);
     free(var);

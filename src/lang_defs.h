@@ -76,4 +76,4 @@ hefesto_type_t get_hsl_list_subtype(hefesto_common_list_ctx *l_items);
 
 hefesto_type_t get_hsl_builtin_outtype(const char *stmt);
 
-#endif
+#endif  // HEFESTO_LANG_DEFS_H

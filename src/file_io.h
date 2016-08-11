@@ -17,4 +17,4 @@ char fgetc_back(FILE *fp);
 
 hefesto_common_list_ctx *lines_from_file(FILE *fp, const char *regex);
 
-#endif
+#endif  // HEFESTO_FILE_IO_H

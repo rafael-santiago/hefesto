@@ -22,13 +22,13 @@ static hefesto_thread_routine_t hefesto_async_run(void *args);
 
 pthread_mutex_t run_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-#else
+#else  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
 HANDLE run_mutex;
 
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
-#endif
+#endif  // HVM_ASYNC_RQUEUE
 
 struct hvm_rqueue_ctx {
     char *path_to_run;
@@ -39,6 +39,7 @@ struct hvm_rqueue_ctx {
 #ifdef HVM_ASYNC_RQUEUE
 
 hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
     hefesto_int_t exit_codes = 0, all_done = 0, sched_proc_nr;
@@ -91,9 +92,7 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
     return exit_codes;
 
-#else
-
-#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
+#elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
     hefesto_int_t exit_codes = 0, all_done = 0, sched_proc_nr;
     hefesto_common_list_ctx *pp;
@@ -147,14 +146,14 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
     return exit_codes;
 
-#endif
+#else  // HEFESTO_TGT_OS == X
 
     return 1;
 
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
 }
-#else
+#else  // HVM_ASYNC_RQUEUE
 
 hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
     hefesto_common_list_ctx *p;
@@ -165,7 +164,7 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
     return retval;
 }
 
-#endif
+#endif  // HVM_ASYNC_RQUEUE
 
 void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size) {
     hefesto_current_rqueue_size = new_size;
@@ -174,6 +173,7 @@ void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size) {
 #ifdef HVM_ASYNC_RQUEUE
 
 static hefesto_thread_routine_t hefesto_async_run(void *args) {
+
 #if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
     hefesto_rqueue_ctx *rqp = (hefesto_rqueue_ctx *) args;
@@ -185,7 +185,7 @@ static hefesto_thread_routine_t hefesto_async_run(void *args) {
         pthread_mutex_unlock(&run_mutex);
     }
 
-#else
+#else  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
 
     hefesto_rqueue_ctx *rqp = (hefesto_rqueue_ctx *) args;
     if (rqp != NULL && rqp->path_to_run != NULL) {
@@ -196,8 +196,9 @@ static hefesto_thread_routine_t hefesto_async_run(void *args) {
         if (rqp->id != NULL) CloseHandle(rqp->id);
     }
 
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+
     return NULL;
 }
 
-#endif
+#endif  // HVM_ASYNC_RQUEUE

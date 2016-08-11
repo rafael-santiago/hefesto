@@ -16,5 +16,4 @@ hefesto_int_t set_value_from_winreg(const char *value_fullpath, const char *valu
 
 hefesto_int_t del_value_from_winreg(const char *value_fullpath);
 
-#endif
-
+#endif  // HEFESTO_HVM_WINREG_H

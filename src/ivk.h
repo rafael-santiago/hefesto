@@ -12,4 +12,4 @@
 
 hefesto_options_ctx *get_options_from_ivk_file();
 
-#endif
+#endif  // HEFESTO_IVK_H

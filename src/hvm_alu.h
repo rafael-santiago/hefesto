@@ -21,4 +21,4 @@ hefesto_type_t get_last_evaluated_type();
 
 hefesto_type_t get_last_evaluated_subtype();
 
-#endif
+#endif  // HEFESTO_HVM_ALU_H

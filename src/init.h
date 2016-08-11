@@ -14,4 +14,4 @@ void hefesto_init(hefesto_options_ctx *options);
 
 void hefesto_deinit();
 
-#endif
+#endif  // HEFESTO_INIT_H

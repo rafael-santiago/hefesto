@@ -115,4 +115,4 @@ typedef enum _hlscm_code {
 
 void hlsc_info(const hefesto_int_t mtype_details, const hlscm_code_t mcode, ...);
 
-#endif
+#endif  // HEFESTO_HLSC_MSG_H

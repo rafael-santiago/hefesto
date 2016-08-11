@@ -10,4 +10,4 @@
 
 char *get_os_name();
 
-#endif
+#endif  // HEFESTO_OS_DETECT_H

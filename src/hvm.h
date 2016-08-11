@@ -30,4 +30,4 @@ hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
                                 hefesto_var_list_ctx **gl_vars,
                                 hefesto_func_list_ctx *functions);
 
-#endif
+#endif  // HEFESTO_HVM_H

@@ -44,4 +44,4 @@ void hvm_init_function_args(const char *args,
                             hefesto_func_list_ctx *functions,
                             hefesto_func_list_ctx **function);
 
-#endif
+#endif  // HEFESTO_HVM_FUNC_H

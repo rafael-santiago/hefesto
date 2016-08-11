@@ -5,7 +5,7 @@
  * the terms of the GNU General Public License version 2.
  *
  */
-#ifndef HEEFSTO_VFS_H
+#ifndef HEFESTO_VFS_H
 #define HEFESTO_VFS_H 1
 
 #include "types.h"
@@ -63,4 +63,4 @@ hefesto_int_t hefesto_is_relative_path(const char *path);
 
 void clear_hefesto_file_ptr_pool();
 
-#endif
+#endif  // HEFESTO_VFS_H

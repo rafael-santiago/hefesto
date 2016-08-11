@@ -12,4 +12,4 @@
 
 void *hefesto_mloc(const size_t ssize);
 
-#endif
+#endif  // HEFESTO_MEM_H

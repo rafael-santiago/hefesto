@@ -311,4 +311,4 @@ hefesto_base_refresh_ctx *get_hefesto_base_refresh_ctx_path(const char *path,
 void del_hefesto_base_refresh_ctx(hefesto_base_refresh_ctx *base);
 
 
-#endif
+#endif  // HEFESTO_STRUCTS_IO_H

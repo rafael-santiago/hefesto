@@ -17,4 +17,4 @@ void *hefesto_sys_call(const char *syscall, hefesto_var_list_ctx **lo_vars,
                        hefesto_var_list_ctx **gl_vars,
                        hefesto_func_list_ctx *functions, hefesto_type_t *otype);
 
-#endif
+#endif  // HEFESTO_HVM_SYSCALL_H

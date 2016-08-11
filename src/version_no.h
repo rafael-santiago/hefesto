@@ -10,4 +10,4 @@
 
 #define HEFESTO_VERSION "0.1.1.5"
 
-#endif
+#endif  // HEFESTO_VERSION_NO_H

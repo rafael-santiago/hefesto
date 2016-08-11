@@ -19,4 +19,4 @@ void *hefesto_project_method(const char *method, hefesto_var_list_ctx **lo_vars,
                              hefesto_func_list_ctx *functions,
                              hefesto_type_t *otype);
 
-#endif
+#endif  // HEFESTO_HVM_PROJECT_H

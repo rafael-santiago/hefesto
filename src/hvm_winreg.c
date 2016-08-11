@@ -11,7 +11,7 @@
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 #include <windows.h>
 #include <winreg.h>
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
@@ -24,11 +24,6 @@ static DWORD get_value_type_from_wreg_path(const char *path);
 static LONG open_winreg_key(const char *value_fullpath, PHKEY key);
 
 static char *get_subkey_from_winreg_path(const char *value_fullpath);
-
-#endif
-
-
-#if HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static hefesto_int_t get_key_handle_from_wreg_path(const char *path) {
 
@@ -136,10 +131,11 @@ static char *get_subkey_from_winreg_path(const char *value_fullpath) {
     return subpath;
 }
 
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 char *get_value_from_winreg(const char *value_fullpath) {
     char *result = NULL;
+
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     HKEY hk;
     char *value_name = get_value_from_wreg_path(value_fullpath);
@@ -174,12 +170,14 @@ char *get_value_from_winreg(const char *value_fullpath) {
         RegCloseKey(hk);
     }
     free(value_name);
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
     return result;
 }
 
 hefesto_int_t set_value_from_winreg(const char *value_fullpath, const char *value) {
     hefesto_int_t result = 0;
+
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     HKEY hk;
     DWORD vtype, vlen;
@@ -194,12 +192,14 @@ hefesto_int_t set_value_from_winreg(const char *value_fullpath, const char *valu
     } else {
         result = GetLastError();
     }
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
     return result;
 }
 
 hefesto_int_t del_value_from_winreg(const char *value_fullpath) {
     hefesto_int_t result = 0;
+
 #if HEFESTO_TGT_OS == HEFESTO_WINDOWS
     HKEY hk;
     char *value_name = NULL;
@@ -220,6 +220,7 @@ hefesto_int_t del_value_from_winreg(const char *value_fullpath) {
         free(value_name);
         RegCloseKey(hk);
     }
-#endif
+#endif  // HEFESTO_TGT_OS == HEFESTO_WINDOWS
+
     return result;
 }
