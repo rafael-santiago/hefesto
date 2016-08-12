@@ -21,6 +21,7 @@
 #define HEFESTO_WINDOWS         1
 #define HEFESTO_FREEBSD         2
 #define HEFESTO_MINIX           3
+#define HEFESTO_SUNOS           4
 
 #ifndef HEFESTO_TGT_OS
 
@@ -35,6 +36,10 @@
 #elif defined(__minix__)
 
 #define HEFESTO_TGT_OS HEFESTO_MINIX
+
+#elif defined(__sun__)
+
+#define HEFESTO_TGT_OS HEFESTO_SUNOS
 
 #elif defined(_WIN32)
 
@@ -51,7 +56,8 @@
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
-    HEFESTO_TGT_OS == HEFESTO_MINIX
+    HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
+    HEFESTO_TGT_OS == HEFESTO_SUNOS
 
 #define HEFESTO_IX_ENV 1
 
@@ -272,17 +278,19 @@ extern char HEFESTO_CURRENT_FORGEFILE_PATH[HEFESTO_MAX_BUFFER_SIZE];
 
 #ifdef HVM_ASYNC_RQUEUE
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_SUNOS
 #include <pthread.h>
 typedef void * hefesto_thread_routine_args_t;
 typedef void * hefesto_thread_routine_t;
 typedef pthread_t hefesto_thread_t;
-#else  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#else  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD || HEFESTO_TGT_OS == HEFESTO_SUNOS
 #include <windows.h>
 typedef void * hefesto_thread_routine_args_t;
 typedef void * hefesto_thread_routine_t;
 typedef HANDLE hefesto_thread_t;
-#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD
+#endif  // HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD || HEFESTO_TGT_OS == HEFESTO_SUNOS
 
 #else  // HVM_ASYNC_RQUEUE
 

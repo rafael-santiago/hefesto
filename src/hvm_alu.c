@@ -784,10 +784,7 @@ void *expr_eval(char *expr, hefesto_var_list_ctx **lo_vars,
             continue;
         }
 
-        if (*e == '[') {
-            // b = get_indexing(b, e, &offset);
-            // e += offset;
-        } else if (*e == '.') {
+        if (*e == '.') {
             b = get_method_call(b, e, &offset);
             e += offset;
             if (*e == 0) {

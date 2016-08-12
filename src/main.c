@@ -62,7 +62,8 @@ char *get_forgefile_projects_option_label(char *forgefile) {
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
-    HEFESTO_TGT_OS == HEFESTO_MINIX
+    HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
+    HEFESTO_TGT_OS == HEFESTO_SUNOS
     for (f_init = f_end-1;
          *f_init != HEFESTO_PATH_SEP && f_init != forgefile; f_init--);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
