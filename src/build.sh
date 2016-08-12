@@ -2,7 +2,7 @@
 # Hefesto's bootstrap :)
 #
 
-# It supposed should run without any manual adjustment over Linux, FreeBSD and MINIX.
+# It supposed should run without any manual adjustment over Linux, FreeBSD, MINIX and Solaris.
 
 # WARNING: If PThread is not available on your UNIX-like remove "-DHVM_ASYNC_RQUEUE" from "COMPILER_OPTS".
 
@@ -50,6 +50,12 @@ then
     LINKERFLAGS=${LINKERFLAGS}" -lpthread"
 else
     CUTEST_CFLAGS="-DHAS_NO_PTHREAD"
+fi
+
+if test "$PLATFORM" = "SunOs"
+then
+    # WARNING: Does your Solaris has support for gnu bts? Comment the following var setting and let's try it.
+    CUTEST_CFLAGS=${CUTEST_CFLAGS}" -DNO_CUTEST_BACKTRACING"
 fi
 
 LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
