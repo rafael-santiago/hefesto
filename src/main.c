@@ -34,17 +34,25 @@ void sigint_watchdog(int signo) {
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
-    HEFESTO_TGT_OS == HEFESTO_MINIX
+    HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
+    HEFESTO_TGT_OS == HEFESTO_SUNOS
 
 void sigsegv_watchdog(int signo) {
+#if HEFESTO_TGT_OS != HEFESTO_SUNOS
     size_t size;
     void *array[50];
+#endif  // HEFESTO_TGT_OS != HEFESTO_SUNOS
+
     printf("\nhvm info: hvm execution aborted.\n\n");
     printf("*** SIGSEV PANIC ***\n\n");
     printf("%s\n\n", HEFESTO_VERSION_INFO);
+
+#if HEFESTO_TGT_OS != HEFESTO_SUNOS
     size = backtrace(array, 50);
     backtrace_symbols_fd(array, size, STDERR_FILENO);
     printf("\n\n");
+#endif  // HEFESTO_TGT_OS != HEFESTO_SUNOS
+
     exit(1);
 }
 
