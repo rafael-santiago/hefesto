@@ -10,7 +10,7 @@ If you are on ``Solaris`` maybe you should read the remarks on ``Pain avoidance 
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
-If you are on ``Linux``, ``FreeBSD`` or ``MINIX`` use: ./build.sh
+If you are on ``Linux``, ``FreeBSD``, ``MINIX`` or ``Solaris`` use: ./build.sh
 
 If you are on ``Windows`` use: build.bat
 
