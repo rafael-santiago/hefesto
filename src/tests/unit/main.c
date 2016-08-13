@@ -652,6 +652,12 @@ static unsigned char hmod_img[] = {
     '\x00'
 };
 
+#elif HEFESTO_TGT_OS == HEFESTO_SUNOS
+
+static unsigned char hmod_img[] = {
+    '\x00'
+};
+
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static unsigned char hmod_img[] = {
@@ -2536,7 +2542,7 @@ CUTE_TEST_CASE(hvm_syscalls_tests)
         lo_vars = NULL;
 
     }
-#if HEFESTO_TGT_OS != HEFESTO_MINIX
+#if HEFESTO_TGT_OS != HEFESTO_MINIX && HEFESTO_TGT_OS != HEFESTO_SUNOS
     if (result == NULL) {
         result = hvm_call_from_module_syscall_test();
     }

@@ -52,10 +52,11 @@ else
     CUTEST_CFLAGS="-DHAS_NO_PTHREAD"
 fi
 
-if test "$PLATFORM" = "SunOs"
+if test "$PLATFORM" = "SunOS"
 then
     # WARNING: Does your Solaris has support for gnu bts? Comment the following var setting and let's try it.
     CUTEST_CFLAGS=${CUTEST_CFLAGS}" -DNO_CUTEST_BACKTRACING"
+    COMPILER_OPTS=${COMPILER_OPTS}" -DNO_CUTEST_BACKTRACING"
 fi
 
 LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\

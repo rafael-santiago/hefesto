@@ -39,7 +39,7 @@ char *get_os_name() {
     struct utsname unbuf;
     static size_t o;
 
-    if (os_name_sz == 0 && uname(&unbuf) == 0) {
+    if (os_name_sz == 0 && uname(&unbuf) != -1) {
         strncpy(os_name, unbuf.sysname, sizeof(os_name) - 1);
 
         for (o = 0; os_name[o] != 0; o++) {
