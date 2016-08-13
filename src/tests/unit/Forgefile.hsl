@@ -85,7 +85,7 @@ hfst-unit.prologue() {
         $ldflags.add_item("-lhere");
         var os_name type string;
         $os_name = hefesto.sys.os_name();
-        if ($os_name == "linux" || $os_name == "freebsd") {
+        if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "sunos") {
             $ldflags.add_item("-lpthread");
         }
         if ($os_name == "linux") {
@@ -94,6 +94,8 @@ hfst-unit.prologue() {
             $ldflags.add_item("-lexecinfo");
         } else if ($os_name == "minix") {
             $ldflags.add_item("-lexecinfo");
+        } else if ($os_name == "sunos") {
+            $cflags.add_item("-DNO_CUTEST_BACKTRACING");
         }
     } else {
         hefesto.project.abort($exit_code);
