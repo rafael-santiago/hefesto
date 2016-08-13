@@ -303,7 +303,7 @@ echo "### Now running unit tests"
 # Running unit tests
 
 cd tests/unit
-$COMPILER -c -I../../here/src -Icutest/src main.c
+$COMPILER -c -I../../here/src -Icutest/src main.c $CUTEST_CFLAGS
 $COMPILER -c cutest/src/cutest.c $CUTEST_CFLAGS
 $COMPILER -c cutest/src/cutest_memory.c $CUTEST_CFLAGS
 $COMPILER -c cutest/src/cutest_mmap.c $CUTEST_CFLAGS
