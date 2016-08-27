@@ -1,7 +1,5 @@
 # BNF
 
-Follows the possible productions supported the implemented Language.
-
 ```
 <hefesto-script> ::= (<include-stmt> | <toolset-decl> | <var-decl> |
                       <func-decl> | <prj-decl> | <comment>)+
