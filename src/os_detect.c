@@ -14,7 +14,8 @@
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
-    HEFESTO_TGT_OS == HEFESTO_SUNOS
+    HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
+    HEFESTO_TGT_OS == HEFESTO_NETBSD
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #endif  // HEFESTO_TGT_OS == X
@@ -34,7 +35,8 @@ char *get_os_name() {
 #elif HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
       HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
       HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
-      HEFESTO_TGT_OS == HEFESTO_SUNOS
+      HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
+      HEFESTO_TGT_OS == HEFESTO_NETBSD
 
     struct utsname unbuf;
     static size_t o;

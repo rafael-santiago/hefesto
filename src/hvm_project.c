@@ -56,12 +56,12 @@ static void *hefesto_project_filepath(const char *method,
 
 static struct hefesto_project_method_callvector
         HEFESTO_PROJECT_METHOD_EXEC_TABLE[HEFESTO_PROJECT_METHODS_NR] = {
-    {hefesto_project_name},
-    {hefesto_project_toolset},
-    {hefesto_project_dep_chain},
-    {hefesto_project_abort},
-    {hefesto_project_options},
-    {hefesto_project_filepath}
+    { hefesto_project_name      },
+    { hefesto_project_toolset   },
+    { hefesto_project_dep_chain },
+    { hefesto_project_abort     },
+    { hefesto_project_options   },
+    { hefesto_project_filepath  }
 };
 
 char

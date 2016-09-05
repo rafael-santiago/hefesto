@@ -51,8 +51,8 @@ static char *hvm_toolset_command_fmt(hefesto_toolset_command_ctx *command);
 static struct hvm_toolset_builtin_facility_ctx
  HVM_TOOLSET_BUILTIN_FACILITY_EXEC_TABLE[HVM_TOOLSET_BUILTIN_FACILITIES_NR] = {
 
-    {hvm_toolset_base_refresh},
-    {hvm_toolset_file_has_change}
+    { hvm_toolset_base_refresh    },
+    { hvm_toolset_file_has_change }
 
 };
 

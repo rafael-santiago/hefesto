@@ -76,7 +76,8 @@ void HEFESTO_DEBUG_INFO(hefesto_int_t wait, char *fmt, ...) {
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
-    HEFESTO_TGT_OS == HEFESTO_SUNOS
+    HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
+    HEFESTO_TGT_OS == HEFESTO_NETBSD
         system("read");
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
         system("pause");

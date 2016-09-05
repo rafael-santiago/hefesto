@@ -2,7 +2,7 @@
 # Hefesto's bootstrap :)
 #
 
-# It supposed should run without any manual adjustment over Linux, FreeBSD, MINIX and Solaris.
+# It supposed should run without any manual adjustment over Linux, FreeBSD, MINIX, Solaris and NetBSD.
 
 # WARNING: If PThread is not available on your UNIX-like remove "-DHVM_ASYNC_RQUEUE" from "COMPILER_OPTS".
 
@@ -36,7 +36,7 @@ then
     COMPILER_OPTS=$(echo $COMPILER_OPTS | sed s/-DHVM_ASYNC_RQUEUE//)
 fi
 
-if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD"
 then
     LINKERFLAGS="-lexecinfo"
 else
@@ -72,7 +72,7 @@ UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ..
 
 ALL_OK=1
 
-if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD"
 then
     HERE_FLAGS="-lexecinfo"
 else
