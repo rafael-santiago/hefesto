@@ -59,6 +59,9 @@ function config_basic_ld_deps() : result type none {
         $ldflags.add_item("-lexecinfo");
     } else if ($os == "minix") {
         $ldflags.add_item("-lexecinfo");
+    } else if ($os == "netbsd") {
+        $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-lexecinfo");
     }
     if (hefesto.sys.os_name() == "windows") {
         $ldflags.del_item("-rdynamic");
