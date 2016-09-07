@@ -8,7 +8,7 @@ If you are a ``MINIX`` user you should read the remarks on [Additional steps for
 
 If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance when cloning it on Solaris](#pain-avoidance-when-cloning-it-on-solaris).
 
-If you are on a ``NetBSD`` box you should read the remaks on [Of course it clones on NetBSD](#of-course-it-runs-netbsd).
+If you are on a ``NetBSD`` box you should read the remaks on [Of course it clones on NetBSD](#of-course-it-clones-on-netbsd).
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
