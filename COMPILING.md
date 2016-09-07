@@ -4,13 +4,15 @@ The easiest way to clone hefesto's repo is:
 
 ``git clone https://github.com/rafael-santiago/hefesto --recursive``
 
-If you are a ``MINIX`` user you should read the remarks on ``Additional steps for cloning it on MINIX`` before going ahead.
+If you are a ``MINIX`` user you should read the remarks on [Additional steps for cloning it on MINIX](#Additional-steps-for-cloning-it-on-MINIX) before going ahead.
 
-If you are on ``Solaris`` maybe you should read the remarks on ``Pain avoidance when cloning it on Solaris``.
+If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance when cloning it on Solaris](#Pain-avoidance-when-cloning-it-on-Solaris).
+
+If you are on a ``NetBSD`` box you should read the remaks on [Of course it runs NetBSD](#Of-course-it-runs-NetBSD).
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
-If you are on ``Linux``, ``FreeBSD``, ``MINIX`` or ``Solaris`` use: ./build.sh
+If you are on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris`` or ``NetBSD`` use: ./build.sh
 
 If you are on ``Windows`` use: build.bat
 
@@ -281,3 +283,206 @@ On this way, you can extract the ``sunglasses.sh`` from the ``COMPILING.md`` wit
 [circus bear on a bike](https://www.google.com/search?q=circus+bear+on+a+bike).
 
 Crazy.
+
+## Of course it runs NetBSD
+
+Yes, I use the ``NetBSD`` slogan to take your here, and of course ``Hefesto`` runs on ``NetBSD``.
+
+I wrote this section facing some troubles when I have tried to run ``git`` on ``NetBSD``. I was getting an ``Abort`` trap
+when calling ``git``. For this reason, the instructions for cloning the ``Hefesto's`` repo here is not based on ``git``.
+
+Taking in consideration that we got an ``UNIX`` under our "callous fingers", be beaten for lacking a tool is shameful and
+not an option. The steps followed here are the same for ``Solaris``.
+
+Requirements for accomplish the discussed goal:
+
+- You need ``bash`` [btw: ``pkg_add bash``].
+- You need ``wget`` [btw: ``pkg_add wget``].
+- You need ``unzip`` [btw: ``pkg_add zip``].
+
+All you should do is extract (normally, or feeling like a circus bear on a bike... you should read [Pain avoidance when cloning it on Solaris](#Pain-avoidance-when-cloning-it-on-Solaris) for undestanding the joke) the following script and execute it:
+
+```bash
+#!/usr/pkg/bin/bash
+
+# of-course-it-clones-on-netbsd.sh
+
+LCM=".caveman-from-the-sun" # Larry, Curl and Moe
+WGET="wget"
+UNZIP="unzip"
+HEFESTOREPOTREE="../hefesto"
+
+${WGET} --version >/dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "Unable to find WGET. What a mess you are in... omg!"
+	exit 1
+fi
+
+${UNZIP} -v >/dev/null 2>&1
+
+if [ $? -ne 1 ] # This is really weird... if your unzip returns the right value 0 for "-v" instead of 1, change it.
+then
+	echo "Unable to find ${UNZIP}. What a mess you are in... omg!"
+	exit 1
+fi
+
+if [ -d ${LCM} ]
+then
+	rm -rf ${LCM}
+fi
+
+mkdir ${LCM}
+
+cd ${LCM}
+
+echo "blah: okay..."
+
+${WGET} https://github.com/rafael-santiago/hefesto/archive/master.zip -O hefesto.zip --no-check-certificate > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "wget ERROR"
+	exit $?
+fi
+
+echo "blah: so..."
+
+${WGET} https://github.com/rafael-santiago/helios/archive/master.zip -O helios.zip --no-check-certificate > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "wget ERROR"
+	exit $?
+fi
+
+echo "blah: Hocus pocus..."
+
+${WGET} https://github.com/rafael-santiago/cutest/archive/master.zip -O cutest.zip --no-check-certificate > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "wget ERROR"
+	exit $?
+fi
+
+echo "blah: Abracadabra..."
+
+${WGET} https://github.com/rafael-santiago/here/archive/master.zip -O here.zip --no-check-certificate > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "ERROR"
+	exit $?
+fi
+
+echo "blah: <Some lisp statement goes here>..."
+
+${UNZIP} hefesto.zip -d hefesto > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "unzip ERROR"
+	exit $?
+fi
+
+${UNZIP} helios.zip -d helios > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "unzip ERROR"
+	exit $?
+fi
+
+${UNZIP} cutest.zip -d cutest > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "unzip ERROR"
+	exit $?
+fi
+
+echo "blah: Tchummmm!"
+
+${UNZIP} here.zip -d here > /dev/null 2>&1
+
+if [ $? -ne 0 ]
+then
+	echo "unzip ERROR"
+	exit $?
+fi
+
+rm -rf ${HEFESTOREPOTREE}
+
+cp -rf hefesto/hefesto-master ${HEFESTOREPOTREE}
+
+if [ $? -ne 0 ]
+then
+	echo "hefesto copying ERROR"
+	exit $?
+fi
+
+rm -rf ${HEFESTOREPOTREE}/helios
+rm -rf ${HEFESTOREPOTREE}/src/here
+rm -rf ${HEFESTOREPOTREE}/src/tests/unit/cutest
+
+cp -rf helios/helios-master ${HEFESTOREPOTREE}/helios
+
+if [ $? -ne 0 ]
+then
+	echo "helios copying ERROR"
+	exit $?
+fi
+
+cp -rf here/here-master ${HEFESTOREPOTREE}/src/here
+
+if [ $? -ne 0 ]
+then
+	echo "src/here copying ERROR"
+	exit $?
+fi
+
+cp -rf cutest/cutest-master ${HEFESTOREPOTREE}/src/tests/unit/cutest
+
+if [ $? -ne 0 ]
+then
+	echo "src/tests/unit/cutest copying ERROR"
+	exit $?
+fi
+
+rm -rf ${HEFESTOREPOTREE}/src/here/src/test/cutest
+cp -rf cutest/cutest-master ${HEFESTOREPOTREE}/src/here/src/test/cutest
+
+if [ $? -ne 0 ]
+then
+	echo "src/here/src/test/cutest copying ERROR"
+	exit $?
+fi
+
+cd ..
+
+rm -rf ${LCM}
+
+echo "blah: All download stuff is done your repo's copy is under 'hefesto' sub-directory."
+```
+Supposing that you have extracted the bash content above into the file ``of-course-it-clones-on-netbsd.sh``... After
+extracting it you need to give execution permission for it (duh!):
+
+```
+# chmod u+x of-course-it-clones-on-netbsd.sh
+```
+
+Now, just run it:
+
+```
+# ./of-course-it-clones-on-netbsd.sh
+```
+
+This script will create a directory named as ``hefesto`` on your ``cwd``. Move to ``hefesto/src`` sub-directory and
+runs ``build.sh`` using your ``bash`` (if you do not use it by default, this remark is pretty important).
+
+After running ``build.sh`` just follow the straightforward steps that this script will present to you.
+
+As suggested before: Of course you can clone and run ``Hefesto`` on ``NetBSD``. Are you a really ``UNIX user``, right?
+For sure that you are, for sure that you can! :)
