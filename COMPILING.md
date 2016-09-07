@@ -4,11 +4,11 @@ The easiest way to clone hefesto's repo is:
 
 ``git clone https://github.com/rafael-santiago/hefesto --recursive``
 
-If you are a ``MINIX`` user you should read the remarks on [Additional steps for cloning it on MINIX](#Additional-steps-for-cloning-it-on-MINIX) before going ahead.
+If you are a ``MINIX`` user you should read the remarks on [Additional steps for cloning it on MINIX](#additional-steps-for-cloning-it-on-minix) before going ahead.
 
-If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance when cloning it on Solaris](#Pain-avoidance-when-cloning-it-on-Solaris).
+If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance when cloning it on Solaris](#pain-avoidance-when-cloning-it-on-solaris).
 
-If you are on a ``NetBSD`` box you should read the remaks on [Of course it runs NetBSD](#Of-course-it-runs-NetBSD).
+If you are on a ``NetBSD`` box you should read the remaks on [Of course it clones on NetBSD](#of-course-it-runs-netbsd).
 
 Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
@@ -284,9 +284,9 @@ On this way, you can extract the ``sunglasses.sh`` from the ``COMPILING.md`` wit
 
 Crazy.
 
-## Of course it runs NetBSD
+## Of course it clones on NetBSD
 
-Yes, I use the ``NetBSD`` slogan to take your here, and of course ``Hefesto`` runs on ``NetBSD``.
+Yes, I made a pun with the ``NetBSD's`` slogan for taking you here, and of course that ``Hefesto`` runs on ``NetBSD``.
 
 I wrote this section facing some troubles when I have tried to run ``git`` on ``NetBSD``. I was getting an ``Abort`` trap
 when calling ``git``. For this reason, the instructions for cloning the ``Hefesto's`` repo here is not based on ``git``.
@@ -300,7 +300,7 @@ Requirements for accomplish the discussed goal:
 - You need ``wget`` [btw: ``pkg_add wget``].
 - You need ``unzip`` [btw: ``pkg_add zip``].
 
-All you should do is extract (normally, or feeling like a circus bear on a bike... you should read [Pain avoidance when cloning it on Solaris](#Pain-avoidance-when-cloning-it-on-Solaris) for undestanding the joke) the following script and execute it:
+All you should do is extract (normally, or feeling like a circus bear on a bike... you should read [Pain avoidance when cloning it on Solaris](#pain-avoidance-when-cloning-it-on-solaris) for undestanding the joke) the following script and execute it:
 
 ```bash
 #!/usr/pkg/bin/bash
