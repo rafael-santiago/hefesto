@@ -1,40 +1,27 @@
-.TH hefesto 1 "Febuary 15, 2013" "version 0.1.0" "USER COMMANDS"
+.TH hefesto 1 "September 11, 2016" "version 0.1.1" "USER COMMANDS"
 .SH NAME
 hefesto \- a multi platform build tool
 .SH SYNOPSIS
 .B hefesto [\fIOPTIONS\fR]
 .SH DESCRIPTION
-Hefesto is a build system. The main goal in design of
-this application is to be generic. With Hefesto you can easily
-build toolsets for widely used compilers or for a new compiler
-for a new language that you created in your last weekend.
-
-Under Hefesto's context a "toolset" can be understood as a set
-of commands that can be used to create something, for example,
-a toolset for Hefesto C language calls the command "compile" to
-create the object files and then calls the command "link" to
-create the binary.
-
-The toolsets are expressed in a particular language.
-
-With a toolset chosen you can not only build your
-app/widget/"whateverthing" but you can use the hsl ([H]efesto
-[s]cript [l]anguage) to assist in the pre and post-compilation.
+The main Hefesto's feature is allow a more programatic build scripting.
 .PP
-This means:
+In order to do it Hefesto uses his own language (more procedural than declarative).
+.PP
+Seeking:
 .TP
 .PP
-\- You can set your code: 
-  editing some headers to fit version, etc.
+\- Clarity
 
-\- You can forge the project.
+\- Organization
 
-\- You can run your unit / system tests.
-
-\- You can generate your application packages, etc.
+\- Expansibility
 .PP
-In the Hefesto's jargon, "forge" something means to create something
-anywhere.
+This application can help not only a small amount of programmers which use some specific languages and toolsets, Hefesto helps on automation of several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend the Hefesto.
+.PP
+When you extend Hefesto this does not mean that you need to recompile the application. All is done via Hsl, the domain specific language which Hefesto implements.
+.PP
+The \fIHSL\fR was developed to be simple but robust.
 .SH OPTIONS
 .TP
 \-\-forgefiles=\fIfoo.hsl,bar.hsl\fR
@@ -65,11 +52,11 @@ non zero value will be returned.
 .SH
 SEE ALSO
 .TP
-\fI/usr/local/share/hefesto/doc\fR (or equivalent in your system)
+\fI/usr/local/share/hefesto/doc\fR (or equivalent on your system)
 .PP
 .SH
 HOMEPAGE
 .TP
-http://hefesto.sf.org/
+https://github.com/rafael-santiago/hefesto
 .SH AUTHOR
 Rafael Santiago <voidbrainvoid@gmail.com>
