@@ -8,19 +8,21 @@ If you are a ``MINIX`` user you should read the remarks on [Additional steps for
 
 If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance when cloning it on Solaris](#pain-avoidance-when-cloning-it-on-solaris).
 
-If you are on a ``NetBSD`` box you should read the remaks on [Of course it clones on NetBSD](#of-course-it-clones-on-netbsd).
+If you are on a ``NetBSD`` box you should read the remarks on [Of course it clones on NetBSD](#of-course-it-clones-on-netbsd).
 
-Now, in order to build Hefesto from the first time you need to use the "src/build.sh" or the "src/build.bat"
+Now, in order to build ``Hefesto`` from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
 If you are on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris`` or ``NetBSD`` use: ./build.sh
 
 If you are on ``Windows`` use: build.bat
 
-Both commands will compile and linking the application, it will run the tests and so use the Hefesto to install the Hefesto ;)
+Both commands will compile and linking the application, it will run the tests and so use the ``Hefesto`` to install the ``Hefesto`` ;)
 
 The installation is pretty straightforward just follow the steps.
 
 After installing you need to perform a new login in order to load some environment variables.
+
+Now you can start reading the [documention](https://github.com/rafael-santiago/hefesto/tree/master/doc) in order to master this build tool.
 
 ## Additional steps for cloning it on MINIX
 
@@ -466,7 +468,7 @@ rm -rf ${LCM}
 
 echo "blah: All download stuff is done your repo's copy is under 'hefesto' sub-directory."
 ```
-Supposing that you have extracted the bash content above into the file ``of-course-it-clones-on-netbsd.sh``... After
+Supposing that you have extracted the shell script content above into the file ``of-course-it-clones-on-netbsd.sh``... After
 extracting it you need to give execution permission for it (duh!):
 
 ```
@@ -484,5 +486,5 @@ runs ``build.sh`` using your ``bash`` (if you do not use it by default, this rem
 
 After running ``build.sh`` just follow the straightforward steps that this script will present to you.
 
-As suggested before: Of course you can clone and run ``Hefesto`` on ``NetBSD``. Are you a really ``UNIX user``, right?
+As suggested before: Of course you can clone and run ``Hefesto`` on ``NetBSD``. Are you a real ``UNIX user``, right?
 For sure that you are, for sure that you can! :)
