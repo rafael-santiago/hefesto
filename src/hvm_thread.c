@@ -15,7 +15,11 @@ hefesto_int_t hvm_thread_create(hefesto_thread_t *thread_id,
 
    hefesto_int_t result = 0;
 
-#if HEFESTO_TGT_OS == HEFESTO_LINUX || HEFESTO_TGT_OS == HEFESTO_FREEBSD || HEFESTO_TGT_OS == HEFESTO_SUNOS || HEFESTO_TGT_OS == HEFESTO_NETBSD
+#if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
+    HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
+    HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
 
     pthread_attr_t attr;
 

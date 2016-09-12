@@ -697,7 +697,8 @@ hefesto_int_t hefesto_is_relative_path(const char *path) {
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
 
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];

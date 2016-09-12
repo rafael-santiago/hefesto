@@ -2,9 +2,12 @@
 # Hefesto's bootstrap :)
 #
 
-# It supposed should run without any manual adjustment over Linux, FreeBSD, MINIX, Solaris and NetBSD.
+# It supposed should run without any manual adjustment over Linux, FreeBSD, MINIX, Solaris, NetBSD and OpenBSD.
 
 # WARNING: If PThread is not available on your UNIX-like remove "-DHVM_ASYNC_RQUEUE" from "COMPILER_OPTS".
+
+# WARNING: If your are on OpenBSD, maybe you need to install the libexecinfo. I have used libexecinfo-0.3v0, try
+#          to install it using pkg_add whether you do not have this library previously installed.
 
 COMPILER="gcc" # Adjust for your system compiler
 COMPILER_OPTS="-c -Wall -DHVM_ASYNC_RQUEUE -Ihere/src" # Options too
@@ -59,6 +62,13 @@ then
     COMPILER_OPTS=${COMPILER_OPTS}" -DNO_CUTEST_BACKTRACING"
 fi
 
+if [ -d /usr/local/include ] ;
+then
+    CUTEST_CFLAGS=${CUTEST_CFLAGS}" -I/usr/local/include"
+    COMPILER_OPTS=${COMPILER_OPTS}" -I/usr/local/include"
+fi
+
+
 LINKER_OPTS="-o../bin/hefesto conv.o dbg.o dep_chain.o expr_handler.o exprchk.o file_io.o hlsc_msg.o\
                 htask.o hvm.o hvm_alu.o hvm_func.o hvm_list.o hvm_rqueue.o hvm_str.o hvm_syscall.o\
                      hvm_thread.o hvm_toolset.o init.o lang_defs.o main.o mem.o os_detect.o parser.o\
@@ -72,7 +82,7 @@ UNIT_TEST="-omain -L../../here/src ../../dbg.o ../../conv.o ../../dep_chain.o ..
 
 ALL_OK=1
 
-if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD" || test "$PLATFORM" = "OpenBSD"
 then
     HERE_FLAGS="-lexecinfo"
 else

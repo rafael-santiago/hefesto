@@ -23,6 +23,7 @@
 #define HEFESTO_MINIX           3
 #define HEFESTO_SUNOS           4
 #define HEFESTO_NETBSD          5
+#define HEFESTO_OPENBSD         6
 
 #ifndef HEFESTO_TGT_OS
 
@@ -46,6 +47,10 @@
 
 #define HEFESTO_TGT_OS HEFESTO_NETBSD
 
+#elif defined(__OpenBSD__)
+
+#define HEFESTO_TGT_OS HEFESTO_OPENBSD
+
 #elif defined(_WIN32)
 
 #define HEFESTO_TGT_OS HEFESTO_WINDOWS
@@ -63,7 +68,8 @@
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
 
 #define HEFESTO_IX_ENV 1
 
@@ -287,7 +293,8 @@ extern char HEFESTO_CURRENT_FORGEFILE_PATH[HEFESTO_MAX_BUFFER_SIZE];
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
 #include <pthread.h>
 typedef void * hefesto_thread_routine_args_t;
 typedef void * hefesto_thread_routine_t;

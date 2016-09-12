@@ -18,7 +18,8 @@
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
 
 #include <dlfcn.h>
 
@@ -148,7 +149,8 @@ static char *module_extension_completion(const char *module_filepath) {
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEEFSTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
         strcat(retval, ".so");
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
         strcat(retval, ".dll");
@@ -185,7 +187,8 @@ static hefesto_mod_handle hvm_mod_load(const char *module_filepath) {
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     hp = dlopen(m_fpath, RTLD_LAZY);
     if (hp == NULL) {
         hlsc_info(HLSCM_MTYPE_RUNTIME, HLSCM_RUNTIME_UNBALE_TO_LOAD_MODULE,
@@ -241,7 +244,8 @@ static hefesto_int_t hvm_mod_close(hefesto_mod_handle mod_handle) {
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     if (mod_handle != NULL) {
         retval = dlclose(mod_handle);
     }
@@ -292,7 +296,8 @@ static hefesto_modfunc hvm_mod_get_sym(hefesto_mod_handle mod_handle,
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
         fn_p = dlsym(mod_handle, function);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
         fn_p = (hefesto_modfunc) GetProcAddress(mod_handle, function);

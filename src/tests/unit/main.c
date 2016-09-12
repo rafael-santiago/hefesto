@@ -664,6 +664,12 @@ static unsigned char hmod_img[] = {
     '\x00'
 };
 
+#elif HEFESTO_TGT_OS == HEFESTO_OPENBSD
+
+static unsigned char hmod_img[] = {
+    '\x00'
+};
+
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
 
 static unsigned char hmod_img[] = {
@@ -2120,7 +2126,8 @@ CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     CUTE_CHECK("result != /home/rs", strcmp(result, "/home/rs") == 0);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     CUTE_CHECK("result != /home\\rs", strcmp(result, "/home\\rs") == 0);
@@ -2134,7 +2141,8 @@ CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     CUTE_CHECK("result != /home/rs", strcmp(result, "/home/rs") == 0);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     CUTE_CHECK("result != /home\\rs", strcmp(result, "/home\\rs") == 0);
@@ -2429,7 +2437,8 @@ CUTE_TEST_CASE(hvm_call_from_module_syscall_test)
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.so");
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     errors = extract_binary_image(hmod_img, sizeof(hmod_img), "libhmodtest.dll");
@@ -2446,7 +2455,8 @@ CUTE_TEST_CASE(hvm_call_from_module_syscall_test)
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
     remove("libhmodtest.so");
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
     remove("libhmodtest.dll");
@@ -2514,7 +2524,8 @@ CUTE_TEST_CASE(hvm_syscalls_tests)
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
     HEFESTO_TGT_OS == HEFESTO_MINIX   ||\
     HEFESTO_TGT_OS == HEFESTO_SUNOS   ||\
-    HEFESTO_TGT_OS == HEFESTO_NETBSD
+    HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
+    HEFESTO_TGT_OS == HEFESTO_OPENBSD
         res = hefesto_sys_call("hefesto.sys.env(\"PWD\")",
                                &lo_vars, &gl_vars, NULL, &otype);
 #elif HEFESTO_TGT_OS == HEFESTO_WINDOWS
@@ -2558,7 +2569,10 @@ CUTE_TEST_CASE(hvm_syscalls_tests)
         lo_vars = NULL;
 
     }
-#if HEFESTO_TGT_OS != HEFESTO_MINIX && HEFESTO_TGT_OS != HEFESTO_SUNOS && HEFESTO_TGT_OS != HEFESTO_NETBSD
+#if HEFESTO_TGT_OS != HEFESTO_MINIX  &&\
+    HEFESTO_TGT_OS != HEFESTO_SUNOS  &&\
+    HEFESTO_TGT_OS != HEFESTO_NETBSD &&\
+    HEFESTO_TGT_OS != HEFESTO_OPENBSD
     if (result == NULL) {
         result = hvm_call_from_module_syscall_test();
     }
