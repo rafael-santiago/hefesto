@@ -62,6 +62,7 @@ The ``Hefesto`` allows you to call this magical file using the name that you wan
 
 Here is a sample of a Forgefile for a C library:
 
+```
     # Comment-sample: Forgefile.hsl...
 
     include ~/toolsets/gcc/gcc-lib.hsl
@@ -77,6 +78,7 @@ Here is a sample of a Forgefile for a C library:
     here.prologue() {
         $sources.ls(".*\\.c$");
     }
+```
 
 In the sample above you can see some HSL statements and it continues inside the "toolset". The toolset can be understood as a set or
 collection of HSL code which automates the essence of a build process. The knowledge base of "how to build a library in language X",
@@ -122,9 +124,11 @@ Table 1: The project's stages
 
 By now let's forget about the ``preloading`` and ``epilogue`` stages. For collecting the source code *file paths* we can use the entry point ``prologue``.
 
-	here.prologue() {
-        	$sources.ls(".*\\.c$");
-        }
+```
+    here.prologue() {
+        $sources.ls(".*\\.c$");
+    }
+```
 
 Do not worry about the ``.ls()``... On further sections when describing the ``HSL`` in details the list conveniences will be shown and everything
 should make more sense.
@@ -160,7 +164,9 @@ For doing it is necessary to inform your worries about reprocessing issues when 
 
 Previously the project declaration was as follows:
 
-		project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
+```
+    project here : toolset "gcc-c-lib" : $sources, $includes, $cflags, $libraries, $ldflags, "libhere.a";
+```
 
 Now we will include the specfification of the dependency chain (a.k.a ``dep-chain``). A ``dep-chain`` basically is a ``string`` expressed in a special format:
 
@@ -177,27 +183,28 @@ If ``a.x`` depends on ``b.x`` which depends on ``c.x`` which depends on ``d.x`` 
 Real programs can have a extense ``dep-chain``, the ``Hefesto's`` standard library includes some ``HSL`` functions for doing this job. Follows a practical
 usage of the ``dep-chains``:
 
-		include ~/toolsets/gcc/gcc-lib.hsl
-		include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+```
+    include ~/toolsets/gcc/gcc-lib.hsl
+    include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 
-		var deps type string;
-		var sources type list;
-		var includes type list;
-		var cflags type list;
-		var libraries type list;
-		var ldflags type list;
+    var deps type string;
+    var sources type list;
+    var includes type list;
+    var cflags type list;
+    var libraries type list;
+    var ldflags type list;
 
-		project here : toolset "gcc-c-lib" : dependencies $deps : $sources,
-        		                                                  $includes,
-                		                                          $cflags,
-                                                                          $libraries,
-                                                                          $ldflags,
-                        		                                  "libhere.a" ;
-
-		here.prologue() {
-        		$deps = get_c_cpp_deps();
-        		$sources.ls(".*\\.c$");
-		}
+    project here : toolset "gcc-c-lib" : dependencies $deps : $sources,
+                                                              $includes,
+                                                              $cflags,
+                                                              $libraries,
+                                                              $ldflags,
+                                                              "libhere.a" ;
+    here.prologue() {
+        $deps = get_c_cpp_deps();
+        $sources.ls(".*\\.c$");
+    }
+```
 
 As you can see now the code is including the directive ``dependencies <string>`` onto project declaration. Besides the usage of the ``get_c_cpp_deps()``
 function included from ``dependency_scanner.hsl``. However, you could write down your own dependency chain without any function. A malformed dependency
@@ -230,70 +237,72 @@ Picking up the previous sample from that shown *lib*... Now, suppose that we hav
 
 Now, I will show the changed *Forgefile*. Ahead the interesting parts will be commented:
 
-		include ~/toolsets/gcc/gcc-lib.hsl
-		include ~/toolsets/vc/vc110-lib.hsl
-		include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
+```
+    include ~/toolsets/gcc/gcc-lib.hsl
+    include ~/toolsets/vc/vc110-lib.hsl
+    include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 
-		var deps type string;
-		var sources type list;
-		var includes type list;
-		var cflags type list;
-		var libraries type list;
-		var ldflags type list;
-		var current_toolset type string;
+    var deps type string;
+    var sources type list;
+    var includes type list;
+    var cflags type list;
+    var libraries type list;
+    var ldflags type list;
+    var current_toolset type string;
 
-		project here : toolset $current_toolset : dependencies $deps : $sources,
-        			                                                   $includes,
-                    			                                       $cflags,
-                                                                       $libraries,
-                                                                       $ldflags,
-                                			                           "libhere.a" ;
+    project here : toolset $current_toolset : dependencies $deps : $sources,
+                                                                   $includes,
+                                                                   $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
+                                                                   "libhere.a" ;
 
-		function has_vs_110() : result type int {
-                    var winreg_rkey type list;
-                    $winreg_rkey.add_item("HKLM");
-                    $winreg_rkey.add_item("HKCU");
+    function has_vs_110() : result type int {
+        var winreg_rkey type list;
+        $winreg_rkey.add_item("HKLM");
+        $winreg_rkey.add_item("HKCU");
 
-                    var subkeys type list;
-                    $subkeys.add_item("\\SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7\\11.0");
-                    $subkeys.add_item("\\SOFTWARE\\Wow6432Node\\Microsoft\\VisualStudio\\SxS\\VS7\\11.0");
+        var subkeys type list;
+        $subkeys.add_item("\\SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7\\11.0");
+        $subkeys.add_item("\\SOFTWARE\\Wow6432Node\\Microsoft\\VisualStudio\\SxS\\VS7\\11.0");
 
-		    var s type int;
-                    var subkey type string;
-                    var w type int;
-                    var root_key type string;
-                    var install_dir type string;
+        var s type int;
+        var subkey type string;
+        var w type int;
+        var root_key type string;
+        var install_dir type string;
 
-                    $s = 0;
-                    while ($s < $subkeys.count()) {
-                    	$subkey = $subkeys.item($s);
-                    	$w = 0;
-                    	while ($w < $winreg_rkey.count()) {
-                        	$root_key = $winreg_rkey.item($w);
-        	        		$install_dir = hefesto.sys.env("WINREG:" +
-            				                       $root_key +
-                                                           $subkey);
-                            if ($install_dir.len() > 0) result 1;
-                                $w = $w + 1;
-                        }
-                        $s = $s + 1;
-                    }
-                    result 0;
-                }
+        $s = 0;
+        while ($s < $subkeys.count()) {
+            $subkey = $subkeys.item($s);
+            $w = 0;
+            while ($w < $winreg_rkey.count()) {
+                $root_key = $winreg_rkey.item($w);
+                $install_dir = hefesto.sys.env("WINREG:" +
+                                               $root_key +
+                                               $subkey);
+                if ($install_dir.len() > 0) result 1;
+                $w = $w + 1;
+            }
+            $s = $s + 1;
+        }
+        result 0;
+    }
 
-                here.preloading() {
-        	    $current_toolset = "gcc-c-lib";
-                	if (hefesto.sys.os_name() == "windows") {
-                        	if (has_vs_110()) {
-                                	$current_toolset = "vc110-lib";
-                                }
-                        }
-                }
+    here.preloading() {
+        $current_toolset = "gcc-c-lib";
+        if (hefesto.sys.os_name() == "windows") {
+            if (has_vs_110()) {
+                $current_toolset = "vc110-lib";
+            }
+        }
+    }
 
-		here.prologue() {
-    		    $deps = get_c_cpp_deps();
-    		    $sources.ls(".*\\.c$");
-		}
+    here.prologue() {
+        $deps = get_c_cpp_deps();
+        $sources.ls(".*\\.c$");
+    }
+```
 
 The function ``has_vs_110`` verifies if the registry entry related with *VS* exists. The section ``About the HSL`` shows more details about the used features.
 When it exists the value ``1`` is returned, otherwise ``0``.
@@ -304,19 +313,23 @@ we will use the default tooselt which is the *GCC*.
 The project declaration brings an indirection for the real toolset name by using the variable ``$current_toolset``. As a result, being the variable content
 changed even before trying to load the toolset (we have done it on ``preloading`` phase), we will have a toolset selection at the run-time.
 
-		project here : toolset $current_toolset : dependencies $deps : $sources,
-        		                                                       $includes,
-                    			                                       $cflags,
-                                                                               $libraries,
-                                                                               $ldflags,
-                                			                       "libhere.a" ;
+```
+    project here : toolset $current_toolset : dependencies $deps : $sources,
+                                                                   $includes,
+                                                                   $cflags,
+                                                                   $libraries,
+                                                                   $ldflags,
+                                                                   "libhere.a" ;
+```
 
 Again, for doing it is necessary to have toolsets which share the same forge function interface.
 
 However, there is a little "problem" with the shown sample. This sample starts with:
 
-		include ~/toolsets/gcc/gcc-lib.hsl
-		include ~/toolsets/vc/vc110-lib.hsl
+```
+    include ~/toolsets/gcc/gcc-lib.hsl
+    include ~/toolsets/vc/vc110-lib.hsl
+```
 
 The forge is multi platform but we do not have to include the *Visual C* toolset every time. Being necessary to include it only when running it under ``Windows`` boxes.
 An improvement related with it would be:
@@ -328,7 +341,9 @@ Done!
 
 The directive ``include`` accepts a platform list for effectively include a file. For instance, existing the necessity of including a file only under ``FreeBSD`` and ` `Linux``. You should do:
 
-		include on freebsd,linux posix/utils.hsl
+```
+    include on freebsd,linux posix/utils.hsl
+```
 
 ### How can I run my tests?
 
@@ -339,22 +354,24 @@ What about to use the ``entry-point epilogue`` for running your tests? You can n
 
 Follows an example based on the previous *lib* sample:
 
-        here.epilogue() {
-    		var notest type list;
-    		if (hefesto.sys.last_forge_result() == 0) {
-        	    $notest = hefesto.sys.get_option("no-test");
-        	    if ($notest.count() == 0) {
-            	        run_tests();
-        	    }
-    		}
-	}
+```
+    here.epilogue() {
+        var notest type list;
+        if (hefesto.sys.last_forge_result() == 0) {
+            $notest = hefesto.sys.get_option("no-test");
+            if ($notest.count() == 0) {
+                run_tests();
+            }
+        }
+    }
 
-	function run_tests() : result type none {
-    	    var retval type int;
-    	    hefesto.sys.cd("test");
-    	    $retval = hefesto.sys.forge("here-test", "Forgefile.hsl", "--bin-output-dir=bin --obj-output-dir=obj");
-    	    hefesto.sys.cd("..");
-	}
+    function run_tests() : result type none {
+        var retval type int;
+        hefesto.sys.cd("test");
+        $retval = hefesto.sys.forge("here-test", "Forgefile.hsl", "--bin-output-dir=bin --obj-output-dir=obj");
+        hefesto.sys.cd("..");
+    }
+```
 
 I am sorry if I am rushing a little bit the things here. Basically, on ``epilogue`` is verified if the lib was really ``built``. If it was, the existence of the option ``--no-test``
 is checked. If this option was not passed the function ``run_tests`` is called.
@@ -364,42 +381,43 @@ forge is invoked. After its execution, the current working directory backs one l
 
 Now it is necessary to see the tests' forge:
 
-		include ~/toolsets/gcc/gcc-app.hsl
+```
+    include ~/toolsets/gcc/gcc-app.hsl
 
-		var sources type list;
-		var includes type list;
-		var libraries type list;
-		var ldflags type list;
-		var cflags type list;
+    var sources type list;
+    var includes type list;
+    var libraries type list;
+    var ldflags type list;
+    var cflags type list;
 
-		project here-test : toolset "gcc-c-app" : $sources, $includes, $cflags,
-        		                        $libraries, $ldflags, "here_unittest" ;
+    project here-test : toolset "gcc-c-app" : $sources, $includes, $cflags,
+                                              $libraries, $ldflags, "here_unittest" ;
 
+    here-test.prologue() {
+        $sources.ls(".*\\.c$");
+        $ldflags = hefesto.sys.get_option("ldflags");
+        $ldflags.add_item("../lib/libhere.a");
+        $includes = hefesto.sys.get_option("includes");
+        $includes = hefesto.sys.get_option("libraries");
+        $includes = hefesto.sys.get_option("cflags");
+    }
 
-		here-test.prologue() {
-    		    $sources.ls(".*\\.c$");
-    		    $ldflags = hefesto.sys.get_option("ldflags");
-    		    $ldflags.add_item("../lib/libhere.a");
-    		    $includes = hefesto.sys.get_option("includes");
-    		    $includes = hefesto.sys.get_option("libraries");
-    		    $includes = hefesto.sys.get_option("cflags");
-		}
+    function run_unittests() : result type int {
+        var retval type int;
+        if (hefesto.sys.os_name() != "windows") {
+            $retval = hefesto.sys.run("bin/here_unittest");
+        } else {
+            $retval = hefesto.sys.run("bin\\here_unittest.exe");
+        }
+        result $retval;
+    }
 
-		function run_unittests() : result type int {
-    		    var retval type int;
-    		    if (hefesto.sys.os_name() != "windows") {
-        		$retval = hefesto.sys.run("bin/here_unittest");
-    		    } else {
-        		$retval = hefesto.sys.run("bin\\here_unittest.exe");
-    		    }
-    		    result $retval;
-		}
-
-		here-test.epilogue() {
-    		    if (hefesto.sys.last_forge_result() == 0) {
-        		if (run_unittests() != 0) hefesto.sys.exit(1);
-    		    }
-		}
+    here-test.epilogue() {
+        if (hefesto.sys.last_forge_result() == 0) {
+            if (run_unittests() != 0) hefesto.sys.exit(1);
+        }
+    }
+```
 
 The most important function here is the function ``run_unittests``. This function is called from the project's ``epilogue``. Returning non-zero values
 the forge will exit with 1. When a forge exit with non-zero value it makes the processing break with a error.
@@ -448,16 +466,20 @@ The ``<var-name>`` can be composed by ``[A-Za-z0-9_]``. Only one declaration per
 
 Practical examples:
 
-        var my_name type string;
-	var my_age type int ;
-	var my_sloopy_list_decl
-	type
-	list;
+```
+    var my_name type string;
+    var my_age type int ;
+    var my_sloopy_list_decl
+    type
+    list;
+```
 
 To access a declared variable (sorry for the pleonasm), this variable need to be prefixed with the unary ``$``:
 
-		$my_name = "John doe.";
-		$my_age = -1;
+```
+    $my_name = "John doe.";
+    $my_age = -1;
+```
 
 Conditional ``branches`` can be expressed in the following way:
 
@@ -503,17 +525,21 @@ The accepted charset for naming functions are the same accepted for naming varia
 
 A practical example... A function which recursively evaluates a factorial from a given number:
 
-	function factorial(n type int) : result type int {
-		if ($n == 0) return 1;
-        	return factorial($n - 1) * $n;
-    	}
+```
+    function factorial(n type int) : result type int {
+        if ($n == 0) return 1;
+        return factorial($n - 1) * $n;
+    }
+```
 
 A function which returns none, whose ``return type`` should be ``none``:
 
-        function say_hello() : result type none
-        {
-        	hefesto.sys.echo("Hello, creative mind....\n");
-        }
+```
+    function say_hello() : result type none
+    {
+        hefesto.sys.echo("Hello, creative mind....\n");
+    }
+```
 
 ### The *Hefesto Syscalls*
 
@@ -590,21 +616,25 @@ return. All with short and straightforward samples (not always useful [i.e.: sam
 Replaces data in a file. The first argument should be the ``file path``, the second is the search pattern (regex), the third is the substitution pattern.
 This ``syscall`` returns the number of replacements done.
 
-            function replace_in_file_sample() : result type none {
-                var replacements_nr type int;
- 		$replacements_nr = hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");
-                hefesto.sys.echo("Number of replacements: " + $replacements_nr);
-	    }
+```
+    function replace_in_file_sample() : result type none {
+        var replacements_nr type int;
+        $replacements_nr = hefesto.sys.replace_in_file("test.txt", "^foo.*", "all initial foo to bar");
+        hefesto.sys.echo("Number of replacements: " + $replacements_nr);
+    }
+```
 
 ##### ++lines_from_file()++
 
 Filters lines from a file. The first argument should be the ``file path``, the second is the search pattern (regex). This ``syscall`` returns a list containing
 the filtered lines.
 
-		function lines_from_file_sample() : result type none {
- 			var retval type list;
- 			$retval = hefesto.sys.lines_from_file("test.txt", "^foo.*");
-		}
+```
+    function lines_from_file_sample() : result type none {
+        var retval type list;
+        $retval = hefesto.sys.lines_from_file("test.txt", "^foo.*");
+    }
+```
 
 ##### ++ls()++
 
@@ -622,50 +652,62 @@ Lists files into the current working directory. Receives a argument which is the
 
 Returns the current work directory as a string. This is hard to use. Look:
 
-		function pwd_only_to_PHDs() : result type none {
- 			hefesto.sys.echo("The current work directory is: " + hefesto.sys.pwd() + "\n");
-		}
+```
+    function pwd_only_to_PHDs() : result type none {
+        hefesto.sys.echo("The current work directory is: " + hefesto.sys.pwd() + "\n");
+    }
+```
 
 ##### ++cd()++
 
 Changes the ``cwd`` to the passed directory. Returning ``1`` for success and ``0`` for failure.
 
-        function cd_sample() : result type none {
-	        hefesto.sys.cd("/home/rs");
-	}
+```
+    function cd_sample() : result type none {
+        hefesto.sys.cd("/home/rs");
+    }
+```
 
 ##### ++rm()++
 
 Removes a file.
 
-		function rm_sample() : result type none {
- 			hefesto.sys.rm("some.lint~");
-		}
+```
+    function rm_sample() : result type none {
+        hefesto.sys.rm("some.lint~");
+    }
+```
 
 ##### ++cp()++
 
 Copies a file/directory. The first argument is the regex pattern which correponds the source. The second argument is the destination. Returns ``1`` for success
 and ``0`` for failure.
 
-		function cp_sample() : result type none {
- 			hefesto.sys.cp(".*\\.(exe|dll|msi)$", "wpkg");
-		}
+```
+    function cp_sample() : result type none {
+        hefesto.sys.cp(".*\\.(exe|dll|msi)$", "wpkg");
+    }
+```
 
 ##### ++mkdir()++
 
-Creates a directory under the ``cwd``. 
+Creates a directory under the ``cwd``.
 
-		function mkdir_sample() : result type none {
- 			hefesto.sys.mkdir("wpkg");
-		}
+```
+    function mkdir_sample() : result type none {
+        hefesto.sys.mkdir("wpkg");
+    }
+```
 
 ##### ++rmdir()++
 
 Removes a empty directory.
 
-		function rmdir_sample() : result type none {
- 			hefesto.sys.rmdir("stage");
-		}
+```
+    function rmdir_sample() : result type none {
+        hefesto.sys.rmdir("stage");
+    }
+```
 
 ##### ++fopen()++
 
@@ -673,23 +715,27 @@ Opens a file descriptor which can be manipulated by other ``syscalls``. The firs
 mode argument follows the standard ``fopen`` from the ``libc`` ("r" = read-only, "w" = write-only, "a" = ``append`` mode). If the ``syscall`` fails is returned
 the value ``0``, otherwise non-zero values will be returned.
 
-		function fopen_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "a");
-		}
+```
+    function fopen_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "a");
+    }
+```
 
 ##### ++fwrite()++
 
 Writes data to a file descriptor previous opened with file writing or appending mode. The first argument is the data ``buffer``. The second is the buffer size.
 The third is the file descriptor. This syscall returns the number of written bytes or ``-1`` when some error happens.
 
-		function fwrite_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "a");
- 			var buf type string;
- 			$buf = "that's all folks for fwrite!\n";
- 			hefesto.sys.fwrite($buf, $buf.len(), $fp);
-		}
+```
+    function fwrite_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "a");
+        var buf type string;
+        $buf = "that's all folks for fwrite!\n";
+        hefesto.sys.fwrite($buf, $buf.len(), $fp);
+    }
+```
 
 ##### ++fread()++
 
@@ -697,257 +743,306 @@ Reads data from a file descriptor (obvious: opened with reading mode). After rea
 The first argument is the data ``buffer``. The second argument indicates the amount of data that should be read. The third argument is the file descriptor.
 This ``syscall`` returns the number of read bytes or ``-1`` when happening some error.
 
-        function fread_sample() : result type none {
-		var fp type file;
-		$fp = hefesto.sys.fopen("test.dat", "r");
-        	var byte type string
- 		hefesto.sys.fread($byte, 1, $fp);
-	}
+```
+    function fread_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        var byte type string
+        hefesto.sys.fread($byte, 1, $fp);
+    }
+```
 
 ##### ++fclose()++
 
 Closes/cleans all internal resources related with the passed file descriptor.
 
-		function fclose_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "w");
- 			# TODO: do some manipulation here...
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function fclose_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "w");
+        # TODO: do some manipulation here...
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++feof()++
 
 Returns ``1`` if the end of file was reached, otherwise ``0``. This ``syscall`` receives the file descriptor which should be verified.
 
-		function feof_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			if (hefesto.sys.feof($fp) == 1) {
-  				hefesto.sys.echo("file end.\n");
-			} else hefesto.sys.echo("NOT file end.\n");
- 				hefesto.sys.fclose($fp);
-			}
-                }
+```
+    function feof_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        if (hefesto.sys.feof($fp) == 1) {
+            hefesto.sys.echo("file end.\n");
+        } else hefesto.sys.echo("NOT file end.\n");
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++fseek()++
 
 Jumps to a specified file offset (always absolute). The first argument is the file descriptor. The second is the wanted new ``offset``.
 
-		function fseek_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			hefesto.sys.fseek($fp, 10);
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function fseek_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        hefesto.sys.fseek($fp, 10);
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++fseek_to_begin()++
 
 Jumps to the beginning of file. Receives a file descriptor.
 
-		function fseek_to_begin_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			hefesto.sys.fseek_to_begin($fp); # yes this is a very useless dummy sample... :D
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function fseek_to_begin_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        hefesto.sys.fseek_to_begin($fp); # yes this is a very useless dummy sample... :D
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++fseek_to_end()++
 
 Jumps to the end of file. Receives a file descriptor.
 
-		function fseek_to_end_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			hefesto.sys.fseek_to_end($fp);
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function fseek_to_end_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        hefesto.sys.fseek_to_end($fp);
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++fsize()++
 
 Returns the amount in ``bytes`` of the passed file descriptor.
 
-		function fsize_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			hefesto.sys.echo("The file has " + hefesto.sys.fsize($fp) + " byte(s).\n");
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function fsize_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        hefesto.sys.echo("The file has " + hefesto.sys.fsize($fp) + " byte(s).\n");
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++ftell()++
 
 Returns the current offset of the passed file descriptor.
 
-		function ftell_sample() : result type none {
- 			var fp type file;
- 			$fp = hefesto.sys.fopen("test.dat", "r");
- 			hefesto.sys.echo("The current offset should be 0 and is " + hefesto.sys.ftell($fp) + ".\n");
- 			hefesto.sys.fclose($fp);
-		}
+```
+    function ftell_sample() : result type none {
+        var fp type file;
+        $fp = hefesto.sys.fopen("test.dat", "r");
+        hefesto.sys.echo("The current offset should be 0 and is " + hefesto.sys.ftell($fp) + ".\n");
+        hefesto.sys.fclose($fp);
+    }
+```
 
 ##### ++run()++
 
 Runs an external process returning its exit code. The ``run`` call is always synchronous.
 
-		function sync_run_sample() : result type none {
- 			hefesto.sys.echo("ls /dev exits with " + hefesto.sys.run("ls /dev") + " exit code.\n");
-		}
+```
+    function sync_run_sample() : result type none {
+        hefesto.sys.echo("ls /dev exits with " + hefesto.sys.run("ls /dev") + " exit code.\n");
+    }
+```
 
 You can also run *n* processes if you pass to this ``syscall`` a list containing command lines for being executed. The number of concurrent process is ruled
 by the option ``--qsize=n``. Into this mode, the ``syscall`` returns the sum of the exit codes.
 
-		function async_run_sample() : result type none {
- 			var wqueue type list;
- 			$wqueue.add_item("ls /dev");
- 			$wqueue.add_item("ls /home/rs");
- 			$wqueue.add_item("echo \"duh!\"");
- 			hefesto.sys.echo("The work queue exit code is " + hefesto.sys.run($wqueue) + ".\n");
-		}
+```
+    function async_run_sample() : result type none {
+        var wqueue type list;
+        $wqueue.add_item("ls /dev");
+        $wqueue.add_item("ls /home/rs");
+        $wqueue.add_item("echo \"duh!\"");
+        hefesto.sys.echo("The work queue exit code is " + hefesto.sys.run($wqueue) + ".\n");
+    }
+```
 
 ##### ++echo()++
 
 Prints a ``string`` on the stdout. In fact, this ``Hefesto syscall`` is pretty complicated.
 
-		function echo_sample() : result type none {
- 			hefesto.sys.echo("Hello world.\n");
-		}
+```
+    function echo_sample() : result type none {
+        hefesto.sys.echo("Hello world.\n");
+    }
+```
 
 ##### ++env()++
 
 Returns the data from a passed environment variable.
 
-		function env_sample() : result type none {
- 			hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");
-		}
+```
+    function env_sample() : result type none {
+        hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");
+    }
+```
 
 ##### ++prompt()++
 
 Returns the read data from keyboard.
 
-        function prompt_sample() : result type none {
-		var usr_data type string;
-		$usr_data = hefesto.sys.prompt("Type about an idea and then press enter to confirm this: \n");
-		hefesto.sys.echo("Hey I had an idea: " + $usr_data + "\nWhat do you think?");
-	}
+```
+    function prompt_sample() : result type none {
+        var usr_data type string;
+        $usr_data = hefesto.sys.prompt("Type about an idea and then press enter to confirm this: \n");
+        hefesto.sys.echo("Hey I had an idea: " + $usr_data + "\nWhat do you think?");
+    }
+```
 
 ##### ++exit()++
 
 Aborts the ``HVM`` execution exiting with the passed code.
 
-		function exit_sample() : result type none {
- 			hefesto.sys.exit(1);
-		}
+```
+    function exit_sample() : result type none {
+        hefesto.sys.exit(1);
+    }
+```
 
 ##### ++os_name()++
 
 Returns the name of the current platform where your ``HSL`` script is running. The name is always represented in ``lower-case`` without any information about
 version. Under unix-likes it will be the name (in lower-case) returned by the ``uname -s`` (call/command).
 
-		function env_sample() : result type none {
- 			if (hefesto.sys.os_name() == "windows") {
-  				hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");
- 			}
-		}
+```
+    function env_sample() : result type none {
+        if (hefesto.sys.os_name() == "windows") {
+            hefesto.sys.echo("The current content of Windows PATH variable is = \"" + hefesto.sys.env("PATH") + "\"\n");
+        }
+    }
+```
 
 ##### ++get_option()++
 
 Returns the argument list of a given command line option. If there is no option related is returned an empty list.
 
-		function get_option_sample() : result type none {
- 			var cups_of_tea type list;
- 			$cups_of_tea = hefesto.sys.get_option("cups-of-tea"); # --cups-of-tea=brown,black,green,red
- 			if ($cups_of_tea.size() == 0)
-  				hefesto.sys.echo("--cups-of-tea option not supplied.\n");
- 			else
-  				hefesto.sys.echo("--cups-of-tea option supplied.\n");
-		}
+```
+    function get_option_sample() : result type none {
+        var cups_of_tea type list;
+        $cups_of_tea = hefesto.sys.get_option("cups-of-tea"); # --cups-of-tea=brown,black,green,red
+        if ($cups_of_tea.size() == 0)
+            hefesto.sys.echo("--cups-of-tea option not supplied.\n");
+        else
+            hefesto.sys.echo("--cups-of-tea option supplied.\n");
+    }
+```
 
 ##### ++make_path()++
 
 Makes an ``string path`` following the current platform conventions for it. The first argument is the ``root path``. The second argument is the *addendum* of
 this ``path``. Returns a string representing the right combination of these two halves.
 
-        function make_path_sample() : result type none {
- 		hefesto.sys.echo("STRING PATH must be /home/rs \"" + hefesto.sys.make_path("/home", "/rs") + "\"\n.");
-	}
+```
+    function make_path_sample() : result type none {
+        hefesto.sys.echo("STRING PATH must be /home/rs \"" + hefesto.sys.make_path("/home", "/rs") + "\"\n.");
+    }
+```
 
 ##### ++last_forge_result()++
 
 Returns the last exit code related with the last executed forge (this ``result`` can be changed by the ``exit syscall``).
 
-		function last_forge_result_sample() : result type none {
- 			hefesto.sys.echo("The last forge result was " + hefesto.sys.last_forge_result() + ".\n");
-		}
+```
+    function last_forge_result_sample() : result type none {
+        hefesto.sys.echo("The last forge result was " + hefesto.sys.last_forge_result() + ".\n");
+    }
+```
 
 ##### ++forge()++
 
 Invokes another forge project. The first argument is the project contained inside the ``HSL`` informed by the second argument. The third argument are the desired
 user option for this forge. This ``syscall`` returns the forge exit code and also changes the ``last_forge_result's`` returned value.
 
-		function forge_sample() : result type none {
- 			hefesto.sys.forge("foolib", "local_deps.hsl", "--user-includes-home=../alt_incs --pre-submit-me");
- 			if (hefesto.sys.last_forge_result() == 0) {
-  				hefesto.sys.echo("foolib built with success.\n");
- 			} else {
-  				hefesto.sys.echo("unable to build foolib.\n");
-  				hefesto.sys.exit(1);
- 			}
-		}
+```
+    function forge_sample() : result type none {
+        hefesto.sys.forge("foolib", "local_deps.hsl", "--user-includes-home=../alt_incs --pre-submit-me");
+        if (hefesto.sys.last_forge_result() == 0) {
+            hefesto.sys.echo("foolib built with success.\n");
+        } else {
+            hefesto.sys.echo("unable to build foolib.\n");
+            hefesto.sys.exit(1);
+        }
+    }
+```
 
 ##### ++byref()++
 
 Updates the data from a local function argument to an external variable which acted as this function argument during a call for the function itself. This
 ``syscall`` receives the local function argument which should has its data uploaded to the external argument.
 
-		function caller() : result type none {
- 			var return type string;
- 			$return = "foo";
- 			hefesto.sys.echo($return);
- 			byref_sample($return);
- 			hefesto.sys.echo($return + "\n");
-		}
+```
+    function caller() : result type none {
+        var return type string;
+        $return = "foo";
+        hefesto.sys.echo($return);
+        byref_sample($return);
+        hefesto.sys.echo($return + "\n");
+    }
 
-		function byref_sample(io_var type string) : result type none {
- 			$io_var = "bar";
- 			hefesto.sys.byref($io_var);
-		}
+    function byref_sample(io_var type string) : result type none {
+        $io_var = "bar";
+        hefesto.sys.byref($io_var);
+    }
+```
 
 ##### ++time()++
 
 Returns a ``string`` representing the current system Time according to the passed format. The accepted formats are the same accepted by the function ``strftime()``
 from the ``libc`` present on the related Operating System.
 
-        function time_sample() : result type none {
-		hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");
-	}
+```
+    function time_sample() : result type none {
+        hefesto.sys.echo("Current time: " + hefesto.sys.time("%H:%M") + "\n");
+    }
+```
 
 ##### ++setenv()++
 
 Creates an environment variable. However, it is a volatile operation. At the end of the process this variable is lost.
 
-		function setenv_sample() : result type none {
- 			hefesto.sys.setenv("mytempvar", "mytempval");
-		}
+```
+    function setenv_sample() : result type none {
+        hefesto.sys.setenv("mytempvar", "mytempval");
+    }
+```
 
 On ``Windows`` you can use this ``syscall`` for accessing the registry too. It is necessary to inform the full path where the wanted value should
 be saved, prefixing this path with ``WINREG:``. In this case, this operation is non-volatile.
 
-		function setenv_sample() : result type none {
- 			hefesto.sys.setenv("WINREG:HKCU\\Software\\Abc\\mytempvar:REG_SZ", "mytempval");
-		}
+```
+    function setenv_sample() : result type none {
+        hefesto.sys.setenv("WINREG:HKCU\\Software\\Abc\\mytempvar:REG_SZ", "mytempval");
+    }
+```
 
 ##### ++unsetenv()++
 
 Removes a specified environment variable. It is a volatile operation. Only affecting the ``HVM`` process where this ``syscall`` was called.
 
-		function unsetenv_sample() : result type none {
- 			hefesto.sys.unsetenv("VSCOMPILERPATH");
-		}
+```
+    function unsetenv_sample() : result type none {
+        hefesto.sys.unsetenv("VSCOMPILERPATH");
+    }
+```
 
 On ``Windows`` you can use this ``syscall`` for removing (permanently) registry values too. On the following way:
 
-        function unsetenv_sample() : result type none {
-		hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");
-	}
+```
+    function unsetenv_sample() : result type none {
+        hefesto.sys.unsetenv("WINREG:HKLM\\Software\\Abc\\mytempvar");
+    }
+```
 
 ##### ++call_from_module()++
 
@@ -955,15 +1050,19 @@ Calls a function implemented inside a shared library.
 
 The shared function needs to be implemented using a special data structure. More info can be found in the specific documentation about module writing.
 
-		function call_from_module_sample() : result type none {
- 			hefesto.sys.call_from_module("/usr/share/mymods/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
-		}
+```
+    function call_from_module_sample() : result type none {
+        hefesto.sys.call_from_module("/usr/share/mymods/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
+    }
+```
 
 You can also use the path indirection for generalizing the modules locating process.
 
-		function call_from_module_sample() : result type none {
- 			hefesto.sys.call_from_module("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
-		}
+```
+    function call_from_module_sample() : result type none {
+        hefesto.sys.call_from_module("~/my_killer_mod.so", "killer_func", "arg1", "arg2", 3);
+    }
+```
 
 In this case, the library ``"my_killer_mod.so"`` will be searched on the configurated paths (into the ``HEFESTO_MODULES_HOME``) besides the
 current working directory.
@@ -972,19 +1071,23 @@ current working directory.
 
 Returns the address of a passed function name.
 
-		function get_func_addr_sample() : result type int {
- 			result hefesto.sys.get_func_addr("dummy_clbk");
-		}
+```
+    function get_func_addr_sample() : result type int {
+        result hefesto.sys.get_func_addr("dummy_clbk");
+    }
+```
 
 ##### ++call_func_addr()++
 
 Tries to call a function from a passed execution address. If something wrong occurs during this process a run-time error is thrown.
 
-		function call_func_addr_sample() : result type int {
- 			var clbk_p type int;
- 			$clbk_p = hefesto.sys.get_func_addr("abc_one_two_three");
- 			result hefesto.sys.call_from_addr($clbk_p, "abc", 1, "two", 3);
-		}
+```
+    function call_func_addr_sample() : result type int {
+        var clbk_p type int;
+        $clbk_p = hefesto.sys.get_func_addr("abc_one_two_three");
+        result hefesto.sys.call_from_addr($clbk_p, "abc", 1, "two", 3);
+    }
+```
 
 ### The *list* and *string* conveniences
 
@@ -1021,23 +1124,25 @@ type.
 
 Here follows:
 
-	function get_filepaths_from_directories(dir type list, regex type string) : result type list {
-        	var d type int;
-                var dirpath type string;
-                var oldcwd type string;
-                var retval type list;
-                $oldcwd = hefesto.sys.pwd();
-                $d = 0;
-                while ($d < $dir.count()) {
-                	$dirpath = $dir.item($d);
-                	if (hefesto.sys.cd($dirpath) == 1) {
-                        	$retval.ls($regex);
-                        }
-                        $d = $d + 1;
-                }
-                hefesto.sys.cd($oldcwd);
-                result $retval;
+```
+    function get_filepaths_from_directories(dir type list, regex type string) : result type list {
+        var d type int;
+        var dirpath type string;
+        var oldcwd type string;
+        var retval type list;
+        $oldcwd = hefesto.sys.pwd();
+        $d = 0;
+        while ($d < $dir.count()) {
+            $dirpath = $dir.item($d);
+            if (hefesto.sys.cd($dirpath) == 1) {
+                $retval.ls($regex);
+            }
+            $d = $d + 1;
         }
+        hefesto.sys.cd($oldcwd);
+        result $retval;
+    }
+```
 
 How to use:
 
@@ -1073,15 +1178,16 @@ How to use:
 >
 >``$files = get_filepaths_from_directories($dir, "*.\\.c$");``
 
-	function piglatinize(said type string) : result type string {
-    	var s type int;
+```
+    function piglatinize(said type string) : result type string {
+        var s type int;
         var etvalray type string;
         var punctoken type list;
         var curr_symbol type string;
         var curr_word type string;
 
-		if ($said.match("[0123456789]") == 1) {
-        	hefesto.sys.echo("ANICPAY: I can't handle numbers... aieeeeeeee!!\n");
+        if ($said.match("[0123456789]") == 1) {
+            hefesto.sys.echo("ANICPAY: I can't handle numbers... aieeeeeeee!!\n");
             result "(ullnay)"; # no way: "nil" is not piglatin!!!! :D
         }
 
@@ -1093,46 +1199,46 @@ How to use:
         $punctoken.add_item("!");
         $s = 0;
         while ($s < $said.len()) {
-        	$curr_symbol = $said.at($s);
-			if (($s + 1) == $said.len()) {
-				if ($punctoken.index_of($curr_symbol) == -1) {
-					$curr_word = $curr_word + $curr_symbol;
-					$curr_symbol = ".";
-				}
-			}
-        	if ($punctoken.index_of($curr_symbol) > -1) {
-            	if ($curr_word.len() > 1) {
-            		var first_letter type string;
-                	var second_letter type string;
-                	$first_letter = $curr_word.at(0);
-                	$second_letter = $curr_word.at(1);
+            $curr_symbol = $said.at($s);
+            if (($s + 1) == $said.len()) {
+                if ($punctoken.index_of($curr_symbol) == -1) {
+                    $curr_word = $curr_word + $curr_symbol;
+                    $curr_symbol = ".";
+                }
+            }
+            if ($punctoken.index_of($curr_symbol) > -1) {
+                if ($curr_word.len() > 1) {
+                    var first_letter type string;
+                    var second_letter type string;
+                    $first_letter = $curr_word.at(0);
+                    $second_letter = $curr_word.at(1);
                     var ss type int;
                     $ss = 2;
                     $etvalray = $etvalray + $second_letter;
                     while ($ss < $curr_word.len()) {
-                    	$etvalray = $etvalray + $curr_word.at($ss);
+                        $etvalray = $etvalray + $curr_word.at($ss);
                         $ss = $ss + 1;
                     }
                     $etvalray = $etvalray + tolower($first_letter);
-                } else {}
-                	$etvalray = $etvalray + $curr_word;
+                } else {
+                    $etvalray = $etvalray + $curr_word;
                 }
-				if ($curr_word.len() > 0) {
-					$etvalray = $etvalray + "ay";
-				}
-				$etvalray = $etvalray + $curr_symbol;
-				$curr_word = "";
+                if ($curr_word.len() > 0) {
+                    $etvalray = $etvalray + "ay";
+                }
+                $etvalray = $etvalray + $curr_symbol;
+                $curr_word = "";
             } else {
-            	$curr_word = $curr_word + $said.at($s);
+                $curr_word = $curr_word + $said.at($s);
             }
             $s = $s + 1;
         }
-		result $etvalray;
+        result $etvalray;
     }
 
     function tolower(l type string) : result type string {
-    	var letters type list;
-        # It is not much smarter but for sample issues is ok ;)
+        var letters type list;
+        # It is not much smart but for sample issues is ok ;)
         $letters.add_item("A");
         $letters.add_item("B");
         $letters.add_item("C");
@@ -1188,12 +1294,13 @@ How to use:
         var l_index type int;
         $l_index =  $letters.index_of($l);
         if ($l_index > -1 && $l_index < 26) {
-        	var lower_letter type string;
+            var lower_letter type string;
             $lower_letter = $letters.item($l_index + 26);
             result $lower_letter;
         }
         result $l;
     }
+```
 
 It should be used on following way:
 
@@ -1279,22 +1386,24 @@ Yes, a good notion about *C* would be nice here. Even newbie. For this section I
 
 Supposing that we have the following *C* ``main`` function:
 
-	#include "init.h"
-        #include "config.h"
-        #include "options.h"
-        #include <stdio.h>
+```
+    #include "init.h"
+    #include "config.h"
+    #include "options.h"
+    #include <stdio.h>
 
-        int main(int argc, char **argv) {
-            if (argc > 1) {
-            	get_options(argv, argc);
-            }
-            if (do_config()) {
-            	printf("*** Started!\n");
-            	return init();
-            }
-            printf("*** Error.\n");
-            return 1;
+    int main(int argc, char **argv) {
+        if (argc > 1) {
+            get_options(argv, argc);
         }
+        if (do_config()) {
+            printf("*** Started!\n");
+            return init();
+        }
+        printf("*** Error.\n");
+        return 1;
+    }
+```
 
 In *C* a include is a little clue telling us about "the doomed mystery of the forgotten dependencies". Usually, inclusions done using double quotes are about local
 files (a.k.a. dependencies), opposing to ``< ... >`` which are about external dependencies.
@@ -1304,103 +1413,109 @@ From now on, we will compose a function that will figure out and spit for us a `
 What is the best way for serializing into lines a file content under the ``HSL``? I vote for the syscall ``lines_from_file()``. I will show the entire code
 in order to comment the interesting parts later:
 
-	include ~/fsutil.hsl
+```
+    include ~/fsutil.hsl
 
-	function get_c_cpp_deps() : result type string {
-    	    var files type list;
-    	    var includes type list;
-    	    var f type int;
-    	    var i type int;
-    	    var dep_chain type string;
-    	    var str type string;
-    	    var cwd type string;
-    	    var exts type list;
-    	    var e type int;
-    	    var dep_nr type int;
-    	    var related_files type list;
+    function get_c_cpp_deps() : result type string {
+        var files type list;
+        var includes type list;
+        var f type int;
+        var i type int;
+        var dep_chain type string;
+        var str type string;
+        var cwd type string;
+        var exts type list;
+        var e type int;
+        var dep_nr type int;
+        var related_files type list;
 
-    	    $e = 0;
+        $e = 0;
 
-    	    $exts.add_item("h");
-    	    $exts.add_item("hpp");
-    	    $exts.add_item("c");
-    	    $exts.add_item("C");
-    	    $exts.add_item("CC");
-    	    $exts.add_item("cc");
-    	    $exts.add_item("cpp");
-    	    $exts.add_item("CPP");
+        $exts.add_item("h");
+        $exts.add_item("hpp");
+        $exts.add_item("c");
+        $exts.add_item("C");
+        $exts.add_item("CC");
+        $exts.add_item("cc");
+        $exts.add_item("cpp");
+        $exts.add_item("CPP");
 
-    	    while ($e < $exts.count()) {
-                $str = ".*\\." + $exts.item($e) + "$";
-                $files.ls($str);
-                $f = 0;
-                $cwd = hefesto.sys.pwd();
-                while ($f < $files.count()) {
-                    $str = $files.item($f);
-	            $dep_chain = $dep_chain + $str + ": ";
-    	            $includes = hefesto.sys.lines_from_file($str, "#include.*$");
-                    $i = 0;
-            	    $dep_nr = 0;
-            	    while ($i < $includes.count()) {
-                        $str = $includes.item($i);
-                        $str.replace(".*#include.*(\"|<)", "");
-                        $str.replace("(\"|>)$", "");
-                        if (isfile($str) == 1) {
-                            $str = hefesto.sys.make_path($cwd, $str);
-                    	    if ($dep_nr > 0) {
-                                $dep_chain = $dep_chain + "& ";
-                    	    }
-                    	    $dep_chain = $dep_chain + $str + " ";
-                        	$dep_nr = $dep_nr + 1;
-               	        }
-                        $i = $i + 1;
-            	    }
-            	    if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
-                        $str = $files.item($f);
-                        $str = filenamefrompath($str);
-                        $str.replace("\\.(h|hpp)$", "");
-	                $related_files.clear();
-    	                $related_files.ls(".*" + filenamefrompath($str) + "\\.(c|C|CC|cc|cpp|CPP)$");
-        	        if ($related_files.count() > 0) {
-            	                $i = 0;
-                                while ($i < $related_files.count()) {
-                    	            if ($dep_nr > 0) {
-	                                $dep_chain = $dep_chain + "& ";
-    	                            }
-                                    $dep_chain = $dep_chain + $related_files.item($i) + " ";
-    	                            $dep_nr = $dep_nr + 1;
-        	                    $i = $i + 1;
-            	                }
+        while ($e < $exts.count()) {
+            $str = ".*\\." + $exts.item($e) + "$";
+            $files.ls($str);
+            $f = 0;
+            $cwd = hefesto.sys.pwd();
+            while ($f < $files.count()) {
+                $str = $files.item($f);
+                $dep_chain = $dep_chain + $str + ": ";
+                $includes = hefesto.sys.lines_from_file($str, "#include.*$");
+                $i = 0;
+                $dep_nr = 0;
+                while ($i < $includes.count()) {
+                    $str = $includes.item($i);
+                    $str.replace(".*#include.*(\"|<)", "");
+                    $str.replace("(\"|>)$", "");
+                    if (isfile($str) == 1) {
+                        $str = hefesto.sys.make_path($cwd, $str);
+                        if ($dep_nr > 0) {
+                            $dep_chain = $dep_chain + "& ";
                         }
-            	    }
-            	    $dep_chain = $dep_chain + ";\n";
-            	    $f = $f + 1;
+                        $dep_chain = $dep_chain + $str + " ";
+                        $dep_nr = $dep_nr + 1;
+                    }
+                    $i = $i + 1;
                 }
-                $files.clear();
-                $e = $e + 1;
-    	    }
-    	    result $dep_chain;
+                if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
+                    $str = $files.item($f);
+                    $str = filenamefrompath($str);
+                    $str.replace("\\.(h|hpp)$", "");
+                    $related_files.clear();
+                    $related_files.ls(".*" + filenamefrompath($str) + "\\.(c|C|CC|cc|cpp|CPP)$");
+                    if ($related_files.count() > 0) {
+                        $i = 0;
+                        while ($i < $related_files.count()) {
+                            if ($dep_nr > 0) {
+                                $dep_chain = $dep_chain + "& ";
+                            }
+                            $dep_chain = $dep_chain + $related_files.item($i) + " ";
+                            $dep_nr = $dep_nr + 1;
+                            $i = $i + 1;
+                        }
+                    }
+                }
+                $dep_chain = $dep_chain + ";\n";
+                $f = $f + 1;
+            }
+            $files.clear();
+            $e = $e + 1;
         }
+        result $dep_chain;
+    }
+```
 
 Yes, *parser* is a hard thing to code. Even silly at first glance, it can become a nightmare. All because it is about supporting lovely Human features: confusion,
 untidiness, lack of pattern.
 
 The lines:
 
-	$exts.add_item("h");
-    	$exts.add_item("hpp");
-    	$exts.add_item("c");
-    	$exts.add_item("C");
-    	$exts.add_item("CC");
-    	$exts.add_item("cc");
-    	$exts.add_item("cpp");
-    	$exts.add_item("CPP");
+```
+    $exts.add_item("h");
+    $exts.add_item("hpp");
+    $exts.add_item("c");
+    $exts.add_item("C");
+    $exts.add_item("CC");
+    $exts.add_item("cc");
+    $exts.add_item("cpp");
+    $exts.add_item("CPP");
+```
 
 Are the lines responsible for defining the relevant extensions for being scanned. Also is possible to eliminate the case issue, if you prefer doing it, feel free about.
 
 After the lines shown above, each registered extension is used for composing a regular expression:
 
-	$str = ".*\\." + $exts.item($e) + "$";
+```
+    $str = ".*\\." + $exts.item($e) + "$";
+```
 
 Beyond the iterations it could be:
 
@@ -1412,12 +1527,16 @@ Beyond the iterations it could be:
 Thus, we will find the relevant files. Each found file will have registered into the ``dep-chain`` (following the previous syntax presented, do you remember?).
 On this way, Hefesto will be able to watch for this file:
 
-	$str = $files.item($f);
-	$dep_chain = $dep_chain + $str + ": ";
+```
+    $str = $files.item($f);
+    $dep_chain = $dep_chain + $str + ": ";
+```
 
 After we look inside this found file, search for more dependencies. For doing it we use a pretty simple but handy regular expression:
 
-	$includes = hefesto.sys.lines_from_file($str, "#include.*$");
+```
+    $includes = hefesto.sys.lines_from_file($str, "#include.*$");
+```
 
 Okay, "Why did not you use a anchor in this regex?". Because, the funny & lovely Human features, like:
 
@@ -1428,54 +1547,62 @@ Okay, "Why did not you use a anchor in this regex?". Because, the funny & lovely
 From each found line is extracted the ``file name`` and made a ``full path`` based on the [``cwd``](http://en.wikipedia.org/wiki/Working_directory). If the
 current file is really accessible under the ``cwd`` it is included as a dependency for the previous found file.
 
-	while ($i < $includes.count()) {
-            $str = $includes.item($i);
-            $str.replace(".*#include.*(\"|<)", "");
-            $str.replace("(\"|>)$", "");
-      	    if (isfile($str) == 1) {
-       	        $str = hefesto.sys.make_path($cwd, $str);
-                if ($dep_nr > 0) {
-                    $dep_chain = $dep_chain + "& ";
-                }
-                $dep_chain = $dep_chain + $str + " ";
-                $dep_nr = $dep_nr + 1;
+```
+    while ($i < $includes.count()) {
+        $str = $includes.item($i);
+        $str.replace(".*#include.*(\"|<)", "");
+        $str.replace("(\"|>)$", "");
+        if (isfile($str) == 1) {
+            $str = hefesto.sys.make_path($cwd, $str);
+            if ($dep_nr > 0) {
+                $dep_chain = $dep_chain + "& ";
             }
-            $i = $i + 1;
-	}
+            $dep_chain = $dep_chain + $str + " ";
+            $dep_nr = $dep_nr + 1;
+        }
+        $i = $i + 1;
+    }
+```
 
 For each found ``header`` is applied a secondary search. This search is based on their implementation files: same name excepting the extension. When accessible
 under the ``cwd`` an implementation file is also taken as a dependency and added to the ``dep-chain``:
 
-	if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
-    	    $str = $files.item($f);
-            $str = filenamefrompath($str);
-            $str.replace("\\.(h|hpp)$", "");
-	    $related_files.clear();
-    	    $related_files.ls(".*" + filenamefrompath($str) + "\\.(c|C|CC|cc|cpp|CPP)$");
-            if ($related_files.count() > 0) {
-        	$i = 0;
-                while ($i < $related_files.count()) {
-            	    if ($dep_nr > 0) {
-	            	$dep_chain = $dep_chain + "& ";
-    	            }
-	            $dep_chain = $dep_chain + $related_files.item($i) + " ";
-    	            $dep_nr = $dep_nr + 1;
-        	    $i = $i + 1;
+```
+    if ($exts.item($e) == "h" || $exts.item($e) == "hpp") {
+        $str = $files.item($f);
+        $str = filenamefrompath($str);
+        $str.replace("\\.(h|hpp)$", "");
+        $related_files.clear();
+        $related_files.ls(".*" + filenamefrompath($str) + "\\.(c|C|CC|cc|cpp|CPP)$");
+        if ($related_files.count() > 0) {
+            $i = 0;
+            while ($i < $related_files.count()) {
+                if ($dep_nr > 0) {
+                    $dep_chain = $dep_chain + "& ";
                 }
+                $dep_chain = $dep_chain + $related_files.item($i) + " ";
+                $dep_nr = $dep_nr + 1;
+                $i = $i + 1;
             }
-	}
+        }
+    }
+```
 
 After it, the current file will have all direct dependency scanned into the ``dep-chain``. Being necessary only terminate the stream of dependencies for the
 current found file:
 
-	$dep_chain = $dep_chain + ";\n";
+```
+    $dep_chain = $dep_chain + ";\n";
+```
 
 All that was described is repeated for each relevant file laying on the ``cwd``.  You can change the ``cwd`` before calling the ``c dependency-scanner``.
 For doing it you should use the ``cd syscall``.
 
 After processing all files the ``dep-chain`` is returned to the caller:
 
+```
     result $dep_chain;
+```
 
 This content will be used onto the section ``dependencies`` of a project declaration.
 
@@ -1491,24 +1618,26 @@ What does a *C* toolset need to do using external tools? (basically)
 
 Follows the related toolset:
 
-	include ~/toolsets/gcc/forges/gcc_c_app_forge.hsl
+```
+    include ~/toolsets/gcc/forges/gcc_c_app_forge.hsl
 
-	toolset "gcc-c-app" forge function "gcc_c_binary_forge" :
-    	            forge helpers "gcc_compile_source_list",
-        			  "gcc_link_ofiles", "gcc_mk_app_compilation_command":
-    	    command "compile_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
-        	gcc -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
-    	    >
-	    command "compile_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
-    	        gcc -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
-    	    >
-    	    command "link_shared": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
-        	gcc -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
-    	    >
-    	    command "link_static": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
-        	gcc -static -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
-    	    >
-	$
+    toolset "gcc-c-app" forge function "gcc_c_binary_forge" :
+        forge helpers "gcc_compile_source_list",
+                      "gcc_link_ofiles", "gcc_mk_app_compilation_command":
+        command "compile_r": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+            gcc -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+        >
+        command "compile_d": SOURCE, OUTFILE, INCLUDES, CFLAGS <
+            gcc -g -c $SOURCE $INCLUDES $CFLAGS -o $OUTFILE
+        >
+        command "link_shared": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+            gcc -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+        >
+        command "link_static": APPNAME, OBJECTS, LIBRARIES, LDFLAGS <
+            gcc -static -o$APPNAME $OBJECTS $LIBRARIES $LDFLAGS
+        >
+    $
+```
 
 The basic syntax is:
 
@@ -1545,107 +1674,110 @@ the forge function steps must be generalized on a way that must be useful for an
 
 Follows the forge function. After its code listing I will comment the relevant parts of it:
 
-	function gcc_c_binary_forge(SOURCES type list,
-   				    INCLUDES type list, CFLAGS type list,
-                                    LIBRARIES type list,
-                                    LDFLAGS type list,
-                                    APPNAME type string) : result type int {
-    	    var exit_code type int;
-    	    var includes type string;
-    	    var cflags type string;
-    	    var libraries type string;
-    	    var ldflags type string;
-    	    var objects type string;
+```
+    function gcc_c_binary_forge(SOURCES type list,
+                                INCLUDES type list,
+                                CFLAGS type list,
+                                LIBRARIES type list,
+                                LDFLAGS type list,
+                                APPNAME type string) : result type int {
+        var exit_code type int;
+        var includes type string;
+        var cflags type string;
+        var libraries type string;
+        var ldflags type string;
+        var objects type string;
 
-            if ($SOURCES.count() == 0) {
-                if (hefesto.project.toolset() == "gcc-c-app") {
-                    $SOURCES.ls(".*\\.c$");
-                } else {
-                    $SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
-                }
+        if ($SOURCES.count() == 0) {
+            if (hefesto.project.toolset() == "gcc-c-app") {
+                $SOURCES.ls(".*\\.c$");
+            } else {
+                $SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
             }
+        }
 
-            if ($SOURCES.count() == 0) {
-                hefesto.sys.echo("\t(empty source list)\n");
+        if ($SOURCES.count() == 0) {
+            hefesto.sys.echo("\t(empty source list)\n");
+            result 1;
+        }
+
+        var obj_output_dir type list;
+        var obj_dir type string;
+
+        $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
+        if ($obj_output_dir.count() > 0) {
+            $obj_dir = $obj_output_dir.item(0);
+            mktree($obj_dir);
+        } else {
+            $obj_dir = hefesto.sys.pwd();
+        }
+
+        var bin_output_dir type list;
+        var bin_output type string;
+
+        $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
+        if ($bin_output_dir.count() > 0) {
+            $bin_output = $bin_output_dir.item(0);
+            mktree($bin_output);
+            $bin_output = hefesto.sys.make_path($bin_output, $APPNAME);
+        } else {
+            $bin_output = $APPNAME;
+        }
+
+        $exit_code = 0;
+
+        #  GCC's include list option string
+        $includes = gcc_mk_gcc_incl_str_opt($INCLUDES); 
+
+        $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
+
+        var cpu_arch type list;
+        var chosen_arch type string;
+        $cpu_arch = hefesto.sys.get_option("cpu-arch");
+        $chosen_arch = "";
+        if ($cpu_arch.count() > 0) {
+            $chosen_arch = $cpu_arch.item(0);
+            if ($chosen_arch != "32" && $chosen_arch != "64") {
+                hefesto.sys.echo(hefesto.project.toolset() +
+                                 " fatal error: invalid value for cpu-arch " +
+                                 "option must be '32' or '64'.\n");
                 result 1;
             }
-
-            var obj_output_dir type list;
-            var obj_dir type string;
-
-            $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
-            if ($obj_output_dir.count() > 0) {
-                $obj_dir = $obj_output_dir.item(0);
-                mktree($obj_dir);
-            } else {
-                $obj_dir = hefesto.sys.pwd();
-            }
-
-            var bin_output_dir type list;
-            var bin_output type string;
-
-            $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
-            if ($bin_output_dir.count() > 0) {
-                $bin_output = $bin_output_dir.item(0);
-                mktree($bin_output);
-                $bin_output = hefesto.sys.make_path($bin_output, $APPNAME);
-            } else {
-                $bin_output = $APPNAME;
-            }
-
-            $exit_code = 0;
-
-	    #  GCC's include list option string
-            $includes = gcc_mk_gcc_incl_str_opt($INCLUDES); 
-
-            $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
-
-            var cpu_arch type list;
-            var chosen_arch type string;
-            $cpu_arch = hefesto.sys.get_option("cpu-arch");
-            $chosen_arch = "";
-            if ($cpu_arch.count() > 0) {
-                $chosen_arch = $cpu_arch.item(0);
-                if ($chosen_arch != "32" && $chosen_arch != "64") {
-                    hefesto.sys.echo(hefesto.project.toolset() +
-                	" fatal error: invalid value for cpu-arch " +
-                        "option must be '32' or '64'.\n");
-                    result 1;
-                }
-                $cflags = $cflags + " -m" + $chosen_arch;
-            }
-
-            #  compiling...
-            hefesto.sys.echo("*** compiling...\n");
-
-            $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); 
-            if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
-                $gcc_c_project_forge_dirty_files_nr = 1;
-            }
-
-            if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
-                $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
-                $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
-                if ($chosen_arch.len() > 0) {
-                    $ldflags = $ldflags + "-m" + $chosen_arch;
-                }
-                $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
-                #  linking...
-                hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");
-                $exit_code = gcc_link_ofiles($objects,
-           				     $libraries
-                                             $ldflags,
-                                             $bin_output);
-            }
-
-            if ($exit_code == 0) {
-                hefesto.sys.echo("*** success.\n");
-            } else {
-                hefesto.sys.echo("*** failure.\n");
-            }
-
-            result $exit_code;
+            $cflags = $cflags + " -m" + $chosen_arch;
         }
+
+        #  compiling...
+        hefesto.sys.echo("*** compiling...\n");
+
+        $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); 
+        if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
+            $gcc_c_project_forge_dirty_files_nr = 1;
+        }
+
+        if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
+            $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
+            $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
+            if ($chosen_arch.len() > 0) {
+                $ldflags = $ldflags + "-m" + $chosen_arch;
+            }
+            $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
+            #  linking...
+            hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");
+            $exit_code = gcc_link_ofiles($objects,
+                                         $libraries
+                                         $ldflags,
+                                         $bin_output);
+        }
+
+        if ($exit_code == 0) {
+            hefesto.sys.echo("*** success.\n");
+        } else {
+            hefesto.sys.echo("*** failure.\n");
+        }
+
+        result $exit_code;
+    }
+```
 
 The forge function has the following interface:
 
@@ -1657,52 +1789,60 @@ The forge function has the following interface:
 
 
 This interface explains the sequence and types of the passed arguments during a project declaration which uses the discussed ``toolset``.
-It was:
+It was declared as:
 
+```
     var sources type list;
     var includes type list;
     var cflags type list;
     var libraries type list;
     var ldflags type list;
 
-	project sample : toolset "gcc-c-app" : $sources, $includes, $cflags,
+    project sample : toolset "gcc-c-app" : $sources, $includes, $cflags,
                                            $libraries, $ldflags, "sample" ;
+```
 
 At the beginning of the presented forge function code, we can see a convenience:
 
-	if ($SOURCES.count() == 0) {
-            if (hefesto.project.toolset() == "gcc-c-app") {
-        	$SOURCES.ls(".*\\.c$");
-            } else {
-            	$SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
-    	    }
+```
+    if ($SOURCES.count() == 0) {
+        if (hefesto.project.toolset() == "gcc-c-app") {
+            $SOURCES.ls(".*\\.c$");
+        } else {
+            $SOURCES.ls(".*\\.(cc|cpp|CC|Cpp|CPP)$");
         }
+    }
+```
 
 If an empty source code list is passed, the forge function will try to scan for code files into the current working directory. This toolset is used for ``C/C++`` code
 compiling, it explains the if clause based on the current chosen toolset name.
 
 After this attempt, being ``SOURCES`` still empty:
 
-        if ($SOURCES.count() == 0) {
-    	    hefesto.sys.echo("\t(empty source list)\n");
-            result 1;
-        }
+```
+    if ($SOURCES.count() == 0) {
+        hefesto.sys.echo("\t(empty source list)\n");
+        result 1;
+    }
+```
 
 We finish here, informing the user about the impossibility of compiling something under this directory. The value ``1`` is returned to make the ``Hefesto``
 "break" the forge process with an error. In this case, it will catch the user's attention about the related fact.
 
 We have more conveniences... Sometimes we do not want to polute the project's directory with files produced by the build process (object files, etc):
 
-        var obj_output_dir type list;
-        var obj_dir type string;
+```
+    var obj_output_dir type list;
+    var obj_dir type string;
 
-        $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
-        if ($obj_output_dir.count() > 0) {
-    	    $obj_dir = $obj_output_dir.item(0);
-            mktree($obj_dir);
-        } else {
-            $obj_dir = hefesto.sys.pwd();
-        }
+    $obj_output_dir = hefesto.sys.get_option("obj-output-dir");
+    if ($obj_output_dir.count() > 0) {
+        $obj_dir = $obj_output_dir.item(0);
+        mktree($obj_dir);
+    } else {
+        $obj_dir = hefesto.sys.pwd();
+    }
+```
 
 If the user has passed the option ``--obj-output-dir=<dirpath>`` we will create and use the requested directory for putting object files there,
 otherwise we will use the ``cwd`` as our object directory. The ``syscall get_option`` always returns a list. When something is passed into a requested
@@ -1711,54 +1851,64 @@ creates a directory tree if it not exists.
 
 A similar thing is done with the binary directory, take a look:
 
-        $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
-        if ($bin_output_dir.count() > 0) {
-    	    $bin_output = $bin_output_dir.item(0);
-            mktree($bin_output);
-            $bin_output = hefesto.sys.make_path($bin_output, $APPNAME);
-        } else {
-    	    $bin_output = $APPNAME;
-        }
+```
+    $bin_output_dir = hefesto.sys.get_option("bin-output-dir");
+    if ($bin_output_dir.count() > 0) {
+        $bin_output = $bin_output_dir.item(0);
+        mktree($bin_output);
+        $bin_output = hefesto.sys.make_path($bin_output, $APPNAME);
+    } else {
+        $bin_output = $APPNAME;
+    }
+```
 
 Now it is the time to convert the compiler's options expressed as lists into *strings*:
 
-        #  GCC's include list option string
-        $includes = gcc_mk_gcc_incl_str_opt($INCLUDES);
-        $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
+```
+    #  GCC's include list option string
+    $includes = gcc_mk_gcc_incl_str_opt($INCLUDES);
+    $cflags = gcc_mk_raw_str_opt($CFLAGS); #  GCC's compile options
+```
 
 The referenced functions above, will be further detailed. By now, you can know them superficially without any problem.
 
 It is a good convenience the possibility of choosing the *target's* architecture. In this case, the option read by the code presented right below, allows
 the choice of a *32-bit* or *64-bit* binary:
 
-        var cpu_arch type list;
-        var chosen_arch type string;
-        $cpu_arch = hefesto.sys.get_option("cpu-arch");
-        $chosen_arch = "";
-        if ($cpu_arch.count() > 0) {
-	    $chosen_arch = $cpu_arch.item(0);
-	    if ($chosen_arch != "32" && $chosen_arch != "64") {
-	    	hefesto.sys.echo(hefesto.project.toolset() +
-                    " fatal error: invalid value for cpu-arch " +
-                    "option must be '32' or '64'.\n");
-			result 1;
-            }
-	}
+```
+    var cpu_arch type list;
+    var chosen_arch type string;
+    $cpu_arch = hefesto.sys.get_option("cpu-arch");
+    $chosen_arch = "";
+    if ($cpu_arch.count() > 0) {
+        $chosen_arch = $cpu_arch.item(0);
+        if ($chosen_arch != "32" && $chosen_arch != "64") {
+            hefesto.sys.echo(hefesto.project.toolset() +
+                             " fatal error: invalid value for cpu-arch " +
+                             "option must be '32' or '64'.\n");
+            result 1;
+        }
+    }
+```
 
 When the user passes ``--cpu-arch=32`` or ``--cpu-arch=64`` will be added ``-m32`` or ``-m64`` to the compilation command. Later, this command will be directly
 passed to the compiler:
 
-	$cflags = $cflags + " -m" + $chosen_arch;
+```
+    $cflags = $cflags + " -m" + $chosen_arch;
+```
 
 The ``-m`` option specifies for *GCC* the target's architecture. Still about the last code listing shown, if an architecture different of ``32`` and ``64`` is passed
 it results in a process abortion, returning 1 besides a error message on the ``stdout``.
 
 Now the function that actually compiles each scanned code takes the control:
 
-        #  compiling...
-        hefesto.sys.echo("*** compiling...\n");
+```
+    #  compiling...
+    hefesto.sys.echo("*** compiling...\n");
 
-        $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); 
+    $exit_code = gcc_compile_source_list($SOURCES, $includes, $cflags, $obj_dir); 
+```
 
 The function ``gcc_compile_source_list()`` will be further detailed.
 
@@ -1766,26 +1916,30 @@ Into this toolset code exists a global variable called ``gcc_c_project_forge_dir
 If after the compilation process none of the codes were processed, the existence of the target file is verified. Not existing, the counter variable is set to
 ``1``:
 
-        if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
-        	$gcc_c_project_forge_dirty_files_nr = 1;
-        }
+```
+    if ($gcc_c_project_forge_dirty_files_nr == 0 && isfile($bin_output) == 0) {
+        $gcc_c_project_forge_dirty_files_nr = 1;
+    }
+```
 
 This set will guarantee the *linking* execution. Even with any code reprocessed but without the wanted target binary, the *linking* must happen:
 
-	if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
-	    $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
-            $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
-            if ($chosen_arch.len() > 0) {
-		$ldflags = $ldflags + "-m" + $chosen_arch;
-	    }
-	    $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
-	    #  linking...
-	    hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");
-	    $exit_code = gcc_link_ofiles($objects,
-					 $libraries
-					 $ldflags,
-					 $bin_output);
-	}
+```
+    if ($gcc_c_project_forge_dirty_files_nr > 0 && $exit_code == 0) {
+        $objects = gcc_mk_ofiles_str_opt($SOURCES, $obj_dir);
+        $ldflags = gcc_mk_raw_str_opt($LDFLAGS);
+        if ($chosen_arch.len() > 0) {
+            $ldflags = $ldflags + "-m" + $chosen_arch;
+        }
+        $libraries = gcc_mk_gcc_lib_str_opt($LIBRARIES);
+        #  linking...
+        hefesto.sys.echo("*** now linking...\n\t*** waiting...\n");
+        $exit_code = gcc_link_ofiles($objects,
+                                     $libraries
+                                     $ldflags,
+                                     $bin_output);
+    }
+```
 
 Of course that besides the total of processed files the *linking* must happen only when has no errors during the compiling. The ``$exit_code == 0``
 in the if-clause express this necessity.
@@ -1800,16 +1954,20 @@ When the *linking* is needed:
 
 After a status report based on the *exit code* is shown, in order to guide the user about what happens:
 
-        if ($exit_code == 0) {
-    	    hefesto.sys.echo("*** success.\n");
-        } else {
-            hefesto.sys.echo("*** failure.\n");
-        }
+```
+    if ($exit_code == 0) {
+        hefesto.sys.echo("*** success.\n");
+    } else {
+        hefesto.sys.echo("*** failure.\n");
+    }
+```
 
 Finally, the function results its *exit code* which is rather important for informing the ``Hefesto`` about what really happened during the forge
 process.
 
-	result $exit_code;
+```
+    result $exit_code;
+```
 
 Now, go back to the fully forge function's source code and try to re-read each detail into the code. It is important really to understand what is being done there before continuing.
 
@@ -1831,10 +1989,12 @@ A synchronous compiling can be understood as one file compiled per cycle. Opposi
 
 This is the function interface:
 
-	function gcc_compile_source_list(sources type list,
-    					 includes type string,
-                                         cflags type string,
-                                         obj_dir type string) : result type int
+```
+    function gcc_compile_source_list(sources type list,
+                                     includes type string,
+                                     cflags type string,
+                                     obj_dir type string) : result type int
+```
 
 The function receives the list of sources to be compiled, a string carrying all additional includes directories, a string gathering the compiler options and
 a string which represents the directory path specifying the place where the object files should be created. When all is gracefully processed the function
@@ -1842,29 +2002,31 @@ returns ``0``, otherwise it returns a non-zero value.
 
 The beginning of the function is what follows:
 
-	var size type int;
-        var i type int;
-        var j type int;
-        var exit_code type int;
-        var ofile type string;
-        var qsize_list type list;
-        var run_list type list;
-        var qsize type int;
-        var not_compiled type list;
-        var not_compiled_tmp type list;
-        var compile_model type list;
-        var is_release type int;
-        var curr_src_file type string;
+```
+    var size type int;
+    var i type int;
+    var j type int;
+    var exit_code type int;
+    var ofile type string;
+    var qsize_list type list;
+    var run_list type list;
+    var qsize type int;
+    var not_compiled type list;
+    var not_compiled_tmp type list;
+    var compile_model type list;
+    var is_release type int;
+    var curr_src_file type string;
 
-        $size = $sources.count();
+    $size = $sources.count();
 
-        if ($size == 0) result 0;
+    if ($size == 0) result 0;
 
-        $qsize_list = hefesto.sys.get_option("qsize");
+    $qsize_list = hefesto.sys.get_option("qsize");
 
-        if ($qsize_list.count() > 0) {
-            $qsize = $qsize_list.item(0);
-        }
+    if ($qsize_list.count() > 0) {
+        $qsize = $qsize_list.item(0);
+    }
+```
 
 If passed an empty source list it will automatically return ``0``. If a non-empty source list is passed, the *Hefesto* option ``--qsize=n`` is read. This
 option is an internal option recognized by ``Hefesto``. This option indicates the total of process that can be concurrently ran by the ``syscall run``. For
@@ -1872,71 +2034,76 @@ calling the ``run`` on an asynchronous way is needed to pass a list containing t
 
 If the option ``--qsize`` is passed, the discussed function will reserves the ``qsize`` value for further usage. After it:
 
-	$compile_model = hefesto.sys.get_option("compile-model");
+```
+    $compile_model = hefesto.sys.get_option("compile-model");
 
-        $is_release = 1;
+    $is_release = 1;
 
-        if ($compile_model.count() > 0) {
-            if ($compile_model.item(0) != "release" &&
-                $compile_model.item(0) != "debug") {
-                hefesto.sys.echo(hefesto.project.toolset() +
-            	    " internal error: unknown compile model: \"" +
-                $compile_model.item(0) + "\"\n");
-                result 1;
-            }
-            $is_release = ($compile_model.item(0) == "release");
+    if ($compile_model.count() > 0) {
+        if ($compile_model.item(0) != "release" &&
+            $compile_model.item(0) != "debug") {
+            hefesto.sys.echo(hefesto.project.toolset() +
+                             " internal error: unknown compile model: \"" +
+                             $compile_model.item(0) + "\"\n");
+            result 1;
         }
+        $is_release = ($compile_model.item(0) == "release");
+    }
+```
 
 The option ``compile-model`` is read. The content passed into this option is verified. The content must be ``release`` or ``debug``. The default model
 is ``release``.
 
 Now, finally, we will actually compile some stuff:
 
-	$exit_code = 0;
-        $i = 0;
+```
+    $exit_code = 0;
+    $i = 0;
 
-        $gcc_c_project_forge_dirty_files_nr = 0;
+    $gcc_c_project_forge_dirty_files_nr = 0;
 
-        $not_compiled = lsdup($sources);
+    $not_compiled = lsdup($sources);
 
-        if ($qsize <= 1) {
-            while ($i < $size && $exit_code == 0) {
-                $ofile = $sources.item($i);
-                $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
-                if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
-                    isfile($ofile) == 0) {
-                        $gcc_c_project_forge_dirty_files_nr =
-                    	$gcc_c_project_forge_dirty_files_nr + 1;
-                        $curr_src_file = $sources.item($i);
-                        $exit_code =
-                	    hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file,
-					          			   $ofile,
-                                                                           $includes,
-                                                                           $cflags, $is_release));
-                        if ($exit_code == 0) {
-                            $not_compiled.del_item($sources.item($i));
-                            hefesto.sys.echo("\t*** " +	$sources.item($i) + ": no errors found.\n");
-                        } else {
-                            hefesto.sys.echo("\t*** " + $sources.item($i) + ": errors found!\n");
-                        }
-                    } else {
-                        hefesto.sys.echo("\t*** " + $sources.item($i) + ": no changes.\n");
-                    }
-                $i = $i + 1;
+    if ($qsize <= 1) {
+        while ($i < $size && $exit_code == 0) {
+            $ofile = $sources.item($i);
+            $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
+                isfile($ofile) == 0) {
+                $gcc_c_project_forge_dirty_files_nr =
+                $gcc_c_project_forge_dirty_files_nr + 1;
+                $curr_src_file = $sources.item($i);
+                $exit_code = hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file,
+                                                                            $ofile,
+                                                                            $includes,
+                                                                            $cflags, $is_release));
+                if ($exit_code == 0) {
+                    $not_compiled.del_item($sources.item($i));
+                    hefesto.sys.echo("\t*** " +	$sources.item($i) + ": no errors found.\n");
+                } else {
+                    hefesto.sys.echo("\t*** " + $sources.item($i) + ": errors found!\n");
+                }
+            } else {
+                hefesto.sys.echo("\t*** " + $sources.item($i) + ": no changes.\n");
             }
-            if ($gcc_c_project_forge_dirty_files_nr > 0) {
-                hefesto.toolset.base_refresh($not_compiled);
-            }
-        } else {
-    	    (...)
+            $i = $i + 1;
         }
+        if ($gcc_c_project_forge_dirty_files_nr > 0) {
+            hefesto.toolset.base_refresh($not_compiled);
+        }
+    } else {
+        (...)
+    }
+```
 
 The *else* is related with the asynchronous stuff, by now we will abstract it. Well, we have the following initializing code:
 
-	$exit_code = 0;
-	$i = 0;
-        $gcc_c_project_forge_dirty_files_nr = 0;
-        $not_compiled = lsdup($sources);
+```
+    $exit_code = 0;
+    $i = 0;
+    $gcc_c_project_forge_dirty_files_nr = 0;
+    $not_compiled = lsdup($sources);
+```
 
 The variable which stores the *exit code* is zeroed. The list counter is zeroed too. The flag which indicates that at least one file was processed is also zeroed.
 After is used a function defined into the ``lsutil.hsl``. This function returns a copy of a passed list.
@@ -1963,34 +2130,35 @@ files status for the next forge. Only with these two functions the *Hefesto* is 
 
 Returning to the code:
 
-	if ($qsize <= 1) {
-            while ($i < $size && $exit_code == 0) {
-                $ofile = $sources.item($i);
-                $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
-                if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
-            	    isfile($ofile) == 0) {
-                        $gcc_c_project_forge_dirty_files_nr =
-                	$gcc_c_project_forge_dirty_files_nr + 1;
-                        $curr_src_file = $sources.item($i);
-                        $exit_code = hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file,
-						  				    $ofile,
-                                                                                    $includes,
-                                                                                    $cflags, $is_release));
-                        if ($exit_code == 0) {
-                            $not_compiled.del_item($sources.item($i));
-                            hefesto.sys.echo("\t*** " + $sources.item($i) + ": no errors found.\n");
-                        } else {
-                            hefesto.sys.echo("\t*** " + $sources.item($i) + ": errors found!\n");
-                        }
+```
+    if ($qsize <= 1) {
+        while ($i < $size && $exit_code == 0) {
+            $ofile = $sources.item($i);
+            $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
+                isfile($ofile) == 0) {
+                $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
+                $curr_src_file = $sources.item($i);
+                $exit_code = hefesto.sys.run(gcc_mk_app_compilation_command($curr_src_file,
+                                                                            $ofile,
+                                                                            $includes,
+                                                                            $cflags, $is_release));
+                if ($exit_code == 0) {
+                    $not_compiled.del_item($sources.item($i));
+                    hefesto.sys.echo("\t*** " + $sources.item($i) + ": no errors found.\n");
                 } else {
-                    hefesto.sys.echo("\t*** " + $sources.item($i) + ": no changes.\n");
+                    hefesto.sys.echo("\t*** " + $sources.item($i) + ": errors found!\n");
                 }
-                $i = $i + 1;
+            } else {
+                hefesto.sys.echo("\t*** " + $sources.item($i) + ": no changes.\n");
             }
-            if ($gcc_c_project_forge_dirty_files_nr > 0) {
-                hefesto.toolset.base_refresh($not_compiled);
-            }
+            $i = $i + 1;
         }
+        if ($gcc_c_project_forge_dirty_files_nr > 0) {
+            hefesto.toolset.base_refresh($not_compiled);
+        }
+    }
+```
 
 If the requested forge is synchronous, ``--qsize=1`` (by the way, the default), for each file path (*C* code) into the list, not occuring compiling errors:
 
@@ -2006,38 +2174,24 @@ caller which must take some action based on the returned value.
 
 Now let's see the asynchronous part of this forge helper:
 
-	else {
-            $not_compiled_tmp.clear();
-            while ($i < $size) {
-                $ofile = $sources.item($i);
-                $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
-                if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
-            	    isfile($ofile) == 0) {
-                        $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
-                        $curr_src_file = $sources.item($i);
-                        $run_list.add_item(gcc_mk_app_compilation_command($curr_src_file,
-                    			 			          $ofile,
-                                                                          $includes,
-                                                                          $cflags,
-                                                                          $is_release));
-                        $not_compiled_tmp.add_item($sources.item($i));
-                }
-                if ($run_list.count() == $qsize) {
-                    $exit_code = hefesto.sys.run($run_list);
-                    if ($exit_code == 0) {
-                        $j = 0;
-                        while ($j < $not_compiled_tmp.count()) {
-                            $not_compiled.del_item($not_compiled_tmp.item($j));
-                            $j = $j + 1;
-                        }
-                        $not_compiled_tmp.clear();
-                        hefesto.toolset.base_refresh($not_compiled);
-                    }
-                    $run_list.clear();
-                }
-                $i = $i + 1;
+```
+    else {
+        $not_compiled_tmp.clear();
+        while ($i < $size) {
+            $ofile = $sources.item($i);
+            $ofile = gcc_mk_ofile_name(filenamefrompath($ofile), $obj_dir);
+            if (hefesto.toolset.file_has_change($sources.item($i)) == 1 ||
+                isfile($ofile) == 0) {
+                $gcc_c_project_forge_dirty_files_nr = $gcc_c_project_forge_dirty_files_nr + 1;
+                $curr_src_file = $sources.item($i);
+                $run_list.add_item(gcc_mk_app_compilation_command($curr_src_file,
+                                                                  $ofile,
+                                                                  $includes,
+                                                                  $cflags,
+                                                                  $is_release));
+                $not_compiled_tmp.add_item($sources.item($i));
             }
-            if($run_list.count() > 0) {
+            if ($run_list.count() == $qsize) {
                 $exit_code = hefesto.sys.run($run_list);
                 if ($exit_code == 0) {
                     $j = 0;
@@ -2045,10 +2199,26 @@ Now let's see the asynchronous part of this forge helper:
                         $not_compiled.del_item($not_compiled_tmp.item($j));
                         $j = $j + 1;
                     }
+                    $not_compiled_tmp.clear();
                     hefesto.toolset.base_refresh($not_compiled);
                 }
+                $run_list.clear();
+            }
+            $i = $i + 1;
+        }
+        if($run_list.count() > 0) {
+            $exit_code = hefesto.sys.run($run_list);
+            if ($exit_code == 0) {
+                $j = 0;
+                while ($j < $not_compiled_tmp.count()) {
+                    $not_compiled.del_item($not_compiled_tmp.item($j));
+                    $j = $j + 1;
+                }
+                hefesto.toolset.base_refresh($not_compiled);
             }
         }
+    }
+```
 
 The behavior is similar of the synchronous stuff. The difference is that the compiling commands are not directly executed, being they added to a list for
 executing at the end of the cycle (understand it as a command pool). Another difference here is the usage of the temporary list ``not_compiled_tmp`` which
@@ -2060,19 +2230,21 @@ processed.
 
 This function makes the commands that will be executed using the previous toolset commands:
 
-	local function gcc_mk_app_compilation_command(src_name type string,
-    	                                              outfile type string,
-        	                                      includes type string,
-            	                                      cflags type string,
-                                                      is_release type int) : result type string {
-    	    var cmd type string;
-    	    if ($is_release == 1) {
-                $cmd = hefesto.toolset.compile_r($src_name, $outfile, $includes, $cflags);
-    	    } else {
-        	$cmd = hefesto.toolset.compile_d($src_name, $outfile, $includes, $cflags);
-    	    }
-    	    result $cmd;
-	}
+```
+    local function gcc_mk_app_compilation_command(src_name type string,
+                                                  outfile type string,
+                                                  includes type string,
+                                                  cflags type string,
+                                                  is_release type int) : result type string {
+        var cmd type string;
+        if ($is_release == 1) {
+            $cmd = hefesto.toolset.compile_r($src_name, $outfile, $includes, $cflags);
+        } else {
+            $cmd = hefesto.toolset.compile_d($src_name, $outfile, $includes, $cflags);
+        }
+        result $cmd;
+    }
+```
 
 If you have understood the concepts related with the ``toolset commands``, I think this function is quite straighforward for
 you.
@@ -2093,40 +2265,41 @@ The *exit code* from the *linker* is captured and returned to the caller which w
 
 Take a look at the code listing reviewing about what you have read above:
 
-	function gcc_link_ofiles(objects type string,
+```
+    function gcc_link_ofiles(objects type string,
                              libraries type string,
                              ldflags type string,
                              appname type string) : result type int {
-	    var exit_code type int;
-    	    var link_model type list;
-    	    var is_static type int;
-    	    $link_model = hefesto.sys.get_option("link-model");
-    	    $is_static = 0;
-    	    if ($link_model.count() > 0) {
-        	if ($link_model.item(0) == "static") {
-            	    $is_static = 1;
-        	} else {
-            	    if ($link_model.item(0) != "shared") {
-                	hefesto.sys.echo(hefesto.project.toolset() +
-                    		" internal error: unknown link model: \"" +
-                            $link_model.item(0) + "\"\n");
-                	result 1;
-            	    }
-        	}
-    	    }
-    	    if ($is_static == 1) {
-        	$exit_code = hefesto.sys.run(
-            	hefesto.toolset.link_static($appname,
-                     			    $objects,
-                                            $libraries, $ldflags));
-    	    } else {
- 	        $exit_code = hefesto.sys.run(
-                hefesto.toolset.link_shared($appname,
-            				    $objects,
-                                            $libraries, $ldflags));
-    	    }
-    	    result $exit_code;
-	}
+        var exit_code type int;
+        var link_model type list;
+        var is_static type int;
+        $link_model = hefesto.sys.get_option("link-model");
+        $is_static = 0;
+        if ($link_model.count() > 0) {
+            if ($link_model.item(0) == "static") {
+                $is_static = 1;
+            } else {
+                if ($link_model.item(0) != "shared") {
+                    hefesto.sys.echo(hefesto.project.toolset() +
+                                     " internal error: unknown link model: \"" +
+                                     $link_model.item(0) + "\"\n");
+                    result 1;
+                }
+            }
+        }
+        if ($is_static == 1) {
+            $exit_code = hefesto.sys.run(hefesto.toolset.link_static($appname,
+                                                                     $objects,
+                                                                     $libraries, $ldflags));
+        } else {
+            $exit_code = hefesto.sys.run(
+            hefesto.toolset.link_shared($appname,
+                                        $objects,
+                                        $libraries, $ldflags));
+        }
+        result $exit_code;
+    }
+```
 
 Well, all done. A good exercise is try to create a ``toolset`` for automating something based on your own necessities. It is not necessary to be related with
 compilers. For example, you can try to create a ``toolset`` which does the *deploy* of your package, etc. Be creative!
