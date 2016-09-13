@@ -39,7 +39,7 @@ then
     COMPILER_OPTS=$(echo $COMPILER_OPTS | sed s/-DHVM_ASYNC_RQUEUE//)
 fi
 
-if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD"
+if test "$PLATFORM" = "FreeBSD" || test "$PLATFORM" = "Minix" || test "$PLATFORM" = "NetBSD" || test "$PLATFORM" = "OpenBSD"
 then
     LINKERFLAGS="-lexecinfo"
 else
@@ -92,7 +92,7 @@ fi
 if [ -d /usr/local/lib ] ;
 then
     LINKER_OPTS=${LINKER_OPTS}" -L/usr/local/lib"
-    HERE_FLAGS=${HERE_FLAGS}" -L/usr/locallib"
+    HERE_FLAGS=${HERE_FLAGS}" -L/usr/local/lib"
 fi
 
 HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o $HERE_FLAGS"
