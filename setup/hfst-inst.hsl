@@ -99,7 +99,12 @@ local function create_dir_tree(path type string) : result type int {
     var fullpath type string;
 
     $temp = hefesto.sys.os_name();
-    if ($temp == "linux" || $temp == "freebsd" || $temp == "minix" || $temp == "sunos" || $temp == "netbsd") {
+    if ($temp == "linux"   ||
+        $temp == "freebsd" ||
+        $temp == "minix"   ||
+        $temp == "sunos"   ||
+        $temp == "netbsd"  ||
+        $temp == "openbsd") {
         $path_sep = "/";
     } else {
         $path_sep = "\\";
@@ -159,7 +164,12 @@ local function get_path_from_filepath(filepath type string) : result type string
 
     $os_name = hefesto.sys.os_name();
 
-    if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    if ($os_name == "linux"   ||
+        $os_name == "freebsd" ||
+        $os_name == "minix"   ||
+        $os_name == "sunos"   ||
+        $os_name == "netbsd"  ||
+        $os_name == "openbsd") {
         $path_sep = "/";
     } else {
         $path_sep = "\\";
@@ -271,7 +281,11 @@ local function export_env_hefesto_var(install_dir type string) : result type int
             }
             hefesto.sys.fclose($hefesto_sh_fd);
         }
-    } else if ($os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    } else if ($os_name == "freebsd" ||
+               $os_name == "minix"   ||
+               $os_name == "sunos"   ||
+               $os_name == "netbsd"  ||
+               $os_name == "openbsd") {
         var profile type list;
         $profile = serialize_profile_file();
         $data_buf = "HEFESTO_INCLUDES_HOME=\"" + hefesto.sys.make_path($install_dir, "include") + "\"; export HEFESTO_INCLUDES_HOME\n";
@@ -408,7 +422,11 @@ local function unexport_env_hefesto_var() : result type int {
     $os_name = hefesto.sys.os_name();
     if ($os_name == "linux") {
         $unexported = (hefesto.sys.rm("/etc/profile.d/hefesto.sh") == 0);
-    } else if ($os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    } else if ($os_name == "freebsd" ||
+               $os_name == "minix"   ||
+               $os_name == "sunos"   ||
+               $os_name == "netbsd"  ||
+               $os_name == "openbsd") {
         var profile type list;
         var p type int;
         var item type string;
@@ -536,7 +554,8 @@ local function hfst_install(install_dir type string, source_files type list, des
             hefesto.sys.os_name() == "freebsd" ||
             hefesto.sys.os_name() == "minix"   ||
             hefesto.sys.os_name() == "sunos"   ||
-            hefesto.sys.os_name() == "netbsd") {
+            hefesto.sys.os_name() == "netbsd"  ||
+            hefesto.sys.os_name() == "openbsd") {
             hefesto.sys.echo("-- Setting instalation directory permissions... ");
             if (hefesto.sys.run("chmod -R 754 " + $install_dir) == 0) {
                 hefesto.sys.echo("ok!\n");
@@ -612,7 +631,12 @@ local function hfst_uninstall(install_dir type string, source_files type list) :
     }
 
     $temp = hefesto.sys.os_name();
-    if ($temp == "linux" || $temp == "freebsd" || $temp == "minix" || $temp == "sunos" || $temp == "netbsd") {
+    if ($temp == "linux"   ||
+        $temp == "freebsd" ||
+        $temp == "minix"   ||
+        $temp == "sunos"   ||
+        $temp == "netbsd"  ||
+        $temp == "openbsd") {
         $path_sep = "/";
     } else {
         $path_sep = "\\";
@@ -882,6 +906,8 @@ hefesto-install.prologue() {
         $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
     } else if ($os_name == "netbsd") {
         $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
+    } else if ($os_name == "openbsd") {
+        $prompt_str = $prompt_str + "[/usr/local/share/hefesto]: ";
     } else if ($os_name == "windows") {
         $prompt_str = $prompt_str +"[C:\\hefesto]: ";
     }
@@ -908,6 +934,8 @@ hefesto-install.prologue() {
             $install_dir = "/usr/local/share/hefesto";
         } else if ($os_name == "netbsd") {
             $install_dir = "/usr/local/share/hefesto";
+        } else if ($os_name == "openbsd") {
+            $install_dir = "/usr/local/share/hefesto";
         } else if ($os_name == "windows") {
             $install_dir = "C:\\hefesto";
         }
@@ -918,7 +946,12 @@ hefesto-install.prologue() {
     #
 
     # Doc files
-    if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    if ($os_name == "linux"   ||
+        $os_name == "freebsd" ||
+        $os_name == "minix"   ||
+        $os_name == "sunos"   ||
+        $os_name == "netbsd"  ||
+        $os_name == "openbsd") {
         $source_files.add_item("../doc/man/hefesto.1");
     }
     $source_files.add_item("../doc/html/imgs/200712080908-3531.jpg");
@@ -930,7 +963,12 @@ hefesto-install.prologue() {
     $source_files.add_item("../doc/html/module-writing-guidelines.html");
 
     # The binaries
-    if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    if ($os_name == "linux"   ||
+        $os_name == "freebsd" ||
+        $os_name == "minix"   ||
+        $os_name == "sunos"   ||
+        $os_name == "netbsd"  ||
+        $os_name == "openbsd") {
         $source_files.add_item("../bin/hefesto");
     } else {
         $source_files.add_item("../bin/hefesto.exe");
@@ -999,7 +1037,12 @@ hefesto-install.prologue() {
     # Destinations
     #
 
-    if ($os_name == "linux" || $os_name == "freebsd" || $os_name == "minix" || $os_name == "sunos" || $os_name == "netbsd") {
+    if ($os_name == "linux"   ||
+        $os_name == "freebsd" ||
+        $os_name == "minix"   ||
+        $os_name == "sunos"   ||
+        $os_name == "netbsd"  ||
+        $os_name == "openbsd") {
         # Doc files
         $dest_files.add_item("/usr/local/man/man1/hefesto.1");
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "doc/html/imgs/200712080908-3531.jpg"));
