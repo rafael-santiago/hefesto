@@ -89,10 +89,20 @@ else
     HERE_FLAGS="-ldl"
 fi
 
+if [ -d /usr/local/lib ] ;
+then
+    LINKER_OPTS=${LINKER_OPTS}" -L/usr/local/lib"
+    HERE_FLAGS=${HERE_FLAGS}" -L/usr/locallib"
+fi
+
 HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o $HERE_FLAGS"
 
-LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
+if test $(echo $COMPILER_OPTS | grep "HVM_ASYNC_RQUEUE" | wc -l) = 1
+then
+    HERE_UNIT_TEST=${HERE_UNIT_TEST}" -lpthread"
+fi
 
+LIBHERE_OBJS="here.o here_ctx.o here_mmachine.o here_mem.o"
 
 # I know... this is ugly... boo!
 
