@@ -93,6 +93,7 @@ if [ -d /usr/local/lib ] ;
 then
     LINKER_OPTS=${LINKER_OPTS}" -L/usr/local/lib"
     HERE_FLAGS=${HERE_FLAGS}" -L/usr/local/lib"
+    UNIT_TEST=${UNIT_TEST}" -L/usr/local/lib"
 fi
 
 HERE_UNIT_TEST="-ohere_unittest main.o ../libhere.a cutest/src/cutest.o cutest/src/cutest_memory.o cutest/src/cutest_mmap.o $HERE_FLAGS"
