@@ -116,8 +116,13 @@ char *hefesto_make_path(const char *root, const char *path, size_t max_sz) {
         *r = *p;
     }
 
-    if (*(r-1) != HEFESTO_PATH_SEP) {
-        *r = HEFESTO_PATH_SEP;
+    if (*root != 0) {
+        if (*(r-1) != HEFESTO_PATH_SEP) {
+            *r = HEFESTO_PATH_SEP;
+            r++;
+        }
+    } else {
+        *r = '/';
         r++;
     }
 
