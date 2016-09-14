@@ -25,6 +25,7 @@
 
 include ../../Toolsets.hsl
 include ../../Forgeutils.hsl
+include ~/fsutil.hsl
 
 var sources type list;
 var includes type list;
@@ -75,8 +76,14 @@ hfst-unit.prologue() {
     }
     if ($exit_code == 0) {
         $includes = hefesto.sys.get_option("includes");
+        if (isdir("/usr/local/include")) {
+            $includes.add_item("/usr/local/include");
+        }
         $includes.add_item("cutest/src");
         $libraries = hefesto.sys.get_option("libraries");
+        if (isdir("/usr/local/lib")) {
+            $libraries.add_item("/usr/local/lib");
+        }
         $ldflags = hefesto.sys.get_option("ldflags");
         $ldflags.add_item("cutest/src/lib/libcutest.a");
         $cflags = hefesto.sys.get_option("cflags");
@@ -90,14 +97,21 @@ hfst-unit.prologue() {
         }
         if ($os_name == "linux") {
             $ldflags.add_item("-ldl");
+            $ldflags.add_item("-lpthread");
         } else if ($os_name == "freebsd") {
             $ldflags.add_item("-lexecinfo");
+            $ldflags.add_item("-lpthread");
         } else if ($os_name == "minix") {
             $ldflags.add_item("-lexecinfo");
         } else if ($os_name == "sunos") {
             $cflags.add_item("-DNO_CUTEST_BACKTRACING");
+            $ldflags.add_item("-lpthread");
         } else if ($os_name == "netbsd") {
             $ldflags.add_item("-lexecinfo");
+            $ldflags.add_item("-lpthread");
+        } else if ($os_name == "openbsd") {
+            $ldflags.add_item("-lexecinfo");
+            $ldflags.add_item("-lpthread");
         }
     } else {
         hefesto.project.abort($exit_code);

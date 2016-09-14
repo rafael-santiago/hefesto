@@ -27,6 +27,7 @@ include Toolsets.hsl
 include Forgeutils.hsl
 include ~/toolsets/common/utils/lang/c/dependency_scanner.hsl
 include ~/string.hsl
+include ~/fsutil.hsl
 include version_handler.hsl
 
 var sources type list;
@@ -62,7 +63,15 @@ function config_basic_ld_deps() : result type none {
     } else if ($os == "netbsd") {
         $ldflags.add_item("-lpthread");
         $ldflags.add_item("-lexecinfo");
+    } else if ($os == "openbsd") {
+        $ldflags.add_item("-lpthread");
+        $ldflags.add_item("-lexecinfo");
     }
+
+    if (isdir("/usr/local/lib")) {
+        $libraries.add_item("/usr/local/lib");
+    }
+
     if (hefesto.sys.os_name() == "windows") {
         $ldflags.del_item("-rdynamic");
     }
@@ -79,6 +88,9 @@ hefesto.prologue() {
         if (hefesto.sys.last_forge_result() == 0) {
             # Getting user options if it exists
             $includes = hefesto.sys.get_option("includes");
+            if (isdir("/usr/local/include")) {
+                $includes.add_item("/usr/local/include");
+            }
             $libraries = hefesto.sys.get_option("libraries");
             $ldflags = hefesto.sys.get_option("ldflags");
             $cflags = hefesto.sys.get_option("cflags");
