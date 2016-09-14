@@ -94,8 +94,6 @@ memory area slice and I am intending to store this kind of trinket inside, okay?
 I think it is a good thing to do (talking about programming languages design) because this feature jumps from the device
 to the programmers' mind so at the moment of the declaration the user will think better about the variable's implications.
 
-I personally dislike "Donnie Darkos" jumping from nowhere along the code's body :)
-
 Backing to the code, these declared variables are used by the forge function (the entry-point to the more internal and generic parts of the build).
 
 After these declarations we have got the project declaration. Saying:
