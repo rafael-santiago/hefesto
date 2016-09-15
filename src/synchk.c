@@ -2130,7 +2130,7 @@ hefesto_int_t is_hefesto_numeric_constant(const char *number) {
 
 char *get_arg_from_call(const char *call, size_t *offset) {
 
-    const char *cp = (call + *offset);
+    const char *cp = (call + *offset), *cp_end = NULL;
     char *arg = (char *) malloc(HEFESTO_MAX_BUFFER_SIZE);
     char *a;
     char *t;
@@ -2143,13 +2143,17 @@ char *get_arg_from_call(const char *call, size_t *offset) {
 
     memset(arg, 0, HEFESTO_MAX_BUFFER_SIZE);
 
-    if (*cp == 0) return arg;
+    if (*cp == 0) {
+        return arg;
+    }
+
+    cp_end = cp + strlen(cp);
 
     while (is_hefesto_blank(*cp)) cp++;
 
     a = arg;
 
-    while (*cp != ',' && *cp != ';' && *cp != 0) {
+    while (*cp != ',' && *cp != ';' && cp < cp_end /*&& *cp != 0*/) {
         if (*cp == '(') {
             o++;
         } else if (*cp == ')') {
@@ -2159,7 +2163,7 @@ char *get_arg_from_call(const char *call, size_t *offset) {
             *a = *cp;
             a++;
             cp++;
-            while (!is_hefesto_string_tok(*cp) && *cp != 0) {
+            while (!is_hefesto_string_tok(*cp) && cp < cp_end /**cp != 0*/) {
                 *a = *cp;
                 if (*cp == '\\') {
                     *a = *cp;
@@ -2178,7 +2182,9 @@ char *get_arg_from_call(const char *call, size_t *offset) {
             }
             *a = *cp;
             a++;
-            cp++;
+            if (cp < cp_end) {
+                cp++;
+            }
         } else {
             *a = *cp;
             cp++;
