@@ -239,7 +239,7 @@ static void *eval_string_constant(char *s, size_t *osize) {
     result = (char *) hefesto_mloc(*osize + 1);
     memset(result, 0, *osize + 1);
 
-    memcpy(result, tmp, *osize + 1);
+    memcpy(result, tmp, *osize);
 
     free(tmp);
 
