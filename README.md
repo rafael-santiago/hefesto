@@ -1,6 +1,6 @@
 # Hefesto
 
-``Hefesto`` is a multi platform build system which currently runs on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris``, ``NetBSD`` and ``Windows``.
+``Hefesto`` is a multi platform build system which currently runs on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris``, ``NetBSD``, ``OpenBSD`` and ``Windows``.
 
 The main ``Hefesto's`` feature is allow a more programatic build scripting.
 
@@ -11,6 +11,10 @@ Seeking:
 - Clarity
 - Organization
 - Expansibility
+
+In practice, you can avoid doing build tasks like this:
+
+![Rube Goldberg Machine / Public Domain](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif "Collier's, September 26 1931 Rube Goldberg's Machine for Self-Operating Napkin / Public Domain")
 
 This application can help not only a small amount of programmers which use some specific languages and toolsets. ``Hefesto`` helps on automating several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend ``Hefesto``.
 

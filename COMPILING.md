@@ -10,9 +10,12 @@ If you are on ``Solaris`` maybe you should read the remarks on [Pain avoidance w
 
 If you are on a ``NetBSD`` box you should read the remarks on [Of course it clones on NetBSD](#of-course-it-clones-on-netbsd).
 
+If you are on ``OpenBSD`` you need ``libexecinfo``. When I wrote this remark I used ``libexecinfo-0.3v0`` on ``OpenBSD 6.0``.
+``Git`` seems to work fine over it so anything tricky will be necessary there.
+
 Now, in order to build ``Hefesto`` from the first time you need to use the "src/build.sh" or the "src/build.bat"
 
-If you are on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris`` or ``NetBSD`` use: ./build.sh
+If you are on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris``, ``NetBSD`` or ``OpenBSD`` use: ./build.sh
 
 If you are on ``Windows`` use: build.bat
 
@@ -22,7 +25,9 @@ The installation is pretty straightforward just follow the steps.
 
 After installing you need to perform a new login in order to load some environment variables.
 
-Now you can start reading the [documention](https://github.com/rafael-santiago/hefesto/tree/master/doc) in order to master this build tool.
+Now you can follow reading the [documention](https://github.com/rafael-santiago/hefesto/tree/master/doc) in order to master this build tool.
+
+I hope you like it, enjoy!
 
 ## Additional steps for cloning it on MINIX
 
