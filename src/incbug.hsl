@@ -1,9 +1,0 @@
-include ~/fsutil.hsl
-include mytrampoline.hsl
-#include hls-test.hsl
-function funcao_bugosa() : result type int {
-    hefesto.sys.echo("funcao_bugosa is running...\n");
-#    hefesto.sys.echo("tolowercase = " + tolwrcase("AAA") + "\n");
-    trampoline();
-    result isdir("boo");
-}

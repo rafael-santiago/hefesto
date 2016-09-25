@@ -16,7 +16,7 @@ In practice, you can avoid doing build tasks like this:
 
 ![Rube Goldberg Machine / Public Domain](https://upload.wikimedia.org/wikipedia/commons/a/a9/Rube_Goldberg%27s_%22Self-Operating_Napkin%22_%28cropped%29.gif "Collier's, September 26 1931 Rube Goldberg's Machine for Self-Operating Napkin / Public Domain")
 
-This application can help not only a small amount of programmers which use some specific languages and toolsets. ``Hefesto`` helps on automating several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend ``Hefesto``.
+This application can help not only a small amount of programmers who use some specific languages and toolsets. ``Hefesto`` helps on automating several tasks that go beyond just compiling and linking programs. It depends on your necessity and disposition to extend ``Hefesto``.
 
 When you extend ``Hefesto`` it does not mean that you need to recompile the application. All is done via ``HSL``, the domain specific language which ``Hefesto`` implements.
 
