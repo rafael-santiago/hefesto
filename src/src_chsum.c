@@ -76,6 +76,7 @@ static unsigned short get_buffer_chsum(const char *buffer, size_t buffer_size,
     unsigned int sum = chsum;
     const char *buffer_end = buffer + buffer_size, *bp;
     unsigned short add = 0;
+    unsigned short ctr = 1;
     if (buffer == NULL) {
         return 1;
     }
@@ -88,7 +89,8 @@ static unsigned short get_buffer_chsum(const char *buffer, size_t buffer_size,
             add |= *bp;
             bp++;
         }
-        sum += add;
+        sum += (add ^ ctr);
+        ctr += 1;
     }
     while (sum >> 16) {
         sum = (sum >> 16) + (sum & 0x0000ffff);
