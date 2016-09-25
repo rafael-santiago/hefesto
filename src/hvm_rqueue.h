@@ -14,4 +14,8 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist);
 
 void hvm_rqueue_set_queue_size(const hefesto_uint_t new_size);
 
+void init_rqueue_mutex();
+
+void deinit_rqueue_mutex();
+
 #endif  // HEFESTO_HVM_RQUEUE_H

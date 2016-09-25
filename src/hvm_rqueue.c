@@ -24,7 +24,7 @@ static hefesto_thread_routine_t hefesto_async_run(void *args);
     HEFESTO_TGT_OS == HEFESTO_NETBSD  ||\
     HEFESTO_TGT_OS == HEFESTO_OPENBSD
 
-pthread_mutex_t run_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t run_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #else  // HEFESTO_TGT_OS == X
 
@@ -41,6 +41,23 @@ struct hvm_rqueue_ctx {
 };
 
 #ifdef HVM_ASYNC_RQUEUE
+
+void init_rqueue_mutex() {
+#ifndef _WIN32
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&run_mutex, &attr);
+#else
+    run_mutex = CreateMutex(NULL, FALSE, NULL);
+#endif
+}
+
+void deinit_rqueue_mutex() {
+#ifdef _WIN32
+    CloseHandle(run_mutex);
+#endif
+}
 
 hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
@@ -162,6 +179,12 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
 
 }
 #else  // HVM_ASYNC_RQUEUE
+
+void init_rqueue_mutex() {
+}
+
+void deinit_rqueue_mutex() {
+}
 
 hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
     hefesto_common_list_ctx *p;

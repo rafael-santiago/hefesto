@@ -11,6 +11,7 @@
 #include "hvm_mod.h"
 #include "structs_io.h"
 #include "options.h"
+#include "hvm_rqueue.h"
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX   ||\
     HEFESTO_TGT_OS == HEFESTO_FREEBSD ||\
@@ -39,10 +40,13 @@ void hefesto_init(hefesto_options_ctx *options) {
     } else {
         set_modules_home(NULL);
     }
+
+    init_rqueue_mutex();
 }
 
 void hefesto_deinit() {
     clear_hefesto_file_ptr_pool();
     hvm_mod_ldmod_table_cleanup();
     unset_modules_home();
+    deinit_rqueue_mutex();
 }
