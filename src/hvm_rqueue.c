@@ -123,8 +123,6 @@ hefesto_int_t hvm_rqueue_run(hefesto_common_list_ctx *plist) {
     hefesto_common_list_ctx *pp;
     hefesto_rqueue_ctx *rqueue = NULL, *rqp;
 
-    run_mutex = CreateMutex(NULL, FALSE, NULL);
-
     if (plist == NULL) return 1;
 
     if (plist->is_dummy_item) return 1;
