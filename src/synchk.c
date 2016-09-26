@@ -1354,7 +1354,7 @@ hefesto_int_t synchk_list_method_statement(const char *statement,
                                 HLSCM_SYN_ERROR_INCOMP_TYPE_IN_FN_ARG_LIST,
                                 statement, arg + 1);
                             }
-                        } else {
+                        } else if (!is_valid_expression(arg, lo_vars, gl_vars, fn)) {
                             result = 0;
                             hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_UNDECL_VAR,
                                       statement);
