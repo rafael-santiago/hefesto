@@ -2,7 +2,7 @@
 
 ``Hefesto`` is a multi platform build system which currently runs on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris``, ``NetBSD``, ``OpenBSD`` and ``Windows``.
 
-The main ``Hefesto's`` feature is allow a more programatic build scripting.
+The main ``Hefesto's`` feature is allow a more programmatic build scripting.
 
 In order to do it ``Hefesto`` uses his own language (more procedural than declarative).
 
