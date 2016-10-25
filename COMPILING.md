@@ -17,6 +17,9 @@ Now, in order to build ``Hefesto`` from the first time you need to use the "src/
 
 If you are on ``Linux``, ``FreeBSD``, ``MINIX``, ``Solaris``, ``NetBSD`` or ``OpenBSD`` use: ./build.sh
 
+**Remarks for FreeBSD users**: as you know by default ``FreeBSD`` uses ``csh`` and the ``build.sh`` was written taking in consideration ``bash``
+conveniences. So you should run it by ``/usr/local/bin/bash build.sh``. Now, if your default shell is ``bash`` just call the script directly.
+
 If you are on ``Windows`` use: build.bat
 
 Both commands will compile and linking the application, it will run the tests and so use the ``Hefesto`` to install the ``Hefesto`` ;)

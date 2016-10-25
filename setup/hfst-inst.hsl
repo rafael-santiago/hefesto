@@ -293,6 +293,13 @@ local function export_env_hefesto_var(install_dir type string) : result type int
         $data_buf = "HEFESTO_MODULES_HOME=\"" + hefesto.sys.make_path($install_dir, "module") + "\"; export HEFESTO_MODULES_HOME\n";
         $profile.add_item($data_buf);
         $exported = flush_profile_file($profile);
+        if (is_using_csh()) {
+            var login_lines type list;
+            $login_lines = serialize_login_file();
+            $login_lines.add_item("setenv HEFESTO_INCLUDES_HOME " + hefesto.sys.make_path($install_dir, "include"));
+            $login_lines.add_item("setenv HEFESTO_MODULES_HOME " + hefesto.sys.make_path($install_dir, "module"));
+            $exported = flush_login_file($login_lines);
+        }
     } else if ($os_name == "windows") {
         var reg_cmd type string;
         var backshd_dir type string;
@@ -365,11 +372,53 @@ local function serialize_env_path(path type string) : result type list {
     result $path_lst;
 }
 
+local function serialize_login_file() : result type list {
+    result hefesto.sys.lines_from_file(hefesto.sys.make_path(hefesto.sys.env("HOME"), ".login"), ".*");
+}
+
+local function flush_login_file(login_lines type list) : result type int {
+    var l type int;
+    var lp type file;
+
+    if ($login_lines.count() == 0) {
+        result 1;
+    }
+
+    $lp = hefesto.sys.fopen(hefesto.sys.make_path(hefesto.sys.env("HOME"), ".login"), "w");
+
+    if ($lp == 0) {
+        result 0;
+    }
+
+    $l = 0;
+    while ($l < $login_lines.count()) {
+        var line type string;
+        $line = $login_lines.item($l);
+        if ($line != "\n") {
+            $line = $line + "\n";
+        }
+        hefesto.sys.fwrite($line, $line.len(), $lp);
+        $l = $l + 1;
+    }
+
+
+    hefesto.sys.fclose($lp);
+
+    result 1;
+}
+
+local function is_using_csh() : result type int {
+    var shell_var type string;
+    $shell_var = hefesto.sys.env("SHELL");
+    result ($shell_var.match(".*/csh$") > 0);
+}
+
 local function serialize_profile_file() : result type list {
     var profd type file;
     var line type string;
     var byte type string;
     var lst type list;
+
     $profd = hefesto.sys.fopen("/etc/profile", "r");
     $line = "";
     $byte = "";
@@ -441,10 +490,25 @@ local function unexport_env_hefesto_var() : result type int {
             $p = $p + 1;
         }
         $unexported = flush_profile_file($profile);
+        if (is_using_csh()) {
+            var login_lines type list;
+            $login_lines = serialize_login_file();
+            var l type int;
+            $l = 0;
+            while ($l < $login_lines.count()) {
+                var login_line type string;
+                $login_line = $login_lines.item($l);
+                if ($login_line.match("setenv HEFESTO_INCLUDES_HOME ") == 1 || $login_line.match("setenv HEFESTO_MODULES_HOME ") == 1) {
+                    $login_lines.del_index($l);
+                    $l = $l - 1;
+                }
+                $l = $l + 1;
+            }
+            $unexported = flush_login_file($login_lines);
+        }
     } else if ($os_name == "windows") {
         $unexported = (hefesto.sys.unsetenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\HEFESTO_INCLUDES_HOME") == 0);
         if ($unexported == 1) {
-            var l type int;
             var path_lst type list;
             $path_lst = serialize_env_path(get_windows_path_env_var_content());
             $l = 0;
@@ -460,7 +524,7 @@ local function unexport_env_hefesto_var() : result type int {
             $unexported = (hefesto.sys.setenv("WINREG:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\PATH", $env_path) == 0);
         }
     }
-    result $unexported;
+    result 1; #  Let's ignore unexporting status.
 }
 
 local function brk_test() : result type int { # WTF???! I don't know....
