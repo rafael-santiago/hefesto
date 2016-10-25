@@ -352,30 +352,18 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
         free(arg_pf);
         free(e);
 
-        if (*(arg_list + offset) == ',') {
+        if (arg_list_cpy[offset] == ',') {
             offset++;
         }
 
-        e = get_arg_from_call(arg_list, &offset);
+        e = get_arg_from_call(arg_list_cpy, &offset);
 
-        if (arg_list_size == real_arg_list_size) {
-
-            if (*e) {
-                strcat(retval, ",");
-            } else {
-                strcat(retval, ")");
-            }
-
+        if (*e) {
+            strcat(retval, ",");
         } else {
-
-            if (*e && offset < arg_list_size + 2) {
-                strcat(retval, ",");
-            } else {
-                strcat(retval, ")");
-                break;
-            }
-
+            strcat(retval, ")");
         }
+
     }
 
     free(e);
