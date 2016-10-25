@@ -2914,3 +2914,29 @@ static void apply_function_readdressing(hefesto_command_list_ctx **commands,
     }
 }
 
+const char *get_stmt_end(const char *buf, const size_t buf_size) {
+    const char *bp, *bp_end;
+
+    if (buf == NULL) {
+        return NULL;
+    }
+
+    bp = buf;
+
+    bp_end = bp + buf_size;
+
+    while (bp != bp_end && *bp != ';') {
+        if (is_hefesto_string_tok(*bp)) {
+            bp++;
+            while (is_hefesto_string_tok(*bp)) {
+                if (*bp == '\\') {
+                    bp++;
+                }
+                bp++;
+            }
+        }
+        bp++;
+    }
+
+    return bp;
+}

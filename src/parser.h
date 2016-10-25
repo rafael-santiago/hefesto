@@ -65,4 +65,6 @@ hefesto_func_list_ctx *compile_and_load_hsl_code(const char *hls_main,
 
 const char *get_arg_list_start_from_call(const char *call_buf);
 
+const char *get_stmt_end(const char *buf, const size_t buf_size);
+
 #endif  // HEFESTO_PARSER_H

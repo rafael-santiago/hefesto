@@ -3279,6 +3279,19 @@ CUTE_TEST_CASE(hvm_list_int_list_values_tests)
     del_hefesto_func_list_ctx(functions);
 CUTE_TEST_CASE_END
 
+CUTE_TEST_CASE(get_stmt_end_tests)
+    char *buf = "\t\tappend_to_cmd_buffer($data, \"-I\", $includes);\n\n"
+                "\t\tget_addl_impl_files($sources, $includes);\n\n"
+                "\t\tappend_to_cmd_buffer($data, \"\", $cflags);\n\n"
+                "\t\t$data = $data + \"\\n\"\n"
+                "\t}";
+    const size_t buf_size = strlen(buf);
+    const char *expected_end = &buf[46];
+    const char *stmt_end = get_stmt_end(buf, buf_size);
+    CUTE_ASSERT(stmt_end == expected_end);
+    CUTE_ASSERT(get_stmt_end(NULL, 999) == NULL);
+CUTE_TEST_CASE_END
+
 CUTE_TEST_CASE(run_tests)
     printf("* running tests...\n");
     CUTE_RUN_TEST(hefesto_common_stack_ctx_tests);
@@ -3286,6 +3299,7 @@ CUTE_TEST_CASE(run_tests)
     CUTE_RUN_TEST(hefesto_var_list_ctx_tests);
     CUTE_RUN_TEST(hefesto_func_list_ctx_tests);
     CUTE_RUN_TEST(options_tests);
+    CUTE_RUN_TEST(get_stmt_end_tests);
     CUTE_RUN_TEST(hsl_compilation_tests);
     CUTE_RUN_TEST(hvm_str_conversion_tests);
     CUTE_RUN_TEST(hvm_str_format_tests);

@@ -20,25 +20,25 @@
                            o == '|' || o == '^' || o == '%' || o == '!')
 
 static struct hefesto_expr_ops_ctx HEFESTO_EXPR_OPS[HEFESTO_EXPR_OPS_NR] = {
-  hefesto_set_expr_op("+\0", 1),
-  hefesto_set_expr_op("-\0", 1),
-  hefesto_set_expr_op("*\0", 2),
-  hefesto_set_expr_op("/\0", 2),
-  hefesto_set_expr_op("==\0", 1),
-  hefesto_set_expr_op(">>\0", 1),
-  hefesto_set_expr_op("<<\0", 1),
-  hefesto_set_expr_op("&&\0", 0),
-  hefesto_set_expr_op("||\0", 0),
-  hefesto_set_expr_op("&\0", 0),
-  hefesto_set_expr_op("|\0", 0),
-  hefesto_set_expr_op("^\0", 0),
-  hefesto_set_expr_op("=\0", 0),
-  hefesto_set_expr_op("%\0", 1),
-  hefesto_set_expr_op("<=\0", 1),
-  hefesto_set_expr_op(">=\0", 1),
-  hefesto_set_expr_op("<\0", 1),
-  hefesto_set_expr_op(">\0", 1),
-  hefesto_set_expr_op("!=\0", 1)
+  hefesto_set_expr_op("+", 1),
+  hefesto_set_expr_op("-", 1),
+  hefesto_set_expr_op("*", 2),
+  hefesto_set_expr_op("/", 2),
+  hefesto_set_expr_op("==", 1),
+  hefesto_set_expr_op(">>", 1),
+  hefesto_set_expr_op("<<", 1),
+  hefesto_set_expr_op("&&", 0),
+  hefesto_set_expr_op("||", 0),
+  hefesto_set_expr_op("&", 0),
+  hefesto_set_expr_op("|", 0),
+  hefesto_set_expr_op("^", 0),
+  hefesto_set_expr_op("=", 0),
+  hefesto_set_expr_op("%", 1),
+  hefesto_set_expr_op("<=", 1),
+  hefesto_set_expr_op(">=", 1),
+  hefesto_set_expr_op("<", 1),
+  hefesto_set_expr_op(">", 1),
+  hefesto_set_expr_op("!=", 1)
 };
 
 #undef hefesto_set_expr_op
@@ -303,51 +303,83 @@ ssize_t get_op_index(const char *op) {
 
 char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
     char *e = NULL;
-    const char *ap = arg_list;
+    const char *ap = NULL, *ap_end = NULL;
     char *arg_pf = NULL;
     size_t offset = 0;
     size_t real_arg_list_size = 0;
     char *retval = NULL;
+    char arg_list_cpy[HEFESTO_MAX_BUFFER_SIZE];
+
     if (arg_list == NULL) {
         return NULL;
     }
+
+    memset(arg_list_cpy, 0, sizeof(arg_list_cpy));
+    strncpy(arg_list_cpy, arg_list, sizeof(arg_list_cpy) - 1);
+    real_arg_list_size = strnlen(arg_list_cpy, sizeof(arg_list_cpy));
+
+    ap_end = get_stmt_end(arg_list_cpy, real_arg_list_size);
+
+    ap = &arg_list_cpy[0];
+
+    if (ap_end != NULL) {
+        memset((char *)ap_end, 0, real_arg_list_size - (ap_end - ap));
+    }
+
     while (*ap != '(' && *ap != 0) {
         ap++;
     }
+
     if (*ap == 0) {
         return NULL;
     }
-    real_arg_list_size = strlen(arg_list);
+
     ap++;
+
     retval = (char *) hefesto_mloc(arg_list_size * 2);
+
     memset(retval, 0, arg_list_size * 2);
+
     *retval = '(';
+
     e = get_arg_from_call(ap, &offset);
+
     while (*e) {
+
         arg_pf = infix2postfix(e, strlen(e), 1);
         strcat(retval, arg_pf);
+
         free(arg_pf);
         free(e);
+
         if (*(arg_list + offset) == ',') {
             offset++;
         }
+
         e = get_arg_from_call(arg_list, &offset);
+
         if (arg_list_size == real_arg_list_size) {
+
             if (*e) {
                 strcat(retval, ",");
             } else {
                 strcat(retval, ")");
             }
+
         } else {
+
             if (*e && offset < arg_list_size + 2) {
                 strcat(retval, ",");
             } else {
                 strcat(retval, ")");
                 break;
             }
+
         }
     }
+
     free(e);
+
     return retval;
 }
 
