@@ -2713,6 +2713,8 @@ static hefesto_include_list_ctx *get_includes_in_file(const char *file_path,
 
                     free(include_file);
                 }
+            } else {
+                should_include = 1;
             }
         }
         free(tok);
