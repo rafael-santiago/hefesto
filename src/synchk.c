@@ -261,6 +261,8 @@ static hefesto_int_t synchk_hefesto_project_filepath(const char *usr_calling,
                                                hefesto_var_list_ctx *gl_vars,
                                             hefesto_func_list_ctx *functions);
 
+static hefesto_int_t is_hefesto_literal_string(const char *string);
+
 struct hefesto_syntax_checker_ctx {
     hefesto_int_t (*synchk)(const char *statement, hefesto_var_list_ctx *lo_vars,
                   hefesto_var_list_ctx *gl_vars, hefesto_func_list_ctx *fn);
@@ -1212,7 +1214,7 @@ hefesto_int_t synchk_list_method_statement(const char *statement,
     char *t;
     const char *s;
     hefesto_int_t result = 0, state;
-    char *arg, *tmp_arg, *pfxd_arg;
+    char *arg, *tmp_arg;
     size_t offset = 0;
     hefesto_var_list_ctx *vp;
     here_search_program_ctx *search_program;
@@ -1302,7 +1304,21 @@ hefesto_int_t synchk_list_method_statement(const char *statement,
                                   statement);
                     }
                 } else {
-                    //tmp_arg = strip_quotes_from_string(arg);
+                    // WARN(Rafael): This code can take us to undefined behavior. Here we are
+                    //               just compiling in order to check any syntax error so
+                    //               no valid data can exist into stack and memory contexts
+                    //               because compiling is not effectively a full execution,
+                    //               what in this case will fuck with your day so bad. You
+                    //               cannot trigger for execution a trinket that can explode
+                    //               on your face, in order to see that it will not really
+                    //               explode, right? The best way for keeping your sanity is to
+                    //               forget about this paradox (it was a warning).
+                    //
+                    //               Due to it from now on only full literal strings will be
+                    //               verified to be considered valid regular expressions.
+                    //               Non-literal strings carried with invalid regexp data
+                    //               will cause run-time errors.
+                    /*
                     pfxd_arg = infix2postfix(arg, strlen(arg), 1);
                     tmp_arg = hvm_str_format(pfxd_arg, &lo_vars, &gl_vars, fn);
                     free(pfxd_arg);
@@ -1314,6 +1330,21 @@ hefesto_int_t synchk_list_method_statement(const char *statement,
                         del_here_search_program_ctx(search_program);
                     }
                     free(tmp_arg);
+                    */
+                    result = (is_hefesto_literal_string(arg) == 0);
+                    if (result == 0) {
+                        // WARN(Rafael): Literal strings -> "", "1", "2", "etc".
+                        //               Non-literal strings -> "" + "", ".*" + somefucktion(), $etc.etc($e).
+                        tmp_arg = strip_quotes_from_string(arg);
+                        if ((search_program = here_compile(tmp_arg, errors)) == NULL) {
+                            hlsc_info(HLSCM_MTYPE_SYNTAX, HLSCM_SYN_ERROR_INVAL_REGEX,
+                                      statement, errors);
+                        } else {
+                            result = 1;
+                            del_here_search_program_ctx(search_program);
+                        }
+                        free(tmp_arg);
+                    }
                 }
 
                 if (result) {
@@ -2102,6 +2133,29 @@ hefesto_int_t is_hefesto_string(const char *string) {
 
     return s && (s+1) && (*(s+1) == 0);
 
+}
+
+static hefesto_int_t is_hefesto_literal_string(const char *string) {
+    const char *s, *s_end;
+
+    for (s = string; is_hefesto_blank(*s); s++);
+
+    s_end = s + strlen(string);
+
+    if (!is_hefesto_string_tok(*s)) {
+        return 0;
+    }
+
+    s++;
+
+    while (s != s_end && !is_hefesto_string_tok(*s)) {
+        if (*s == '\\') {
+            s++;
+        }
+        s++;
+    }
+
+    return (s + 1) == s_end;
 }
 
 hefesto_int_t is_hefesto_numeric_constant(const char *number) {
