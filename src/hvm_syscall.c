@@ -1155,7 +1155,8 @@ static void *hefesto_sys_env(const char *syscall,
     HEFESTO_TGT_OS != HEFESTO_FREEBSD &&\
     HEFESTO_TGT_OS != HEFESTO_MINIX   &&\
     HEFESTO_TGT_OS != HEFESTO_NETBSD  &&\
-    HEFESTO_TGT_OS != HEFESTO_OPENBSD
+    HEFESTO_TGT_OS != HEFESTO_OPENBSD &&\
+    HEFESTO_TGT_OS != HEFESTO_SUNOS
         free(value);
 #endif  // HEFESTO_TGT_OS != X
 
