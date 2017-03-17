@@ -316,7 +316,7 @@ char *infix2postfix_args(const char *arg_list, const size_t arg_list_size) {
 
     memset(arg_list_cpy, 0, sizeof(arg_list_cpy));
     strncpy(arg_list_cpy, arg_list, sizeof(arg_list_cpy) - 1);
-#if HEFESTO_TGT_OS != HEFESTO_SUNOS
+#if HEFESTO_TGT_OS != HEFESTO_SUNOS && HEFESTO_TGT_OS != HEFESTO_WINDOWS
     real_arg_list_size = strnlen(arg_list_cpy, sizeof(arg_list_cpy));
 #else
     real_arg_list_size = strlen(arg_list_cpy);
