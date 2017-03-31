@@ -708,7 +708,17 @@ hefesto_int_t hefesto_is_relative_path(const char *path) {
     char *cwd;
     char *p, temp[HEFESTO_MAX_BUFFER_SIZE * 2];
 
-    if (path && *path == HEFESTO_PATH_SEP) return 0;
+    if (path == NULL) {
+        return 0;
+    }
+
+    if (*path == HEFESTO_PATH_SEP) {
+        return 0;
+    }
+
+    if (*path == 0) {
+        return 1;
+    }
 
     cwd = hefesto_pwd();
 

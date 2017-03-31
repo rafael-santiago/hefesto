@@ -27,6 +27,7 @@
 #include "../../hvm_rqueue.h"
 
 #include <time.h>
+#include <sys/stat.h>
 
 #if HEFESTO_TGT_OS == HEFESTO_LINUX
 
@@ -1937,6 +1938,7 @@ CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
     hefesto_var_list_ctx *lo_vars = NULL, *gl_vars = NULL;
     hefesto_func_list_ctx *func = NULL;
     FILE *fp;
+    mode_t permissions = 0;
 
     //  setting the cwd and saving fullpath to compare below.
 
@@ -2272,7 +2274,10 @@ CUTE_TEST_CASE(hvm_syscalls_filesystem_tests)
     fclose(fp);
     fp = fopen("test.dat.c", "w");
     fclose(fp);
-    mkdir("test.dat.d");
+
+    permissions = umask(0);
+    mkdir("test.dat.d", 0755);
+    umask(permissions);
 
     //  regex cp
     result = hefesto_sys_call("hefesto.sys.cp(\"test\\.dat\\.[abd]$\","
