@@ -2817,7 +2817,7 @@ for (ip = includes; ip != NULL; ip = ip->next) {
                                                                      gl_p->type);
                         } else {
                             hlsc_info(HLSCM_MTYPE_GENERAL, HLSCM_GLVAR_REDECL_IN,
-                                      includes_tail->filepath);
+                                      gl_p->name, includes_tail->filepath);
                             (*errors)++;
                         }
                     }
