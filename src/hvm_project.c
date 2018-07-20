@@ -224,8 +224,8 @@ static void *hefesto_project_options(const char *method,
                 strcat(retval, " ");
                 strcat(retval, o->option);
             }
+            strcat(retval, "=");
             for (d = o->data; d; d = d->next) {
-                strcat(retval, "=");
                 strcat(retval, d->data);
                 if (d->next != NULL) strcat(retval, ",");
             }
