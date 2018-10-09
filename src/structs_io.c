@@ -41,8 +41,6 @@ hefesto_common_stack_ctx *hefesto_common_stack_ctx_push(
 
     hefesto_common_stack_ctx *t = NULL;
 
-    if (dsize < 0) return stack;
-
     new_hefesto_common_stack_ctx(t);
 
     if (t == NULL) return stack;
