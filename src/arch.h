@@ -10,6 +10,13 @@
 
 #ifdef __GNUC__
 # if !defined(__MINGW64__) && !defined(__MINGW32__)
+# if !defined(__WORDSIZE)
+#  if defined(__amd64) || defined(__x86_64__)
+#   define __WORDSIZE 64
+#  else
+#   define __WORDSIZE 32
+#  endif
+# endif
 #  if __WORDSIZE == 32
 #   define HEFESTO_ARCH_X86 1
 #  else  // __WORDSIZE == 32
