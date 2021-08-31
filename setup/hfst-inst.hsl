@@ -1090,6 +1090,9 @@ hefesto-install.prologue() {
     $source_files.add_item("../helios/src/include/generators/codeblocks_project_generator.hsl");
     $source_files.add_item("../helios/src/include/generators/devcpp_project_generator.hsl");
     $source_files.add_item("../helios/src/include/generators/visualstudio_project_generator.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/msvc/forges/msvc_forge.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/msvc/util/msvc_utils.hsl");
+    $source_files.add_item("../helios/src/include/toolsets/msvc/msvc.hsl");
 
     # The setup files
 
@@ -1168,6 +1171,9 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/codeblocks_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/devcpp_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/generators/visualstudio_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/msvc/forges/msvc_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/msvc/util/msvc_utils.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include/toolsets/msvc/msvc.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup/LEIAME"));
@@ -1233,6 +1239,9 @@ hefesto-install.prologue() {
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\codeblocks_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\devcpp_project_generator.hsl"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\generators\\visualstudio_project_generator.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\msvc\\forges\\msvc_forge.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\msvc\\util\\msvc_utils.hsl"));
+        $dest_files.add_item(hefesto.sys.make_path($install_dir, "include\\toolsets\\msvc\\msvc.hsl"));
         # The setup files
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\README"));
         $dest_files.add_item(hefesto.sys.make_path($install_dir, "setup\\LEIAME"));
