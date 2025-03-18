@@ -705,6 +705,7 @@ hefesto_int_t hvm_forge_project(hefesto_project_ctx *project,
     }
 
     HEFESTO_CURRENT_PROJECT = last_project;
+    HEFESTO_CURRENT_DEP_CHAIN = NULL;
 
     return HEFESTO_LAST_FORGE_RESULT;
 
