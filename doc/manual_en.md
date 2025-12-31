@@ -1325,18 +1325,18 @@ The functions shown by the **Table 7** can be accessed in the following general 
 
 ### Is there an easy way of running these samples for playing with the Language?
 
-Yes, sure! When you install ``Hefesto`` together are installed a [stub](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md) ``toolset``.
+Yes, sure! When you install ``Hefesto`` together are installed a [stub](https://codeberg.org/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md) ``toolset``.
 When basing a project on this stub toolset you can call anything from inside the ``project entry points``.
 
 ### Where can I continue exploring the *HSL*?
 
-The ``HSL`` has its on repository gathering useful stuff. It is called [Helios](https://github.com/rafael-santiago/helios.git). When you clone the ``Hesfesto's`` repo
+The ``HSL`` has its on repository gathering useful stuff. It is called [Helios](https://codeberg.org/rafael-santiago/helios.git). When you clone the ``Hesfesto's`` repo
 the ``Helios`` is also cloned together (as a git-submodule). By the way, a very basic piece from ``Helios`` is installed on. By default, ``Helios`` includes documentation about its modules.
 Take a look at this documentation, it is a good thing to do before using any additional ``Hefesto`` stuff.
 
 You can also understand ``Helios`` as a ``Hefesto`` package manager or still as the ``Hefesto include`` directory.
 
-There is a code collection inside ``Helios`` called [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md).
+There is a code collection inside ``Helios`` called [hc-functions](https://codeberg.org/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md).
 Using the ``hc-functions`` is possible to perform several checkings over a current build environment. It is good for using when you want to check if the
 environment really can build your software. It can verify some software exportation, library version, etc. All is done using straightforward ``HSL`` functions
 which can be re-used, improved, extended, etc.

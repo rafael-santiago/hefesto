@@ -2,7 +2,7 @@
 
 The easiest way to clone hefesto's repo is:
 
-``git clone https://github.com/rafael-santiago/hefesto --recursive``
+``git clone https://codeberg.org/rafael-santiago/hefesto --recursive``
 
 If you are a ``MINIX`` user you should read the remarks on [Additional steps for cloning it on MINIX](#additional-steps-for-cloning-it-on-minix) before going ahead.
 
@@ -28,7 +28,7 @@ The installation is pretty straightforward just follow the steps.
 
 After installing you need to perform a new login in order to load some environment variables.
 
-Now you can follow reading the [documention](https://github.com/rafael-santiago/hefesto/tree/master/doc) in order to master this build tool.
+Now you can follow reading the [documention](https://codeberg.org/rafael-santiago/hefesto/tree/master/doc) in order to master this build tool.
 
 I hope you like it, enjoy!
 
@@ -48,18 +48,18 @@ So do the following, after cloning the main repo supposing that you have cloned 
 # cd hefesto
 # git submodule deinit helios
 # git rm helios
-# git submodule add git://github.com/rafael-santiago/helios helios
+# git submodule add git://codeberg.org/rafael-santiago/helios helios
 # git submodule deinit src/tests/unit/cutest
 # git rm src/tests/unit/cutest
-# git submodule add git://github.com/rafael-santiago/cutest src/tests/unit/cutest
+# git submodule add git://codeberg.org/rafael-santiago/cutest src/tests/unit/cutest
 # git submodule deinit src/here
 # git rm src/here
-# git submodule add git://github.com/rafael-santiago/here src/here
+# git submodule add git://codeberg.org/rafael-santiago/here src/here
 # cd src/here
 # git submodule deinit src/test/cute
 # git rm src/test/cute
 # git submodule deinit src/test/cutest
-# git submodule add git://github.com/rafael-santiago/cutest src/test/cutest
+# git submodule add git://codeberg.org/rafael-santiago/cutest src/test/cutest
 # cd ..
 ```
 
@@ -132,7 +132,7 @@ cd ${LCM}
 
 echo "blah: okay..."
 
-${WGET} https://github.com/rafael-santiago/hefesto/archive/master.zip -O hefesto.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/hefesto/archive/master.zip -O hefesto.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -142,7 +142,7 @@ fi
 
 echo "blah: so..."
 
-${WGET} https://github.com/rafael-santiago/helios/archive/master.zip -O helios.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/helios/archive/master.zip -O helios.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -152,7 +152,7 @@ fi
 
 echo "blah: Hocus pocus..."
 
-${WGET} https://github.com/rafael-santiago/cutest/archive/master.zip -O cutest.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/cutest/archive/master.zip -O cutest.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -162,7 +162,7 @@ fi
 
 echo "blah: Abracadabra..."
 
-${WGET} https://github.com/rafael-santiago/here/archive/master.zip -O here.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/here/archive/master.zip -O here.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -349,7 +349,7 @@ cd ${LCM}
 
 echo "blah: okay..."
 
-${WGET} https://github.com/rafael-santiago/hefesto/archive/master.zip -O hefesto.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/hefesto/archive/master.zip -O hefesto.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -359,7 +359,7 @@ fi
 
 echo "blah: so..."
 
-${WGET} https://github.com/rafael-santiago/helios/archive/master.zip -O helios.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/helios/archive/master.zip -O helios.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -369,7 +369,7 @@ fi
 
 echo "blah: Hocus pocus..."
 
-${WGET} https://github.com/rafael-santiago/cutest/archive/master.zip -O cutest.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/cutest/archive/master.zip -O cutest.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -379,7 +379,7 @@ fi
 
 echo "blah: Abracadabra..."
 
-${WGET} https://github.com/rafael-santiago/here/archive/master.zip -O here.zip --no-check-certificate > /dev/null 2>&1
+${WGET} https://codeberg.org/rafael-santiago/here/archive/master.zip -O here.zip --no-check-certificate > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then

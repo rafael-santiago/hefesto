@@ -1168,13 +1168,13 @@ As funções apresentadas na **Tabela 7** podem ser acessadas à partir de:
 
 ### Tem uma forma fácil de rodar esses exemplos e brincar com a Linguagem para eu me habituar?!
 
-Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md), a função de forja apenas retorna o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
+Sim, claro! Quando você instala o ``Hefesto`` juntamente com os ``toolsets`` padrão ele instala um ``toolset`` [oco](https://codeberg.org/rafael-santiago/helios/blob/master/src/include/doc/toolsets/null/README.md), a função de forja apenas retorna o número que você passa na declaração do projeto. Com isso, você pode chamar o que quiser dentro dos ``entry-points`` do projeto que criar baseado nesse ``toolset-stub``.
 
 ### Onde posso continuar explorando a *HSL*?
 
-A ``HSL`` possui um repositório próprio de códigos chamado [Helios](https://github.com/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositório do ``Hefesto`` em sua máquina e uma parte que julgo básica dele já está instalada. Por padrão, ele traz documentações acerca de seus módulos. É uma boa dar uma lida nesses documentos caso queira saber mais sobre funções de apoio que você já possui à sua disposição. Em termos práticos, o ``Helios`` pode ser entendido como o diretório de ``includes`` do ``Hefesto`` criado na cópia que você instalou.
+A ``HSL`` possui um repositório próprio de códigos chamado [Helios](https://codeberg.org/rafael-santiago/helios.git), ele inclusive foi baixado junto com o repositório do ``Hefesto`` em sua máquina e uma parte que julgo básica dele já está instalada. Por padrão, ele traz documentações acerca de seus módulos. É uma boa dar uma lida nesses documentos caso queira saber mais sobre funções de apoio que você já possui à sua disposição. Em termos práticos, o ``Helios`` pode ser entendido como o diretório de ``includes`` do ``Hefesto`` criado na cópia que você instalou.
 
-Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://github.com/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essas bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
+Existe uma coleção de códigos dentro do *Helios* que são as [hc-functions](https://codeberg.org/rafael-santiago/helios/blob/master/src/include/doc/hc/README.md), com elas é possível verificar se o ambiente onde será executada a forja possui todos os requisitos necessários para isso. Essas bibliotecas de funções ``HSL`` permite que você crie um *build* mais "parrudo". Seria interessante para quem deseja uma tolerância maior para diferentes *build-environments*, de forma a ter um *build* mais no estado da arte.
 
 ### Tirando as rodinhas: criando *Hefesto toolsets* e dominando completamente o *build-system*
 

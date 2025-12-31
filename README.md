@@ -22,4 +22,4 @@ When you extend ``Hefesto`` it does not mean that you need to recompile the appl
 
 The ``HSL`` was developed to be simple but robust.
 
-In order to build this project follow the steps in [COMPILING.md](https://github.com/rafael-santiago/hefesto/blob/master/COMPILING.md).
+In order to build this project follow the steps in [COMPILING.md](https://codeberg.org/rafael-santiago/hefesto/blob/master/COMPILING.md).
